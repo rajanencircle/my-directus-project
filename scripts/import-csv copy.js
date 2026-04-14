@@ -100,7 +100,6 @@ const PROFILES = {
 
     mainFields: {
       id: "id",
-      destination_id: "destination_id",
       cid_primarix: "cid_primarix",
       id_primarix: "id_primarix",
       cid_px_karawane: "cid_px_karawane",
@@ -113,7 +112,7 @@ const PROFILES = {
         csvColumn: "destination_id",
         targetCollection: "destinations",
         targetField: "sort",
-        directusField: "destination_id",
+        directusField: "id",
         optional: true,
       },
     },
@@ -136,8 +135,7 @@ const PROFILES = {
     localeFkField: "translations_id",
 
     mainFields: {
-      id: "id",
-      // country_id: "country_id",
+      id: "sort",
       cid_primarix: "cid_primarix",
       id_primarix: "id_primarix",
     },
@@ -162,9 +160,8 @@ const PROFILES = {
     localeFkField: "translations_id",
 
     mainFields: {
-      id: "id",
-      ISO: "ISO",
-      country_id: "country_id",
+      id: "sort",
+      ISO: "short",
     },
 
     foreignKeys: {
@@ -195,11 +192,7 @@ const PROFILES = {
     localeFkField: "translations_id",
 
     mainFields: {
-      id: "id",
-      location_tour32: "location_tour32",
-      country_id: "country_id",
-      state_id: "state_id",
-      region_id: "region_id",
+      id: "sort",
       cid_primarix: "cid_primarix",
       id_primarix: "id_primarix",
     },
@@ -246,7 +239,7 @@ const PROFILES = {
     localeFkField: "translations_id",
 
     mainFields: {
-      id: "id",
+      id: "sort",
     },
 
     foreignKeys: {},
