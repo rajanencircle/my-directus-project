@@ -26,8 +26,10 @@
 const fs = require("fs");
 
 const CONFIG = {
-  directusUrl: "http://localhost:8055",
-  directusToken: "x9BhgTAKg_fRO3Dd2obJMYCd4o2Rumh3",
+  // directusUrl: "http://localhost:8055",
+  // directusToken: "x9BhgTAKg_fRO3Dd2obJMYCd4o2Rumh3",
+  directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
+  directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
 };
 
 // =============================================================================
@@ -476,12 +478,19 @@ async function importCollection(profileName, localeMap) {
 
     // Handle m2mFields (e.g. regions_geo -> country_id)
     if (profile.m2mFields) {
-      for (const [directusField, m2mConfig] of Object.entries(profile.m2mFields)) {
+      for (const [directusField, m2mConfig] of Object.entries(
+        profile.m2mFields,
+      )) {
         const csvValue = row[m2mConfig.csvColumn];
         if (csvValue) {
-          const ids = csvValue.split(';').map(v => Number(v.trim())).filter(v => !isNaN(v));
+          const ids = csvValue
+            .split(";")
+            .map((v) => Number(v.trim()))
+            .filter((v) => !isNaN(v));
           if (ids.length > 0) {
-            mainPayload[directusField] = ids.map(id => ({ [m2mConfig.junctionField]: id }));
+            mainPayload[directusField] = ids.map((id) => ({
+              [m2mConfig.junctionField]: id,
+            }));
           }
         }
       }
