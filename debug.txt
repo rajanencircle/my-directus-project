@@ -1,0 +1,35 @@
+﻿=== Directus Multi-Collection CSV Import ===
+
+Fetching locale UUIDs...
+Found 3 locale(s): de-DE, de-CH, nl-NL
+
+=== Importing places ===
+CSV file   : ./geographies list/places_26-04-10.csv
+Collection : places
+
+Parsed 695 row(s) from CSV.
+
+Building FK mapping for country_id (countries_geo/sort)...
+
+Building FK mapping for state_id (states/sort)...
+
+Building FK mapping for region_id (regions_geo/sort)...
+
+Importing...
+
+=== Summary ===
+Γ£à Created 0 item(s) in places
+Γ£à Created 0 translation record(s) in places_translations
+
+ΓÜá∩╕Å  1390 warning(s):
+   - Row 1: FK country_id=221 not found (required)
+   - Row {"id":"1","name_en-GB":"Honolulu","name_de-DE":"Honolulu","name_ch-DE":"Honolulu","name_nl-NL":"Honolulu","location_tour32":"896","country_id":"221","state_id":"","region_id":"134","cid_primarix":"51","id_primarix":"121451"}: failed to create item ΓÇö POST /items/places ΓåÆ HTTP 400: {"errors":[{"message":"Value \"1\" for field \"id\" in collection \"places\" has to be unique.","extensions":{"collection":"places","field":"id","value":1,"code":"RECORD_NOT_UNIQUE"}}]}
+   - Row 2: FK country_id=221 not found (required)
+   - Row {"id":"2","name_en-GB":"Kailua-Kona","name_de-DE":"Kailua-Kona","name_ch-DE":"Kailua-Kona","name_nl-NL":"Kailua-Kona","location_tour32":"","country_id":"221","state_id":"","region_id":"129","cid_primarix":"51","id_primarix":"121383"}: failed to create item ΓÇö POST /items/places ΓåÆ HTTP 400: {"errors":[{"message":"Value \"2\" for field \"id\" in collection \"places\" has to be unique.","extensions":{"collection":"places","field":"id","value":2,"code":"RECORD_NOT_UNIQUE"}}]}
+   - Row 3: FK country_id=10 not found (required)
+   - Row {"id":"3","name_en-GB":"Buenos Aires","name_de-DE":"Buenos Aires","name_ch-DE":"Buenos Aires","name_nl-NL":"Buenos Aires","location_tour32":"278","country_id":"10","state_id":"","region_id":"","cid_primarix":"51","id_primarix":"3795"}: failed to create item ΓÇö POST /items/places ΓåÆ HTTP 400: {"errors":[{"message":"Value \"3\" for field \"id\" in collection \"places\" has to be unique.","extensions":{"collection":"places","field":"id","value":3,"code":"RECORD_NOT_UNIQUE"}}]}
+   - Row 4: FK country_id=10 not found (required)
+   - Row {"id":"4","name_en-GB":"El Calafate","name_de-DE":"El Calafate","name_ch-DE":"El Calafate","name_nl-NL":"El Calafate","location_tour32":"604","country_id":"10","state_id":"","region_id":"3","cid_primarix":"51","id_primarix":"3812"}: failed to create item ΓÇö POST /items/places ΓåÆ HTTP 400: {"errors":[{"message":"Value \"4\" for field \"id\" in collection \"places\" has to be unique.","extensions":{"collection":"places","field":"id","value":4,"code":"RECORD_NOT_UNIQUE"}}]}
+   - Row 5: FK country_id=10 not found (required)
+   - Row {"id":"5","name_en-GB":"El Chalten","name_de-DE":"El Chalten","name_ch-DE":"El Chalten","name_nl-NL":"El Chalten","location_tour32":"605","country_id":"10","state_id":"","region_id":"","cid_primarix":"","id_primarix":""}: failed to create item ΓÇö POST /items/places ΓåÆ HTTP 400: {"errors":[{"message":"Value \"5\" for field \"id\" in collection \"places\" has to be unique.","extensions":{"collection":"places","field":"id","value":5,"code":"RECORD_NOT_UNIQUE"}}]}
+   ... and 1380 more

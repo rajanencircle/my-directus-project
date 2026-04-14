@@ -137,9 +137,15 @@ const PROFILES = {
 
     mainFields: {
       id: "id",
-      // country_id: "country_id",
       cid_primarix: "cid_primarix",
       id_primarix: "id_primarix",
+    },
+
+    m2mFields: {
+      country_id: {
+        csvColumn: "country_id",
+        junctionField: "countries_geo_id",
+      },
     },
 
     foreignKeys: {},
@@ -151,7 +157,7 @@ const PROFILES = {
       { csvColumn: "name_nl-NL", localeCode: "nl-NL", field: "name" },
     ],
 
-    clearBeforeImport: false,
+    clearBeforeImport: true,
   },
 
   states: {
@@ -196,33 +202,36 @@ const PROFILES = {
 
     mainFields: {
       id: "id",
-      location_tour32: "location_tour32",
-      country_id: "country_id",
-      state_id: "state_id",
-      region_id: "region_id",
       cid_primarix: "cid_primarix",
       id_primarix: "id_primarix",
     },
 
     foreignKeys: {
+      location_tour32: {
+        csvColumn: "location_tour32",
+        targetCollection: "locations_tour32",
+        targetField: "id",
+        directusField: "location_tour32",
+        optional: true,
+      },
       country_id: {
         csvColumn: "country_id",
         targetCollection: "countries_geo",
-        targetField: "sort",
+        targetField: "id",
         directusField: "country_id",
         optional: false,
       },
       state_id: {
         csvColumn: "state_id",
         targetCollection: "states",
-        targetField: "sort",
+        targetField: "id",
         directusField: "state_id",
         optional: true,
       },
       region_id: {
         csvColumn: "region_id",
         targetCollection: "regions_geo",
-        targetField: "sort",
+        targetField: "id",
         directusField: "region_id",
         optional: true,
       },
@@ -235,7 +244,7 @@ const PROFILES = {
       { csvColumn: "name_nl-NL", localeCode: "nl-NL", field: "name" },
     ],
 
-    clearBeforeImport: false,
+    clearBeforeImport: true,
   },
 
   locations_tour32: {
@@ -462,6 +471,19 @@ async function importCollection(profileName, localeMap) {
       const val = row[csvCol];
       if (val !== undefined && val !== "") {
         mainPayload[fieldName] = isNaN(val) || val === "" ? val : Number(val);
+      }
+    }
+
+    // Handle m2mFields (e.g. regions_geo -> country_id)
+    if (profile.m2mFields) {
+      for (const [directusField, m2mConfig] of Object.entries(profile.m2mFields)) {
+        const csvValue = row[m2mConfig.csvColumn];
+        if (csvValue) {
+          const ids = csvValue.split(';').map(v => Number(v.trim())).filter(v => !isNaN(v));
+          if (ids.length > 0) {
+            mainPayload[directusField] = ids.map(id => ({ [m2mConfig.junctionField]: id }));
+          }
+        }
       }
     }
 
