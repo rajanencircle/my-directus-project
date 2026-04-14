@@ -1,0 +1,56 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,ISO,country_id
+1,Australian Capital Territory,Australian Capital Territory,Australian Capital Territory,Australian Capital Territory,ACT,13
+2,New South Wales,New South Wales,New South Wales,New South Wales,NSW,13
+3,Northern Territory,Northern Territory,Northern Territory,Northern Territory,NT,13
+4,Queensland,Queensland,Queensland,Queensland,QLD,13
+5,South Australia,South Australia,South Australia,South Australia,SA,13
+6,Tasmania,Tasmania,Tasmania,Tasmania,TAS,13
+7,Victoria,Victoria,Victoria,Victoria,VIC,13
+8,Western Australia,Western Australia,Western Australia,Western Australia,WA,13
+9,Rarotonga,Rarotonga,Rarotonga,Rarotonga,RAR,50
+10,Südinsel,Südinsel,Südinsel,Südinsel,SI,152
+11,Florida,Florida,Florida,Florida,FL,221
+12,North Carolina,North Carolina,North Carolina,North Carolina,NC,221
+13,South Carolina,South Carolina,South Carolina,South Carolina,SC,221
+14,North Island,Nordinsel,Nordinsel,Noordereiland,NI,152
+15,Eastern Cape,Ostkap,Ostkap,Oost-Kaap,EC,197
+16,Free State,Freistaat,Freistaat,Vrijstaat,FS,197
+17,Gauteng,Gauteng,Gauteng,Gauteng,GP,197
+18,KwaZulu-Natal,KwaZulu-Natal,KwaZulu-Natal,KwaZulu-Natal,KZN,197
+19,Limpopo,Limpopo,Limpopo,Limpopo,LP,197
+20,Mpumalanga,Mpumalanga,Mpumalanga,Mpumalanga,MP,197
+21,North West,Nordwest,Nordwest,Noordwest,NW,197
+22,Northern Cape,Nordkap,Nordkap,Noord-Kaap,NC,197
+23,Western Cape,Westkap,Westkap,West-Kaap,WC,197
+24,Easter Island,Osterinsel,Osterinsel,Paaseiland,AP,43
+25,Abu Dhabi,Abu Dhabi,Abu Dhabi,Abu Dhabi,AZ,224
+26,Dubai,Dubai,Dubai,Dubai,DU,224
+27,Alberta,Alberta,Alberta,Alberta,AB,38
+28,British Columbia,British Columbia,British Columbia,British Columbia,BC,38
+29,Newfoundland and Labrador,Neufundland und Labrador,Neufundland und Labrador,Newfoundland,NL,38
+30,Nova Scotia,Neuschottland,Neuschottland,Nova Scotia,NS,38
+31,Quebec,Quebec,Quebec,Quebec,QC,38
+32,Yukon,Yukon,Yukon,Yukon,YT,38
+33,Alaska,Alaska,Alaska,Alaska,AK,221
+34,Arizona,Arizona,Arizona,Arizona,AZ,221
+35,California,Kalifornien,Kalifornien,Californië,CA,221
+36,Colorado,Colorado,Colorado,Colorado,CO,221
+37,Georgia,Georgia,Georgia,Georgia,GA,221
+38,Hawaii,Hawaii,Hawaii,Hawaii,HI,221
+39,Illinois,Illinois,Illinois,Illinois,IL,221
+40,Iowa,Iowa,Iowa,Iowa,IA,221
+41,Kentucky,Kentucky,Kentucky,Kentucky,KY,221
+42,Massachusetts,Massachusetts,Massachusetts,Massachusetts,MA,221
+43,Minnesota,Minnesota,Minnesota,Minnesota,MN,221
+44,Missouri,Missouri,Missouri,Missouri,MO,221
+45,Montana,Montana,Montana,Montana,MT,221
+46,Nevada,Nevada,Nevada,Nevada,NV,221
+47,New Mexico,New Mexico,New Mexico,New Mexico,NM,221
+48,New York,New York,New York,New York,NY,221
+49,North Dakota,North Dakota,North Dakota,North Dakota,ND,221
+50,Oregon,Oregon,Oregon,Oregon,OR,221
+51,South Dakota,South Dakota,South Dakota,South Dakota,SD,221
+52,Texas,Texas,Texas,Texas,TX,221
+53,Utah,Utah,Utah,Utah,UT,221
+54,Washington D.C.,Washington D.C.,Washington D.C.,Washington D.C.,DC,221
+55,Washington State,Washington State,Washington State,Washington State,WA,221

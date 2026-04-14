@@ -1,0 +1,696 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,location_tour32,country_id,state_id,region_id,cid_primarix,id_primarix
+1,Honolulu,Honolulu,Honolulu,Honolulu,896,221,,134,51,121451
+2,Kailua-Kona,Kailua-Kona,Kailua-Kona,Kailua-Kona,,221,,129,51,121383
+3,Buenos Aires,Buenos Aires,Buenos Aires,Buenos Aires,278,10,,,51,3795
+4,El Calafate,El Calafate,El Calafate,El Calafate,604,10,,3,51,3812
+5,El Chalten,El Chalten,El Chalten,El Chalten,605,10,,,,
+6,"La Merced Chica, Salta","La Merced Chica, Salta","La Merced Chica, Salta","La Merced Chica, Salta",,10,,2,,
+7,"Maipu, Mendoza","Maipu, Mendoza","Maipu, Mendoza","Maipu, Mendoza",,10,,4,,
+8,Puerto Iguazu,Puerto Iguazu,Puerto Iguazu,Puerto Iguazu,1968,10,,,,
+9,"Puerto Madero, Buenos Aires","Puerto Madero, Buenos Aires","Puerto Madero, Buenos Aires","Puerto Madero, Buenos Aires",,10,,,,
+10,Salta,Salta,Salta,Salta,2120,10,,2,51,6224
+11,Ushuaia,Ushuaia,Ushuaia,Ushuaia,2513,10,,1,51,3807
+12,"Ushuaia, Tierra del Fuego","Ushuaia, Tierra del Fuego","Ushuaia, Tierra del Fuego","Ushuaia, Tierra del Fuego",,10,,,,
+13,Eagle Beach,Eagle Beach,Eagle Beach,Eagle Beach,,12,,,,
+14,Adelaide,Adelaide,Adelaide,Adelaide,14,13,5,20,51,3333
+15,Agnes Water,Agnes Water,Agnes Water,Agnes Water,17,13,4,19,,
+16,Airlie Beach,Airlie Beach,Airlie Beach,Airlie Beach,23,13,4,10,51,3346
+17,Albany,Albany,Albany,Albany,38,13,8,24,51,121851
+18,Alice Springs,Alice Springs,Alice Springs,Alice Springs,44,13,3,16,51,3336
+19,Apollo Bay,Apollo Bay,Apollo Bay,Apollo Bay,79,13,7,11,51,115328
+20,Arkaroola Village,Arkaroola Village,Arkaroola Village,Arkaroola Village,,13,5,7,,
+21,Atherton,Atherton,Atherton,Atherton,,13,4,26,,
+22,Atherton Tablelands,Atherton Tablelands,Atherton Tablelands,Atherton Tablelands,106,13,4,26,,
+23,Ayers Rock Resort (Yulara),Ayers Rock Resort (Yulara),Ayers Rock Resort (Yulara),Ayers Rock Resort (Yulara),,13,3,16,,
+24,"Barossa Valley, Lyndoch","Barossa Valley, Lyndoch","Barossa Valley, Lyndoch","Barossa Valley, Lyndoch",,13,5,20,,
+25,"Barossa Valley, Tanunda","Barossa Valley, Tanunda","Barossa Valley, Tanunda","Barossa Valley, Tanunda",,13,5,20,,
+26,"Batchelor, Litchfield NP","Batchelor, Litchfield NP","Batchelor, Litchfield NP","Batchelor, Litchfield NP",,13,3,25,,
+27,Brisbane,Brisbane,Brisbane,Brisbane,267,13,4,19,51,3337
+28,Broome,Broome,Broome,Broome,272,13,8,27,51,3331
+29,"Broome, Yardoogarra","Broome, Yardoogarra","Broome, Yardoogarra","Broome, Yardoogarra",,13,8,23,,
+30,"Bundaberg, Sharon","Bundaberg, Sharon","Bundaberg, Sharon","Bundaberg, Sharon",,13,4,19,,
+31,Busselton,Busselton,Busselton,Busselton,292,13,8,24,51,121852
+32,Cairns,Cairns,Cairns,Cairns,305,13,4,26,51,3332
+33,"Canberra, Barton","Canberra, Barton","Canberra, Barton","Canberra, Barton",,13,1,5,,
+34,Cape Range Nationalpark,Cape Range Nationalpark,Cape Range Nationalpark,Cape Range Nationalpark,,13,8,23,,
+35,"Cape Tribulation, Diwan","Cape Tribulation, Diwan","Cape Tribulation, Diwan","Cape Tribulation, Diwan",,13,4,26,,
+36,Cervantes,Cervantes,Cervantes,Cervantes,384,13,8,27,,
+37,Christmas Island,Christmas Island,Christmas Island,Christmas Island,425,13,,,51,122084
+38,Clare,Clare,Clare,Clare,,13,5,20,,
+39,Cobbold Gorge (via Forsayth),Cobbold Gorge (via Forsayth),Cobbold Gorge (via Forsayth),Cobbold Gorge (via Forsayth),,13,4,15,,
+40,Coffs Harbour,Coffs Harbour,Coffs Harbour,Coffs Harbour,453,13,2,17,,
+41,Coles Bay,Coles Bay,Coles Bay,Coles Bay,,13,6,8,,
+42,Coober Pedy,Coober Pedy,Coober Pedy,Coober Pedy,466,13,5,20,51,115752
+43,Cooktown,Cooktown,Cooktown,Cooktown,467,13,4,26,,
+44,"Cooktown, Helenvale","Cooktown, Helenvale","Cooktown, Helenvale","Cooktown, Helenvale",,13,4,26,,
+45,Coral Bay,Coral Bay,Coral Bay,Coral Bay,473,13,8,27,51,3356
+46,"Corlette, Port Stephens","Corlette, Port Stephens","Corlette, Port Stephens","Corlette, Port Stephens",,13,2,17,,
+47,Cradle Mountain Nationalpark,Cradle Mountain Nationalpark,Cradle Mountain Nationalpark,Cradle Mountain Nationalpark,,13,6,6,,
+48,"Daintree Nationalpark, Cape Tribulation","Daintree Nationalpark, Cape Tribulation","Daintree Nationalpark, Cape Tribulation","Daintree Nationalpark, Cape Tribulation",,13,4,26,,
+49,Dampier Peninsula,Dampier Peninsula,Dampier Peninsula,Dampier Peninsula,,13,8,13,,
+50,Darwin,Darwin,Darwin,Darwin,525,13,3,25,51,3338
+51,Denham,Denham,Denham,Denham,546,13,8,27,51,121849
+52,El Questro Wilderness Park,El Questro Wilderness Park,El Questro Wilderness Park,El Questro Wilderness Park,,13,8,13,,
+53,Esperance,Esperance,Esperance,Esperance,625,13,8,24,51,122079
+54,Eungella Nationalpark,Eungella Nationalpark,Eungella Nationalpark,Eungella Nationalpark,640,13,4,19,,
+55,Exmouth,Exmouth,Exmouth,Exmouth,644,13,8,27,51,6210
+56,Fitzroy Crossing,Fitzroy Crossing,Fitzroy Crossing,Fitzroy Crossing,661,13,8,13,,
+57,Fitzroy Island,Fitzroy Island,Fitzroy Island,Fitzroy Island,662,13,4,26,,
+58,Flinders,Flinders,Flinders,Flinders,,13,7,22,,
+59,Fraser Island,Fraser Island,Fraser Island,Fraser Island,698,13,4,10,,
+60,Fremantle,Fremantle,Fremantle,Fremantle,704,13,8,23,51,115327
+61,Geraldton,Geraldton,Geraldton,Geraldton,733,13,8,27,34,82162
+62,Glasshouse Mountains,Glasshouse Mountains,Glasshouse Mountains,Glasshouse Mountains,,13,4,19,,
+63,Glen Helen,Glen Helen,Glen Helen,Glen Helen,749,13,3,16,,
+64,Halls Creek,Halls Creek,Halls Creek,Halls Creek,836,13,8,13,,
+65,Halls Gap,Halls Gap,Halls Gap,Halls Gap,837,13,7,9,,
+66,Hamilton,Hamilton,Hamilton,Hamilton,840,13,6,21,34,57758
+67,Hamilton Island,Hamilton Island,Hamilton Island,Hamilton Island,841,13,4,10,51,57785
+68,Hayman Island,Hayman Island,Hayman Island,Hayman Island,860,13,4,10,,
+69,Heron Island,Heron Island,Heron Island,Heron Island,873,13,4,10,,
+70,Hervey Bay,Hervey Bay,Hervey Bay,Hervey Bay,874,13,4,19,51,3347
+71,Hidden Valley,Hidden Valley,Hidden Valley,Hidden Valley,876,13,4,19,,
+72,Hobart,Hobart,Hobart,Hobart,885,13,6,21,51,3340
+73,Huskisson,Huskisson,Huskisson,Huskisson,,13,2,17,,
+74,"Kakadu Nationalpark, Cooinda","Kakadu Nationalpark, Cooinda","Kakadu Nationalpark, Cooinda","Kakadu Nationalpark, Cooinda",,13,3,25,,
+75,"Kakadu Nationalpark, Jabiru","Kakadu Nationalpark, Jabiru","Kakadu Nationalpark, Jabiru","Kakadu Nationalpark, Jabiru",,13,3,25,,
+76,Kalbarri,Kalbarri,Kalbarri,Kalbarri,1010,13,8,27,,
+77,Kalgoorlie,Kalgoorlie,Kalgoorlie,Kalgoorlie,1011,13,8,24,,
+78,Kangaroo Island,Kangaroo Island,Kangaroo Island,Kangaroo Island,1027,13,5,12,,
+79,"Kangaroo Island, Cape Willoughby","Kangaroo Island, Cape Willoughby","Kangaroo Island, Cape Willoughby","Kangaroo Island, Cape Willoughby",,13,5,12,,
+80,"Kangaroo Island, Hanson Bay","Kangaroo Island, Hanson Bay","Kangaroo Island, Hanson Bay","Kangaroo Island, Hanson Bay",,13,5,12,,
+81,"Kangaroo Island, Kingscote","Kangaroo Island, Kingscote","Kangaroo Island, Kingscote","Kangaroo Island, Kingscote",,13,5,12,,
+82,"Kangaroo Island, Penneshaw","Kangaroo Island, Penneshaw","Kangaroo Island, Penneshaw","Kangaroo Island, Penneshaw",,13,5,12,,
+83,Karijini Nationalpark,Karijini Nationalpark,Karijini Nationalpark,Karijini Nationalpark,1036,13,8,23,,
+84,Katherine,Katherine,Katherine,Katherine,1047,13,3,25,51,3343
+85,"Katherine, Nitmiluk Nationalpark","Katherine, Nitmiluk Nationalpark","Katherine, Nitmiluk Nationalpark","Katherine, Nitmiluk Nationalpark",,13,3,25,,
+86,Kimberleys,Kimberleys,Kimberleys,Kimberleys,,13,8,13,,
+87,King Leopold Ranges,King Leopold Ranges,King Leopold Ranges,King Leopold Ranges,,13,8,13,,
+88,Kings Canyon,Kings Canyon,Kings Canyon,Kings Canyon,1096,13,3,16,,
+89,Kukerin,Kukerin,Kukerin,Kukerin,,13,8,24,,
+90,Kununurra,Kununurra,Kununurra,Kununurra,1157,13,8,13,51,3344
+91,Lady Elliot Island,Lady Elliot Island,Lady Elliot Island,Lady Elliot Island,1186,13,4,10,,
+92,Lakes Entrance,Lakes Entrance,Lakes Entrance,Lakes Entrance,1214,13,7,11,,
+93,Lamington Nationalpark,Lamington Nationalpark,Lamington Nationalpark,Lamington Nationalpark,1219,13,4,19,,
+94,Launceston,Launceston,Launceston,Launceston,1238,13,6,21,51,3341
+95,"Litchfield Nationalpark, Rakula","Litchfield Nationalpark, Rakula","Litchfield Nationalpark, Rakula","Litchfield Nationalpark, Rakula",,13,3,25,,
+96,Lizard Island,Lizard Island,Lizard Island,Lizard Island,1285,13,4,10,,
+97,Long Island,Long Island,Long Island,Long Island,1291,13,4,10,,
+98,Lord Howe Island,Lord Howe Island,Lord Howe Island,Lord Howe Island,1299,13,2,14,,
+99,Magnetic Island,Magnetic Island,Magnetic Island,Magnetic Island,1340,13,4,19,51,122133
+100,"Magnetic Island, Nelly Bay","Magnetic Island, Nelly Bay","Magnetic Island, Nelly Bay","Magnetic Island, Nelly Bay",,13,4,10,,
+101,Maleny,Maleny,Maleny,Maleny,1363,13,4,19,,
+102,Margaret River,Margaret River,Margaret River,Margaret River,1402,13,8,24,51,121338
+103,"Margaret River, Gnarabup Beach","Margaret River, Gnarabup Beach","Margaret River, Gnarabup Beach","Margaret River, Gnarabup Beach",,13,8,24,,
+104,Mary River Conservation Reserve,Mary River Conservation Reserve,Mary River Conservation Reserve,Mary River Conservation Reserve,,13,3,25,,
+105,McLaren Flat,McLaren Flat,McLaren Flat,McLaren Flat,,13,5,20,,
+106,Melbourne,Melbourne,Melbourne,Melbourne,1466,13,7,22,51,3334
+107,Melbourne Airport,Melbourne Airport,Melbourne Airport,Melbourne Airport,,13,7,22,34,51478
+108,Mission Beach,Mission Beach,Mission Beach,Mission Beach,1509,13,4,19,51,84127
+109,Mitchell Plateau,Mitchell Plateau,Mitchell Plateau,Mitchell Plateau,,13,8,13,,
+110,Montville,Montville,Montville,Montville,1545,13,4,19,,
+111,Mooloolaba,Mooloolaba,Mooloolaba,Mooloolaba,,13,4,19,,
+112,Mossman,Mossman,Mossman,Mossman,1560,13,4,26,,
+113,Mount Elizabeth,Mount Elizabeth,Mount Elizabeth,Mount Elizabeth,1565,13,8,13,,
+114,Mount Mulligan,Mount Mulligan,Mount Mulligan,Mount Mulligan,1574,13,4,15,,
+115,"Mt. Borradaile, Arnhemland","Mt. Borradaile, Arnhemland","Mt. Borradaile, Arnhemland","Mt. Borradaile, Arnhemland",,13,3,25,,
+116,Mungo National Park,Mungo National Park,Mungo National Park,Mungo National Park,,13,2,17,,
+117,Naracoorte,Naracoorte,Naracoorte,Naracoorte,1633,13,5,20,,
+118,"Noosa, Elanda Point","Noosa, Elanda Point","Noosa, Elanda Point","Noosa, Elanda Point",,13,4,19,,
+119,"Noosa, Tewantin","Noosa, Tewantin","Noosa, Tewantin","Noosa, Tewantin",,13,4,19,,
+120,Oak Beach near Port Douglas,Oak Beach near Port Douglas,Oak Beach near Port Douglas,Oak Beach near Port Douglas,,13,4,26,,
+121,Palm Cove,Palm Cove,Palm Cove,Palm Cove,,13,4,26,51,5906
+122,Paynesville,Paynesville,Paynesville,Paynesville,1836,13,7,22,,
+123,Pemberton,Pemberton,Pemberton,Pemberton,1842,13,8,24,,
+124,Perth,Perth,Perth,Perth,1854,13,8,23,51,3335
+125,"Perth, Belmont (Airport)","Perth, Belmont (Airport)","Perth, Belmont (Airport)","Perth, Belmont (Airport)",,13,8,23,,
+126,"Perth, Scarborough","Perth, Scarborough","Perth, Scarborough","Perth, Scarborough",,13,8,23,,
+127,Pokolbin,Pokolbin,Pokolbin,Pokolbin,,13,2,17,,
+128,Port Arthur,Port Arthur,Port Arthur,Port Arthur,1911,13,6,21,,
+129,Port Augusta,Port Augusta,Port Augusta,Port Augusta,1912,13,5,20,,
+130,Port Campbell,Port Campbell,Port Campbell,Port Campbell,1916,13,7,11,,
+131,Port Douglas,Port Douglas,Port Douglas,Port Douglas,1917,13,4,26,51,3349
+132,Port Fairy,Port Fairy,Port Fairy,Port Fairy,1921,13,7,11,,
+133,Port Lincoln,Port Lincoln,Port Lincoln,Port Lincoln,1925,13,5,20,51,6211
+134,Port Macquarie,Port Macquarie,Port Macquarie,Port Macquarie,1926,13,2,17,,
+135,Purnululu Nationalpark,Purnululu Nationalpark,Purnululu Nationalpark,Purnululu Nationalpark,,13,8,13,,
+136,Rainbow Beach,Rainbow Beach,Rainbow Beach,Rainbow Beach,2018,13,4,19,51,37129
+137,Rawnsley Park,Rawnsley Park,Rawnsley Park,Rawnsley Park,,13,5,7,,
+138,Robe,Robe,Robe,Robe,2061,13,5,20,,
+139,Rottnest Island,Rottnest Island,Rottnest Island,Rottnest Island,2081,13,8,23,,
+140,Shark Bay,Shark Bay,Shark Bay,Shark Bay,,13,8,27,,
+141,St. Helens,St. Helens,St. Helens,St. Helens,2288,13,6,21,,
+142,Strahan,Strahan,Strahan,Strahan,2311,13,6,21,51,5904
+143,Sydney,Sydney,Sydney,Sydney,2336,13,2,17,51,3330
+144,Sydney Airport,Sydney Airport,Sydney Airport,Sydney Airport,,13,2,17,34,51473
+145,Tennant Creek,Tennant Creek,Tennant Creek,Tennant Creek,2397,13,3,18,,
+146,The Caves (north of Rockhampton),The Caves (north of Rockhampton),The Caves (north of Rockhampton),The Caves (north of Rockhampton),,13,4,19,,
+147,Thredbo,Thredbo,Thredbo,Thredbo,2410,13,2,17,,
+148,Townsville,Townsville,Townsville,Townsville,2451,13,4,19,51,3350
+149,Trinity Beach,Trinity Beach,Trinity Beach,Trinity Beach,,13,4,26,,
+150,Undara,Undara,Undara,Undara,2507,13,4,15,,
+151,Victor Harbor,Victor Harbor,Victor Harbor,Victor Harbor,2538,13,5,20,,
+152,"Wave Rock, Hyden","Wave Rock, Hyden","Wave Rock, Hyden","Wave Rock, Hyden",,13,8,24,,
+153,Wilpena Pound,Wilpena Pound,Wilpena Pound,Wilpena Pound,,13,5,7,,
+154,"Wilsons Promontory, Tidal River","Wilsons Promontory, Tidal River","Wilsons Promontory, Tidal River","Wilsons Promontory, Tidal River",,13,7,22,,
+155,"Wilsons Promontory, Yanakie","Wilsons Promontory, Yanakie","Wilsons Promontory, Yanakie","Wilsons Promontory, Yanakie",,13,7,22,,
+156,Hopkins,Hopkins,Hopkins,Hopkins,,22,,29,,
+157,Indian Church,Indian Church,Indian Church,Indian Church,,22,,28,,
+158,Colchani,Colchani,Colchani,Colchani,,26,,30,,
+159,La Paz,La Paz,La Paz,La Paz,1176,26,,,51,3818
+160,Madidi Nationalpark,Madidi Nationalpark,Madidi Nationalpark,Madidi Nationalpark,,26,,112,,
+161,Sucre,Sucre,Sucre,Sucre,2318,26,,,51,101926
+162,Uyuni,Uyuni,Uyuni,Uyuni,2518,26,,,51,119557
+163,Central Kalahari,Central Kalahari,Central Kalahari,Central Kalahari,379,28,,33,,
+164,Central Kalahari Game Reserve,Central Kalahari Game Reserve,Central Kalahari Game Reserve,Central Kalahari Game Reserve,,28,,33,,
+165,Chobe Nationalpark,Chobe Nationalpark,Chobe Nationalpark,Chobe Nationalpark,423,28,,32,,
+166,Chobe Nationalpark/Kasane,Chobe Nationalpark/Kasane,Chobe Nationalpark/Kasane,Chobe Nationalpark/Kasane,,28,,32,,
+167,Kasane,Kasane,Kasane,Kasane,1041,28,,32,51,3522
+168,Khwai,Khwai,Khwai,Khwai,1082,28,,34,,
+169,Khwai Community Concession,Khwai Community Concession,Khwai Community Concession,Khwai Community Concession,,28,,34,,
+170,Linyanti,Linyanti,Linyanti,Linyanti,1275,28,,35,,
+171,Makgadikgadi Pans,Makgadikgadi Pans,Makgadikgadi Pans,Makgadikgadi Pans,1353,28,,36,,
+172,Maun,Maun,Maun,Maun,1447,28,,40,51,3524
+173,Moremi Game Reserve,Moremi Game Reserve,Moremi Game Reserve,Moremi Game Reserve,1549,28,,37,,
+174,Okavango Delta,Okavango Delta,Okavango Delta,Okavango Delta,1734,28,,38,,
+175,Savuti,Savuti,Savuti,Savuti,,28,,39,,
+176,Savuti Kanal,Savuti Kanal,Savuti Kanal,Savuti Kanal,2194,28,,39,,
+177,Tuli Block,Tuli Block,Tuli Block,Tuli Block,2483,28,,40,,
+178,Buzios,Buzios,Buzios,Buzios,294,30,,44,,
+179,Cuiaba,Cuiaba,Cuiaba,Cuiaba,503,30,,43,51,121470
+180,Foz do Iguazu,Foz do Iguazu,Foz do Iguazu,Foz do Iguazu,693,30,,,,
+181,"Foz do Iguazu, Parana","Foz do Iguazu, Parana","Foz do Iguazu, Parana","Foz do Iguazu, Parana",,30,,41,,
+182,Miranda,Miranda,Miranda,Miranda,,30,,45,,
+183,"Morro de São Paulo, Bahia","Morro de São Paulo, Bahia","Morro de São Paulo, Bahia","Morro de São Paulo, Bahia",,30,,45,,
+184,Poconé,Poconé,Poconé,Poconé,,30,,43,,
+185,Praia do Forte,Praia do Forte,Praia do Forte,Praia do Forte,1948,30,,,,
+186,Rio de Janeiro,Rio de Janeiro,Rio de Janeiro,Rio de Janeiro,2052,30,,44,51,3825
+187,Salvador da Bahia,Salvador da Bahia,Salvador da Bahia,Salvador da Bahia,2121,30,,,51,3826
+188,"Ayllu de Quitor, San Pedro de Atacama","Ayllu de Quitor, San Pedro de Atacama","Ayllu de Quitor, San Pedro de Atacama","Ayllu de Quitor, San Pedro de Atacama",,43,,46,,
+189,"Castro, Chiloe","Castro, Chiloe","Castro, Chiloe","Castro, Chiloe",,43,,,,
+190,"Cerro Alegre, Valparaiso","Cerro Alegre, Valparaiso","Cerro Alegre, Valparaiso","Cerro Alegre, Valparaiso",,43,,48,,
+191,Hanga Roa,Hanga Roa,Hanga Roa,Hanga Roa,,43,24,,,
+192,"Los Muernos, Los Lagos","Los Muernos, Los Lagos","Los Muernos, Los Lagos","Los Muernos, Los Lagos",,43,,49,,
+193,National Park Torres de Paine,National Park Torres de Paine,National Park Torres de Paine,National Park Torres de Paine,,43,,3,,
+194,Nationalpark Torres del Paine,Nationalpark Torres del Paine,Nationalpark Torres del Paine,Nationalpark Torres del Paine,,43,,3,,
+195,Osterinsel,Osterinsel,Osterinsel,Osterinsel,1772,43,,,51,3806
+196,Patagonia National Park - Chacabuco Valley,Patagonia National Park - Chacabuco Valley,Patagonia National Park - Chacabuco Valley,Patagonia National Park - Chacabuco Valley,,43,,,,
+197,Puerto Natales,Puerto Natales,Puerto Natales,Puerto Natales,1975,43,,,51,60637
+198,Puerto Varas,Puerto Varas,Puerto Varas,Puerto Varas,1979,43,,49,51,119582
+199,Punta Arenas,Punta Arenas,Punta Arenas,Punta Arenas,1986,43,,3,51,3796
+200,San Pedro de Atacama,San Pedro de Atacama,San Pedro de Atacama,San Pedro de Atacama,2150,43,,46,51,37120
+201,Santiago de Chile,Santiago de Chile,Santiago de Chile,Santiago de Chile,2169,43,,48,51,3793
+202,Valparaiso,Valparaiso,Valparaiso,Valparaiso,2523,43,,48,34,119574
+203,"Hongkong, Kowloon","Hongkong, Kowloon","Hongkong, Kowloon","Hongkong, Kowloon",,44,,,,
+204,Tsim Sha Tsui,Tsim Sha Tsui,Tsim Sha Tsui,Tsim Sha Tsui,,44,,,,
+205,Tsimshatsui Kowloon Hong Kong,Tsimshatsui Kowloon Hong Kong,Tsimshatsui Kowloon Hong Kong,Tsimshatsui Kowloon Hong Kong,,44,,,,
+206,Aitutaki,Aitutaki,Aitutaki,Aitutaki,25,50,,50,51,122100
+207,Amuri,Amuri,Amuri,Amuri,,50,,50,,
+208,Arorangi,Arorangi,Arorangi,Arorangi,,50,9,,,
+209,Atiu,Atiu,Atiu,Atiu,107,50,,51,51,122103
+210,Matavera District,Matavera District,Matavera District,Matavera District,,50,9,,,
+211,Muri,Muri,Muri,Muri,,50,9,,,
+212,Muri Beach,Muri Beach,Muri Beach,Muri Beach,,50,9,,,
+213,Ootu Beach,Ootu Beach,Ootu Beach,Ootu Beach,,50,,50,,
+214,Titikaveka,Titikaveka,Titikaveka,Titikaveka,,50,9,,,
+215,"Titikaveka, Rarotonga","Titikaveka, Rarotonga","Titikaveka, Rarotonga","Titikaveka, Rarotonga",,50,9,,,
+216,Vaimaanga,Vaimaanga,Vaimaanga,Vaimaanga,,50,9,,,
+217,Boca Tapada,Boca Tapada,Boca Tapada,Boca Tapada,232,51,,53,51,122051
+218,Puerto Carrillo,Puerto Carrillo,Puerto Carrillo,Puerto Carrillo,,51,,55,,
+219,Puerto Viejo de Talamanca,Puerto Viejo de Talamanca,Puerto Viejo de Talamanca,Puerto Viejo de Talamanca,,51,,54,51,121978
+220,San José,San José,San José,San José,,51,,56,,
+221,Tamarindo,Tamarindo,Tamarindo,Tamarindo,2359,51,,55,51,121974
+222,Guayaquil,Guayaquil,Guayaquil,Guayaquil,811,62,,57,51,3822
+223,Quito,Quito,Quito,Quito,2012,62,,,51,3821
+224,Samborondón - Guayaquil,Samborondón - Guayaquil,Samborondón - Guayaquil,Samborondón - Guayaquil,,62,,59,,
+225,Beachcomber Island,Beachcomber Island,Beachcomber Island,Beachcomber Island,,72,,60,,
+226,Beqa Lagoon,Beqa Lagoon,Beqa Lagoon,Beqa Lagoon,192,72,,64,,
+227,Castaway Island,Castaway Island,Castaway Island,Castaway Island,,72,,60,,
+228,Denarau Island,Denarau Island,Denarau Island,Denarau Island,,72,,64,,
+229,Drawaqa Island,Drawaqa Island,Drawaqa Island,Drawaqa Island,,72,,65,,
+230,Kuata Island,Kuata Island,Kuata Island,Kuata Island,,72,,65,,
+231,Malolo Island,Malolo Island,Malolo Island,Malolo Island,,72,,60,,
+232,Malolo Lai Lai Island,Malolo Lai Lai Island,Malolo Lai Lai Island,Malolo Lai Lai Island,,72,,60,,
+233,Mamanucas,Mamanucas,Mamanucas,Mamanucas,,72,,60,,
+234,Matamanoa Island,Matamanoa Island,Matamanoa Island,Matamanoa Island,,72,,60,,
+235,Matangi Island,Matangi Island,Matangi Island,Matangi Island,,72,,61,,
+236,Nacula Island,Nacula Island,Nacula Island,Nacula Island,,72,,65,,
+237,Nadi Airport,Nadi Airport,Nadi Airport,Nadi Airport,,72,,64,,
+238,Natadola Beach,Natadola Beach,Natadola Beach,Natadola Beach,,72,,64,,
+239,Naukacuvu Island,Naukacuvu Island,Naukacuvu Island,Naukacuvu Island,,72,,65,,
+240,Nukubati Island,Nukubati Island,Nukubati Island,Nukubati Island,,72,,63,,
+241,Pacific Harbour,Pacific Harbour,Pacific Harbour,Pacific Harbour,,72,,64,,
+242,Rakiraki,Rakiraki,Rakiraki,Rakiraki,2021,72,,64,,
+243,Savu Savu,Savu Savu,Savu Savu,Savu Savu,,72,,63,,
+244,Tokoriki Island,Tokoriki Island,Tokoriki Island,Tokoriki Island,,72,,60,,
+245,Vomo Island,Vomo Island,Vomo Island,Vomo Island,,72,,60,,
+246,Waiyevo,Waiyevo,Waiyevo,Waiyevo,,72,,62,,
+247,Yasawas,Yasawas,Yasawas,Yasawas,,72,,65,,
+248,Arue,Arue,Arue,Arue,,76,,73,,
+249,Avatoru,Avatoru,Avatoru,Avatoru,,76,,71,,
+250,Bora Bora,Bora Bora,Bora Bora,Bora Bora,243,76,,66,51,3500
+251,"Bora Bora, near Matira Beach","Bora Bora, near Matira Beach","Bora Bora, near Matira Beach","Bora Bora, near Matira Beach",,76,,66,,
+252,BP 185  Maharepo,BP 185  Maharepo,BP 185  Maharepo,BP 185  Maharepo,,76,,69,,
+253,Fare,Fare,Fare,Fare,,76,,68,,
+254,Haapiti,Haapiti,Haapiti,Haapiti,,76,,69,,
+255,Maiao,Maiao,Maiao,Maiao,,76,,69,,
+256,Motu Omee,Motu Omee,Motu Omee,Motu Omee,,76,,66,,
+257,Motu Tautau,Motu Tautau,Motu Tautau,Motu Tautau,,76,,72,,
+258,Opoa Beach,Opoa Beach,Opoa Beach,Opoa Beach,,76,,70,,
+259,Papeete,Papeete,Papeete,Papeete,,76,,73,51,3498
+260,Papetoai,Papetoai,Papetoai,Papetoai,,76,,69,,
+261,Pirae,Pirae,Pirae,Pirae,,76,,73,,
+262,Punaauia,Punaauia,Punaauia,Punaauia,,76,,73,,
+263,Rotoava,Rotoava,Rotoava,Rotoava,,76,,67,,
+264,"Tahiti, Faa´a","Tahiti, Faa´a","Tahiti, Faa´a","Tahiti, Faa´a",,76,,73,,
+265,Taravao,Taravao,Taravao,Taravao,,76,,73,,
+266,Temae,Temae,Temae,Temae,,76,,69,,
+267,Tetiaroa,Tetiaroa,Tetiaroa,Tetiaroa,2402,76,,73,,
+268,Tiahura - Haapiti,Tiahura - Haapiti,Tiahura - Haapiti,Tiahura - Haapiti,,76,,69,,
+269,Tikehau,Tikehau,Tikehau,Tikehau,2414,76,,,,
+270,Tuherahera,Tuherahera,Tuherahera,Tuherahera,,76,,74,,
+271,Uturoa,Uturoa,Uturoa,Uturoa,,76,,72,,
+272,Vaitape,Vaitape,Vaitape,Vaitape,,76,,66,,
+273,Isabela,Isabela,Isabela,Isabela,948,62,,75,,
+274,San Cristobal,San Cristobal,San Cristobal,San Cristobal,2133,62,,75,51,3823
+275,Santa Cruz,Santa Cruz,Santa Cruz,Santa Cruz,2158,62,,75,51,3820
+276,Kowloon,Kowloon,Kowloon,Kowloon,,96,,,,
+277,Amboseli Nationalpark,Amboseli Nationalpark,Amboseli Nationalpark,Amboseli Nationalpark,57,112,,,,
+278,Chale Island,Chale Island,Chale Island,Chale Island,,112,,,,
+279,Diani Beach,Diani Beach,Diani Beach,Diani Beach,,112,,,,
+280,Lake Naivasha,Lake Naivasha,Lake Naivasha,Lake Naivasha,1205,112,,,,
+281,Masai Mara,Masai Mara,Masai Mara,Masai Mara,1420,112,,,51,3532
+282,Meru Nationalpark,Meru Nationalpark,Meru Nationalpark,Meru Nationalpark,1482,112,,,,
+283,Nairobi,Nairobi,Nairobi,Nairobi,1615,112,,,51,3528
+284,Samburu Nationalreservat,Samburu Nationalreservat,Samburu Nationalreservat,Samburu Nationalreservat,2127,112,,,,
+285,Tsavo West Nationalpark,Tsavo West Nationalpark,Tsavo West Nationalpark,Tsavo West Nationalpark,2470,112,,,,
+286,Watamu,Watamu,Watamu,Watamu,2583,112,,,,
+287,Bogota,Bogota,Bogota,Bogota,234,47,,76,51,37987
+288,Cartagena,Cartagena,Cartagena,Cartagena,365,47,,,51,37988
+289,"El Poblado (Provenza), Medellin","El Poblado (Provenza), Medellin","El Poblado (Provenza), Medellin","El Poblado (Provenza), Medellin",,47,,78,,
+290,Isla Mucura,Isla Mucura,Isla Mucura,Isla Mucura,953,47,,77,,
+291,Los Naranjos,Los Naranjos,Los Naranjos,Los Naranjos,1307,47,,79,,
+292,"Medellín, Antioquia","Medellín, Antioquia","Medellín, Antioquia","Medellín, Antioquia",,47,,78,,
+293,Rincon del Mar,Rincon del Mar,Rincon del Mar,Rincon del Mar,2051,47,,79,,
+294,Cilaos,Cilaos,Cilaos,Cilaos,430,179,,,,
+295,Entre-Deux,Entre-Deux,Entre-Deux,Entre-Deux,,179,,,,
+296,Grande Anse,Grande Anse,Grande Anse,Grande Anse,789,179,,,,
+297,"Hell-Bourg, Salazie","Hell-Bourg, Salazie","Hell-Bourg, Salazie","Hell-Bourg, Salazie",,179,,,,
+298,La Plaine des Cafres,La Plaine des Cafres,La Plaine des Cafres,La Plaine des Cafres,1177,179,,,,
+299,La Saline-les-Bains,La Saline-les-Bains,La Saline-les-Bains,La Saline-les-Bains,1181,179,,,,
+300,Mare à Vieille Place,Mare à Vieille Place,Mare à Vieille Place,Mare à Vieille Place,,179,,,,
+301,Piton de la Fournaise,Piton de la Fournaise,Piton de la Fournaise,Piton de la Fournaise,,179,,,,
+302,Piton des Neiges,Piton des Neiges,Piton des Neiges,Piton des Neiges,,179,,,,
+303,Saint Leu,Saint Leu,Saint Leu,Saint Leu,2107,179,,,,
+304,Saint-Benoît,Saint-Benoît,Saint-Benoît,Saint-Benoît,,179,,,,
+305,Saint-Gilles-Les-Bains,Saint-Gilles-Les-Bains,Saint-Gilles-Les-Bains,Saint-Gilles-Les-Bains,,179,,,,
+306,Saint-Joseph,Saint-Joseph,Saint-Joseph,Saint-Joseph,,179,,,,
+307,Saint-Louis,Saint-Louis,Saint-Louis,Saint-Louis,,179,,,,
+308,Sainte-Anne,Sainte-Anne,Sainte-Anne,Sainte-Anne,,179,,,,
+309,Salazie,Salazie,Salazie,Salazie,2111,179,,,,
+310,St Gilles les Bains,St Gilles les Bains,St Gilles les Bains,St Gilles les Bains,,179,,,,
+311,St. Denis,St. Denis,St. Denis,St. Denis,,179,,,51,3542
+312,Akanin’ny Nofy,Akanin’ny Nofy,Akanin’ny Nofy,Akanin’ny Nofy,28,126,,,,
+313,Antananarivo,Antananarivo,Antananarivo,Antananarivo,72,126,,,51,3541
+314,Fort Dauphin,Fort Dauphin,Fort Dauphin,Fort Dauphin,681,126,,,51,119535
+315,Ifaty,Ifaty,Ifaty,Ifaty,927,126,,,,
+316,Masoala,Masoala,Masoala,Masoala,1424,126,,,,
+317,Mitsio Archipel,Mitsio Archipel,Mitsio Archipel,Mitsio Archipel,1512,126,,,,
+318,Nosy Be,Nosy Be,Nosy Be,Nosy Be,1703,126,,,51,24576
+319,Ranohira,Ranohira,Ranohira,Ranohira,2027,126,,,,
+320,Sainte Marie,Sainte Marie,Sainte Marie,Sainte Marie,2109,126,,,,
+321,Cape Maclear,Cape Maclear,Cape Maclear,Cape Maclear,349,127,,80,,
+322,Chinteche,Chinteche,Chinteche,Chinteche,416,127,,80,,
+323,Likoma Island,Likoma Island,Likoma Island,Likoma Island,1266,127,,80,,
+324,Liwonde Nationalpark,Liwonde Nationalpark,Liwonde Nationalpark,Liwonde Nationalpark,1284,127,,,,
+325,Nankoma Island,Nankoma Island,Nankoma Island,Nankoma Island,1626,127,,80,,
+326,Baa Atoll,Baa Atoll,Baa Atoll,Baa Atoll,,129,,,,
+327,Haa Dhalu Atoll,Haa Dhalu Atoll,Haa Dhalu Atoll,Haa Dhalu Atoll,,129,,,,
+328,North Ari Atoll,North Ari Atoll,North Ari Atoll,North Ari Atoll,,129,,,,
+329,North Male Atoll,North Male Atoll,North Male Atoll,North Male Atoll,,129,,,,
+330,Noth Male Atoll,Noth Male Atoll,Noth Male Atoll,Noth Male Atoll,,129,,,,
+331,Raa Atoll,Raa Atoll,Raa Atoll,Raa Atoll,,129,,,,
+332,South Ari Atoll,South Ari Atoll,South Ari Atoll,South Ari Atoll,,129,,,,
+333,Upper North Province,Upper North Province,Upper North Province,Upper North Province,,129,,,,
+334,Anse La Raie,Anse La Raie,Anse La Raie,Anse La Raie,,135,,81,,
+335,Bain Boeuf,Bain Boeuf,Bain Boeuf,Bain Boeuf,,135,,81,51,24577
+336,Balaclava,Balaclava,Balaclava,Balaclava,,135,,81,,
+337,Belle Mare,Belle Mare,Belle Mare,Belle Mare,,135,,83,,
+338,Calodyne,Calodyne,Calodyne,Calodyne,,135,,81,,
+339,"Case Noyale, Le Morne","Case Noyale, Le Morne","Case Noyale, Le Morne","Case Noyale, Le Morne",,135,,84,,
+340,Chamarel,Chamarel,Chamarel,Chamarel,,135,,84,,
+341,Grand River South East,Grand River South East,Grand River South East,Grand River South East,,135,,83,,
+342,Le Morne,Le Morne,Le Morne,Le Morne,,135,,84,,
+343,Le Morne Peninsula,Le Morne Peninsula,Le Morne Peninsula,Le Morne Peninsula,,135,,84,,
+344,Mahebourg,Mahebourg,Mahebourg,Mahebourg,,135,,83,,
+345,"Mont Choisy, Pamplemousses","Mont Choisy, Pamplemousses","Mont Choisy, Pamplemousses","Mont Choisy, Pamplemousses",,135,,81,,
+346,Pointe aux Cannoniers,Pointe aux Cannoniers,Pointe aux Cannoniers,Pointe aux Cannoniers,,135,,81,,
+347,Pointe aux Canonniers,Pointe aux Canonniers,Pointe aux Canonniers,Pointe aux Canonniers,,135,,81,,
+348,Pointe aux Piments,Pointe aux Piments,Pointe aux Piments,Pointe aux Piments,,135,,82,,
+349,Poste de Flacq,Poste de Flacq,Poste de Flacq,Poste de Flacq,,135,,83,,
+350,St. Felix (B10),St. Felix (B10),St. Felix (B10),St. Felix (B10),,135,,84,,
+351,Trou d´Eau Douce,Trou d´Eau Douce,Trou d´Eau Douce,Trou d´Eau Douce,,135,,82,,
+352,"Wolmar, Flic en Flac","Wolmar, Flic en Flac","Wolmar, Flic en Flac","Wolmar, Flic en Flac",,135,,85,,
+353,"Wolmar, Flic en Flax","Wolmar, Flic en Flax","Wolmar, Flic en Flax","Wolmar, Flic en Flax",,135,,84,,
+354,Mexico-City,Mexico-City,Mexico-City,Mexico-City,,137,,86,,
+355,Playa del Carmen,Playa del Carmen,Playa del Carmen,Playa del Carmen,1889,137,,87,51,121955
+356,"Xpu-Ha, Quintana Roo","Xpu-Ha, Quintana Roo","Xpu-Ha, Quintana Roo","Xpu-Ha, Quintana Roo",,137,,87,,
+357,Inhambane,Inhambane,Inhambane,Inhambane,937,145,,,,
+358,Praia do Barra,Praia do Barra,Praia do Barra,Praia do Barra,,145,,,,
+359,Praia do Tofo,Praia do Tofo,Praia do Tofo,Praia do Tofo,1949,145,,,,
+360,"Santa Maria, Machangulo","Santa Maria, Machangulo","Santa Maria, Machangulo","Santa Maria, Machangulo",,145,,,,
+361,Vilanculos,Vilanculos,Vilanculos,Vilanculos,2543,145,,,51,8870
+362,Aus,Aus,Aus,Aus,116,147,,94,,
+363,Bagani,Bagani,Bagani,Bagani,,147,,95,,
+364,Bwabwata Nationalpark,Bwabwata Nationalpark,Bwabwata Nationalpark,Bwabwata Nationalpark,295,147,,95,,
+365,Epupa Falls,Epupa Falls,Epupa Falls,Epupa Falls,,147,,88,,
+366,Erongo,Erongo,Erongo,Erongo,,147,,94,,
+367,Etosha Nationalpark,Etosha Nationalpark,Etosha Nationalpark,Etosha Nationalpark,,147,,89,51,36781
+368,"Etosha Nationalpark, Andersson Tor","Etosha Nationalpark, Andersson Tor","Etosha Nationalpark, Andersson Tor","Etosha Nationalpark, Andersson Tor",,147,,89,,
+369,"Etosha Nationalpark, Von Lindequist Tor","Etosha Nationalpark, Von Lindequist Tor","Etosha Nationalpark, Von Lindequist Tor","Etosha Nationalpark, Von Lindequist Tor",,147,,89,,
+370,Fish River Canyon,Fish River Canyon,Fish River Canyon,Fish River Canyon,658,147,,90,51,3535
+371,Grootfontein,Grootfontein,Grootfontein,Grootfontein,804,147,,94,,
+372,"Kalimbeza, Katima Mulilo","Kalimbeza, Katima Mulilo","Kalimbeza, Katima Mulilo","Kalimbeza, Katima Mulilo",,147,,95,,
+373,Kalkrand,Kalkrand,Kalkrand,Kalkrand,1014,147,,91,,
+374,Kamanjab,Kamanjab,Kamanjab,Kamanjab,1016,147,,88,,
+375,Kaokoland,Kaokoland,Kaokoland,Kaokoland,,147,,88,,
+376,Khorixas,Khorixas,Khorixas,Khorixas,1080,147,,88,,
+377,Kongola,Kongola,Kongola,Kongola,1138,147,,95,,
+378,Lüderitz,Lüderitz,Lüderitz,Lüderitz,1322,147,,92,,
+379,Mariental,Mariental,Mariental,Mariental,1404,147,,91,,
+380,NamibRand Nature Reserve,NamibRand Nature Reserve,NamibRand Nature Reserve,NamibRand Nature Reserve,,147,,93,,
+381,Otjiwarongo,Otjiwarongo,Otjiwarongo,Otjiwarongo,1776,147,,94,,
+382,Seeheim,Seeheim,Seeheim,Seeheim,,147,,90,,
+383,Sinclair Nature Reserve,Sinclair Nature Reserve,Sinclair Nature Reserve,Sinclair Nature Reserve,,147,,93,,
+384,Skelettküste,Skelettküste,Skelettküste,Skelettküste,,147,,92,,
+385,Solitaire,Solitaire,Solitaire,Solitaire,2257,147,,93,,
+386,Sossusvlei,Sossusvlei,Sossusvlei,Sossusvlei,,147,,93,,
+387,Swakopmund,Swakopmund,Swakopmund,Swakopmund,2332,147,,92,51,3534
+388,Tirasberge,Tirasberge,Tirasberge,Tirasberge,2422,147,,93,,
+389,Twyfelfontein,Twyfelfontein,Twyfelfontein,Twyfelfontein,2494,147,,88,,
+390,Ugab River,Ugab River,Ugab River,Ugab River,,147,,88,,
+391,Uhlenhorst,Uhlenhorst,Uhlenhorst,Uhlenhorst,,147,,91,,
+392,Usakos,Usakos,Usakos,Usakos,2512,147,,94,,
+393,Windhoek,Windhoek,Windhoek,Windhoek,2639,147,,94,51,3521
+394,"Windhoek, Klein-Windhoek","Windhoek, Klein-Windhoek","Windhoek, Klein-Windhoek","Windhoek, Klein-Windhoek",,147,,94,,
+395,Lifou,Lifou,Lifou,Lifou,1262,151,,,,
+396,Nouméa,Nouméa,Nouméa,Nouméa,,151,,,51,3509
+397,Ouvea,Ouvea,Ouvea,Ouvea,1784,151,,,,
+398,Port Boise,Port Boise,Port Boise,Port Boise,1915,151,,,,
+399,Tadine,Tadine,Tadine,Tadine,,151,,,,
+400,Vao,Vao,Vao,Vao,,151,,,,
+401,Abel Tasman National Park,Abel Tasman National Park,Abel Tasman National Park,Abel Tasman National Park,,152,,96,,
+402,Akaroa,Akaroa,Akaroa,Akaroa,29,152,10,99,51,115255
+403,Akaroa (Christchurch),Akaroa (Christchurch),Akaroa (Christchurch),Akaroa (Christchurch),,152,10,99,,
+404,Auckland,Auckland,Auckland,Auckland,112,152,,,51,3345
+405,Auckland Airport,Auckland Airport,Auckland Airport,Auckland Airport,,152,,,34,51477
+406,Blenheim,Blenheim,Blenheim,Blenheim,225,152,10,102,51,3496
+407,Catlins,Catlins,Catlins,Catlins,369,152,10,105,51,121803
+408,Christchurch,Christchurch,Christchurch,Christchurch,424,152,10,99,51,3353
+409,"Clyde, Central Otago","Clyde, Central Otago","Clyde, Central Otago","Clyde, Central Otago",,152,10,105,,
+410,Dunedin,Dunedin,Dunedin,Dunedin,582,152,10,105,51,21543
+411,Fox Glacier,Fox Glacier,Fox Glacier,Fox Glacier,692,152,10,110,51,61036
+412,Franz Josef,Franz Josef,Franz Josef,Franz Josef,,152,10,110,51,21544
+413,Glenorchy,Glenorchy,Glenorchy,Glenorchy,750,152,10,105,,
+414,Greymouth,Greymouth,Greymouth,Greymouth,802,152,10,110,51,122102
+415,Havelock North,Havelock North,Havelock North,Havelock North,856,152,,101,,
+416,Hokianga,Hokianga,Hokianga,Hokianga,,152,,104,,
+417,Hokitika,Hokitika,Hokitika,Hokitika,888,152,10,110,34,57762
+418,Kaikoura,Kaikoura,Kaikoura,Kaikoura,1006,152,10,99,51,121952
+419,Kaiteriteri,Kaiteriteri,Kaiteriteri,Kaiteriteri,,152,10,96,,
+420,Lake Tekapo,Lake Tekapo,Lake Tekapo,Lake Tekapo,1212,152,10,99,51,121951
+421,Mangonui,Mangonui,Mangonui,Mangonui,,152,,104,,
+422,Mapua Village,Mapua Village,Mapua Village,Mapua Village,,152,10,96,,
+423,Marahau Beach,Marahau Beach,Marahau Beach,Marahau Beach,,152,10,96,,
+424,Martinborough,Martinborough,Martinborough,Martinborough,1413,152,,109,,
+425,Mount Cook,Mount Cook,Mount Cook,Mount Cook,1564,152,10,99,51,115254
+426,Mt. Ruapehu,Mt. Ruapehu,Mt. Ruapehu,Mt. Ruapehu,,152,,,,
+427,Napier,Napier,Napier,Napier,1630,152,,,51,3359
+428,National Park,National Park,National Park,National Park,,152,,108,,
+429,Nelson,Nelson,Nelson,Nelson,1647,152,10,103,51,3497
+430,New Plymouth,New Plymouth,New Plymouth,New Plymouth,1658,152,,107,34,57768
+431,Oamaru,Oamaru,Oamaru,Oamaru,1722,152,,,51,122097
+432,Ohakune,Ohakune,Ohakune,Ohakune,1727,152,,108,,
+433,Orewa,Orewa,Orewa,Orewa,1760,152,,97,,
+434,Owhango,Owhango,Owhango,Owhango,1785,152,,100,,
+435,Paihia,Paihia,Paihia,Paihia,1798,152,,104,51,3354
+436,Pauanui,Pauanui,Pauanui,Pauanui,,152,,100,,
+437,Peka Peka (Kapiti Coast),Peka Peka (Kapiti Coast),Peka Peka (Kapiti Coast),Peka Peka (Kapiti Coast),,152,,109,,
+438,Picton,Picton,Picton,Picton,1872,152,10,102,51,21542
+439,Punakaiki,Punakaiki,Punakaiki,Punakaiki,1983,152,10,,,
+440,Queen Charlotte Sound (Marlborough),Queen Charlotte Sound (Marlborough),Queen Charlotte Sound (Marlborough),Queen Charlotte Sound (Marlborough),,152,10,102,,
+441,Queenstown,Queenstown,Queenstown,Queenstown,2005,152,10,105,51,3363
+442,Rotorua,Rotorua,Rotorua,Rotorua,2080,152,,100,51,3358
+443,Takaka,Takaka,Takaka,Takaka,,152,10,96,,
+444,Taupo,Taupo,Taupo,Taupo,2383,152,,100,51,21539
+445,"Tauranga, Mt. Maunganui","Tauranga, Mt. Maunganui","Tauranga, Mt. Maunganui","Tauranga, Mt. Maunganui",,152,,98,,
+446,Te Anau,Te Anau,Te Anau,Te Anau,2387,152,10,106,51,3364
+447,Tekapo,Tekapo,Tekapo,Tekapo,2391,152,,,,
+448,The Catlins,The Catlins,The Catlins,The Catlins,,152,10,105,,
+449,Tongariro Nationalpark,Tongariro Nationalpark,Tongariro Nationalpark,Tongariro Nationalpark,2441,152,,108,,
+450,Turangi,Turangi,Turangi,Turangi,2487,152,,,,
+451,Twizel,Twizel,Twizel,Twizel,2493,152,10,99,,
+452,Waiheke Island,Waiheke Island,Waiheke Island,Waiheke Island,2562,152,,97,,
+453,Waipoua Forest,Waipoua Forest,Waipoua Forest,Waipoua Forest,2566,152,,104,,
+454,Waitomo,Waitomo,Waitomo,Waitomo,2568,152,,100,51,115252
+455,Wanaka,Wanaka,Wanaka,Wanaka,2574,152,10,105,,
+456,Wanganui,Wanganui,Wanganui,Wanganui,2575,152,,108,34,57775
+457,Warkworth,Warkworth,Warkworth,Warkworth,2578,152,,97,,
+458,Wellington,Wellington,Wellington,Wellington,2592,152,,109,51,3495
+459,Whakatane,Whakatane,Whakatane,Whakatane,2604,152,,98,34,57777
+460,Whitianga,Whitianga,Whitianga,Whitianga,,152,,100,,
+461,Bocas del Toro,Bocas del Toro,Bocas del Toro,Bocas del Toro,,166,,111,51,122037
+462,Panama-City,Panama-City,Panama-City,Panama-City,1811,166,,111,,
+463,Riviera Pacifica,Riviera Pacifica,Riviera Pacifica,Riviera Pacifica,2057,166,,111,,
+464,"Kimbe, Cannonvale","Kimbe, Cannonvale","Kimbe, Cannonvale","Kimbe, Cannonvale",,167,,,,
+465,Aguas Calientes,Aguas Calientes,Aguas Calientes,Aguas Calientes,19,169,,113,51,103128
+466,Arequipa,Arequipa,Arequipa,Arequipa,84,169,,115,51,3815
+467,"Barranco, Lima","Barranco, Lima","Barranco, Lima","Barranco, Lima",,169,,,,
+468,"Caylloma, Valle del Colca","Caylloma, Valle del Colca","Caylloma, Valle del Colca","Caylloma, Valle del Colca",,169,,115,,
+469,Cusco,Cusco,Cusco,Cusco,511,169,,113,51,3817
+470,Huayoccari,Huayoccari,Huayoccari,Huayoccari,,169,,,,
+471,Lima,Lima,Lima,Lima,1272,169,,,51,3794
+472,Mancora,Mancora,Mancora,Mancora,1377,169,,114,,
+473,Nasca,Nasca,Nasca,Nasca,1637,169,,115,51,103127
+474,Paracas,Paracas,Paracas,Paracas,1817,169,,115,51,103126
+475,Puno,Puno,Puno,Puno,1985,169,,116,51,3816
+476,Puno - Lake Titicaca,Puno - Lake Titicaca,Puno - Lake Titicaca,Puno - Lake Titicaca,,169,,,,
+477,"San Blas, Cusco","San Blas, Cusco","San Blas, Cusco","San Blas, Cusco",,169,,113,,
+478,Tambopata Naturreservat / Puerto Maldonado,Tambopata Naturreservat / Puerto Maldonado,Tambopata Naturreservat / Puerto Maldonado,Tambopata Naturreservat / Puerto Maldonado,,169,,112,,
+479,Urquillos,Urquillos,Urquillos,Urquillos,,169,,,,
+480,"Yucay, Urubamba","Yucay, Urubamba","Yucay, Urubamba","Yucay, Urubamba",,169,,113,,
+481,"Zorritos, Tumbes","Zorritos, Tumbes","Zorritos, Tumbes","Zorritos, Tumbes",,169,,114,,
+482,Aleipata,Aleipata,Aleipata,Aleipata,,185,,,,
+483,Apia,Apia,Apia,Apia,,185,,,51,3507
+484,Asau,Asau,Asau,Asau,,185,,,,
+485,Aufaga,Aufaga,Aufaga,Aufaga,,185,,,,
+486,Fa'asaleleaga,Fa'asaleleaga,Fa'asaleleaga,Fa'asaleleaga,,185,,,,
+487,Fagamalo,Fagamalo,Fagamalo,Fagamalo,,185,,,,
+488,Lefaga,Lefaga,Lefaga,Lefaga,,185,,,,
+489,Maninoa,Maninoa,Maninoa,Maninoa,,185,,,,
+490,Matatufu,Matatufu,Matatufu,Matatufu,,185,,,,
+491,Siumu,Siumu,Siumu,Siumu,,185,,,,
+492,Alphonse Island,Alphonse Island,Alphonse Island,Alphonse Island,49,190,,,,
+493,Bird Island,Bird Island,Bird Island,Bird Island,216,190,,,,
+494,Denis Island,Denis Island,Denis Island,Denis Island,547,190,,,,
+495,La Digue,La Digue,La Digue,La Digue,1169,190,,,51,121930
+496,Mahé,Mahé,Mahé,Mahé,,190,,,51,3537
+497,Praslin,Praslin,Praslin,Praslin,1950,190,,,51,3538
+498,"Round Island, Seychelles","Round Island, Seychelles","Round Island, Seychelles","Round Island, Seychelles",,190,,,,
+499,Silhouette Island,Silhouette Island,Silhouette Island,Silhouette Island,,190,,,,
+500,Singapur,Singapur,Singapur,Singapur,2248,192,,,51,4128
+501,Addo Elephant Nationalpark,Addo Elephant Nationalpark,Addo Elephant Nationalpark,Addo Elephant Nationalpark,,197,,119,,
+502,Amakhala Game Reserve,Amakhala Game Reserve,Amakhala Game Reserve,Amakhala Game Reserve,55,197,,119,,
+503,Augrabies Falls Nationalpark,Augrabies Falls Nationalpark,Augrabies Falls Nationalpark,Augrabies Falls Nationalpark,,197,22,,,
+504,Babanango Game Reserve,Babanango Game Reserve,Babanango Game Reserve,Babanango Game Reserve,122,197,,128,,
+505,Ballito,Ballito,Ballito,Ballito,139,197,,126,,
+506,Balule Private Nature Reserve,Balule Private Nature Reserve,Balule Private Nature Reserve,Balule Private Nature Reserve,,197,,121,,
+507,Cape St. Francis,Cape St. Francis,Cape St. Francis,Cape St. Francis,,197,,119,,
+508,Chintsa East,Chintsa East,Chintsa East,Chintsa East,418,197,,119,,
+509,Clanwilliam,Clanwilliam,Clanwilliam,Clanwilliam,432,197,,126,,
+510,De Hoop Nature Reserve,De Hoop Nature Reserve,De Hoop Nature Reserve,De Hoop Nature Reserve,532,197,,119,,
+511,De Kelders - Gansbaai,De Kelders - Gansbaai,De Kelders - Gansbaai,De Kelders - Gansbaai,,197,,126,,
+512,Drakensberge,Drakensberge,Drakensberge,Drakensberge,571,197,,117,,
+513,Franschhoek,Franschhoek,Franschhoek,Franschhoek,696,197,,127,,
+514,Fresnaye,Fresnaye,Fresnaye,Fresnaye,,197,,120,,
+515,Gqeberha (Port Elizabeth),Gqeberha (Port Elizabeth),Gqeberha (Port Elizabeth),Gqeberha (Port Elizabeth),,197,,119,,
+516,"Greater Pilanesberg National Park, Black Rhino Game Reserve","Greater Pilanesberg National Park, Black Rhino Game Reserve","Greater Pilanesberg National Park, Black Rhino Game Reserve","Greater Pilanesberg National Park, Black Rhino Game Reserve",,197,,123,,
+517,Green Kalahari,Green Kalahari,Green Kalahari,Green Kalahari,,197,22,,,
+518,Hazyview,Hazyview,Hazyview,Hazyview,861,197,,125,,
+519,Hermanus,Hermanus,Hermanus,Hermanus,872,197,,126,,
+520,Hluhluwe,Hluhluwe,Hluhluwe,Hluhluwe,883,197,,128,,
+521,Hluhluwe iMfolozi Game Reserve,Hluhluwe iMfolozi Game Reserve,Hluhluwe iMfolozi Game Reserve,Hluhluwe iMfolozi Game Reserve,,197,,128,,
+522,Hoedspruit,Hoedspruit,Hoedspruit,Hoedspruit,886,197,,121,51,3520
+523,iSimangaliso Wetland Park,iSimangaliso Wetland Park,iSimangaliso Wetland Park,iSimangaliso Wetland Park,,197,,128,,
+524,Johannesburg,Johannesburg,Johannesburg,Johannesburg,990,197,,126,51,3515
+525,Cape Town,Kapstadt,Kapstadt,Kaapstad,1033,197,,120,51,3511
+526,Kariega Game Reserve,Kariega Game Reserve,Kariega Game Reserve,Kariega Game Reserve,1035,197,,119,,
+527,Kgalagadi Transfrontier Nationalpark,Kgalagadi Transfrontier Nationalpark,Kgalagadi Transfrontier Nationalpark,Kgalagadi Transfrontier Nationalpark,,197,22,,,
+528,Klaserie Private Nature Reserve,Klaserie Private Nature Reserve,Klaserie Private Nature Reserve,Klaserie Private Nature Reserve,1105,197,,121,,
+529,Knysna,Knysna,Knysna,Knysna,1109,197,,119,,
+530,Krüger Nationalpark,Krüger Nationalpark,Krüger Nationalpark,Krüger Nationalpark,,197,,121,,
+531,Ladysmith,Ladysmith,Ladysmith,Ladysmith,1187,197,,117,,
+532,Langebaan,Langebaan,Langebaan,Langebaan,1225,197,,126,,
+533,Mabula Game Reserve,Mabula Game Reserve,Mabula Game Reserve,Mabula Game Reserve,1325,197,,123,,
+534,Madikwe Game Reserve,Madikwe Game Reserve,Madikwe Game Reserve,Madikwe Game Reserve,1333,197,,122,,
+535,MalaMala Game Reserve,MalaMala Game Reserve,MalaMala Game Reserve,MalaMala Game Reserve,,197,,121,,
+536,Mhlambanyatsi,Mhlambanyatsi,Mhlambanyatsi,Mhlambanyatsi,,197,,118,,
+537,Mkambati Nature Reserve,Mkambati Nature Reserve,Mkambati Nature Reserve,Mkambati Nature Reserve,,197,,119,,
+538,Mkuze,Mkuze,Mkuze,Mkuze,1515,197,,128,,
+539,Montagu,Montagu,Montagu,Montagu,1532,197,,126,,
+540,Mossel Bay,Mossel Bay,Mossel Bay,Mossel Bay,1559,197,,119,,
+541,Nkomazi Private Game Reserve,Nkomazi Private Game Reserve,Nkomazi Private Game Reserve,Nkomazi Private Game Reserve,,197,,126,,
+542,Ohrigstad,Ohrigstad,Ohrigstad,Ohrigstad,1728,197,,125,,
+543,Oudtshoorn,Oudtshoorn,Oudtshoorn,Oudtshoorn,1780,197,,119,,
+544,Oyster Bay,Oyster Bay,Oyster Bay,Oyster Bay,1786,197,,119,,
+545,Paternoster,Paternoster,Paternoster,Paternoster,1831,197,,126,,
+546,Phalaborwa,Phalaborwa,Phalaborwa,Phalaborwa,1858,197,,121,,
+547,Phuthaditjhaba,Phuthaditjhaba,Phuthaditjhaba,Phuthaditjhaba,,197,,117,,
+548,Plettenberg Bay,Plettenberg Bay,Plettenberg Bay,Plettenberg Bay,1894,197,,119,,
+549,Pongola,Pongola,Pongola,Pongola,1904,197,,128,,
+550,Port Alfred,Port Alfred,Port Alfred,Port Alfred,1909,197,,119,,
+551,Pretoria,Pretoria,Pretoria,Pretoria,1952,197,,126,51,3512
+552,Qwabi Private Game Reserve,Qwabi Private Game Reserve,Qwabi Private Game Reserve,Qwabi Private Game Reserve,,197,,126,,
+553,Sabi Sand Game Reserve,Sabi Sand Game Reserve,Sabi Sand Game Reserve,Sabi Sand Game Reserve,2092,197,,121,,
+554,Salt Rock,Salt Rock,Salt Rock,Salt Rock,,197,,128,,
+555,Sedgefield,Sedgefield,Sedgefield,Sedgefield,,197,,119,,
+556,Simon´s Town,Simon´s Town,Simon´s Town,Simon´s Town,,197,,120,,
+557,Soutpansberg Mountains,Soutpansberg Mountains,Soutpansberg Mountains,Soutpansberg Mountains,,197,,123,,
+558,St. Francis Bay,St. Francis Bay,St. Francis Bay,St. Francis Bay,2286,197,,119,,
+559,St. Lucia,St. Lucia,St. Lucia,St. Lucia,2295,197,,128,,
+560,Stellenbosch,Stellenbosch,Stellenbosch,Stellenbosch,2304,197,,127,,
+561,Storms River Village,Storms River Village,Storms River Village,Storms River Village,,197,,119,,
+562,Swellendam,Swellendam,Swellendam,Swellendam,2335,197,,126,,
+563,Timbavati Game Reserve,Timbavati Game Reserve,Timbavati Game Reserve,Timbavati Game Reserve,2419,197,,121,,
+564,Tsitsikamma Nationalpark,Tsitsikamma Nationalpark,Tsitsikamma Nationalpark,Tsitsikamma Nationalpark,,197,,119,,
+565,Welgevonden Private Game Reserve,Welgevonden Private Game Reserve,Welgevonden Private Game Reserve,Welgevonden Private Game Reserve,,197,,123,,
+566,White River,White River,White River,White River,2614,197,,125,,
+567,Arusha,Arusha,Arusha,Arusha,94,210,,,51,3529
+568,Bagamoyo,Bagamoyo,Bagamoyo,Bagamoyo,126,210,,,,
+569,Katavi Nationalpark,Katavi Nationalpark,Katavi Nationalpark,Katavi Nationalpark,1046,210,,,,
+570,Lake Manyara Nationalpark,Lake Manyara Nationalpark,Lake Manyara Nationalpark,Lake Manyara Nationalpark,1203,210,,,,
+571,Mafia Island,Mafia Island,Mafia Island,Mafia Island,1338,210,,,,
+572,Mahale Mountain Nationalpark,Mahale Mountain Nationalpark,Mahale Mountain Nationalpark,Mahale Mountain Nationalpark,,210,,,,
+573,Ngorongoro Krater,Ngorongoro Krater,Ngorongoro Krater,Ngorongoro Krater,1672,210,,,,
+574,Nyerere Nationalpark,Nyerere Nationalpark,Nyerere Nationalpark,Nyerere Nationalpark,1715,210,,,,
+575,Pemba Island,Pemba Island,Pemba Island,Pemba Island,1841,210,,,,
+576,Ruaha Nationalpark,Ruaha Nationalpark,Ruaha Nationalpark,Ruaha Nationalpark,2083,210,,,,
+577,Serengeti Nationalpark,Serengeti Nationalpark,Serengeti Nationalpark,Serengeti Nationalpark,2217,210,,,,
+578,Tarangire Nationalpark,Tarangire Nationalpark,Tarangire Nationalpark,Tarangire Nationalpark,2372,210,,,,
+579,Zanzibar,Zanzibar,Zanzibar,Zanzibar,2686,210,,,51,3530
+580,Haapai,Haapai,Haapai,Haapai,823,213,,,,
+581,Nukualofa,Nukualofa,Nukualofa,Nukualofa,,213,,,,
+582,Otea,Otea,Otea,Otea,,213,,,,
+583,Asheville,Asheville,Asheville,Asheville,,221,12,,,
+584,Bradenton,Bradenton,Bradenton,Bradenton,,221,11,,,
+585,Charleston,Charleston,Charleston,Charleston,386,221,13,,,
+586,Charlotte,Charlotte,Charlotte,Charlotte,,221,12,,51,121726
+587,Culver City,Culver City,Culver City,Culver City,,221,,,,
+588,"Duck, Outer Banks","Duck, Outer Banks","Duck, Outer Banks","Duck, Outer Banks",,221,12,,,
+589,Hana,Hana,Hana,Hana,,221,,132,,
+590,Hilton Head Island,Hilton Head Island,Hilton Head Island,Hilton Head Island,,221,13,,,
+591,"Hollywood, CA","Hollywood, CA","Hollywood, CA","Hollywood, CA",,221,,,,
+593,Kaanapali,Kaanapali,Kaanapali,Kaanapali,,221,,132,,
+594,Kahuku,Kahuku,Kahuku,Kahuku,,221,,134,,
+595,Kapa'a,Kapa'a,Kapa'a,Kapa'a,,221,,130,,
+596,Kaunakakai,Kaunakakai,Kaunakakai,Kaunakakai,,221,,133,,
+597,Keauhou,Keauhou,Keauhou,Keauhou,,221,,129,,
+598,Kihei,Kihei,Kihei,Kihei,1086,221,,132,,
+599,Kohala,Kohala,Kohala,Kohala,,221,,129,,
+600,Koloa,Koloa,Koloa,Koloa,,221,,130,,
+601,Kona,Kona,Kona,Kona,1135,221,,129,51,121453
+602,Lahaina,Lahaina,Lahaina,Lahaina,,221,,132,51,121603
+603,Lanai City,Lanai City,Lanai City,Lanai City,,221,,131,,
+604,Lihue,Lihue,Lihue,Lihue,1264,221,,130,,
+605,Marina del Rey/Los Angeles,Marina del Rey/Los Angeles,Marina del Rey/Los Angeles,Marina del Rey/Los Angeles,,221,,,,
+606,Myrtle Beach,Myrtle Beach,Myrtle Beach,Myrtle Beach,,221,13,,,
+607,Naples,Naples,Naples,Naples,,221,11,,,
+608,New York,New York,New York,New York,1660,221,,,51,121439
+609,Poipu Beach,Poipu Beach,Poipu Beach,Poipu Beach,,221,,130,,
+610,San Francisco,San Francisco,San Francisco,San Francisco,2137,221,,,51,121437
+611,Sarasota,Sarasota,Sarasota,Sarasota,,221,11,,,
+612,Volcano Village,Volcano Village,Volcano Village,Volcano Village,,221,,129,,
+613,Wailea,Wailea,Wailea,Wailea,,221,,132,,
+614,Waimea,Waimea,Waimea,Waimea,,221,,130,,
+615,Aore Island,Aore Island,Aore Island,Aore Island,,228,,,,
+616,Lenakel,Lenakel,Lenakel,Lenakel,,228,,,,
+617,Luganville,Luganville,Luganville,Luganville,,228,,,51,24570
+618,Port Vila,Port Vila,Port Vila,Port Vila,,228,,,51,3510
+619,Dubai,Dubai,Dubai,Dubai,575,224,,,51,24575
+620,Kafue Nationalpark,Kafue Nationalpark,Kafue Nationalpark,Kafue Nationalpark,,234,,137,,
+621,Liuwa Plains Nationalpark,Liuwa Plains Nationalpark,Liuwa Plains Nationalpark,Liuwa Plains Nationalpark,,234,,137,,
+622,Livingstone,Livingstone,Livingstone,Livingstone,1282,234,,140,51,3523
+623,Lower Zambezi Nationalpark,Lower Zambezi Nationalpark,Lower Zambezi Nationalpark,Lower Zambezi Nationalpark,,234,,135,,
+624,South Luangwa Nationalpark,South Luangwa Nationalpark,South Luangwa Nationalpark,South Luangwa Nationalpark,,234,,136,,
+625,Gonarezhou NP,Gonarezhou NP,Gonarezhou NP,Gonarezhou NP,760,235,,141,,
+626,Hwange Nationalpark,Hwange Nationalpark,Hwange Nationalpark,Hwange Nationalpark,,235,,138,,
+627,Lake Kariba,Lake Kariba,Lake Kariba,Lake Kariba,1201,235,,,,
+628,Mana Pools,Mana Pools,Mana Pools,Mana Pools,1372,235,,,,
+629,Mana Pools Nationalpark,Mana Pools Nationalpark,Mana Pools Nationalpark,Mana Pools Nationalpark,,235,,141,,
+630,Nyanga Nationalpark,Nyanga Nationalpark,Nyanga Nationalpark,Nyanga Nationalpark,,235,,139,,
+631,Victoria Falls,Victoria Falls,Victoria Falls,Victoria Falls,2540,235,,140,51,3514
+632,Durban,Durban,Durban,Durban,587,197,,128,,
+633,Springbok,Springbok,Springbok,Springbok,2272,197,22,,,
+634,Sun City,Sun City,Sun City,Sun City,2323,197,,123,,
+635,Port Louis,Port Louis,Port Louis,Port Louis,,135,,81,,
+636,Bangkok,Bangkok,Bangkok,Bangkok,149,58,,,,
+637,Kuala Lumpur,Kuala Lumpur,Kuala Lumpur,Kuala Lumpur,1152,35,,,,
+638,Amsterdam,Amsterdam,Amsterdam,Amsterdam,61,150,,,,
+639,Athens,Athen,Athen,Athene,105,84,,,,
+640,Barcelona,Barcelona,Barcelona,Barcelona,,199,,,,
+641,Bergen,Bergen,Bergen,Bergen,,161,,,,
+642,Civitavecchia,Civitavecchia,Civitavecchia,Civitavecchia,,105,,,,
+643,Dubrovnik,Dubrovnik,Dubrovnik,Dubrovnik,,52,,,,
+644,Genoa,Genua,Genua,Genua,,105,,,,
+645,Gibraltar,Gibraltar,Gibraltar,Gibraltar,,83,,,,
+646,Hamburg,Hamburg,Hamburg,Hamburg,,81,,,,
+647,Helsinki,Helsinki,Helsinki,Helsinki,,73,,,,
+648,Istanbul,Istanbul,Istanbul,Istanbul,957,216,,,,
+649,Kiel,Kiel,Kiel,Kiel,,81,,,,
+650,Copenhagen,Kopenhagen,Kopenhagen,Kopenhagen,1139,57,,,,
+651,Lisbon,Lissabon,Lissabon,Lissabon,1278,173,,,,
+652,Longyearbyen,Longyearbyen,Longyearbyen,Longyearbyen,1296,203,,,,
+653,Mallorca,Mallorca,Mallorca,Mallorca,1367,199,,,,
+654,Marseille,Marseille,Marseille,Marseille,,74,,,,
+655,Monaco,Monaco,Monaco,Monaco,,140,,,,
+656,Nice,Nizza,Nizza,Nice,,74,,,,
+657,Oslo,Oslo,Oslo,Oslo,1770,161,,,,
+658,Porto,Porto,Porto,Porto,1940,173,,,,
+659,Reykjavik,Reykjavik,Reykjavik,Reykjavik,2041,98,,,,
+660,Rotterdam,Rotterdam,Rotterdam,Rotterdam,,150,,,,
+661,Southampton,Southampton,Southampton,Southampton,,225,,,,
+662,Split,Split,Split,Split,,52,,,,
+663,Stockholm,Stockholm,Stockholm,Stockholm,,204,,,,
+664,Tallinn,Tallinn,Tallinn,Tallinn,,67,,,,
+665,Tenerife,Teneriffa,Teneriffa,Tenerife,2396,199,,,,
+666,Trondheim,Trondheim,Trondheim,Trondheim,,161,,,,
+667,Venice,Venedig,Venedig,Venetië,,105,,,,
+668,Vienna,Wien,Wien,Wenen,,14,,,,
+669,Warnemünde,Warnemünde,Warnemünde,Warnemünde,,81,,,,
+670,Havana,Havanna,Havanna,Havana,854,53,,,,
+671,Miami,Miami,Miami,Miami,1491,221,,,,
+672,Montreal,Montreal,Montreal,Montreal,1540,38,,,,
+673,Ottawa,Ottawa,Ottawa,Ottawa,1778,38,,,,
+674,Quebec City,Quebec City,Quebec City,Quebec City,2000,38,,,,
+675,Toronto,Toronto,Toronto,Toronto,2443,38,,,,
+676,Vancouver,Vancouver,Vancouver,Vancouver,2525,38,,,,
+677,São Paulo,São Paulo,São Paulo,São Paulo,2175,30,,,,
+678,Montevideo,Montevideo,Montevideo,Montevideo,1538,226,,,,
+679,Beijing,Peking,Peking,Peking,1838,44,,,,
+680,Chiang Mai,Chiang Mai,Chiang Mai,Chiang Mai,403,211,,,,
+681,Colombo,Colombo,Colombo,Colombo,459,200,,,,
+682,Hanoi,Hanoi,Hanoi,Hanoi,846,231,,,,
+683,Ho Chi Minh City,Saigon,Saigon,Ho Chi Minh-stad,2098,231,,,,
+684,Kampala,Kampala,Kampala,Kampala,,222,,,,
+685,Kigali,Kigali,Kigali,Kigali,1085,178,,,,
+686,Kyoto,Kyoto,Kyoto,Kyoto,1166,109,,,,
+687,Luang Prabang,Luang Prabang,Luang Prabang,Luang Prabang,1314,116,,,,
+688,Muscat,Muscat,Muscat,Muscat,,162,,,,
+689,Osaka,Osaka,Osaka,Osaka,1766,109,,,,
+690,Phuket,Phuket,Phuket,Phuket,1869,211,,,,
+691,Seoul,Seoul,Seoul,Seoul,2213,198,,,,
+692,Taipei,Taipei,Taipei,Taipei,2352,208,,,,
+693,Tokyo,Tokio,Tokio,Tokio,2432,109,,,,
+694,Yangon,Yangon,Yangon,Yangon,2661,146,,,,
+695,Casablanca,Casablanca,Casablanca,Casablanca,,144,,,,
+696,Marrakech,Marrakesch,Marrakesch,Marrakesh,1410,144,,,,

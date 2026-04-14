@@ -1,0 +1,13 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,destinations_cluster_id
+1,Europe,Europa,Europa,Europa,7
+2,Africa,Afrika,Afrika,Afrika,1
+3,Middle East,Orient,Orient,Midden-Oosten,2
+4,Asia,Asien,Asien,Azië,2
+5,Indian Ocean,Indischer Ozean,Indischer Ozean,Indische Oceaan,3
+6,Australia,Australien,Australien,Australië,4
+7,New Zealand,Neuseeland,Neuseeland,Nieuw-Zeeland,4
+8,South Pacific,Südsee,Südsee,Stille Zuidzee,4
+9,North America,Nordamerika,Nordamerika,Noord-Amerika,6
+10,Central America and Caribbean,Mittelamerika und Karibik,Mittelamerika und Karibik,Midden-Amerika en Caraïben,5
+11,South America,Südamerika,Südamerika,Zuid-Amerika,5
+12,Antarctica,Antarktis,Antarktis,Antarctica,7

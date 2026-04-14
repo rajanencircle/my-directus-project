@@ -1,0 +1,28 @@
+{
+  "name": "directus-extension-cascading-select",
+  "version": "1.0.0",
+  "description": "Cascading dropdown interface with autocomplete for Directus",
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "directus-custom-interface"
+  ],
+  "type": "module",
+  "directus:extension": {
+    "type": "interface",
+    "path": "dist/index.js",
+    "source": "src/index.ts",
+    "host": "^10.0.0"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w --no-minify",
+    "link": "directus-extension link"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "^10.0.0",
+    "typescript": "^5.0.0",
+    "vue": "^3.3.0"
+  },
+  "dependencies": {}
+}

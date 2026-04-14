@@ -1,0 +1,2583 @@
+[
+  {
+    "id": "0415255e-9281-448e-a2fc-8bd9eb69c230",
+    "name": "(Trigger Flow) MULTIPLE - AI Translations",
+    "icon": "language_japanese_kana",
+    "color": null,
+    "description": null,
+    "trigger": "operation",
+    "options": {},
+    "operation": "52b886dc-0463-40e4-8638-5e6e7b4c5f01",
+    "operations": [
+      {
+        "id": "03cfb929-f883-45bc-9ac9-0a1d4c829413",
+        "name": "languages",
+        "key": "languages",
+        "type": "item-read",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "translations"
+        },
+        "resolve": "69b5eee8-a6c2-4192-81ec-e8e3002f7a1b",
+        "reject": null
+      },
+      {
+        "id": "2799f107-bcec-4cf2-854f-80fb9a9bbb64",
+        "name": "isTranslatable",
+        "key": "isTranslatable",
+        "type": "condition",
+        "position_x": 91,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "script": {
+              "isTranslatable": {
+                "_eq": true
+              }
+            }
+          }
+        },
+        "resolve": "6f4301d4-60f7-40d3-b76b-555b90560222",
+        "reject": "a6045c8a-c6dc-4217-9284-13ad1f076801"
+      },
+      {
+        "id": "52b886dc-0463-40e4-8638-5e6e7b4c5f01",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "json": {
+            "id": "{{ $trigger }}",
+            "from_translation_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+            "to_translation_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9"
+          }
+        },
+        "resolve": "b7a8f9c9-6a52-4f6d-8e93-08a00d8964df",
+        "reject": null
+      },
+      {
+        "id": "69b5eee8-a6c2-4192-81ec-e8e3002f7a1b",
+        "name": "script",
+        "key": "script",
+        "type": "exec",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function (data) {\n  const { transform_payload, languages = [], hotel_translate = [] } = data;\n\n  const fromId = transform_payload?.from_translation_id;\n  const toId = transform_payload?.to_translation_id;\n\n  if (!fromId || !toId) {\n    return {\n      isTranslatable: false,\n      data: [],\n      error: \"Missing from_translation_id or to_translation_id\",\n    };\n  }\n\n  const hotel = hotel_translate.find((h) => h);\n\n  if (!hotel) {\n    return {\n      isTranslatable: false,\n      data: [],\n      error: \"No hotel_translate record found\",\n    };\n  }\n\n  const toLanguage = languages.find((lang) => lang?.id === toId);\n\n  if (!toLanguage) {\n    return {\n      isTranslatable: false,\n      data: [],\n      error: \"Target language not found\",\n    };\n  }\n\n  // Find source multiple translation\n  const sourceMultiple = hotel.translations_multiple?.find(\n    (t) => t?.translations_id?.id === fromId\n  );\n\n  if (!sourceMultiple) {\n    return {\n      isTranslatable: false,\n      data: [],\n      error: \"Source multiple translation not found\",\n    };\n  }\n\n  // Check if target translation already exists\n  const existingMultipleTarget = hotel.translations_multiple?.find(\n    (t) => t?.translations_id?.id === toId\n  );\n\n  const keysToTranslate = [\"name\", \"description\"];\n\n  const result = keysToTranslate\n    .filter((key) => sourceMultiple[key]) // only keys that exist\n    .map((key) => ({\n      hotel_translate_id: hotel.id,\n      field: key,\n      data_to_translate: sourceMultiple[key],\n      from_language: sourceMultiple.translations_id,\n      to_language: toLanguage,\n      hasToTranslateData: !!existingMultipleTarget,\n      existingTranslation: existingMultipleTarget\n        ? existingMultipleTarget\n        : null,\n    }));\n\n  return {\n    isTranslatable: result.length > 0,\n    data: result,\n  };\n};"
+        },
+        "resolve": "2799f107-bcec-4cf2-854f-80fb9a9bbb64",
+        "reject": null
+      },
+      {
+        "id": "6f4301d4-60f7-40d3-b76b-555b90560222",
+        "name": "Trigger Flow",
+        "key": "trigger_flow",
+        "type": "trigger",
+        "position_x": 109,
+        "position_y": 1,
+        "options": {
+          "iterationMode": "batch",
+          "batchSize": null,
+          "payload": "{{script.data}}",
+          "flow": "d67ba115-9f2a-4c79-b860-fd0d987aa61c"
+        },
+        "resolve": "ef8b1071-9ff8-40fb-9b15-21c035a093cd",
+        "reject": null
+      },
+      {
+        "id": "713285a6-3287-49cf-beee-2ac4befc935c",
+        "name": "conditon_add_or_update",
+        "key": "conditon_add_or_update",
+        "type": "condition",
+        "position_x": 153,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "script": {
+              "data[0]": {
+                "hasToTranslateData": {
+                  "_eq": true
+                }
+              }
+            }
+          }
+        },
+        "resolve": "d5ec5dbc-b9de-4252-8da8-a5afd70a46c7",
+        "reject": "fb656df3-b789-48be-967b-8ae4bd3b73a3"
+      },
+      {
+        "id": "a6045c8a-c6dc-4217-9284-13ad1f076801",
+        "name": "log",
+        "key": "log",
+        "type": "log",
+        "position_x": 109,
+        "position_y": 17,
+        "options": {
+          "message": "{{script}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "b7a8f9c9-6a52-4f6d-8e93-08a00d8964df",
+        "name": "hotel_translate",
+        "key": "hotel_translate",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotel_translate",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{transform_payload.id}}"
+              }
+            },
+            "fields": [
+              "*",
+              "translations_single.*",
+              "translations_single.translations_id.*",
+              "translations_multiple.*",
+              "translations_multiple.translations_id.*"
+            ]
+          }
+        },
+        "resolve": "03cfb929-f883-45bc-9ac9-0a1d4c829413",
+        "reject": null
+      },
+      {
+        "id": "d5ec5dbc-b9de-4252-8da8-a5afd70a46c7",
+        "name": "update",
+        "key": "update",
+        "type": "item-update",
+        "position_x": 180,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "payload": "{{script_2}}",
+          "collection": "hotel_translate_translations_1",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{script.data[0].existingTranslation.id}}"
+              }
+            }
+          }
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "ef8b1071-9ff8-40fb-9b15-21c035a093cd",
+        "name": "script_2",
+        "key": "script_2",
+        "type": "exec",
+        "position_x": 130,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function (data) {\n  const triggerResults = data.$last || [];\n\n  const translatedObject = triggerResults\n    .filter(item =>\n      item?.open_web?.status === 200 &&\n      item?.open_web?.data?.choices?.[0]?.message?.content\n    )\n    .reduce((acc, item) => {\n      const fieldName = item?.$trigger?.field;\n      const translatedValue =\n        item?.open_web?.data?.choices?.[0]?.message?.content;\n\n      if (fieldName) {\n        acc[fieldName] = translatedValue;\n      }\n\n      return acc;\n    }, {});\nif(!data.script.data[0].hasToTranslateData){\ntranslatedObject.hotel_translate_id= data.transform_payload.id;\n    translatedObject.translations_id= data.transform_payload.to_translation_id;\n}\n  return translatedObject;\n};"
+        },
+        "resolve": "713285a6-3287-49cf-beee-2ac4befc935c",
+        "reject": null
+      },
+      {
+        "id": "fb656df3-b789-48be-967b-8ae4bd3b73a3",
+        "name": "add",
+        "key": "add",
+        "type": "item-create",
+        "position_x": 184,
+        "position_y": 21,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotel_translate_translations_1",
+          "payload": "{{script_2}}"
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": "9WSA3nE3DN",
+    "accountability": "all"
+  },
+  {
+    "id": "1b43f966-cc8f-4d5f-aa48-ef6b31d2bb39",
+    "name": "Sync New Partner to All Hotels",
+    "icon": "hotel",
+    "color": "#4CAF50",
+    "description": "When a new partner is created, add them to all hotels with partner_type = all",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create"
+      ],
+      "collections": [
+        "partner"
+      ]
+    },
+    "operation": "c6224413-8711-441b-93f0-74a600b67cbf",
+    "operations": [
+      {
+        "id": "098eb4f3-600a-412b-9052-63b9819dc81c",
+        "name": "Read existing hotel links for this partner",
+        "key": "read_existing_links",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "hotels_partner",
+          "query": {
+            "filter": {
+              "partner_id": {
+                "_eq": "{{ $trigger.key }}"
+              }
+            },
+            "fields": [
+              "hotels_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "6f3fdb9b-0441-4197-b52a-93df003edfaa",
+        "reject": null
+      },
+      {
+        "id": "39a7855d-5555-4e72-bb39-f604742c27f4",
+        "name": "No hotels to sync - skip",
+        "key": "no_hotels_log",
+        "type": "log",
+        "position_x": 55,
+        "position_y": 19,
+        "options": {
+          "message": "No hotels with partner_type=all found. Nothing to sync."
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "487cceab-da23-4c6d-b2d1-d07e1247ffba",
+        "name": "Insert partner into all hotels",
+        "key": "create_junction",
+        "type": "item-create",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "hotels_partner",
+          "payload": "{{ build_records.records }}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "6f3fdb9b-0441-4197-b52a-93df003edfaa",
+        "name": "Build junction records for new partner",
+        "key": "build_records",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const hotels = data['read_all_hotels'];\n  const existingLinks = data['read_existing_links'];\n  const partnerId = data['$trigger'].key;\n\n  if (!Array.isArray(hotels) || hotels.length === 0) {\n    return { records: [], count: 0 };\n  }\n\n  const existingHotelIds = new Set(\n    Array.isArray(existingLinks) ? existingLinks.map(function(l) { return l.hotels_id; }) : []\n  );\n\n  const records = hotels\n    .filter(function(h) { return !existingHotelIds.has(h.id); })\n    .map(function(h) { return { hotels_id: h.id, partner_id: partnerId }; });\n\n  return { records: records, count: records.length };\n};"
+        },
+        "resolve": "94cee6cd-e57b-4b94-88ef-a3273703a26a",
+        "reject": null
+      },
+      {
+        "id": "94cee6cd-e57b-4b94-88ef-a3273703a26a",
+        "name": "Check if any hotels to sync",
+        "key": "check_has_records",
+        "type": "condition",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "build_records": {
+              "count": {
+                "_gt": 0
+              }
+            }
+          }
+        },
+        "resolve": "487cceab-da23-4c6d-b2d1-d07e1247ffba",
+        "reject": "39a7855d-5555-4e72-bb39-f604742c27f4"
+      },
+      {
+        "id": "c6224413-8711-441b-93f0-74a600b67cbf",
+        "name": "Read hotels where partner_type = all",
+        "key": "read_all_hotels",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "filter": {
+              "partner_type": {
+                "_eq": "all"
+              }
+            },
+            "fields": [
+              "id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "098eb4f3-600a-412b-9052-63b9819dc81c",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "1de64051-0e0e-4a8d-a46f-66f582f42864",
+    "name": "MULTIPLE Translate Trigger",
+    "icon": "bolt",
+    "color": null,
+    "description": null,
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "hotel_translate"
+      ],
+      "requireConfirmation": true,
+      "confirmationDescription": "Are you sure. you want to translate MULTIPLE?"
+    },
+    "operation": "87dbed43-0f8c-4b4e-923e-58e6aba59cb8",
+    "operations": [
+      {
+        "id": "6955affd-6e7e-4f95-bba4-65dabf1ebfe4",
+        "name": "trigger_multiple",
+        "key": "trigger_multiple",
+        "type": "trigger",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "iterationMode": "parallel",
+          "payload": "{{transform_payload.ids}}",
+          "flow": "0415255e-9281-448e-a2fc-8bd9eb69c230"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "87dbed43-0f8c-4b4e-923e-58e6aba59cb8",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "json": {
+            "ids": "{{ $trigger.body.keys }}"
+          }
+        },
+        "resolve": "6955affd-6e7e-4f95-bba4-65dabf1ebfe4",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": "9WSA3nE3DN",
+    "accountability": "all"
+  },
+  {
+    "id": "357e2900-2702-45ee-9a15-f9e0641a7511",
+    "name": "publication_date - Notify Editor Before Unpublish",
+    "icon": "notifications",
+    "color": "#FF6644",
+    "description": "Sends in-app notification to the last editor when a hotel is about to expire",
+    "trigger": "operation",
+    "options": {
+      "return": "$last"
+    },
+    "operation": "2af438a9-ba65-4959-8670-b989a80c98d1",
+    "operations": [
+      {
+        "id": "2af438a9-ba65-4959-8670-b989a80c98d1",
+        "name": "Notify Last Editor",
+        "key": "notify_editor",
+        "type": "notification",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "recipient": [
+            "{{ $trigger.user_updated }}"
+          ],
+          "subject": "⚠️ '{{ $trigger.name }}' (ID: {{ $trigger.id }}) — unpublishes in 5 days",
+          "message": "The publication entry '{{ $trigger.name }}' (ID: {{ $trigger.id }}) is set to unpublish on {{ $trigger.end_date }}.\n\nPlease review and take action if needed.",
+          "collection": "hotels",
+          "item": "{{ $trigger.id }}"
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "37a5bee0-dced-4f24-a173-8c550600792f",
+    "name": "publication_date - Daily Expiry Check",
+    "icon": "schedule",
+    "color": "#FF9900",
+    "description": "Runs daily at 8am, finds hotels expiring in 5 days, and notifies their last editor",
+    "trigger": "schedule",
+    "options": {
+      "cron": "0 0 8 * * *"
+    },
+    "operation": "43b6d772-c405-422f-a891-8033487ff5fc",
+    "operations": [
+      {
+        "id": "43b6d772-c405-422f-a891-8033487ff5fc",
+        "name": "Compute Target Date (+5 days)",
+        "key": "compute_target_date",
+        "type": "exec",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const d = new Date();\n  d.setDate(d.getDate() + 5);\n  const target = d.toISOString().split('T')[0];\n  return { target_date: target };\n}"
+        },
+        "resolve": "a7731fe6-df0c-427b-a687-d1a6396ef054",
+        "reject": null
+      },
+      {
+        "id": "a7731fe6-df0c-427b-a687-d1a6396ef054",
+        "name": "Find Expiring Hotels",
+        "key": "find_expiring_items",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "fields": [
+              "id",
+              "name",
+              "end_date",
+              "user_updated"
+            ],
+            "filter": {
+              "end_date": {
+                "_eq": "{{ compute_target_date.target_date }}"
+              }
+            },
+            "limit": -1
+          }
+        },
+        "resolve": "e18a6157-3b60-4b0d-b1ea-b3f6c00f7b75",
+        "reject": null
+      },
+      {
+        "id": "e18a6157-3b60-4b0d-b1ea-b3f6c00f7b75",
+        "name": "Notify Each Editor",
+        "key": "notify_each",
+        "type": "trigger",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "flow": "357e2900-2702-45ee-9a15-f9e0641a7511",
+          "payload": "{{ find_expiring_items }}",
+          "iterationMode": "parallel"
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "587baa5a-3c14-4bc6-85c2-99ecba7ecf39",
+    "name": "[TEST] Notification Check - Delete After",
+    "icon": "science",
+    "color": "#999999",
+    "description": null,
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "publication_date",
+        "hotels"
+      ],
+      "requireSelection": false,
+      "requireConfirmation": false,
+      "location": "item"
+    },
+    "operation": "db2567ac-5529-41af-9a13-a3a066192c67",
+    "operations": [
+      {
+        "id": "0cd757b7-01a0-4916-9abb-21f89c92f842",
+        "name": "log",
+        "key": "log",
+        "type": "log",
+        "position_x": 42,
+        "position_y": 2,
+        "options": {
+          "message": "{{$trigger}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "102b2a8e-0df0-4ed6-a247-02f05b8e374b",
+        "name": "condition",
+        "key": "condition",
+        "type": "condition",
+        "position_x": 61,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "compute_target_date": {
+              "isSendNotification": {
+                "_eq": true
+              }
+            }
+          }
+        },
+        "resolve": "96dbc18a-6795-4028-8bcc-2e4c43fb2bd4",
+        "reject": "b474ce26-8b9b-48c2-bc73-2a5eaead0348"
+      },
+      {
+        "id": "96dbc18a-6795-4028-8bcc-2e4c43fb2bd4",
+        "name": "Trigger Notification Flow",
+        "key": "trigger_notify",
+        "type": "trigger",
+        "position_x": 83,
+        "position_y": 1,
+        "options": {
+          "iterationMode": "parallel",
+          "flow": "357e2900-2702-45ee-9a15-f9e0641a7511",
+          "payload": [
+            {
+              "id": "{{read_data[0].id}}",
+              "name": "{{read_data[0].hotel_name}}",
+              "end_date": "{{read_data[0].end_date}}",
+              "user_updated": "{{read_data[0].user_updated}}"
+            }
+          ]
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "a53650ac-6c17-4c0e-8de6-e212d1335053",
+        "name": "Compute Target Date (+5 days)",
+        "key": "compute_target_date",
+        "type": "exec",
+        "position_x": 42,
+        "position_y": 2,
+        "options": {
+          "code": "/*module.exports = async function(data) {\n  const d = new Date();\n  d.setDate(d.getDate() + 5);\n  const target = d.toISOString().split('T')[0];\n  let isSendNotification = false;\n\n  const endDate = new Date(data.read_data.end_date);\n  const targetDate = new Date(target);\n\n  if (endDate <= targetDate) {\n    isSendNotification = true;\n  }\n  return { target_date: target,isSendNotification,endDate,targetDate,read_data:data.read_data };\n}*/\n\nmodule.exports = async function(data) {\n  const d = new Date();\n  d.setDate(d.getDate() + 5);\n  const target = d.toISOString().split('T')[0];\n\n  let isSendNotification = false;\n\n  const endDateStr = data.read_data?.[0]?.end_date;\n\n  if (endDateStr) {\n    const endDate = (new Date(endDateStr)).getTime();\n    const targetDate = (new Date(target)).getTime();\n\n    if (endDate <= targetDate) {\n      isSendNotification = true;\n    }\n\n    return { target_date: target, isSendNotification, endDate, targetDate, read_data: data.read_data ,endDateStr};\n  }\n\n  return { target_date: target, isSendNotification, read_data: data.read_data ,endDateStr};\n};"
+        },
+        "resolve": "102b2a8e-0df0-4ed6-a247-02f05b8e374b",
+        "reject": null
+      },
+      {
+        "id": "b474ce26-8b9b-48c2-bc73-2a5eaead0348",
+        "name": "log_2",
+        "key": "log_2",
+        "type": "log",
+        "position_x": 81,
+        "position_y": 20,
+        "options": {
+          "message": "{{condition}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "db2567ac-5529-41af-9a13-a3a066192c67",
+        "name": "read_data",
+        "key": "read_data",
+        "type": "item-read",
+        "position_x": 23,
+        "position_y": 2,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.body.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": "a53650ac-6c17-4c0e-8de6-e212d1335053",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "6111a945-2b7a-4049-b743-b3b847ebe0d1",
+    "name": "publication_date - Compute Publication Output",
+    "icon": "bolt",
+    "color": "#6644FF",
+    "description": "Computes the output field based on start_date and end_date on create/update",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create",
+        "items.update"
+      ],
+      "collections": [
+        "publication_date",
+        "hotels"
+      ]
+    },
+    "operation": "6a38fddc-610d-41ca-b737-5fbc8cfd1f75",
+    "operations": [
+      {
+        "id": "0519b5db-6e0d-4caa-8b23-23d7a41676fa",
+        "name": "Compute Output Value",
+        "key": "compute_output",
+        "type": "exec",
+        "position_x": 21,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const payload = data.$trigger.payload;\n  const existing = data.read_item;\n\n  // Merge: payload fields take precedence over existing DB values\n  const start_date = 'start_date' in payload ? payload.start_date : existing.start_date;\n  const end_date = 'end_date' in payload ? payload.end_date : existing.end_date;\n\n  let publication_status;\n\n  if (!start_date && !end_date) {\n    publication_status = 'never published';\n  } else if (!start_date && end_date) {\n    publication_status = 'never published';\n  } else if (start_date && !end_date) {\n    publication_status = 'always published';\n  } else {\n    publication_status = 'published period';\n  }\n\n  return { publication_status };\n}"
+        },
+        "resolve": "81fec2c1-120b-46e3-ad9a-5a2959c6c14e",
+        "reject": null
+      },
+      {
+        "id": "55932a5e-f372-490a-ad3e-0c2811f03352",
+        "name": "Read Existing Item",
+        "key": "read_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "fields": [
+              "start_date",
+              "end_date"
+            ]
+          },
+          "key": "{{ resolve_key.item_key }}"
+        },
+        "resolve": "0519b5db-6e0d-4caa-8b23-23d7a41676fa",
+        "reject": null
+      },
+      {
+        "id": "6a38fddc-610d-41ca-b737-5fbc8cfd1f75",
+        "name": "Resolve Item Key (Create or Update)",
+        "key": "resolve_key",
+        "type": "exec",
+        "position_x": 1,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  // For items.create the key is $trigger.key (singular)\n  // For items.update the key is $trigger.keys[0] (array)\n  const keys = data.$trigger.keys;\n  const key = (keys && keys.length > 0) ? keys[0] : data.$trigger.key;\n  return { item_key: key };\n};"
+        },
+        "resolve": "55932a5e-f372-490a-ad3e-0c2811f03352",
+        "reject": null
+      },
+      {
+        "id": "81fec2c1-120b-46e3-ad9a-5a2959c6c14e",
+        "name": "Save Output to Item",
+        "key": "save_output",
+        "type": "item-update",
+        "position_x": 43,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotels",
+          "key": "{{ resolve_key.item_key }}",
+          "payload": {
+            "publication_status": "{{ compute_output.publication_status }}"
+          }
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "615e3c58-7457-4563-850b-10af36c04384",
+    "name": "alt text",
+    "icon": "bolt",
+    "color": null,
+    "description": null,
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "files.upload"
+      ]
+    },
+    "operation": null,
+    "operations": [],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "94835078-2dcf-456e-b974-a3d25f024ba7",
+    "name": "Reconcile Hotel Partner Types",
+    "icon": "sync",
+    "color": "#9C27B0",
+    "description": "Checks all hotels and corrects partner_type based on selected vs total partner count",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "partner"
+      ],
+      "location": "collection",
+      "requireSelection": false,
+      "requireConfirmation": true,
+      "confirmationDescription": "This will log hotels that need partner_type reconciliation.",
+      "async": true
+    },
+    "operation": "121eac0c-a2af-4f56-a0f2-d97c75299d9d",
+    "operations": [
+      {
+        "id": "03bafd0f-ad19-400a-b86b-af45fbcf681e",
+        "name": "Compute which hotels need partner_type update",
+        "key": "compute_updates",
+        "type": "exec",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const allPartners = data['read_all_partners'];\n  const allHotels = data['read_all_hotels'];\n\n  const totalPartners = Array.isArray(allPartners) ? allPartners.length : 0;\n\n  const toAll = [];\n  const toSelected = [];\n  const toNull = [];\n\n  if (Array.isArray(allHotels)) {\n    for (var i = 0; i < allHotels.length; i++) {\n      var hotel = allHotels[i];\n\n      var uniquePartnerIds = new Set(\n        Array.isArray(hotel.partner)\n          ? hotel.partner.map(function(p) { return p.partner_id; })\n          : []\n      );\n      var selectedCount = uniquePartnerIds.size;\n\n      if (selectedCount === 0) {\n        if (hotel.partner_type !== null) {\n          toNull.push({ id: hotel.id, name: hotel.hotel_name, current: hotel.partner_type });\n        }\n      } else if (selectedCount >= totalPartners) {\n        if (hotel.partner_type !== 'all') {\n          toAll.push({ id: hotel.id, name: hotel.hotel_name, current: hotel.partner_type });\n        }\n      } else {\n        if (hotel.partner_type !== 'selected') {\n          toSelected.push({ id: hotel.id, name: hotel.hotel_name, current: hotel.partner_type });\n        }\n      }\n    }\n  }\n\n  return {\n    to_all: toAll.map(function(h) { return h.id; }),\n    to_selected: toSelected.map(function(h) { return h.id; }),\n    to_null: toNull.map(function(h) { return h.id; }),\n    has_to_all: toAll.length > 0,\n    has_to_selected: toSelected.length > 0,\n    has_to_null: toNull.length > 0,\n    to_all_log: toAll.length > 0 ? toAll.map(function(h) { return h.name + ' (' + h.id + ') [was: ' + h.current + '] → all'; }).join('\\n') : 'None',\n    to_selected_log: toSelected.length > 0 ? toSelected.map(function(h) { return h.name + ' (' + h.id + ') [was: ' + h.current + '] → selected'; }).join('\\n') : 'None',\n    to_null_log: toNull.length > 0 ? toNull.map(function(h) { return h.name + ' (' + h.id + ') [was: ' + h.current + '] → null'; }).join('\\n') : 'None'\n  };\n};"
+        },
+        "resolve": "2b0ad7c7-a435-41b1-943c-879bf29ff37a",
+        "reject": null
+      },
+      {
+        "id": "121eac0c-a2af-4f56-a0f2-d97c75299d9d",
+        "name": "Read all partners",
+        "key": "read_all_partners",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "partner",
+          "query": {
+            "fields": [
+              "id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "efe3368f-b09f-43e9-8908-0a97b7cd3545",
+        "reject": null
+      },
+      {
+        "id": "1afd6614-3e87-4db3-887d-f1106fc7c4d6",
+        "name": "Update hotels to selected (decoupled)",
+        "key": "do_update_to_selected",
+        "type": "item-update",
+        "position_x": 88,
+        "position_y": 1,
+        "options": {
+          "collection": "hotels",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "filter": {
+              "id": {
+                "_in": "{{ compute_updates.to_selected }}"
+              }
+            },
+            "limit": -1
+          },
+          "payload": {
+            "partner_type": "selected"
+          }
+        },
+        "resolve": "91c58e5a-70c4-4b69-9fa5-55a6e6a05e1b",
+        "reject": null
+      },
+      {
+        "id": "1eb208b4-517f-4174-8b47-04d213ea7773",
+        "name": "Any hotels to set to all?",
+        "key": "check_to_all",
+        "type": "condition",
+        "position_x": 57,
+        "position_y": 32,
+        "options": {
+          "filter": {
+            "compute_updates": {
+              "has_to_all": {
+                "_eq": true
+              }
+            }
+          }
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "2b0ad7c7-a435-41b1-943c-879bf29ff37a",
+        "name": "Update hotels to all (decoupled)",
+        "key": "do_update_to_all",
+        "type": "item-update",
+        "position_x": 71,
+        "position_y": 1,
+        "options": {
+          "collection": "hotels",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "filter": {
+              "id": {
+                "_in": "{{ compute_updates.to_all }}"
+              }
+            },
+            "limit": -1
+          },
+          "payload": {
+            "partner_type": "all"
+          }
+        },
+        "resolve": "1afd6614-3e87-4db3-887d-f1106fc7c4d6",
+        "reject": null
+      },
+      {
+        "id": "30e2a02a-3227-422a-876c-44ca6459e7f1",
+        "name": "Log hotels changing to all",
+        "key": "update_to_all",
+        "type": "log",
+        "position_x": 72,
+        "position_y": 32,
+        "options": {
+          "message": "Hotels to change to ALL:\n{{ compute_updates.to_all_log }}"
+        },
+        "resolve": "599ffc58-85f6-40ab-b18e-bdc9c9df050f",
+        "reject": null
+      },
+      {
+        "id": "599ffc58-85f6-40ab-b18e-bdc9c9df050f",
+        "name": "Log hotels changing to selected",
+        "key": "update_to_selected",
+        "type": "log",
+        "position_x": 110,
+        "position_y": 31,
+        "options": {
+          "message": "Hotels to change to SELECTED:\n{{ compute_updates.to_selected_log }}"
+        },
+        "resolve": "fcc1f3ca-490e-4d56-8172-faa4cf7ed753",
+        "reject": null
+      },
+      {
+        "id": "91c58e5a-70c4-4b69-9fa5-55a6e6a05e1b",
+        "name": "Update hotels to null",
+        "key": "do_update_to_null",
+        "type": "item-update",
+        "position_x": 105,
+        "position_y": 1,
+        "options": {
+          "collection": "hotels",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "filter": {
+              "id": {
+                "_in": "{{ compute_updates.to_null }}"
+              }
+            },
+            "limit": -1
+          },
+          "payload": {
+            "partner_type": null
+          }
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "ef6aa8a3-383f-4bea-948b-774a8d32e163",
+        "name": "Any hotels to set to selected?",
+        "key": "check_to_selected",
+        "type": "condition",
+        "position_x": 87,
+        "position_y": 34,
+        "options": {
+          "filter": {
+            "compute_updates": {
+              "has_to_selected": {
+                "_eq": true
+              }
+            }
+          }
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "efe3368f-b09f-43e9-8908-0a97b7cd3545",
+        "name": "Read all hotels with partners",
+        "key": "read_all_hotels",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_name",
+              "partner_type",
+              "partner.partner_id"
+            ],
+            "limit": -1,
+            "deep": {
+              "partner": {
+                "_limit": -1
+              }
+            }
+          }
+        },
+        "resolve": "03bafd0f-ad19-400a-b86b-af45fbcf681e",
+        "reject": null
+      },
+      {
+        "id": "fcc1f3ca-490e-4d56-8172-faa4cf7ed753",
+        "name": "Log hotels changing to null",
+        "key": "log_to_null",
+        "type": "log",
+        "position_x": 132,
+        "position_y": 27,
+        "options": {
+          "message": "Hotels to change to NULL:\n{{ compute_updates.to_null_log }}"
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "996832f3-833a-4aa2-898f-c35928a65ad6",
+    "name": "Delete Room Prices",
+    "icon": "delete_sweep",
+    "color": "#F00000",
+    "description": "On Delete of Room Categories, Price Dates or Occupancies, than delete the respective Room Prices",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.delete"
+      ],
+      "collections": [
+        "room_categories",
+        "price_dates",
+        "occupancies"
+      ]
+    },
+    "operation": "62718238-10e2-4a11-944b-77f37f0b68f8",
+    "operations": [
+      {
+        "id": "62718238-10e2-4a11-944b-77f37f0b68f8",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 8,
+        "position_y": 20,
+        "options": {
+          "json": {
+            "trigger": "{{ $trigger}}"
+          }
+        },
+        "resolve": "7318bdc4-c657-47a9-bc07-f8af4d2dbb08",
+        "reject": null
+      },
+      {
+        "id": "7318bdc4-c657-47a9-bc07-f8af4d2dbb08",
+        "name": "log",
+        "key": "log",
+        "type": "log",
+        "position_x": 26,
+        "position_y": 20,
+        "options": {
+          "message": "{{transform_payload}}"
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "a6bc119b-a228-4d03-a445-603e76dc7f05",
+    "name": "Sync New Partner to All Filters",
+    "icon": null,
+    "color": null,
+    "description": null,
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create"
+      ],
+      "collections": [
+        "partner"
+      ]
+    },
+    "operation": "a8c67557-3769-4d33-a0c3-70b185703937",
+    "operations": [
+      {
+        "id": "19436fd7-93de-4719-b4d5-a5a1fa0b331e",
+        "name": "No missing records - skip",
+        "key": "no_missing_records",
+        "type": "log",
+        "position_x": 55,
+        "position_y": 19,
+        "options": {
+          "message": "No missing partner records to sync. All filters are up to date."
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "8e7127f1-d01b-4a44-bd69-c64e5a45e7f0",
+        "name": "Build missing junction records",
+        "key": "build_records",
+        "type": "exec",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const allPartners = data['read_all_partners'];\n  const filters = data['read_filters'];\n\n  if (!Array.isArray(allPartners) || !Array.isArray(filters)) {\n    return { records: [], count: 0 };\n  }\n\n  const allPartnerIds = allPartners.map(function(p) { return p.id; });\n  const records = [];\n\n  for (var i = 0; i < filters.length; i++) {\n    var filter = filters[i];\n    var existingIds = new Set(\n      (filter.selected_partners || []).map(function(sp) { return sp.partner_id; })\n    );\n\n    for (var j = 0; j < allPartnerIds.length; j++) {\n      if (!existingIds.has(allPartnerIds[j])) {\n        records.push({\n          partner_filter_id: filter.id,\n          partner_id: allPartnerIds[j]\n        });\n      }\n    }\n  }\n\n  return { records: records, count: records.length };\n};"
+        },
+        "resolve": "e5f61a9e-f67d-43c5-8377-d2d4e175de66",
+        "reject": null
+      },
+      {
+        "id": "a8c67557-3769-4d33-a0c3-70b185703937",
+        "name": "Read all partners",
+        "key": "read_all_partners",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "partner",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "c43efc6f-17d7-4121-94a2-b15e3addeb68",
+        "reject": null
+      },
+      {
+        "id": "b585dd75-51ce-42c2-ab63-1c142ea26d61",
+        "name": "Bulk insert into partner_filter_partners",
+        "key": "bulk_insert",
+        "type": "item-create",
+        "position_x": 91,
+        "position_y": 1,
+        "options": {
+          "collection": "partner_filter_partner",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{ build_records.records }}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "c43efc6f-17d7-4121-94a2-b15e3addeb68",
+        "name": "Read partner_filter where type = all",
+        "key": "read_filters",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "collection": "partner_filter",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "selected_partners.partner_id"
+            ],
+            "filter": {
+              "partner_type": {
+                "_eq": "all"
+              }
+            },
+            "limit": -1
+          }
+        },
+        "resolve": "8e7127f1-d01b-4a44-bd69-c64e5a45e7f0",
+        "reject": null
+      },
+      {
+        "id": "e5f61a9e-f67d-43c5-8377-d2d4e175de66",
+        "name": "Check if any filters matched",
+        "key": "check_if_any_filters_matched",
+        "type": "condition",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "build_records": {
+              "count": {
+                "_gt": 0
+              }
+            }
+          }
+        },
+        "resolve": "b585dd75-51ce-42c2-ab63-1c142ea26d61",
+        "reject": "19436fd7-93de-4719-b4d5-a5a1fa0b331e"
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "b6148f77-5dd3-4916-9937-dc1acfb46722",
+    "name": "Sync All Partners When Filter Changes to All",
+    "icon": null,
+    "color": null,
+    "description": null,
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.update"
+      ],
+      "collections": [
+        "partner_filter"
+      ]
+    },
+    "operation": "48f7e93b-1747-42c9-be23-635b8dd426a3",
+    "operations": [
+      {
+        "id": "32222a38-2678-4536-bf80-3dc5305eb8eb",
+        "name": "Read existing partner_filter_partner for this filter",
+        "key": "read_existing_partners",
+        "type": "item-read",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "collection": "partner_filter_partner",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "partner_id"
+            ],
+            "filter": {
+              "partner_filter_id": {
+                "_eq": "{{ $trigger.keys[0] }}"
+              }
+            },
+            "limit": -1
+          }
+        },
+        "resolve": "a5361c78-fa01-4086-bd1d-06d430ef6bb8",
+        "reject": null
+      },
+      {
+        "id": "48f7e93b-1747-42c9-be23-635b8dd426a3",
+        "name": "Check if partner_type changed to all",
+        "key": "check_type_is_all",
+        "type": "condition",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "$trigger": {
+              "payload": {
+                "partner_type": {
+                  "_eq": "all"
+                }
+              }
+            }
+          }
+        },
+        "resolve": "b43bf9a2-121e-43cb-96dc-05330c06cd14",
+        "reject": null
+      },
+      {
+        "id": "68a67564-7bfb-42be-b98f-39eae63739ff",
+        "name": "Bulk insert into partner_filter_partner",
+        "key": "bulk_insert",
+        "type": "item-create",
+        "position_x": 109,
+        "position_y": 1,
+        "options": {
+          "collection": "partner_filter_partner",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{ build_records.records }}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "86de3d01-4475-4ebe-8875-498b7acc0da9",
+        "name": "Check if any records to insert",
+        "key": "check_records_exist",
+        "type": "condition",
+        "position_x": 91,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "build_records": {
+              "count": {
+                "_gt": 0
+              }
+            }
+          }
+        },
+        "resolve": "68a67564-7bfb-42be-b98f-39eae63739ff",
+        "reject": null
+      },
+      {
+        "id": "a5361c78-fa01-4086-bd1d-06d430ef6bb8",
+        "name": "Build missing junction records",
+        "key": "build_records",
+        "type": "exec",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const allPartners = data['read_all_partners'];\n  const existing = data['read_existing_partners'];\n  const filterId = data['$trigger'].keys[0];\n\n  if (!Array.isArray(allPartners)) {\n    return { records: [], count: 0 };\n  }\n\n  const existingIds = new Set(\n    (Array.isArray(existing) ? existing : []).map(function(r) { return r.partner_id; })\n  );\n\n  const records = [];\n  for (var i = 0; i < allPartners.length; i++) {\n    if (!existingIds.has(allPartners[i].id)) {\n      records.push({\n        partner_filter_id: filterId,\n        partner_id: allPartners[i].id\n      });\n    }\n  }\n\n  return { records: records, count: records.length };\n};"
+        },
+        "resolve": "86de3d01-4475-4ebe-8875-498b7acc0da9",
+        "reject": null
+      },
+      {
+        "id": "b43bf9a2-121e-43cb-96dc-05330c06cd14",
+        "name": "Read all partners",
+        "key": "read_all_partners",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "collection": "partner",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "32222a38-2678-4536-bf80-3dc5305eb8eb",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "badbe328-d0d8-4ff1-8199-534780cfc9ad",
+    "name": "Map Pin",
+    "icon": "file_map",
+    "color": null,
+    "description": "Map location set using co-ordinates in Geo Location",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create",
+        "items.update"
+      ],
+      "collections": [
+        "geo_location"
+      ]
+    },
+    "operation": "34ce3dc1-b655-4f56-922e-3342b2e3a5e6",
+    "operations": [
+      {
+        "id": "2a5df964-4145-4699-8312-1d94d786c58e",
+        "name": "read_data",
+        "key": "read_data",
+        "type": "item-read",
+        "position_x": 39,
+        "position_y": 3,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "geo_location",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": "9da59d56-951a-441f-8696-242eb504e65d",
+        "reject": null
+      },
+      {
+        "id": "34ce3dc1-b655-4f56-922e-3342b2e3a5e6",
+        "name": "log",
+        "key": "log",
+        "type": "log",
+        "position_x": 21,
+        "position_y": 3,
+        "options": {
+          "message": "{{$trigger}}"
+        },
+        "resolve": "2a5df964-4145-4699-8312-1d94d786c58e",
+        "reject": null
+      },
+      {
+        "id": "38b7549c-61ac-4016-90b7-13b9bfd46f2d",
+        "name": "update",
+        "key": "update",
+        "type": "item-update",
+        "position_x": 80,
+        "position_y": 3,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "payload": "{{script}}",
+          "collection": "geo_location",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "9da59d56-951a-441f-8696-242eb504e65d",
+        "name": "script",
+        "key": "script",
+        "type": "exec",
+        "position_x": 57,
+        "position_y": 3,
+        "options": {
+          "code": "module.exports = async function(data) {\n\t// Do something...\n\treturn {\n    \"point_location\": {\n        \"type\": \"Point\",\n        \"coordinates\": [\n            parseFloat(data.read_data[0].longitude),\n            parseFloat(data.read_data[0].latitude)\n        ]\n    }\n};\n}"
+        },
+        "resolve": "38b7549c-61ac-4016-90b7-13b9bfd46f2d",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "cfcfcbdd-1829-4f10-9418-27b1e61f4eec",
+    "name": "Sync All Partners to Hotel When Changed to All",
+    "icon": "hotel",
+    "color": "#2196F3",
+    "description": "When a hotel's partner_type changes to all, sync all existing partners into it",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create",
+        "items.update"
+      ],
+      "collections": [
+        "hotels"
+      ]
+    },
+    "operation": "ca676ff8-15b0-49b9-86ff-4bb55e4dd402",
+    "operations": [
+      {
+        "id": "0708cf27-5161-4266-b552-eb7f75e4a5da",
+        "name": "Build missing junction records",
+        "key": "build_missing_records",
+        "type": "exec",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const allPartners = data['read_all_partners'];\n  const hotels = data['read_current_hotel'];\n\n  if (!Array.isArray(allPartners) || !Array.isArray(hotels) || hotels.length === 0) {\n    return { records: [], count: 0 };\n  }\n\n  const currentHotel = hotels[0];\n  const hotelId = currentHotel.id;\n  const existingIds = new Set(\n    (currentHotel.partner || []).map(function(p) { return p.partner_id; })\n  );\n\n  const records = [];\n  for (var i = 0; i < allPartners.length; i++) {\n    if (!existingIds.has(allPartners[i].id)) {\n      records.push({ hotels_id: hotelId, partner_id: allPartners[i].id });\n    }\n  }\n\n  return { records: records, count: records.length };\n};"
+        },
+        "resolve": "9989793e-833d-4abc-93ac-fcb268bf5163",
+        "reject": null
+      },
+      {
+        "id": "39a175d3-b49c-45cd-98e6-39ebc611cf45",
+        "name": "Bulk insert partners into hotel",
+        "key": "create_junction",
+        "type": "item-create",
+        "position_x": 109,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "hotels_partner",
+          "payload": "{{ build_missing_records.records }}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "3f4d48a9-e954-4d44-a824-f43820d2e73a",
+        "name": "Read this hotel with existing partners",
+        "key": "read_current_hotel",
+        "type": "item-read",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{ normalize_hotel_id.hotel_id }}"
+              }
+            },
+            "fields": [
+              "id",
+              "partner.partner_id"
+            ],
+            "limit": 1
+          }
+        },
+        "resolve": "0708cf27-5161-4266-b552-eb7f75e4a5da",
+        "reject": null
+      },
+      {
+        "id": "9989793e-833d-4abc-93ac-fcb268bf5163",
+        "name": "Check if any partners are missing",
+        "key": "check_has_records",
+        "type": "condition",
+        "position_x": 91,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "build_missing_records": {
+              "count": {
+                "_gt": 0
+              }
+            }
+          }
+        },
+        "resolve": "39a175d3-b49c-45cd-98e6-39ebc611cf45",
+        "reject": "f1f05de9-9d19-460b-884e-bf11ac3d9de4"
+      },
+      {
+        "id": "a21d3007-3c32-4b3e-b9a1-5bd4cd9595a9",
+        "name": "Normalize hotel ID (create vs update)",
+        "key": "normalize_hotel_id",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 19,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const trigger = data['$trigger'];\n  const id = (trigger.keys && trigger.keys[0]) || trigger.key;\n  return { hotel_id: id };\n};"
+        },
+        "resolve": "ec479c14-7250-42f7-ac2d-18fe43e80da8",
+        "reject": null
+      },
+      {
+        "id": "ca676ff8-15b0-49b9-86ff-4bb55e4dd402",
+        "name": "Check partner_type = all",
+        "key": "condition_is_all",
+        "type": "condition",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "$trigger": {
+              "payload": {
+                "partner_type": {
+                  "_eq": "all"
+                }
+              }
+            }
+          }
+        },
+        "resolve": "a21d3007-3c32-4b3e-b9a1-5bd4cd9595a9",
+        "reject": null
+      },
+      {
+        "id": "ec479c14-7250-42f7-ac2d-18fe43e80da8",
+        "name": "Read all partners",
+        "key": "read_all_partners",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "permissions": "$full",
+          "emitEvents": false,
+          "collection": "partner",
+          "query": {
+            "fields": [
+              "id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "3f4d48a9-e954-4d44-a824-f43820d2e73a",
+        "reject": null
+      },
+      {
+        "id": "f1f05de9-9d19-460b-884e-bf11ac3d9de4",
+        "name": "No missing records - skip",
+        "key": "no_missing_records",
+        "type": "log",
+        "position_x": 91,
+        "position_y": 19,
+        "options": {
+          "message": "No missing partner records to sync. Hotel is already up to date."
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "d3960afd-9f72-417f-8cce-f8269f67c61c",
+    "name": "Calculate Sell Prices",
+    "icon": "calculate",
+    "color": "#DFDEED",
+    "description": null,
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "hotels"
+      ],
+      "requireSelection": false,
+      "location": "item",
+      "async": true,
+      "requireConfirmation": true
+    },
+    "operation": "7afbdfa4-3ba3-4ab1-9022-38bf801b0cdd",
+    "operations": [
+      {
+        "id": "08123070-fd21-4d82-a75e-57bf80703910",
+        "name": "room_prices",
+        "key": "room_prices",
+        "type": "item-read",
+        "position_x": 43,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          },
+          "collection": "room_prices"
+        },
+        "resolve": "10897137-c12c-44ee-8efb-37c066dfed67",
+        "reject": null
+      },
+      {
+        "id": "10897137-c12c-44ee-8efb-37c066dfed67",
+        "name": "occupancies",
+        "key": "occupancies",
+        "type": "item-read",
+        "position_x": 46,
+        "position_y": 18,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          },
+          "collection": "occupancies"
+        },
+        "resolve": "3bb9cccf-109d-4fa8-ba32-35e64c7aa241",
+        "reject": null
+      },
+      {
+        "id": "12adcf6b-06dd-4a89-9858-14826d2b674f",
+        "name": "exchange_rate",
+        "key": "exchange_rate",
+        "type": "item-read",
+        "position_x": 24,
+        "position_y": 18,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{hotel_data[0].exchange_rate.key}}"
+              }
+            }
+          },
+          "collection": "rates"
+        },
+        "resolve": "08123070-fd21-4d82-a75e-57bf80703910",
+        "reject": null
+      },
+      {
+        "id": "3994dd24-6734-4269-8ee5-e57036f3b6a9",
+        "name": "hotel_data",
+        "key": "hotel_data",
+        "type": "item-read",
+        "position_x": 22,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          },
+          "collection": "hotels"
+        },
+        "resolve": "12adcf6b-06dd-4a89-9858-14826d2b674f",
+        "reject": null
+      },
+      {
+        "id": "3bb9cccf-109d-4fa8-ba32-35e64c7aa241",
+        "name": "calculated_sell_prices",
+        "key": "calculated_sell_prices",
+        "type": "exec",
+        "position_x": 65,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function (data) {\n  const hotel_data = data.hotel_data[0];\n  const room_prices = data.room_prices;\n\n  const buy_price_type = hotel_data.buy_price_type; //\"per_person\" or \"per_unit\"\n  const sell_price_type = hotel_data.sell_price_type; //\"per_person\" or \"per_unit\"\n  const percentage_type = hotel_data.percentage_type; //\"net\" or \"gross\"\n  const margin_percentage = hotel_data.margin_percentage;\n  const provision_percentage = hotel_data.provision_percentage;\n  const exchange_rate = data.exchange_rate[0].rate;\n  const occupancies = data.occupancies;\n\n  function roundHalf(val) {\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  function calculateSellPrice(buy, occupancy_id) {\n    if (buy == null) return null;\n    const margin = margin_percentage / 100;\n    const provision = provision_percentage / 100;\n    const converted_buy = buy * exchange_rate;\n\n    let sell = null;\n    if (percentage_type === \"net\") {\n      sell = converted_buy / (1 - margin);\n    }\n    if (percentage_type === \"gross\") {\n      sell = (converted_buy * (1 - provision)) / (1 - margin);\n    }\n\n    if (buy_price_type === sell_price_type) {\n      return roundHalf(sell);\n    }\n    if (buy_price_type !== sell_price_type) {\n      const occupancy = occupancies.find((o) => o.id === occupancy_id);\n      return roundHalf(sell / (occupancy?.value ?? 1));\n    }\n\n    return null;\n  }\n\n  const calculated_sell_prices = room_prices.map((item) => {\n    const buy = item.buy_price;\n    const occupancy_id = item.occupancy_id;\n    const sell = calculateSellPrice(buy, occupancy_id);\n\n    return {\n      id: item.id,\n      sell_price: sell,\n    };\n  });\n\n  return calculated_sell_prices;\n};\n"
+        },
+        "resolve": "73859b0f-84f0-4f14-8bb5-896d0789a074",
+        "reject": null
+      },
+      {
+        "id": "73859b0f-84f0-4f14-8bb5-896d0789a074",
+        "name": "update_room_sell_prices",
+        "key": "update_room_sell_prices",
+        "type": "item-update",
+        "position_x": 69,
+        "position_y": 18,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "room_prices",
+          "payload": "{{calculated_sell_prices}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "7afbdfa4-3ba3-4ab1-9022-38bf801b0cdd",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 4,
+        "position_y": 20,
+        "options": {
+          "json": {
+            "hotel_id": "{{ $trigger.body.keys[0] }}"
+          }
+        },
+        "resolve": "3994dd24-6734-4269-8ee5-e57036f3b6a9",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "d4b7ff69-61f3-400d-a213-25c21a2ff495",
+    "name": "Calculate Surcharge Prices",
+    "icon": "exposure",
+    "color": "#9DF292",
+    "description": null,
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "hotels"
+      ],
+      "location": "item",
+      "requireConfirmation": true
+    },
+    "operation": "4a6c195c-df9f-4550-9e91-db046d0c2ee0",
+    "operations": [
+      {
+        "id": "326bf94d-83d4-419f-814c-cdc5b41c5f44",
+        "name": "hotel_data",
+        "key": "hotel_data",
+        "type": "item-read",
+        "position_x": 23,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "38d74632-276e-4da2-bc4c-e45c4ea99a22",
+        "reject": null
+      },
+      {
+        "id": "38d74632-276e-4da2-bc4c-e45c4ea99a22",
+        "name": "surcharge_exchange_rate",
+        "key": "surcharge_exchange_rate",
+        "type": "item-read",
+        "position_x": 27,
+        "position_y": 18,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "rates",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{hotel_data[0].surcharge_exchange_rate.key}}"
+              }
+            }
+          }
+        },
+        "resolve": "dda7bb08-3fc3-4f07-9359-6f69fa65d223",
+        "reject": null
+      },
+      {
+        "id": "4460f0e5-df44-49bc-a79e-a6db77f145b9",
+        "name": "update_surcharge_sell_prices",
+        "key": "update_surcharge_sell_prices",
+        "type": "item-update",
+        "position_x": 67,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "surcharges",
+          "payload": "{{calculated_surcharge_prices}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "4a6c195c-df9f-4550-9e91-db046d0c2ee0",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 5,
+        "position_y": 19,
+        "options": {
+          "json": {
+            "hotel_id": "{{ $trigger.body.keys[0] }}"
+          }
+        },
+        "resolve": "326bf94d-83d4-419f-814c-cdc5b41c5f44",
+        "reject": null
+      },
+      {
+        "id": "825f6b4f-a559-4fc1-8192-3220fbbd6613",
+        "name": "calculated_surcharge_prices",
+        "key": "calculated_surcharge_prices",
+        "type": "exec",
+        "position_x": 49,
+        "position_y": 19,
+        "options": {
+          "code": "module.exports = async function (data) {\n  const hotel_data = data.hotel_data[0];\n  const surcharges = data.surcharges;\n\n  const percentage_type = hotel_data.surcharge_percentage_type; //\"net\" or \"gross\"\n  const margin_percentage = hotel_data.surcharge_margin_percentage;\n  const provision_percentage = hotel_data.surcharge_provision_percentage;\n  const exchange_rate = data.surcharge_exchange_rate[0].rate;\n\n  function roundHalf(val) {\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  function calculateSellPrice(buy) {\n    if (buy == null) return null;\n    const margin = margin_percentage / 100;\n    const provision = provision_percentage / 100;\n    const converted_buy = buy * exchange_rate;\n\n    let sell = null;\n    if (percentage_type === \"net\") {\n      sell = converted_buy / (1 - margin);\n    }\n    if (percentage_type === \"gross\") {\n      sell = (converted_buy * (1 - provision)) / (1 - margin);\n    }\n    return roundHalf(sell);\n  }\n\n  const calculated_sell_prices = surcharges.map((item) => {\n    const buy = item.buy_price;\n    const sell = calculateSellPrice(buy);\n\n    return {\n      id: item.id,\n      sell_price: sell,\n    };\n  });\n\n  return calculated_sell_prices;\n};\n"
+        },
+        "resolve": "4460f0e5-df44-49bc-a79e-a6db77f145b9",
+        "reject": null
+      },
+      {
+        "id": "dda7bb08-3fc3-4f07-9359-6f69fa65d223",
+        "name": "surcharges",
+        "key": "surcharges",
+        "type": "item-read",
+        "position_x": 45,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "surcharges",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "825f6b4f-a559-4fc1-8192-3220fbbd6613",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "d67ba115-9f2a-4c79-b860-fd0d987aa61c",
+    "name": "(Trigger Flow) AI Translations WEBHOOK",
+    "icon": "g_translate",
+    "color": null,
+    "description": null,
+    "trigger": "operation",
+    "options": {
+      "return": "$all"
+    },
+    "operation": "48567510-3b99-49fb-872e-0703106454fe",
+    "operations": [
+      {
+        "id": "48567510-3b99-49fb-872e-0703106454fe",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 23,
+        "position_y": 2,
+        "options": {
+          "json": {
+            "script": "{{ $trigger }}"
+          }
+        },
+        "resolve": "deea72a4-8532-4cb3-85ce-3bd13c8d564c",
+        "reject": null
+      },
+      {
+        "id": "deea72a4-8532-4cb3-85ce-3bd13c8d564c",
+        "name": "open_web",
+        "key": "open_web",
+        "type": "request",
+        "position_x": 46,
+        "position_y": 1,
+        "options": {
+          "method": "POST",
+          "url": "https://botg.ai-playground.pro/api/chat/completions",
+          "headers": [
+            {
+              "header": "Accept",
+              "value": "application/json"
+            },
+            {
+              "header": "Authorization",
+              "value": "Bearer sk-00ffbf07910743b4b3a30bcb3d16bcf2"
+            },
+            {
+              "header": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"model\": \"-hotel-translator-vlaams-beta-v2\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"You are a language translator. Translate '{{transform_payload.script.data_to_translate}}' from {{transform_payload.script.from_language.name}} {{transform_payload.script.from_language.code}} to {{transform_payload.script.to_language.name}} {{transform_payload.script.to_language.code}}. Only return the translated text.\"\n    }\n  ]\n}"
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": "9WSA3nE3DN",
+    "accountability": "all"
+  },
+  {
+    "id": "d7608c01-5670-4daa-8369-ffb548d9d6c1",
+    "name": "(Trigger Flow) SINGLE - AI Translations",
+    "icon": "language_japanese_kana",
+    "color": null,
+    "description": null,
+    "trigger": "operation",
+    "options": {},
+    "operation": "e1570214-22ca-437b-a2b9-64c20b2317b5",
+    "operations": [
+      {
+        "id": "0bd40973-1c37-4830-adbc-7e92dc4fdc8c",
+        "name": "languages",
+        "key": "languages",
+        "type": "item-read",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "translations"
+        },
+        "resolve": "b00b2969-977f-4b3b-87a3-7445b4df6ef0",
+        "reject": null
+      },
+      {
+        "id": "28755255-b395-44a4-b765-18518fe26518",
+        "name": "conditon_add_or_update",
+        "key": "conditon_add_or_update",
+        "type": "condition",
+        "position_x": 153,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "script": {
+              "hasToTranslateData": {
+                "_eq": true
+              }
+            }
+          }
+        },
+        "resolve": "44aa94ab-6a84-46b5-86d4-99e99839158f",
+        "reject": "865505c4-6acb-4ee2-8a72-e04621644e41"
+      },
+      {
+        "id": "3ec8969c-f83a-43e1-be9b-91b52cd401f0",
+        "name": "log",
+        "key": "log",
+        "type": "log",
+        "position_x": 109,
+        "position_y": 17,
+        "options": {
+          "message": "{{script}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "42192011-cda6-4578-aade-c23836f0c5db",
+        "name": "isTranslatable",
+        "key": "isTranslatable",
+        "type": "condition",
+        "position_x": 91,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "script": {
+              "isTranslatable": {
+                "_eq": true
+              }
+            }
+          }
+        },
+        "resolve": "d628165b-7f53-40b8-8ce7-25710c760957",
+        "reject": "3ec8969c-f83a-43e1-be9b-91b52cd401f0"
+      },
+      {
+        "id": "44aa94ab-6a84-46b5-86d4-99e99839158f",
+        "name": "update",
+        "key": "update",
+        "type": "item-update",
+        "position_x": 171,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "payload": {
+            "title": "{{open_web.data.choices[0].message.content}}"
+          },
+          "collection": "hotel_translate_translations",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{script.toTranslate.id}}"
+              }
+            }
+          }
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "865505c4-6acb-4ee2-8a72-e04621644e41",
+        "name": "add",
+        "key": "add",
+        "type": "item-create",
+        "position_x": 171,
+        "position_y": 17,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotel_translate_translations",
+          "payload": {
+            "hotel_translate_id": "{{script.hotel_translate_id}}",
+            "translations_id": "{{transform_payload.to_translation_id}}",
+            "title": "{{open_web.data.choices[0].message.content}}"
+          }
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "a050d20d-a889-4c33-8d71-142bbac9e0a0",
+        "name": "log_2",
+        "key": "log_2",
+        "type": "log",
+        "position_x": 153,
+        "position_y": 17,
+        "options": {
+          "message": "{{open_web}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "b00b2969-977f-4b3b-87a3-7445b4df6ef0",
+        "name": "script",
+        "key": "script",
+        "type": "exec",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n\tconst { transform_payload, languages = [], hotel_translate = [] } = data;\n\n  const fromId = transform_payload?.from_translation_id;\n  const toId = transform_payload?.to_translation_id;\n\n  if (!fromId || !toId) {\n    return {\n        isTranslatable : false,\n      data: [],\n      error: \"Missing from_translation_id or to_translation_id\",\n    };\n  }\n\n  // Find source hotel dynamically (if exists)\n  const hotel = hotel_translate.find((h) => h?.translations_single?.length);\n\n  if (!hotel) {\n    return {\n        isTranslatable : false,\n      data: [],\n      error: \"No hotel_translate record found\",\n    };\n  }\n\n  // Find matching source translation\n  const sourceTranslation = hotel.translations_single.find(\n    (t) => t?.translations_id?.id === fromId,\n  );\n\n  if (!sourceTranslation) {\n    return {\n        isTranslatable : false,\n      data: [],\n      error: \"Source translation not found\",\n    };\n  }\n\n  // Find target language\n  const toLanguage = languages.find((lang) => lang?.id === toId);\n\n  if (!toLanguage) {\n    return {\n        isTranslatable : false,\n      data: [],\n      error: \"Target language not found\",\n    };\n  }\n  \n   let hasToTranslateData = false;\n   let toTranslate = null;\n  hotel.translations_single.map(ts=>{\n   if( ts.translations_id.id===toId){\n       hasToTranslateData = true;\n       toTranslate = ts\n   }\n  })\n  \n\n  return {\n    isTranslatable : true,\n        hotel_translate_id: hotel.id,\n        data_to_translate: sourceTranslation.title,\n        from_language: sourceTranslation.translations_id,\n        to_language: toLanguage,\n      hasToTranslateData,\n      toTranslate\n  \n  };\n}"
+        },
+        "resolve": "42192011-cda6-4578-aade-c23836f0c5db",
+        "reject": null
+      },
+      {
+        "id": "c7097e0f-3d63-408a-8fba-bc8117cc8e42",
+        "name": "hotel_translate",
+        "key": "hotel_translate",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotel_translate",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{transform_payload.id}}"
+              }
+            },
+            "fields": [
+              "*",
+              "translations_single.*",
+              "translations_single.translations_id.*",
+              "translations_multiple.*",
+              "translations_multiple.translations_id.*"
+            ]
+          }
+        },
+        "resolve": "0bd40973-1c37-4830-adbc-7e92dc4fdc8c",
+        "reject": null
+      },
+      {
+        "id": "d628165b-7f53-40b8-8ce7-25710c760957",
+        "name": "open_web",
+        "key": "open_web",
+        "type": "request",
+        "position_x": 109,
+        "position_y": 1,
+        "options": {
+          "method": "POST",
+          "url": "https://botg.ai-playground.pro/api/chat/completions",
+          "body": "{\n  \"model\": \"-hotel-translator-vlaams-beta-v2\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"You are a language translator. Translate '{{script.data_to_translate}}' from {{script.from_language.name}} {{script.from_language.code}} to {{script.to_language.name}} {{script.to_language.code}}. Only return the translated text.\"\n    }\n  ]\n}",
+          "headers": [
+            {
+              "header": "Accept",
+              "value": "application/json"
+            },
+            {
+              "header": "Authorization",
+              "value": "Bearer sk-00ffbf07910743b4b3a30bcb3d16bcf2"
+            },
+            {
+              "header": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "resolve": "df79e296-f592-42c8-9ba6-9f139ffa6a9a",
+        "reject": null
+      },
+      {
+        "id": "df79e296-f592-42c8-9ba6-9f139ffa6a9a",
+        "name": "check_response",
+        "key": "check_response",
+        "type": "condition",
+        "position_x": 130,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "open_web": {
+              "status": {
+                "_eq": 200
+              }
+            }
+          }
+        },
+        "resolve": "28755255-b395-44a4-b765-18518fe26518",
+        "reject": "a050d20d-a889-4c33-8d71-142bbac9e0a0"
+      },
+      {
+        "id": "e1570214-22ca-437b-a2b9-64c20b2317b5",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "json": {
+            "id": "{{ $trigger.id }}",
+            "from_translation_id": "{{ $trigger.from }}",
+            "to_translation_id": "{{ $trigger.to }}"
+          }
+        },
+        "resolve": "c7097e0f-3d63-408a-8fba-bc8117cc8e42",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": "9WSA3nE3DN",
+    "accountability": "all"
+  },
+  {
+    "id": "e8d04a32-b43f-4130-a0e7-68b616b78a4c",
+    "name": "From Price Selection",
+    "icon": "price_change",
+    "color": null,
+    "description": null,
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.update"
+      ],
+      "collections": [
+        "hotels"
+      ]
+    },
+    "operation": "f2bee7df-fda6-4e21-94cd-4a885d0c596e",
+    "operations": [
+      {
+        "id": "01ea68dd-b7ba-4b2a-b140-1787283480df",
+        "name": "room_categories",
+        "key": "room_categories",
+        "type": "item-read",
+        "position_x": 25,
+        "position_y": 17,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "room_categories",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "5a25f08c-3a86-40ee-89e9-02e3f0b00027",
+        "reject": null
+      },
+      {
+        "id": "0f066c8c-6d9f-4cde-b735-cb61ff2c4592",
+        "name": "occupancies",
+        "key": "occupancies",
+        "type": "item-read",
+        "position_x": 45,
+        "position_y": 19,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "occupancies",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "5facc9a0-1c97-4f2b-8c45-9603aba1488b",
+        "reject": null
+      },
+      {
+        "id": "3d9d0d7a-ef54-43c0-b265-11d1e297a859",
+        "name": "hotel",
+        "key": "hotel",
+        "type": "item-read",
+        "position_x": 21,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "01ea68dd-b7ba-4b2a-b140-1787283480df",
+        "reject": null
+      },
+      {
+        "id": "5a25f08c-3a86-40ee-89e9-02e3f0b00027",
+        "name": "price_dates",
+        "key": "price_dates",
+        "type": "item-read",
+        "position_x": 41,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "price_dates",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "0f066c8c-6d9f-4cde-b735-cb61ff2c4592",
+        "reject": null
+      },
+      {
+        "id": "5dae2afb-ff91-4e77-9ef1-390b913f34cf",
+        "name": "from_price",
+        "key": "from_price",
+        "type": "exec",
+        "position_x": 65,
+        "position_y": 19,
+        "options": {
+          "code": "/*module.exports = async function(data) {\n\tconst hotel = data.hotel;\n    const roomCategories = data.room_categories;\n    const priceDates = data.price_dates;\n    const occupancies = data.occupancies;\n    const roomPrices = data.room_prices;\n    \n    \n  // Build quick lookup maps\n  const roomCategoryMap = Object.fromEntries(\n    roomCategories.map(rc => [rc.id, rc])\n  );\n\n  const priceDateMap = Object.fromEntries(\n    priceDates.map(pd => [pd.id, pd])\n  );\n\n  const occupancyMap = Object.fromEntries(\n    occupancies.map(o => [o.id, o])\n  );\n\n  // Step 1: Filter room_prices where ANY linked entity has from_price = true\n  const eligibleRoomPrices = roomPrices.filter(rp => {\n    const roomCategory = roomCategoryMap[rp.room_category_id];\n    const priceDate = priceDateMap[rp.price_date_id];\n    const occupancy = occupancyMap[rp.occupancy_id];\n\n    return (\n      roomCategory?.from_price === true ||\n      priceDate?.from_price === true ||\n      occupancy?.from_price === true\n    );\n  });\n\n  // Step 2: Select the room_price with the lowest sell_price\n  const lowestRoomPrice = eligibleRoomPrices.reduce((lowest, current) => {\n    if (!lowest) return current;\n    return Number(current.sell_price) < Number(lowest.sell_price)\n      ? current\n      : lowest;\n  }, null);\n// return {hotel,room_categories,price_dates,occupancies,room_prices};\n  return {\n    eligible_room_prices: eligibleRoomPrices,\n    lowest_room_price: lowestRoomPrice,\n    from_price_update : [{id : data.transform_payload.hotel_id, from_price : lowestRoomPrice ?  lowestRoomPrice.id : null}]\n  };\n    \n}*/\n\n\nmodule.exports = async function(data) {\n  const hotel = data.hotel;\n  const roomCategories = data.room_categories;\n  const priceDates = data.price_dates;\n  const occupancies = data.occupancies;\n  const roomPrices = data.room_prices;\n\n  // Maps\n  const roomCategoryMap = Object.fromEntries(\n    roomCategories.map(rc => [rc.id, rc])\n  );\n\n  const priceDateMap = Object.fromEntries(\n    priceDates.map(pd => [pd.id, pd])\n  );\n\n  const occupancyMap = Object.fromEntries(\n    occupancies.map(o => [o.id, o])\n  );\n\n  // Step 1: Filter eligible\n  const eligibleRoomPrices = roomPrices.filter(rp => {\n    const roomCategory = roomCategoryMap[rp.room_category_id];\n    const priceDate = priceDateMap[rp.price_date_id];\n    const occupancy = occupancyMap[rp.occupancy_id];\n\n    return (\n      (roomCategory?.from_price === true ||\n        priceDate?.from_price === true ||\n        occupancy?.from_price === true) &&\n      rp.sell_price !== null &&\n      !isNaN(Number(rp.sell_price))\n    );\n  });\n\n  // Step 2: Get lowest\n  const lowestRoomPrice = eligibleRoomPrices.reduce((lowest, current) => {\n    if (!lowest) return current;\n\n    return Number(current.sell_price) < Number(lowest.sell_price)\n      ? current\n      : lowest;\n  }, null);\n\n  return {\n    eligible_room_prices: eligibleRoomPrices,\n    lowest_room_price: lowestRoomPrice,\n    from_price_update: [\n      {\n        id: data.transform_payload.hotel_id,\n        from_price: lowestRoomPrice ? lowestRoomPrice.id : null\n      }\n    ]\n  };\n};"
+        },
+        "resolve": "e227802d-7a2e-4a76-bc87-f061b617a809",
+        "reject": null
+      },
+      {
+        "id": "5facc9a0-1c97-4f2b-8c45-9603aba1488b",
+        "name": "room_prices",
+        "key": "room_prices",
+        "type": "item-read",
+        "position_x": 60,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "room_prices",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{transform_payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "5dae2afb-ff91-4e77-9ef1-390b913f34cf",
+        "reject": null
+      },
+      {
+        "id": "e227802d-7a2e-4a76-bc87-f061b617a809",
+        "name": "update_from_price",
+        "key": "update_from_price",
+        "type": "item-update",
+        "position_x": 82,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotels",
+          "payload": "{{from_price.from_price_update}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "f2bee7df-fda6-4e21-94cd-4a885d0c596e",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 4,
+        "position_y": 18,
+        "options": {
+          "json": {
+            "hotel_id": "{{ $trigger.keys[0] }}"
+          }
+        },
+        "resolve": "3d9d0d7a-ef54-43c0-b265-11d1e297a859",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "ebf92a01-7857-4e05-82ff-a7703f2e5736",
+    "name": "SINGLE Translate Trigger",
+    "icon": "bolt",
+    "color": null,
+    "description": null,
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "hotel_translate"
+      ],
+      "requireConfirmation": true,
+      "confirmationDescription": "Are you sure. you want to translate SINGLE?",
+      "fields": [
+        {
+          "field": "from",
+          "type": "json",
+          "name": "From language",
+          "meta": {
+            "interface": "collection-item-dropdown",
+            "width": "half",
+            "required": true,
+            "options": {
+              "selectedCollection": "translations",
+              "template": "{{code}}"
+            }
+          }
+        },
+        {
+          "field": "to",
+          "type": "json",
+          "name": "To Language",
+          "meta": {
+            "interface": "collection-item-dropdown",
+            "width": "half",
+            "required": true,
+            "options": {
+              "selectedCollection": "translations",
+              "template": "{{code}}"
+            }
+          }
+        }
+      ]
+    },
+    "operation": "d6745b1b-e456-4046-a30f-05f2da84f244",
+    "operations": [
+      {
+        "id": "d1fbac12-297b-4c70-991a-ec0a31ebbb1f",
+        "name": "trigger_single",
+        "key": "trigger_single",
+        "type": "trigger",
+        "position_x": 38,
+        "position_y": 2,
+        "options": {
+          "iterationMode": "parallel",
+          "payload": "{{script.result}}",
+          "flow": "d7608c01-5670-4daa-8369-ffb548d9d6c1"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "d2c8a104-e0a1-41ec-ab40-803501ca8a3d",
+        "name": "script",
+        "key": "script",
+        "type": "exec",
+        "position_x": 21,
+        "position_y": 19,
+        "options": {
+          "code": "module.exports = async function(data) {\n\tconst transform_payload = data?.transform_payload;\n    const result = [];\n    transform_payload.ids.map(id=>{\n        result.push({id:id,from:transform_payload.from,to:transform_payload.to})\n    })\n\treturn {result};\n}"
+        },
+        "resolve": "d1fbac12-297b-4c70-991a-ec0a31ebbb1f",
+        "reject": null
+      },
+      {
+        "id": "d6745b1b-e456-4046-a30f-05f2da84f244",
+        "name": "transform_payload",
+        "key": "transform_payload",
+        "type": "transform",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "json": {
+            "ids": "{{ $trigger.body.keys }}",
+            "from": "{{ $trigger.body.from.key }}",
+            "to": "{{ $trigger.body.to.key }}"
+          }
+        },
+        "resolve": "d2c8a104-e0a1-41ec-ab40-803501ca8a3d",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": "9WSA3nE3DN",
+    "accountability": "all"
+  },
+  {
+    "id": "ff324964-985a-4a2c-b804-75bc8e01b9d8",
+    "name": "Adding Hotel Room Prices",
+    "icon": "add_circle",
+    "color": "#53E515",
+    "description": null,
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create"
+      ],
+      "collections": [
+        "room_categories",
+        "occupancies",
+        "price_dates"
+      ]
+    },
+    "operation": "d048c4ce-93bf-49fc-a538-a3a45e9caa7b",
+    "operations": [
+      {
+        "id": "07ebc68a-9df5-4444-b52e-b919fba227a3",
+        "name": "filter existing",
+        "key": "filter_existing",
+        "type": "exec",
+        "position_x": 70,
+        "position_y": 18,
+        "options": {
+          "code": "module.exports = async function(data) {\n\tlet filter_existing = [];\n    const existing_room_prices = data.existing_room_prices;\n    const data2Add = data.script_to_get_data_to_add_in_room_prices;\n    const roomCategories = data.roomCategories;\n    const priceDates = data.priceDates;\n    const occupancies = data.occupancies;\n    \n    if(!!data?.isPossible){\n        // STEP 1: Build a lookup set of existing combinations\nconst existingSet = new Set(\n  existing_room_prices.map(\n    (item) =>\n      `${item.room_category_id}|${item.price_date_id}|${item.occupancy_id}`,\n  ),\n);\n\n// STEP 2: Filter out only non-existing combinations\n filter_existing = data2Add.filter(\n  (item) => {\n    const key = `${item.room_category_id}|${item.price_date_id}|${item.occupancy_id}`;\n    return !existingSet.has(key);\n  },\n);\n       \n    }\n\nreturn filter_existing;\n\n}"
+        },
+        "resolve": "a62e8bd4-3aa4-495d-bbb3-1ce0258fc12a",
+        "reject": null
+      },
+      {
+        "id": "0ee7c083-cbc6-4882-8a60-36019d31374e",
+        "name": "Script to get Data to add in Room Prices",
+        "key": "script_to_get_data_to_add_in_room_prices",
+        "type": "exec",
+        "position_x": 65,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n\tconst data2Add = [];\n    \n    if(!!data?.isPossible){\nfor (const room of data.roomCategories) {\n  for (const period of data.priceDates) {\n    for (const occ of data.occupancies) {\n      data2Add.push({\n        hotel_id: data[\"$trigger\"].payload.hotel_id,\n        room_category_id: room.id,\n        price_date_id: period.id,\n        occupancy_id: occ.id,\n        buy_price: null,\n        sell_price: null\n      });\n    }\n  }\n}\n    }\n\nreturn data2Add;\n\n}"
+        },
+        "resolve": "07ebc68a-9df5-4444-b52e-b919fba227a3",
+        "reject": null
+      },
+      {
+        "id": "4e7a61e1-6100-4dd6-87c9-a2837a6f20af",
+        "name": "roomCategories",
+        "key": "roomCategories",
+        "type": "item-read",
+        "position_x": 24,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "room_categories",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{$trigger.payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "aef89051-fbea-48fb-8016-57ebaf829f96",
+        "reject": null
+      },
+      {
+        "id": "6b6b0c94-8218-416f-9543-871a0e307b97",
+        "name": "existing_room_prices",
+        "key": "existing_room_prices",
+        "type": "item-read",
+        "position_x": 45,
+        "position_y": 1,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "room_prices",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{$trigger.payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "a7dea8c2-447a-497f-b143-923a8148967c",
+        "reject": null
+      },
+      {
+        "id": "a62e8bd4-3aa4-495d-bbb3-1ce0258fc12a",
+        "name": "Create Data",
+        "key": "create_data",
+        "type": "item-create",
+        "position_x": 89,
+        "position_y": 2,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "payload": "{{filter_existing}}",
+          "collection": "room_prices"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "a7dea8c2-447a-497f-b143-923a8148967c",
+        "name": "Is Possible to Add",
+        "key": "isPossible",
+        "type": "exec",
+        "position_x": 48,
+        "position_y": 19,
+        "options": {
+          "code": "module.exports = async function(data) {\n\nif(data.roomCategories.length===0||\n  data.priceDates.length===0||\n  data.occupancies.length===0){\nreturn false\n}\n\nreturn true;\n\n}"
+        },
+        "resolve": "0ee7c083-cbc6-4882-8a60-36019d31374e",
+        "reject": null
+      },
+      {
+        "id": "aef89051-fbea-48fb-8016-57ebaf829f96",
+        "name": "occupancies",
+        "key": "occupancies",
+        "type": "item-read",
+        "position_x": 25,
+        "position_y": 18,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "occupancies",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{$trigger.payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "6b6b0c94-8218-416f-9543-871a0e307b97",
+        "reject": null
+      },
+      {
+        "id": "d048c4ce-93bf-49fc-a538-a3a45e9caa7b",
+        "name": "priceDates",
+        "key": "priceDates",
+        "type": "item-read",
+        "position_x": 3,
+        "position_y": 19,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "price_dates",
+          "query": {
+            "filter": {
+              "hotel_id": {
+                "_eq": "{{$trigger.payload.hotel_id}}"
+              }
+            }
+          }
+        },
+        "resolve": "4e7a61e1-6100-4dd6-87c9-a2837a6f20af",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  }
+]

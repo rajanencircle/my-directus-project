@@ -1,0 +1,30 @@
+{
+  "name": "directus-extension-translations-ai",
+  "version": "1.0.13",
+  "description": "Enhanced Directus Translations interface with AI-powered translation via webhook flows",
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "directus-custom-interface",
+    "translations",
+    "ai",
+    "i18n"
+  ],
+  "directus:extension": {
+    "type": "interface",
+    "path": "dist/index.js",
+    "source": "index.js",
+    "host": "^10.0.0"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build --watch"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "^10.0.0"
+  },
+  "peerDependencies": {
+    "@directus/extensions-sdk": "^10.0.0"
+  },
+  "license": "MIT"
+}

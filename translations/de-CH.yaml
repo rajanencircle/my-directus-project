@@ -1,0 +1,2898 @@
+about: Über
+directus_bsl: Directus BSL 1.1
+privacy_policy: Datenschutzbestimmungen
+contact_our_team: Nehmen Sie Kontakt mit unserem Team auf
+setup_welcome: Willkommen bei Directus
+setup_info: Lasst uns Ihr Benutzerkonto erstellen und Ihr Projekt in Betrieb nehmen.
+setup_license_notice: Directus ist für Unternehmen mit einem jährlichen Umsatz, einer Finanzierung oder einem Betriebsbudget von bis zu 5 Millionen Dollar kostenlos nutzbar.
+setup_license_follow_up: Entitäten, die diesen Schwellenwert überschreiten, benötigen eine kostenpflichtige Lizenz. Sie können die Evaluierung von Directus weiterhin fortsetzen und {contactOurTeam} kontaktieren, sobald Sie bereit sind, über den Einsatz in der Produktion zu sprechen.
+setup_save_accept_license: Durch das Anklicken von «Speichern» erklären Sie sich mit den Bedingungen von {directusBsl} und der Datenschutzerklärung vertraut und akzeptieren diese.
+setup_accept_license: Ich akzeptiere die Bedingungen von {directusBsl} und {Datenschutzrichtlinie}.
+setup_marketing_emails: Bitte informieren Sie mich über neue Produkte und deren Funktionen.
+setup_launch: Einführung von Directus
+setup_project: Projekt einrichten
+first_name: Vorname
+last_name: Nachname
+admin_email: E-Mail für die Administration
+owner_email: E-Mail des Eigentümers
+email_address: E-Mail-Adresse
+organization_name: Name der Organisation
+how_do_you_use_directus: Wofür nutzen Sie Directus?
+usage_personal: Persönlich / Weiterbildung
+usage_commercial: Geschäftlich / Kommerziell
+usage_community: Open Source / Community
+identifier: Kennzeichnung
+avatar: Avatar
+application: Antrag
+default_provider: Standardwert
+method: Methode
+published: Veröffentlicht
+draft: Entwurf
+archived: Archiviert
+marketplace: Marktplatz
+extensions: Erweiterungen
+skip_link_nav: Zum Menü
+skip_link_module_nav: Springen Sie zur Navigation
+skip_link_main: Zum Hauptinhalt
+skip_link_sidebar: Zum Seitenbereich
+modules: Module
+module_bar: Modul-Bar
+logs: Protokolle
+unknown: Unbekannt
+reset_width: Breite zurücksetzen
+tile_size: Grösse der Fliesen
+edit_field: Feld zum Bearbeiten
+conditions: Bedingungen
+location: Lage
+collection_names_are_case_sensitive: Die Namen der Sammlungen sind case-sensitiv.
+condition_rules: Regeln für den Zustand
+input: Eingabe
+invalid_input: Ungültige Eingabe
+invalid_file_type: Ungültiger Dateityp
+invalid_files_selected: Keine ungültigen Dateien | Ungültige Datei ausgewählt | {Anzahl} ungültige Dateien ausgewählt
+files_wrong_type: Die Dateien {files} haben ungültige Typen und erwarten den Typ {expected}.
+files_are_empty: "Die folgenden Dateien sind leer und können nicht hochgeladen werden: {Dateien}"
+not_a_number: Keine Zahl
+invalid_range_min: Der Wert liegt unter dem Mindestwert von {value}
+invalid_range_max: Der Wert übersteigt den Maximalwert von {value}
+maps: Karten
+switch_user: Benutzer wechseln
+item_deleted: Das von Ihnen bearbeitete Element wurde gelöscht.
+item_creation: Erstellung eines Artikels
+item_revision: Versionsänderung
+previous_revision: Vorherige Überarbeitung
+latest_revision: Neueste Überarbeitung
+comparing_to: Im Vergleich mit
+compare_to_latest_to_restore: Vergleichen Sie mit der aktuellsten Version, um zu prüfen, ob eine Wiederherstellung dieser Revision sinnvoll wäre.
+select_earlier_revision_to_restore: Wählen Sie eine frühere Version, um zu prüfen, ob sie wiederhergestellt werden soll.
+enter_a_name: Gib einen Namen ein...
+duplicate_field: Doppelte Feld
+half_width: Halbe Breite
+full_width: Volle Breite
+group: Gruppe
+popular: Beliebt
+recent: Aktuell
+previous: Vorher
+latest: Aktuellste
+updated: Aktualisiert
+export_items: Exportierte Artikel
+and: Und
+or: Oder
+init: Start
+dataset_too_large_currently_showing_n_items: Der Datensatz ist zu gross. Derzeit werden die ersten {n} Elemente angezeigt.
+modifier: Modifikator
+extension_interface: Schnittstelle
+extension_display: Anzeige
+extension_layout: Anordnung
+extension_module: Modul
+extension_panel: Kommission
+extension_theme: Thema
+extension_hook: Fassung
+extension_endpoint: Ziel
+extension_operation: Durchführung
+extension_bundle: Paket
+extension_interfaces: Schnittstellen
+extension_displays: Anzeigen
+extension_layouts: Gestaltungen
+extension_modules: Module
+extension_panels: Paneele
+extension_themes: Themen
+extension_hooks: Haken
+extension_endpoints: Endpunkte
+extension_operations: Betrieb
+extension_bundles: Pakete
+extension_missing: Fehlend
+extension_reload_required: Seite muss neu geladen werden
+extension_reload_required_copy: Um die Änderungen nach dem Aktivieren oder Deaktivieren von App-Erweiterungen anzuzeigen, ist das Neuladen der Seite erforderlich.
+extension_reload_now: Neues Laden
+published_relative: Veröffentlicht am {relativeTime}
+compatible_with_your_project: Kompatibel mit Ihrem Projekt
+compatible_with_your_project_copy: Der Autor hat angegeben, dass diese Erweiterung mit der Version {hostVersion} kompatibel ist, was der Version Ihres Projekts ({currentVersion}) entspricht.
+last_updated_relative: "Letztes Update: {relativeTime}"
+n_files: "{n} Dateien"
+verified: Bestätigt
+homepage: Startseite
+repository: Speicher
+reload_page: Seite neu laden
+reload_required: Neuer Ladev
+report_an_issue: Melden Sie ein Problem
+website: Webseite
+github: GitHub
+beta: Vorabversion
+collab_collision: Das Element wurde während Ihrer Bearbeitung geändert. Wählen Sie, welche Änderungen Sie behalten möchten.
+collab_disconnected: Zusammenarbeitende Bearbeitung ist unterbrochen
+collab_editing_field: Bearbeitung des Feldes "{field}"
+collab_currently_viewing: Aktuell angesehen
+you: Sie
+n_downloads: "{Anzahl} Downloads"
+downloads: Downloads
+compatibility_not_guaranteed: Kompatibilität nicht garantiert
+compatibility_not_guaranteed_copy: Der Autor hat angegeben, dass diese Erweiterung mit der Version {hostVersion} kompatibel ist, was nicht mit der Version Ihres Projekts ({currentVersion}) übereinstimmt.
+enable: Aktivieren
+disable: Deaktivieren
+custom: Massanfertigung
+hook: Haken
+fill_width: Breite
+field_name_translations: Übersetzungen für Feldnamen
+enter_password_to_enable_tfa: Geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu aktivieren
+sso_tfa_setup_notice: Sie werden von Ihrem Konto abgemeldet und müssen sich erneut anmelden. Alle noch nicht gespeicherten Änderungen werden verworfen.
+enable_tfa: Aktivieren Sie die Zwei-Faktor-Authentifizierung
+cancel_tfa_setup: Abbrechen der Einrichtung von Zwei-Faktor-Authentifizierung
+cancel_tfa_setup_notice: Sind Sie sicher, dass Sie die Einrichtung der zweistufigen Authentifizierung stornieren möchten?
+keep_setup: Einstellungen beibehalten
+cancel_setup: Abbrechen der Einrichtung
+add_field: Feld hinzufügen
+role_name: Positionsbezeichnung
+policy_name: Name der Richtlinie
+branch: Zweig
+leaf: Blatt
+indeterminate: Unbestimmt
+edit_collection: Sammlung bearbeiten
+exclusive: Exklusiv
+children: Kinder
+db_only_click_to_configure: "Datenbank: Klicken, um die Einstellungen zu konfigurieren"
+show_active_items: Anzeigen der aktuell aktiven Elemente
+show_archived_items: Anzeigen archivierte Artikel
+show_all_items: Alle Artikel anzeigen
+edited: Wertmässig angepasst
+required: Erforderlich
+required_for_app_access: Erforderlich für den Zugriff auf die App
+requires_value: Benötigt einen bestimmten Wert
+create_preset: Vorlage erstellen
+create_panel: Erstelle eine Arbeitsgruppe
+create_role: Rolle erstellen
+create_policy: Richtlinie erstellen
+create_user: Benutzer erstellen
+message: Nachricht
+delete_panel: Löschen
+create_custom_translation: Erstelle eine individuelle Übersetzung
+edit_custom_translation: Bearbeiten Sie die angepasste Übersetzung
+no_custom_translations: Keine individuelle Übersetzung
+no_custom_translations_copy: Es gibt noch keine spezifischen Übersetzungen.
+invite_users: Nutzer einladen
+invite: Einladung
+email_already_invited: Die E-Mail an "{email}" wurde bereits gesendet.
+subject: Thema
+inbox: Eingehende Post
+emails: E-Mails
+connection_excellent: Ausgezeichnete Verbindung
+connection_good: Gute Verbindung
+connection_fair: Gerechte Verbindung
+connection_poor: Schlechte Verbindung
+primary: Haupt
+download_folder: Ordner herunterladen
+rename_folder: Ordner umbenennen
+delete_folder: Ordner löschen
+prefix: Vorwort
+suffix: Suffix
+keep: Behalten
+version: Version
+version_key: Schlüsselversion
+version_name: Name der Version
+main_version: Haupt
+your_version: Ihre Version
+switch_version: Version für die Nutzung mit einem Schalter
+switch_version_copy: Sind Sie sicher, dass Sie auf die Version "{version}" umsteigen möchten? Ungespeicherte Änderungen gehen verloren.
+create_version: Version erstellen
+rename_version: Neuen Namen vergeben
+reserved_version_key: Der Versionsschlüssel "{key}" ist reserviert und kann nicht verwendet werden.
+compare_version: Vergleichen Sie Version
+save_version: Version speichern
+promote_version: Version fördern/ausgearbeitet
+apply: Einreichen
+discard: Entsorgen
+select_all_differences: Alle Unterschiede auswählen
+show_differences_only: Nur die Unterschiede anzeigen
+main_updated_notice: Das Hauptthema wurde seit der Erstellung dieser Version aktualisiert.
+delete_version: Version löschen
+delete_version_copy: Sind Sie sicher, dass Sie die Version "{version}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+delete_on_apply_copy: Sie werden kurzzeitig "Version {version}" in die Hauptversion aufnehmen. Was soll nach der Übernahme von "Version {version}" passieren?
+content_edited: Inhalt überarbeitet
+reset_bookmark: Zurücksetzen
+update_bookmark: Markierung aktualisieren
+delete_bookmark: Löschen
+delete_bookmark_copy: Sind Sie sicher, dass Sie den Bookmark "{bookmark}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+delete_personal_bookmark: Löschen Sie die persönliche Lesezeichen
+delete_role_bookmark: Eintrag für Rolle löschen
+delete_global_bookmark: Globales Lesezeichen löschen
+logoutReason:
+  SIGN_OUT: Ausgeliehen
+  SESSION_EXPIRED: Sitzung abgelaufen
+public_label: Öffentlich
+public_description: Steuert, welche API-Daten ohne Authentifizierung verfügbar sind.
+public_role_info: Die öffentliche Rolle bestimmt, welche API-Daten für nicht authentifizierte Benutzer oder Benutzer ohne Rolle verfügbar sind. Anfragen mit der öffentlichen Rolle dürfen keine App- oder Admin-Zugänge haben. Wenn App- oder Admin-Zugänge einer Richtlinie zugewiesen sind, die der öffentlichen Rolle zugeordnet ist, werden diese ignoriert.
+admin_description: Anfängliche administrative Rolle mit uneingeschränkten Zugriffsrechten auf App/API.
+admin_policy_description: Ursprüngliche Verwaltungspolitik mit uneingeschränkten Zugriffsrechten für Apps/APIs.
+no_description: Keine Beschreibung...
+reached_maximum_number_of_extensions: Sie haben die maximale Anzahl an Erweiterungen für dieses Projekt ({n}) erreicht. Bitte wenden Sie sich an Ihren Systemadministrator für weitere Informationen.
+not_allowed: Nicht gestattet
+archive: Archiv
+archive_confirm: Sind Sie sicher, dass Sie diesen Artikel archivieren möchten?
+archive_confirm_count: Keine Elemente ausgewählt | Sind Sie sicher, dass Sie dieses Element archivieren möchten? | Sind Sie sicher, dass Sie diese {count} Elemente archivieren möchten?
+reset_system_permissions_to: "Systemberechtigungen auf:"
+reset_system_permissions_copy: Diese Aktion wird alle benutzerdefinierten Berechtigungen überschreiben, die Sie für die System-Sammlungen festgelegt haben. Sind Sie sicher?
+the_following_are_minimum_permissions: Folgende minimalen Berechtigungen werden automatisch gewährt, sobald "App-Zugriff" aktiviert ist. Sie können zusätzliche Berechtigungen gewähren, wenn nötig, jedoch können Sie die Berechtigungen nicht auf diesen Stufe reduzieren.
+app_access_minimum: Mindestzugriff auf die App
+recommended_defaults: Empfohlene Standardwerte
+unarchive: Archiv wieder öffnen
+unarchive_confirm: Sind Sie sicher, dass Sie diesen Artikel wieder aus dem Archiv entfernen möchten?
+nested_files_folders_will_be_moved: Dateien und Ordner, die verschachtelt sind, werden um eine Ebene nach oben verschoben.
+delete_folder_dialog:
+  move_content: Den Inhalt um eine Ebene nach oben verschieben
+  delete_content: Alle Inhalte löschen
+  content_behavior: Was soll mit dem Inhalt des Ordners geschehen?
+validation_errors_notice: "Die folgenden Felder enthalten ungültige Werte:"
+validation_value_is_invalid: Der Wert ist ungültig
+validationError:
+  eq: Der Wert muss gültig sein.
+  neq: Der Wert darf nicht {ungültig} sein.
+  in: Der Wert muss einer der {gültigen} sein
+  nin: Der Wert darf nicht {ungültig} sein.
+  contains: Der Wert muss {Teilstring} enthalten
+  ncontains: Der Wert kann {Teilstring} nicht enthalten
+  gt: Der Wert muss grösser sein als {gültig}
+  gte: Der Wert muss grösser oder gleich {gültig} sein.
+  lt: Der Wert muss kleiner als {gültig} sein.
+  lte: Der Wert muss kleiner oder gleich {gültig} sein.
+  empty: Der Wert muss leer sein
+  nempty: Ein Wert darf nicht leer sein
+  "null": Der Wert muss auf Null gesetzt werden.
+  nnull: Der Wert darf nicht Null sein
+  required: Es ist notwendig, einen Wert zu bestimmen.
+  unique: Der Wert muss einzigartig sein.
+  email: Die E-Mail-Adresse muss eine gültige Adresse sein.
+  regex: Der Wert hat das falsche Format
+  starts_with: Der Wert muss mit {substring} beginnen.
+  istarts_with: Der Wert muss mit {substring} beginnen.
+  nstarts_with: Der Wert darf nicht mit {Teilstring} beginnen.
+  nistarts_with: Der Wert darf nicht mit {Teilstring} beginnen.
+  ends_with: Der Wert muss mit {Teilstring} enden.
+  iends_with: Der Wert muss mit {Teilstring} enden.
+  nends_with: Der Wert darf nicht mit {substring} enden.
+  niends_with: Der Wert darf nicht mit {substring} enden.
+  confirm_password: Die Passwörter stimmen nicht überein
+  org_name: Bitte geben Sie den Namen der Organisation an
+all_access: Vollzugang
+no_access: Kein Zutritt
+use_custom: Anpassen
+nullable: Optional
+allow_null_value: Ermöglichen von NULL-Werten
+allow_multiple: Mehrere Optionen zulassen
+allow_multiple_to_be_open: Ermöglichen Sie das Öffnen mehrerer Fenster
+enter_value_to_replace_nulls: Bitte geben Sie einen neuen Wert ein, um alle aktuellen NULL-Werte in diesem Feld zu ersetzen.
+field_standard: Standard
+field_presentation: Präsentation und Aliasse
+field_file: Einzelne Datei
+field_files: Verschiedene Dateien
+field_m2o: Beziehung zwischen M2O
+field_m2a: Beziehung zwischen M2A
+field_o2m: Beziehung mit O2M
+field_m2m: Beziehung zwischen zwei Geräten
+field_translations: Übersetzungen
+field_group: Projektgruppe
+item_permissions: Berechtigungen für das Element
+field_permissions: Zugriffsrechte
+field_validation: Validierung im Feld
+field_presets: Vordefinierte Einstellungen
+permissions_for_role: Aktionen, die die Rolle {Rolle} ausführen kann.
+permissions_for_policy: "Die {Richtlinie} kann folgende Aktionen ausführen:"
+fields_for_role: Die Rolle {Rolle} kann {Aktion} ausführen.
+fields_for_policy: Die {Richtlinie} kann {Aktion} durchführen.
+validation_for_role: Die Regeln für den {Aktionsbereich} müssen von der {Rolle} eingehalten werden.
+validation_for_policy: Die Regeln für {Aktion} bestimmen die {Richtlinie}. Die Richtlinie muss diesen Regeln entsprechen.
+presets_for_role: Standardwerte für Feldwerte für die Rolle {role}.
+presets_for_policy: Standardwerte für Feldwerte für die {policy} Richtlinie.
+presets_field_warning: Vordefinierte Beziehungen für das Feld "{feld}" sollten mit der Syntax "detailliert" konfiguriert werden.
+presentation_and_aliases: Präsentation und Aliasse
+revision_post_create: Hier ist, wie dieses Produkt ursprünglich aussah.
+revision_post_update: Hier ist, wie das Produkt nach dem Update aussah.
+changes_made: Im Folgenden sind die spezifischen Änderungen aufgeführt, die in dieser Überarbeitung vorgenommen wurden.
+no_relational_data: Bitte beachten Sie, dass hier keine Daten über Beziehungen enthalten sind.
+junction_field_location: Lage von Junction Fields
+top: Höchster Punkt
+bottom: Unterteil
+hide_field: Feld ausblenden
+hide_field_on_detail: Feld ausblenden im Detail
+show_field_on_detail: Feld im Detail anzeigen
+delete_field: Feld löschen
+fields_and_layout: Felder und Anordnung
+field_create_success: "Erstelltes Feld: \"{feld}\""
+field_update_success: "Aktualisierter Feld: \"{feld}\""
+duplicate_where_to: Wo möchten Sie dieses Feld duplizieren?
+language: Sprache
+language_placeholder: Wählen Sie eine Sprache...
+aggregate_function: Aggregationsfunktion
+aggregate_precision: Gesamte Präzision
+group_aggregation: Gruppen-Zusammenfassung
+group_precision: Präzision im Team
+global: Global
+admins_have_all_permissions: Die Administratoren haben alle Berechtigungen.
+camera: Kamera
+show_zero: Zeige Null
+create_in_advanced_field_creation_mode: Feld erstellen im erweiterten Modus
+continue_in_advanced_field_creation_mode: Setzen Sie den Modus zur Erstellung von fortgeschrittenen Feldern fort
+validation: Überprüfung
+sum: Summe
+sum_distinct: Summe der eindeutigen Werte
+avg: Durchschnitt
+avg_distinct: Durchschnittliche Anzahl unterschiedlicher Werte
+count: Zählen
+count_distinct: Anzahl der eindeutigen Werte ermitteln
+min: Minimal
+max: Max
+exposure: Auswirkung
+shutter: Abdeckung
+iso: ISO
+focal_length: Brennweite
+schema_setup_key: Name der Datenbankspalte und API-Schlüssel für dieses Feld
+create_field: Feld erstellen
+creating_new_field: Neues Feld ({Sammlung})
+field_in_collection: "{Feld} ({Sammlung})"
+reset_page_preferences: Seiteinstellungen zurücksetzen
+hidden_field: Verstecktes Feld
+hidden_on_detail: Versteckt im Detail
+clear_hidden_field: Klare Werte
+clear_value_on_save_when_hidden: Klarer Vorteil beim Speichern, wenn der Inhalt verborgen ist
+readonly_field_label: Das Feld in der App deaktivieren
+required_readonly_field_warning: Durch die Aktivierung sowohl der schreibgeschützten als auch der obligatorischen Option für ein Feld wird verhindert, dass ein Artikel gespeichert wird, wenn der Wert leer ist.
+key: Schlüssel
+alias: Alias
+bigInteger: Grosses Ganzzahls
+boolean: Boolescher Wert
+date: Datum
+date_range: Zeitraum
+translation_key_placeholder: Geben Sie einen Schlüssel ein...
+datetime: Datum und Uhrzeit
+dateTime: Datum und Uhrzeit
+precision: Präzision
+decimal: Dezimal
+float: Schweben
+integer: Ganzzahl
+json: JSON
+xml: XML
+yaml: YAML
+string: Zeichenkette
+text: Text
+time: Zeit
+timestamp: Zeitstempel
+uuid: Eindeutige Kennung
+hash: Hash
+geometry:
+  All: Geometrie (Allgemein)
+  Point: Punkt
+  LineString: Zeichenkette
+  Polygon: Polygon
+  MultiPoint: Mehrere Anschlüsse
+  MultiLineString: Mehrzeiliger String
+  MultiPolygon: Mehrere Polygone
+theme_auto: Automatisch (basierend auf dem System)
+theme_light: Heller Modus
+theme_dark: Dunkelmodus
+theme_directus_default: Standardeinstellungen von Directus
+theme_directus_minimal: "Directus: Minimal"
+theme_directus_colormatch: Direkter Farbendruck
+not_available_for_type: Nicht verfügbar für diesen Typ
+create_translations: Erstellen von Übersetzungen
+auto_refresh: Automatische Aktualisierung
+refresh_interval: Aktualisierungsintervall
+no_refresh: Bitte nicht aktualisieren
+refresh_interval_seconds: Sofortiges Auffrischen | Alle Sekunde | Alle {sekunden} Sekunden
+refresh_interval_minutes: Jede Minute | Alle {minutes} Minuten
+auto_generate: Automatisch generieren
+this_will_auto_setup_fields_relations: Dadurch werden automatisch alle erforderlichen Felder und Beziehungen eingerichtet.
+click_here: Klicken Sie hier
+to_manually_setup_translations: um Übersetzungen manuell einzurichten.
+manage: Verwalten
+click_to_manage_translated_fields: Es gibt noch keine übersetzten Felder. Klicken Sie hier, um sie zu erstellen. | Es gibt ein übersetztes Feld. Klicken Sie hier, um es zu verwalten. | Es gibt {count} übersetzte Felder. Klicken Sie hier, um sie zu verwalten.
+fields_group: Fields Group
+no_collections_found: Keine Einträge gefunden.
+new_data_alert: "Folgendes wird innerhalb Ihres Datenmodells erstellt:"
+search_collection: Suche im Bestand...
+search_role: Suchfunktion...
+search_policy: Suchrichtlinien...
+search_field: Suchfeld...
+new_field: Neuer Bereich
+new_collection: Neue Kollektion
+add_m2o_to_collection: Füge M2O zur Sammlung "{collection}" hinzu
+add_o2m_to_collection: Füge O2M zur "{collection}" hinzu
+add_m2m_to_collection: Füge M2M zu "{collection}" hinzu
+choose_a_type: Wählen Sie eine Kategorie...
+determined_by_relationship: Abhängig von der Beziehung
+add_note: Fügen Sie eine nützliche Anmerkung für die Benutzer hinzu…
+add_link: Link hinzufügen
+custom_link: Individueller Link
+default_value: Standardwert
+standard_field: Standardfeld
+single_file: Einzeldatei
+multiple_files: Mehrere Dateien
+m2o_relationship: Viele-zu-einer-Beziehung
+o2m_relationship: Beziehung von einem zu vielen
+m2m_relationship: Viele-zu-Viele-Beziehung
+m2a_relationship: Viele zu vielen Beziehung
+invalid_item: Ungültiges Element
+require_confirmation: Bitte um Bestätigung
+dialog: Gespräch
+modal: Möglichkeit
+confirmation_dialog: Bestätigungsdialog
+confirmation_description: Bestätigungsbeschreibung
+confirmation_input_fields: Feld zur Eingabe von Bestätigungsdaten
+next: Nächster
+field_name: Feldname
+translations: Übersetzungen
+no_translations: Keine Übersetzungen
+left_to_right: Von links nach rechts
+right_to_left: Von rechts nach links
+note: Hinweis
+enter_a_value: Gib einen Wert ein...
+enter_a_placeholder: Geben Sie einen Platzhalter ein...
+length: Länge
+soft_length: Festgelegter Grenzwert
+precision_scale: Präzision und Genauigkeit
+readonly: Nur Lesen
+unique: Einzigartig
+index: Inhaltsverzeichnis
+searchable: Durchsuchbar
+field_searchable: Feld im Suchbegriff angeben
+updated_on: Letztes Update
+updated_by: Aktualisiert von
+primary_key: Primärschlüssel
+foreign_key: Fremdschlüssel
+field_key: Schlüssel für den Bereich
+finish_setup: Abschluss der Einrichtung
+dismiss: Abweisen
+toggle_raw_editor: Umschalten zwischen dem Roh-Editor und dem bearbeitbaren Editor
+toggle_variable_input: Einstellbare Eingabe
+raw_editor_placeholder: "{'{'}{'{'}$trigger.payload.example{'}'}{'}'}"
+raw_value: Rohwert
+copy_raw_value: Originalwert kopieren
+copy_raw_value_success: Kopiert
+copy_raw_value_fail: Kopieren fehlgeschlagen
+paste_raw_value: Wert einfügen
+paste_raw_value_success: Eingekopiert
+paste_raw_value_fail: Klebstoff nicht angebracht
+view_raw_value: Ursprünglichen Wert anzeigen
+edit_raw_value: Wert bearbeiten
+enter_raw_value: Geben Sie den ursprünglichen Wert ein...
+clear_value: Klarer Wert
+clear_changes: Klare Veränderungen
+clear_items: Klare Artikel
+reset_to_default: Zurück auf Standard
+undo_changes: Änderungen rückgängig machen
+notifications: Benachrichtigungen
+archive_all: Alle archivieren
+show_all_activity: Alle Aktivitäten anzeigen
+page_not_found: Seite nicht gefunden
+page_not_found_body: Die Seite, die Sie suchen, scheint nicht vorhanden zu sein.
+confirm_revert: Bestätigen Rückgängig
+confirm_revert_body: Dadurch wird das Element wieder in den ausgewählten Zustand versetzt.
+display: Anzeige
+settings_update_success: Einstellungen aktualisiert
+title: Titel
+subtitle: Untertitel
+revision_delta_created: Erstellt
+revision_delta_created_externally: Entwickelt von Dritten
+revision_delta_updated: "Aktualisiert: 1 Feld | Aktualisiert: {count} Felder"
+revision_delta_deleted: Gelöscht
+revision_delta_reverted: Zurückgesetzt
+revision_delta_update_message: Dieses Feld wurde aktualisiert, aber sein Wert wird aus Sicherheitsgründen verborgen.
+revision_delta_other: Überarbeitung
+revision_delta_by: "{Datum} von {Benutzer}"
+differences_count: Keine Unterschiede | 1 Unterschied | {Anzahl} Unterschiede
+presentation_text_values_cannot_be_reimported: Verwendet Text für die Präsentation, Werte können nicht erneut importiert werden.
+download_page_as_csv: Seite zum Herunterladen als CSV
+download_page_as_csv_unsupported: Diese Anordnung ermöglicht nicht das Herunterladen der aktuellen Seite.
+private_user: Privater Nutzer
+creation_preview: Vorschau der Kreation
+revision_preview: Vorschau der Überarbeitung
+updates_made: Durchgeführte Änderungen
+leave_comment: Schreibe einen Kommentar...
+post_comment_success: Kommentar
+post_comment_updated: Kommentar aktualisiert
+item_create_success: Erstelltes Element | Erstellte Elemente
+item_update_success: Artikel aktualisiert | Artikel aktualisiert
+item_delete_success: Artikel gelöscht | Artikel gelöscht
+this_collection: Diese Sammlung
+related_collection: Verwandte Artikel
+related_collections: Ähnliche Sammlungen
+translations_collection: Sammlung von Übersetzungen
+languages_collection: Sammlung von Sprachen
+enable_translations: Aktivieren von Übersetzungen
+manage_translation_fields: Füge Übersetzungsfelder hinzu
+fields_to_translate: Felder zum Übersetzen
+fields_to_add_to_translations: Felder, die für Übersetzungen hinzugefügt werden sollen
+translations_collection_name: Sammlung von Übersetzungen
+translations_already_enabled: Übersetzungen sind aktiviert
+translations_manage_helper_description: Sie können weitere Felder hinzufügen, um Daten aus dieser Sammlung zu übersetzen.
+translations_copy_data_note: Die Felder werden zur Sammlung der Übersetzungen hinzugefügt. Bestehende Daten werden nicht migriert.
+add_fields: Felder hinzufügen
+show_advanced_options: Zeige Details zur Beziehung
+hide_advanced_options: Details zur Beziehung verbergen
+translations_field_name_required: Alle Feldbezeichnungen sind obligatorisch.
+translations_foreign_key_name_conflict: Die Namen der Fremdschlüssel für Eltern und Sprache müssen unterschiedlich sein.
+translations_duplicate_field_names: Die Namen der Übersetzungspolfelder müssen eindeutig sein.
+translation_configuration: Konfiguration für die Übersetzung
+translations_invalid_config_warning: Die Konfiguration für {count} Übersetzungen konnte nicht aufgerufen werden und wird weiterhin nur zum Lesen verfügbar sein | Die Konfigurationen für {count} Übersetzungen konnten nicht aufgerufen werden und werden weiterhin nur zum Lesen verfügbar sein
+translations_collection_already_exists: Diese Sammlung von Übersetzungen existiert bereits und wird wiederverwendet.
+translations_fields_up_to_date: Alle relevanten Felder sind bereits in der Sammlung der Übersetzungen vorhanden.
+translations_preview_collections: Sammlungen
+translations_preview_fields: Felder
+translations_preview_relations: Beziehungen
+ungrouped: Nicht gruppiert
+translations_enable_helper_description: Inhalte in verschiedene Sprachen übersetzen.
+import_data_input_placeholder: CSV oder JSON...
+import_data_button: Beginnen mit dem Import
+import_background: Import im Hintergrund
+import_data_indeterminate: Daten importieren...
+import_data_success: Daten erfolgreich aus {filename} importiert
+import_upload_success: "{Dateiname} erfolgreich hochgeladen. Daten werden im Hintergrund importiert."
+import_data_errors: Fehler beim Import
+import_data_error: Die Datenstruktur dieser Datei entspricht nicht der Sammlung.
+import_data_validation_errors_notice: "Die folgenden Zeilen enthalten ungültige Werte:"
+import_data_error_row: "Zeile {zeilen} {feld}:"
+snapshot:
+  export: Exportstruktur
+  download: Datenexport als Snapshot (JSON) herunterladen
+  info: Export nur der Struktur, um sie zu teilen oder für die Fehlersuche zu verwenden
+label_import: Import
+label_export: Export
+import_export: Import / Export
+format: Format
+last_page: Letzte Seite
+last_access: Letzte Zugabe
+fill_template: Mit Vorlage-Wert füllen
+a_unique_table_name: Ein einzigartiger Tabellenname...
+a_unique_column_name: Ein einzigartiger Spaltenname...
+enable_custom_values: Ermöglichen Sie benutzerdefinierte Werte
+submit: Absenden
+move_to_folder: In einen Ordner verschieben
+move: Bewegen
+system: System
+add_field_related: Feld zu der zugehörigen Sammlung hinzufügen
+interface_label: Schnittstelle
+display_label: Anzeige
+x_axis_display_field: Feld für die Anzeige auf der X-Achse
+today: Heute
+yesterday: Gestern
+delete_comment: Kommentar löschen
+delete_share: Löschen
+functions:
+  year: Jahr
+  month: Monat
+  week: Woche
+  day: Tag
+  weekday: Wochentag
+  hour: Stunde
+  minute: Minute
+  second: Zweit
+  count: Zählen
+date-fns_date: PPP
+date-fns_time: hh:mm:ss Uhr
+date-fns_time_no_seconds: hh:mm Uhr
+date-fns_time_24hour: HH:mm:ss
+date-fns_time_no_seconds_24hour: HH:mm
+date-fns_date_short: MMM d, u
+date-fns_time_short: h:mma
+date-fns_time_short_seconds: hh:mm:ss
+date-fns_date_short_no_year: MMM d
+minutes: Minuten
+hours: Öffnungszeiten
+month: Monat
+year: Jahr
+select_all: Alle auswählen
+permissionsLevel:
+  all: Vollständiger Zugriff
+  partial: Teilweiser Zugriff
+  custom: Teilweiser Zugriff
+  none: Keine {Aktion} Zugriff
+months:
+  january: Januar
+  february: Februar
+  march: März
+  april: April
+  may: Mai
+  june: Juni
+  july: Juli
+  august: August
+  september: September
+  october: Oktober
+  november: November
+  december: Dezember
+drag_mode: Drag-Modus
+move_tool: Werkzeug zum Verschieben
+crop_tool: Werkzeug zum Zuschneiden
+focal_point_tool: Werkzeug zur Fokussierung
+cancel_crop: Abbestellen
+cancel_selection: Auswahl aufheben
+original: Original
+url: Webadresse
+import_label: Import
+file_details: Dateieinstellungen
+copy_id: Identifikationsnummer
+copy_id_success: ID kopiert
+copy_id_fail: ID nicht übernommen
+dimensions: Abmessungen
+size: Grösse
+created: Erstellt
+uploaded: Hochgeladen
+modified: Angepasst
+owner: Eigentümer
+edited_by: Redigiert von
+folder: Ordner
+folders: Ordner
+zoom: Zoom
+download: Herunterladen
+open: Öffnen
+open_in_new_window: Öffnen in neuem Fenster
+open_folder: Öffne den Ordner "{Ordner}"
+foreground_color: Hintergrundfarbe
+background_color: Hintergrundfarbe
+upload_from_device: Datei von Gerät hochladen
+choose_from_library: Datei aus der Bibliothek auswählen
+import_from_url: Datei von einer URL importieren
+replace_from_device: Datei von Gerät ersetzen
+replace_from_library: Datei aus der Bibliothek ersetzen
+replace_from_url: Datei aus URL ersetzen
+no_image_selected: Kein Bild ausgewählt
+no_file_selected: Keine Datei ausgewählt
+download_file: Datei herunterladen
+open_file_in_tab: Datei in neuem Tab öffnen
+start_export: Beginnen mit dem Export
+not_available_for_local_downloads: Nicht für den lokalen Download verfügbar
+exporting_all_items_in_collection: Alle Artikel ({gesamtanzahl}) aus der Sammlung {collection} exportieren.
+exporting_limited_items_in_collection: "{Anzahl} von {Gesamtanzahl} Artikeln aus der {Sammlung} werden exportiert."
+exporting_no_items_to_export: Keine Artikel zum Exportieren vorhanden. Passe die Export-Konfiguration an und/oder füge Artikel zur Sammlung hinzu.
+exporting_download_hint: Sobald die {format}-Datei erstellt wurde, wird sie auf Ihr Gerät heruntergeladen.
+exporting_library_hint: Sobald die {format}-Datei erstellt wurde, wird sie in der Datei-Bibliothek gespeichert.
+exporting_library_hint_forced: Dieser Export muss in Chargen erfolgen. Nach Abschluss wird die {Format}-Datei in der Dateibank gespeichert.
+collection_key: Schlüssel für die Sammlung
+name: Name
+primary_key_field: Feld für den Primärschlüssel
+type: Art
+creating_new_collection: Entwicklung einer neuen Kollektion
+created_by: Von
+created_on: Erstellt am
+creating_collection_info: Benennen Sie die Sammlung und definieren Sie ihr einzigartiges «Schlüssel»-Feld...
+creating_collection_system: Aktivieren und umbenennen Sie beliebige dieser optionalen Felder.
+auto_increment_integer: Integer, der automatisch inkrementiert wird
+auto_increment_big_integer: Automatisch inkrementierendes grosses Integer
+generated_uuid: Erzeugt ID
+manual_string: String, die manuell eingegeben wurde
+save_and_create_new: Speichern und neu erstellen
+save_and_stay: Speichern und bleiben
+save_and_quit: Speichern und Beenden
+save_and_return_to_main: Speichern und Zurück zum Hauptmenü
+save_as_copy: Als Kopie speichern
+save_as_new_file: Als neue Datei speichern
+add_existing: Hinzufügen
+creating_items: Artikel erstellen
+enable_create_button: Aktivieren Schaltfläche „Erstellen“
+selecting_items: Artikel auswählen
+enable_select_button: Aktivieren Schaltfläche
+allow_duplicates: Ermöglichen von Duplikaten
+comments: Kommentare
+no_comments: Noch keine Kommentare
+expand: Ausführlicher machen
+expand_all: Alle Optionen anzeigen
+expand_none: "Ausweitung: Keine"
+collapse: Zusammenbruch
+collapse_all: Alle ausklappen
+select_item: Artikel auswählen
+no_items: Keine Artikel
+search_items: Artikel suchen...
+search_extensions: Erweiterungen suchen...
+disabled: Menschen mit Behinderung
+information: Informationen
+report_bug: Fehler melden
+request_feature: Funktionsanfrage
+request_body: Anfrage-Daten
+interface_not_found: Schnittstelle "{interface}" nicht gefunden.
+operation_not_found: «Operation {operation}» nicht gefunden.
+reset_interface: Zurücksetzen der Schnittstelle
+display_not_found: Das Element "{display}" konnte nicht gefunden werden.
+reset_display: Bildschirm zurücksetzen
+list-m2a: Bauunternehmer (M2A)
+item_count: Keine Artikel | Ein Artikel | {Anzahl} Artikel
+filtered_item_count: Keine gefilterten Artikel | Ein gefilterter Artikel | {Anzahl} gefilterte Artikel
+no_items_copy: Im Moment sind noch keine Artikel in dieser Sammlung vorhanden.
+file_count: Keine Dateien | Eine Datei | {Anzahl} Dateien
+no_files_copy: Es gibt hier keine Dateien.
+user_count: Keine Nutzer | Ein Nutzer | {Anzahl} Nutzer
+no_users_copy: Es gibt derzeit noch keine Benutzer mit dieser Rolle.
+no_active_users: Keine aktiven Nutzer
+no_suspended_users: Keine gesperrten Nutzer
+no_invited_users: Keine eingeladenen Nutzer
+no_status_users_copy: Es gibt keine Benutzer mit dem Status {status}.
+no_notifications: Keine Benachrichtigungen
+no_notifications_copy: Ihr seid alle auf dem neuesten Stand!
+activity_log: Aktivitätsverlauf
+all_items: Alle Artikel
+any: Jedes
+csv: CSV
+csv_utf8: CSV-Datei, kompatibel mit Excel (UTF-8)
+no_collections: Keine Einträge
+create_collection: Sammlung erstellen
+no_collections_copy_admin: Sie haben noch keine Sammlungen erstellt. Klicken Sie auf die Schaltfläche unten, um zu beginnen.
+no_collections_copy: Sie haben noch keine Sammlungen erstellt. Bitte wenden Sie sich an Ihren Systemadministrator.
+relationship_not_setup: Die Verbindung ist nicht korrekt eingerichtet oder Sie haben keine Berechtigung, darauf zuzugreifen.
+no_singleton_relations: Unterstützung für Beziehungen zu Einzelpersonen ist nicht vorhanden.
+display_template_not_setup: Die Option für das Vorlagen-Layout ist falsch konfiguriert.
+collection_field_not_setup: Die Option zur Auswahl eines Feldes ist falsch konfiguriert.
+select_a_collection: Wählen Sie eine Sammlung
+select_a_field: Wähle ein Feld
+active: Aktiv
+move_to: Verlegen Sie...
+copy: Kopie
+copy_to: Kopieren nach...
+no_other_dashboards_copy: Sie haben derzeit noch keine weiteren Dashboards erstellt.
+inactive: Inaktiv
+users: Nutzer
+roles: Rollen
+activity: Aktivität
+activity_item: Aktivität
+action: Massnahmen
+ip_address: IP-Adresse
+user_agent: Benutzer-Agent
+origin: Herkunft
+decimals: Dezimalzahlen
+value_decimals: Werte mit Dezimalstellen
+min_value: Minimalwert
+max_value: Höchster Wert
+automatic: Automatisch
+field_width: Breite des Felds
+add_filter: Filter hinzufügen
+upper_limit: Höchster Wert…
+lower_limit: Untergrenze...
+user_directory: Verzeichnis der Benutzer
+documentation: Dokumentation
+sidebar: Seitenleiste
+duration: Dauer
+charset: Zeichenkodierung
+second: zweiter
+file_moved: Datei verschoben
+collection_created: Sammlung erstellt
+modified_on: Geändert am
+card_size: Grösse
+sort_field: Feld sortieren
+add_sort_field: Feld nach sortieren
+sort: Sortieren
+status: Status
+remove: Entfernen
+toggle_manual_sorting: Manuelle Sortierung aktivieren/deaktivieren
+bookmark_doesnt_exist: Das Buchzeichen ist nicht vorhanden
+bookmark_doesnt_exist_copy: Die Markierung, die Sie öffnen möchten, konnte nicht gefunden werden.
+bookmark_doesnt_exist_cta: Zurück zur Sammlung
+select_an_item: Wählen Sie ein Element aus...
+edit: Bearbeiten
+edit_item: Artikel bearbeiten
+enabled: Aktiviert
+partially_enabled: Teilweise aktiviert
+enable_all: Alle Optionen aktivieren
+disable_all: Alle Funktionen deaktivieren
+enabled_dev_tooltip: App-Erweiterungen sind in Entwicklungsmodus immer aktiviert.
+disable_tfa: Deaktiviere die Zwei-Faktor-Authentifizierung
+admin_disable_tfa_text: Sind Sie sicher, dass Sie die Zwei-Faktor-Authentifizierung für diesen Benutzer deaktivieren möchten?
+tfa_setup: Einrichtung der Zwei-Faktor-Authentifizierung
+tfa_setup_description: Richten Sie die Zwei-Faktor-Authentifizierung ein, um Ihr Konto zu schützen.
+tfa_scan_code: Scannen Sie den Code in Ihrer Authenticator-App, um die Einrichtung der Zwei-Faktor-Authentifizierung abzuschliessen
+enter_otp_to_disable_tfa: Geben Sie den OTP ein, um die 2FA zu deaktivieren
+create_account: Konto erstellen
+account_created_successfully: Konto erfolgreich erstellt
+auto_fill: Automatische Vervollständigung
+corresponding_field: Entsprechendes Feld
+errors:
+  COLLECTION_NOT_FOUND: Die Sammlung existiert nicht
+  CONTAINS_NULL_VALUES: Das Feld enthält keine Werte
+  CONTENT_TOO_LARGE: Die eingereichte Datei/das Dokument ist zu gross.
+  FAILED_VALIDATION: Validierung fehlgeschlagen
+  FIELD_NOT_FOUND: Feld nicht gefunden
+  FORBIDDEN: Verboten
+  GRAPHQL_VALIDATION: GraphQL-Validierung
+  ILLEGAL_ASSET_TRANSFORMATION: Quellebild zu gross für die Vorschau
+  INTERNAL_SERVER_ERROR: Unerwarteter Fehler
+  INVALID_CONFIG: Ungültige Konfiguration
+  INVALID_CREDENTIALS: Falscher Benutzername oder falsches Passwort
+  INVALID_FOREIGN_KEY: Ungültiger Fremdschlüssel
+  INVALID_INVITE: Diese Einladung ist nicht mehr gültig.
+  INVALID_IP: IP-Adresse nicht erlaubt
+  INVALID_OTP: Falsches einmaliges Passwort
+  INVALID_PAYLOAD: Ungültige Datenübertragung
+  INVALID_PROVIDER: Der Benutzer gehört zu einem anderen Authentifizierungssystem.
+  INVALID_PROVIDER_CONFIG: Ungültige Konfiguration des Anbieters
+  INVALID_QUERY: Ungültige Abfrage
+  INVALID_TOKEN: Ungültiger Token
+  INVALID_USER: Benutzer konnte nicht authentifiziert werden
+  ITEM_LIMIT_REACHED: Maximale Anzahl von Artikeln erreicht
+  ITEM_NOT_FOUND: Artikel nicht gefunden
+  LIMIT_EXCEEDED: Grenzwert überschritten
+  METHOD_NOT_ALLOWED: Diese Operation ist nicht gestützt
+  NOT_NULL_VIOLATION: Der Wert darf nicht leer sein
+  RANGE_NOT_SATISFIABLE: Ungültiger Bereich
+  RECORD_NOT_UNIQUE: Doppelte Angabe festgestellt
+  REQUESTS_EXCEEDED: Die Anzahl der Anfragen ist ausgeschöpft
+  ROUTE_NOT_FOUND: Nicht gefunden
+  SERVICE_UNAVAILABLE: Dienstleistung nicht verfügbar
+  TOKEN_EXPIRED: Token ist abgelaufen
+  UNEXPECTED_RESPONSE: Unerwartete Reaktion
+  UNKNOWN: Unerwarteter Fehler
+  UNPROCESSABLE_CONTENT: Inhalt konnte nicht verarbeitet werden
+  UNSUPPORTED_MEDIA_TYPE: Nicht unterstütztes Medientyp
+  USER_SUSPENDED: Nutzer gesperrt
+  VALUE_OUT_OF_RANGE: Der Wert liegt nicht im erwarteten Bereich
+  VALUE_TOO_LONG: Der Preis ist zu hoch.
+security: Sicherheit
+value_securely_stored: Wert sicher aufbewahrt
+bookmark_name: Name der Lesezeichen...
+create_bookmark: Ordner erstellen
+edit_bookmark: Bearbeiten, Lesezeichen
+edit_personal_bookmark: Persönliche Lesezeichen bearbeiten
+edit_role_bookmark: Aufgabe-Merkmal speichern
+edit_global_bookmark: Globale Lesezeichen bearbeiten
+cannot_edit_role_bookmarks: Es ist nicht möglich, die Markierungen für Rollen zu bearbeiten.
+cannot_edit_global_bookmarks: Nicht möglich, globale Lesezeichen zu bearbeiten
+bookmarks: Lesezeichen
+presets: Voreinstellungen
+unexpected_error: Unerwarteter Fehler
+unexpected_error_copy: Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es erneut.
+copy_details: Detaillierte Angaben
+no_app_access: Kein Zugriff über App
+no_app_access_copy: Dieser Benutzer darf die Admin-App nicht verwenden.
+password_reset_sent: Wenn Sie ein Konto haben und diese die Möglichkeit bietet, das Passwort zurückzusetzen, haben wir Ihnen eine sichere Verknüpfung per E-Mail zugestellt.
+password_reset_successful: Passwort erfolgreich zurückgesetzt
+back: Zurück
+filter: Filter
+edit_image: Bild bearbeiten
+editing_image: Bildbearbeitung
+square: Quadrat
+free: kostenlos
+flip_horizontal: Spiegeln horizontal
+flip_vertical: Drehen vertikal
+aspect_ratio: Bildformat
+rotate: Drehen
+all_users: Alle Nutzer
+active_users: Aktive Nutzer
+suspended_users: Benutzern, die vorübergehend gesperrt wurden
+invited_users: Einladene
+delete_collection: Sammlung löschen
+update_collection_success: Neues Kollektion
+delete_collection_success: Gelöschte Kollektion
+make_collection_visible: Sorge dafür, dass die Sammlung sichtbar ist
+make_collection_hidden: Sammelobjekte aus dem Inventar ausblenden
+make_folder_visible: Ordner sichtbar machen
+make_folder_hidden: Ordner unsichtbar machen
+goto_collection_content: Inhalt anzeigen
+count_of_total_items: "{Anzahl} von {Gesamtanzahl} Artikeln"
+start_end_of_count_items: "{Start}-{End} von {Anzahl} Artikeln"
+start_end_of_count_filtered_items: "{Start}-{End} von {Anzahl} gefilterten Artikeln"
+delete_collection_are_you_sure: Sind Sie sicher, dass Sie die Sammlung "{collection}" löschen möchten? Dies löscht die Sammlung und alle darin enthaltenen Elemente. Diese Aktion ist dauerhaft.
+delete_folder_are_you_sure: Sind Sie sicher, dass Sie den Ordner "{folder}" löschen möchten? Verschachtelte Ordner und Sammlungen werden auf die höchste Ebene verschoben.
+delete_collection_peer_dependencies: Die folgenden Felder werden ebenfalls gelöscht, da sie sich auf die aktuelle Kollektion beziehen.
+collections_shown: Ausgestellte Sammlungen
+visible_collections: Sichtbare Sammlungen
+hidden_collections: Versteckte Sammlungen
+show_hidden_collections: Zeige verborgene Sammlungen
+hide_hidden_collections: Verstecke verborgene Sammlungen
+show_header: Überschrift
+unmanaged_collections: Nicht konfigurierte Sammlungen
+system_collections: System-Sammlungen
+placeholder: Platzhalter
+icon_left: Symbol links
+icon_right: Symbol rechts
+count_other_revisions: "{Anzahl} Weitere Änderungen"
+font: Schriftart
+sans_serif: Serif-los
+serif: Serif (Buchstaben mit Strich)
+monospace: Einheitliches Schriftbild
+divider: Trennwand
+color: Farbe
+circle: Kreis
+empty_item: Leeres Produkt
+log_in_with: Anmelden mit {Anbieter}
+conditional_styles: Bedingte Stile
+advanced_settings: Erweiterte Einstellungen
+advanced_filter: Erweiterte Filter
+delete_advanced_filter: Filter löschen
+change_advanced_filter_operator: Ändern
+advanced: Fortgeschritten
+operators:
+  eq: Gleich
+  neq: Gleicht nicht
+  lt: Weniger als
+  gt: Grösser als
+  lte: Kleiner oder gleich
+  gte: Grösser oder gleich
+  in: Ist eine von
+  nin: Ist nicht einer von
+  "null": Ist null
+  nnull: Ist das nicht der Fall?
+  contains: Enthält
+  ncontains: Enthält keine
+  icontains: Enthält (unangemessene) Inhalte
+  starts_with: Beginnt mit
+  nstarts_with: Beginnt nicht
+  istarts_with: Beginnt mit (unsensibler)
+  nistarts_with: Beginnt nicht mit (unpassender)
+  ends_with: Endet mit
+  nends_with: Es endet nicht
+  iends_with: Endet mit (unsensibler) Aussage
+  niends_with: Es endet nicht mit (unsensibler)
+  between: liegt zwischen
+  nbetween: Ist nicht dazwischen
+  empty: Ist leer
+  nempty: Ist nicht leer
+  all: Enthält folgende Schlüssel
+  has: Enthält einige dieser Schlüssel
+  intersects: Kreuzen sich
+  nintersects: Überlappt sich nicht
+  intersects_bbox: Überlappt mit dem Begrenzungsrahmen
+  nintersects_bbox: Überlappt den Begrenzungsrahmen
+  regex: Übereinstimmungen mit regulären Ausdrücken
+custom_validation_message: Benutzerdefinierte Validierungsnachricht
+loading: Laden...
+extension_readme_missing: Dieses Add-on enthält keine Datei mit Installationsanweisungen.
+drop_to_upload: Herunterladen
+item: Artikel
+items: Artikel
+upload_file: Datei hochladen
+upload_file_indeterminate: Datei hochladen...
+upload_file_success: Datei hochgeladen
+upload_files_indeterminate: Dateien hochladen {erfolgreich}/{gesamt}
+upload_files_success: "{Anzahl} Dateien hochgeladen"
+upload_pending: Hochladen ausstehend
+drag_file_here: Ziehen und Ablegen Sie eine Datei hier
+click_to_browse: Klicken Sie, um die Auswahl zu durchsuchen
+interface_options: Mögliche Schnittstellen
+display_options: Auswahlen
+layout_options: Gestaltungsmöglichkeiten
+rows: Reihen
+columns: Spalten
+collection_setup: Einrichtung der Sammlung
+optional_system_fields: Optionale Felder
+value_unique: Der Wert muss einzigartig sein.
+value_index: Das Feld ist indiziert
+all_activity: Alle Aktivitäten
+create_item: Artikel erstellen
+display_template: Vorlage für die Darstellung
+language_display_template: Vorlage für die Anzeige der Sprache
+translations_display_template: Vorlage für die Darstellung von Übersetzungen
+n_items_selected: Keine Artikel ausgewählt | Ein Artikel ausgewählt | {n} Artikel ausgewählt
+per_page: Pro Seite
+all_files: Alle Dateien
+my_files: Meine Dateien
+recent_files: Aktuelle Dateien
+create_folder: Ordner erstellen
+edit_folder: Ordner bearbeiten
+folder_name: Ordnername...
+folder_key: Ordner-Schlüssel...
+add_file: Datei hinzufügen
+replace_file: Datei ersetzen
+no_results: Keine Ergebnisse
+no_results_copy: Passen Sie die Suchfilter an oder löschen Sie diese, um die Ergebnisse anzuzeigen.
+no_visible_fields: Leeres Formular
+no_visible_fields_copy: Dieses Formular enthält keine sichtbaren Felder.
+clear_filters: Klare Filter
+saves_automatically: Automatische Speicherung
+role: Rolle
+edit_role: Rollen bearbeiten
+rule: Regel
+user: Nutzer
+no_presets: Keine voreingestellten Optionen
+no_presets_copy: Noch keine Voreinstellungen oder Favoriten wurden gespeichert.
+no_presets_cta: Vorhandene Einstellung hinzufügen
+presets_only: Nur vordefinierte Einstellungen
+create: Erstellen
+on_create: Bei der Erstellung
+on_update: Überblick
+read: Lesen
+update: Aktualisierung
+delete: Löschen
+select_fields: Ausgewählte Felder
+format_text: Text formatieren
+format_value: Formatwert
+abbreviate_value: Kurzform
+operator: Betreiber
+bold: Hervorheben
+toggle: Umschalten
+icon_on: Symbol
+icon_off: Symbol ausschalten
+label: Beschriftung
+flows: Ströme
+flow: Fluss
+select_a_flow: Wählen Sie einen Ablauf
+run_flow_confirm: Sind Sie sicher, dass Sie diesen Ablauf ausführen möchten?
+run_flow_anyway: Unabhängig davon, wie es läuft
+run_flow_on_current_collection: Nutze Flow im aktuellen Sammlungsbereich
+run_flow_on_current: Ausführen auf dem aktuellen Artikel
+run_flow_on_current_edited_confirm: Dieses Element kann durch diesen Workflow aktualisiert werden. Sind Sie sicher, dass Sie es ausführen möchten?
+run_flow_on_selected: Wählen Sie zunächst ein oder mehrere Artikel aus | Ausführen des Ablaufs auf einem ausgewählten Artikel | Ausführen des Ablaufs auf {n} ausgewählten Artikeln
+run_flow: Flusslauf
+trigger_flow_success: Der Ablauf "{flow}" wurde erfolgreich gestartet.
+field_name_placeholder: Bitte Feldname eingeben...
+field_key_placeholder: Bitte geben Sie den Feldschlüssel ein...
+trigger: Auslöser
+trigger_options: Mögliche Auslöser
+view_trigger: Auslöser anzeigen
+create_trigger: Trigger erstellen
+trigger_setup: Konfiguration des Auslösers
+change_trigger: Auslöser
+flow_delete_confirm: Sind Sie sicher, dass Sie den Fluss "{flow}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+set_flow_active: Flow auf Aktiv schalten
+set_flow_inactive: Flow auf "Inaktiv" setzen
+edit_flow: Bearbeitungsablauf
+delete_flow: Löschen
+no_other_flows_copy: Sie haben bisher noch keine weiteren Arbeitsabläufe definiert.
+no_flows: Keine Durchflüsse
+no_flows_copy: Sie haben noch keine Arbeitsabläufe definiert.
+create_flow: Erstellen von Fluss
+creating_new_flow: Neuen Fluss erschaffen
+updating_flow: Aktualisieren des Ablaufs
+flow_setup: Konfiguration
+flow_name: Name
+flow_tracking: Aktivitäten und Protokolle verfolgen
+flow_tracking_all: Aktivitäten und Protokolle einsehen
+flow_tracking_activity: Nur Aktivitäten im Trainingsprotokoll
+flow_tracking_null: Keine Informationen über das Nutzerverhalten erfassen
+start_flow: Beginnen
+stop_flow: Stopp
+create_operation: Erstellen von Operation
+edit_operation: Bearbeitung
+code: Code
+operation_options: Mögliche Optionen
+operation_name: Name der Operation...
+operation_key: Referenz-Kennung
+operation_key_unique_error: Die Zugangsdaten für eine Operation müssen innerhalb eines Flows eindeutig sein.
+operation_handle_resolve: "Lösung: Klicken, um hinzuzufügen, oder ziehen, um die Route zu ändern"
+operation_handle_reject: "Ablehnen: Klicken, um hinzuzufügen oder per Drag-and-Drop neu ausrichten"
+visual_editor: Visueller Editor
+toggle_navigation: Menü öffnen/schliessen
+toggle_sidebar: Seitenleiste ausblenden/anzeigen
+toggle_editable_elements: Elemente, die bearbeitet werden können, ein- und ausschalten
+no_url: Keine URL angegeben
+no_url_copy: Bitte fügen Sie eine URL in den Einstellungen hinzu.
+invalid_url: Ungültige URL
+invalid_url_copy: Die angegebene URL entspricht keiner der in den Einstellungen angegebenen URLs.
+insights: Einblicke
+deployment:
+  deployment: Einsatz
+  overview:
+    overview: Überblick
+    providers: Anbieter
+    configure: Einrichten
+    provider_description: Bereitstellung von {provider}-Diensten direkt aus Directus
+    projects: "{Anzahl} Projekt(e)|{Anzahl} Projekte"
+  provider:
+    setup_title: "{Anbieter}-Einrichtung"
+    credentials:
+      notice: Diese Informationen finden Sie in den Einstellungen Ihres Kontos bei {Anbieter}.
+      link: Einstellungen für {Anbieter} öffnen
+    token:
+      label: Persönlicher Zugriffstoken
+      placeholder: Geben Sie Ihren Zugangs-Token ein...
+      encrypted_notice: Dieser Token wird verschlüsselt und sicher in Ihrer Directus-Konfiguration gespeichert.
+    settings:
+      settings: "{Anbieter}-Konfiguration"
+      edit_configuration: Konfiguration bearbeiten
+      delete: Konfiguration löschen
+      delete_confirm: Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Sind Sie sicher, dass Sie fortfahren möchten?
+      remove_projects_confirm: Das Entfernen des/der Projekts/der Projekte ({projects}) löscht dauerhaft die gesamte Historie der Bereitstellung aus Directus. Diese Aktion kann nicht rückgängig gemacht werden. Sind Sie sicher, dass Sie fortfahren möchten?
+    vercel:
+      name: Vercel
+      settings_warning: Die Änderung von Zugangsdaten oder Team-IDs kann sich auf die von Ihnen ausgewählten Projekte auswirken, wenn diese mit der neuen Konfiguration nicht mehr zugänglich sind.
+      account_type:
+        label: Art der Kontoverwaltung
+        hint: Wählen Sie ein Team, um eine Team-ID zu verwenden, oder ein persönliches Konto, um Ihren Vercel-Benutzernamen für die Bereitstellung zu verwenden.
+        team: Team
+        personal: Persönlicher Konto
+      team_id:
+        label: Team-ID
+        hint: Erforderlich für Teamkonten. Sie finden es in den Team-Einstellungen Ihrer Vercel-Instanz.
+        placeholder: Team xxxxxxxxxxxxxx
+      username:
+        label: Benutzername
+        hint: Ihr Vercel-Benutzername für persönliche Konten. Sie finden ihn in der URL Ihres Vercel-Kontos (vercel.com/benutzername).
+        placeholder: Ihr Benutzername
+    netlify:
+      name: Netlify
+      settings_warning: Die Änderung von Anmeldedaten oder der Account-Bezeichnung kann sich auf Ihre ausgewählten Projekte auswirken, wenn diese mit der neuen Konfiguration nicht mehr zugänglich sind.
+      account_slug:
+        label: Konto-Bezeichnung
+        hint: Optional. Filtere die Suchergebnisse auf ein bestimmtes Konto. Lassen Sie das Feld leer, um alle verfügbaren Suchergebnisse anzuzeigen.
+        placeholder: dein-konto-alias
+    projects: Projekte
+    select_projects: Ausgewählte Projekte
+    select_projects_hint: Wählen Sie aus, welche Projekte Sie über Directus verwalten möchten.
+    project:
+      not_deployable: Das Projekt kann nicht von Directus bereitgestellt werden. Weitere Informationen finden Sie in der Dokumentation.
+    runs:
+      runs: Durchführungen
+      id: Kennung für die Bereitstellung
+      started: Angefangen
+      author: Verfasser
+      refresh: Erneuern
+      deploy_preview: Vorläufige Version
+      empty: Keine Ausführungen
+      empty_copy: Dieses Projekt hat bisher noch keine Bereitstellungsgeschichte.
+      external_user: Externer Nutzer
+    run:
+      title: "{Projekt}: Detaillierte Angaben zur Implementierung"
+      id: Kennung für die Bereitstellung
+      currently_deploying: Im Moment wird...
+      stop: Stopp
+      cancel_confirm: Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Sind Sie sicher, dass Sie fortfahren möchten?
+      log_all: Alle Protokollstufen
+      search_logs: Suchprotokolle...
+      no_logs: Keine Protokolle vorhanden
+      download_logs: Protokolle zum Herunterladen
+      open_deployment: Besuch
+      open_in_provider: Öffnen in {Anbieter}
+  no_providers: Keine Anbieter für die Bereitstellung
+  no_providers_copy: Richten Sie einen Bereitstellungsanbieter in den Einstellungen ein, um loslegen zu können.
+  no_providers_copy_nonadmin: Für Ihr Konto stehen keine Bereitstellungsanbieter zur Verfügung. Bitte wenden Sie sich an einen Administrator.
+  select_provider: Wählen Sie einen Anbieter
+  select_provider_copy: Wählen Sie einen Anbieter für die Bereitstellung aus der Seitenleiste, um Ihre Projekte anzuzeigen.
+  no_projects: Keine Projekte
+  no_projects_copy: Für diesen Anbieter wurden noch keine Projekte ausgewählt.
+  no_runs: Keine Ausführungen
+  no_runs_copy: Dieses Projekt hat bisher noch keine Bereitstellungsgeschichte.
+  deploy: Einsetzen
+  target: Ziel
+  target_value:
+    production: Produktion
+    preview: Vorschau
+  runs_status:
+    ready: Bereit
+    building: Bau
+    error: Nicht erfolgreich
+    canceled: Abgebrochen
+  dashboard:
+    projects: Projekte ({count})
+    deployed: Einsatz
+    total_projects: "Gesamtes Projekt: {count} | Gesamte Projekte: {count}"
+    active_deployments: "Aktive Implementierung: {count} | Aktive Implementierungen: {count}"
+    failed_builds: "Fehlgeschlagene Builds: {count} | Fehlgeschlagene Builds: {count}"
+    successful_builds: "Erfolgreiche Kompilierung: {count} | Erfolgreiche Kompilierungen: {count}"
+    total_deployments: "Verbreitung: {count} | Verteilungen: {count}"
+    average_build_time: "Durchschnittliche Bauzeit: {value}"
+    success_rate: "Erfolgsrate: {value}%"
+  range:
+    1d: Letzte 24 Stunden
+    7d: Letzte 7 Tage
+    30d: Letzte 30 Tage
+dashboard: Übersicht
+panel: Kommission
+panel_options: Mögliche Optionen für die Verkleidung
+panel_header: Überschrift der Tabelle
+panel_name_placeholder: Nennen Sie diesen Ausschuss...
+panel_note_placeholder: Zusätzliche Informationen zu diesem Thema...
+panel_delete_confirm: Sind Sie sicher, dass Sie dieses Element löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+list_panel_allow_edit: Ermöglichen Sie die Bearbeitung direkt im Text
+dashboard_delete_confirm: Sind Sie sicher, dass Sie dieses Dashboard löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+edit_dashboard: Dashboard bearbeiten
+delete_dashboard: Dashboard löschen
+visible: Sichtbar
+prefix_placeholder: Text vor dem Wert…
+suffix_placeholder: Text nach dem Wert...
+decimals_placeholder: Anzahl der Nachkommastellen...
+no_dashboards: Keine Dashboards
+no_dashboards_copy: Sie haben derzeit noch keine Dashboards eingerichtet.
+create_dashboard: Dashboard erstellen
+dashboard_name: Name des Dashboards
+no_data: Keine Daten
+no_data_in_flow: Keine Daten wurden innerhalb dieses Prozesses erzeugt oder abgerufen.
+accountability: Verantwortung
+payload: Lastgewicht
+details: Detaillierte Informationen
+resume_streaming_logs: Protokolle der Streaming-Aktivitäten
+pause_streaming_logs: Streaming-Protokolle pausieren
+logs_session_resumed: Die Protokollierung wurde wieder aufgenommen…
+logs_session_paused: Protokollierung pausiert...
+logs_stream_disconnected: Die Protokollübertragung wurde unterbrochen...
+log_detail_filter_paths: Filterpfade (z.B. req.method, res.statusCode)
+logs_beginning: Dies ist der Beginn Ihrer Protokollierungs-Sitzung…
+logs_waiting: Warte auf weitere Protokolle...
+logs_unread_count: "{Anzahl} ungelekt"
+clear_logs: Klare Protokolle
+search_logs: Suchprotokolle...
+all_instances: Alle Beispiele
+instance_count: Keine Instanz | Eine Instanz | {Anzahl} Instanzen
+all_log_levels: Alle Protokollstufen
+log_level_count: Kein Protokollierungsgrad | Ein Protokollierungsgrad | {anzahl} Protokollierungsgrade
+soft_wrap_lines: Weiche, abgerundete Linien
+full_screen: Voller Bildschirm
+full_text_search: Volltextsuche
+edit_panels: Bearbeitungsfelder
+center_align: Zentrierter
+left_align: Ausrichtung links
+right_align: Rechtsbündig
+fit_to_screen: Geeignet für die Bildschirmpräsentation
+image_url: Bild-URL
+alt_text: Alternativer Text
+media: Medien
+quality: Qualität
+width: Breite
+height: Grösse
+transformation_preset_key: Voreinstellungs-Schlüssel
+source: Quelle
+url_placeholder: Geben Sie eine URL ein...
+display_text: Anzeigetext
+display_text_placeholder: Geben Sie einen Text für die Anzeige ein...
+interface_group_text_and_numbers: Text und Zahlen
+interface_group_selection: Auswahl
+interface_group_relational: Beziehungsbezogen
+interface_group_presentation: Präsentation
+interface_group_groups: Gruppen
+interface_group_other: Andere
+tooltip: Hilfehülle
+tooltip_placeholder: Gib einen Tooltip-Text ein...
+unlimited: Unbegrenzt
+open_link_in: Link öffnen in
+new_tab: Neue Registerkarte
+save_image: Bild speichern
+save_media: Medien archivieren
+wysiwyg_options:
+  aligncenter: Zentrieren
+  alignjustify: Ausrichten, Begründen
+  alignleft: Ausrichtung links
+  alignnone: "Ausrichtung: Keine"
+  alignright: Ausrichtung rechts
+  forecolor: Hintergrundfarbe
+  backcolor: Hintergrundfarbe
+  bold: Hervorheben
+  italic: Kursiv
+  underline: Unterstreichen
+  strikethrough: Durchgestrichen
+  subscript: Fußzeile
+  superscript: Hochgestellt
+  codeblock: Code
+  blockquote: Zitat
+  bullist: Aufzählung
+  numlist: Aufzählung mit Nummern
+  hr: Horizontale Linie
+  link: Hinzufügen/Bearbeiten
+  unlink: Link entfernen
+  media: Medien hinzufügen/bearbeiten
+  image: Bild hinzufügen/bearbeiten
+  copy: Kopie
+  cut: Schneiden
+  paste: Kleber
+  heading: Überschrift
+  h1: Überschrift 1
+  h2: Überschrift 2
+  h3: Überschrift 3
+  h4: Überschrift 4
+  h5: Überschrift 5
+  h6: Überschrift 6
+  pre: Vordefiniert
+  fontselect: Schriftart auswählen
+  fontsizeselect: Schriftgrösse auswählen
+  indent: Einrücken
+  outdent: Entfernen von Verschlüssen
+  undo: Abbrechen
+  redo: Neu machen
+  remove: Entfernen
+  removeformat: Format aufheben
+  selectall: Alle auswählen
+  table: Tisch
+  visualaid: Elemente anzeigen, die normalerweise unsichtbar sind
+  source_code: Quellcode bearbeiten
+  fullscreen: Voller Bildschirm
+  directionality: Richtung
+  lazy_loading: Bilder bei Bedarf laden
+  lazy_loading_label: Aktivieren Sie das "Lazy Loading"
+dropdown: Auswahlliste
+choices: Optionen
+choices_option_configured_incorrectly: Fehlkonfigurationen
+deselect: Entwählen
+deselect_all: Alle auswählen deaktivieren
+theme: Thema
+select_a_theme: Wählen Sie ein Thema
+default_sync_with_project: Standard (Synchronisieren mit Projekt)
+appearance_auto: Automatisch (Synchronisation mit dem System)
+appearance_light: Licht
+appearance_dark: Dunkel
+other: Weitere...
+adding_user: Benutzer hinzufügen
+more_users: Klicken Sie, um weitere Informationen anzuzeigen
+unknown_user: Unbekannter Nutzer
+unknown_version: Unbekannte Version
+unknown_revision: Unbekannte Version
+creating_in: Erstellung eines Artikels in der Sammlung {collection}
+editing_in: Bearbeitungselement in {Sammlung}
+viewing_in: Artikel in der Sammlung «{collection}» anzeigen
+creating_unit: Erstellung von {Einheit}
+editing_unit: Bearbeitung {Einheit}
+editing_in_batch: Massenbearbeitung von {count} Artikeln
+no_options_available: Keine Optionen verfügbar
+settings_data_model: Datenmodell
+settings_roles: Benutzerrollen
+settings_permissions: Richtlinien für den Zugang
+settings_project: Einstellungen
+settings_appearance: Aussehen
+settings_ai: Künstliche Intelligenz
+model_context_protocol: Modell-Kontextprotokoll
+ai_assistant: KI-Assistent
+ai_disabled_by_env: Die Funktionen des KI-Assistenten wurden über eine Umgebungsvariable deaktiviert.
+mcp_disabled_by_env: Die Funktionen von MCP wurden über eine Umgebungsvariable deaktiviert.
+settings_flows: Ströme
+settings_system_logs: Systemprotokolle
+settings_presets: Lesezeichen
+settings_translations: Übersetzungen
+one_or_more_options_are_missing: Eine oder mehrere Optionen fehlen.
+configure_field_key_to_continue: Konfigurieren Sie das Feld, um fortzufahren
+scope: Umfang
+actions: Massnahmen
+select: Auswählen...
+layout: Anordnung
+tree_view: Baumansicht
+changes_are_permanent: Die Änderungen sind dauerhaft
+preset_name_placeholder: Wird standardmässig verwendet, wenn nichts anderes vorhanden ist...
+preset_search_placeholder: Suchbegriff...
+editing_preset: Voreinstellungs bearbeiten
+layout_preview: Vorschau des Layouts
+layout_setup: Gestaltung vorbereiten
+data: Daten
+theme-overrides: Themen-Überschreibungen
+unsaved_changes: Nicht gespeicherte Änderungen
+unsaved_changes_copy: Sind Sie sicher, dass Sie diese Seite verlassen möchten?
+unsaved_changes_collab: Nicht gespeicherte Änderungen, die von mehreren Personen gemeinsam bearbeitet wurden
+unsaved_changes_copy_collab: Sie bearbeiten diesen Artikel gemeinsam mit anderen. Ihre Änderungen werden vorerst im kollaborativen Arbeitsbereich gespeichert, können aber verloren gehen, wenn niemand sie speichert.
+leave_page: Zurück zur vorherigen Seite
+cancel_anyway: Abbrechen, trotzdem
+discard_changes: Änderungen aufheben
+discard_all_changes: Alle Änderungen rückgängig machen
+discard_changes_copy: Sind Sie sicher, dass Sie alle bisherigen Änderungen wirklich rückgängig machen möchten?
+discard_changes_copy_collab: Sie bearbeiten diesen Artikel gemeinsam mit anderen. Das Löschen von Änderungen wird alle noch nicht gespeicherten Änderungen für alle Teilnehmer dieser kollaborativen Sitzung rücksetzen.
+show_x_axis: Zeige die X-Achse
+show_y_axis: Zeige die Y-Achse
+keep_editing: Weiter bearbeiten
+activity_feed: Aktivitäts-Feed
+add_new: Neu hinzufügen
+create_new: Neu erstellen
+all: Alles
+none: Keine
+no_layout_collection_selected_yet: Noch kein Layout/Sammlung ausgewählt
+batch_delete_confirm: Keine Elemente ausgewählt | Sind Sie sicher, dass Sie dieses Element löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden. | Sind Sie sicher, dass Sie diese {count} Elemente löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+cancel: Abbrechen
+no_upscale: Nicht die Bilder vergrössern
+no_extensions: Keine Verlängerungen
+no_extensions_copy: Noch keine Erweiterungen wurden installiert.
+install_extension: Erweiterung installieren
+uninstall_locked: Es ist nicht möglich, Erweiterungen zu deinstallieren, die nicht über den Marketplace installiert wurden.
+uninstall: Deinstallieren
+installed: Installiert
+reinstall: Neu installieren
+open_in_marketplace: Im Markt verfügbar
+source_registry: Marktplatz
+source_local: Regional
+source_module: Modul
+collection: Sammlung
+collections: Sammlungen
+content: Inhalt
+singleton: Einzigartiges Exemplar
+singleton_label: Behandeln Sie als einzelnes Objekt
+system_fields_locked: Die Systemfelder sind gesperrt und können nicht bearbeitet werden.
+directus_collection:
+  directus_access: Anhänge zur Richtlinie
+  directus_activity: Protokolle für alle Ereignisse, einschliesslich Verantwortlichkeiten
+  directus_collections: Zusätzliche Konfigurations- und Metadatenoptionen
+  directus_comments: Kommentare zu Artikeln
+  directus_dashboards: Dashboards im Modul „Insights“
+  directus_fields: Zusätzliche Konfiguration und Metadaten
+  directus_files: Metadaten für alle verwalteten Dateigüter
+  directus_flows: Automatisierungsabläufe
+  directus_folders: Bietet virtuelle Verzeichnisse für Dateien
+  directus_migrations: Welche Version der Datenbank verwenden Sie?
+  directus_notifications: Benachrichtigungen, die an Nutzer gesendet werden
+  directus_operations: Prozesse, die innerhalb von Flows ablaufen
+  directus_panels: Einzelne Elemente innerhalb der Dashboards von Insights
+  directus_permissions: Zugriffsrechte für jede Richtlinie
+  directus_policies: Richtlinien für den Zutrittskontroll
+  directus_presets: Voreinstellungen für Standardeinstellungen und Lesezeichen
+  directus_relations: Konfiguration und Metadaten für die Beziehung
+  directus_revisions: Daten-Schnappschüsse für alle Aktivitäten
+  directus_roles: Zugriffsrechte für Systembenutzer
+  directus_sessions: Informationen zur Benutzersitzung
+  directus_settings: Möglichkeiten zur Konfiguration des Projekts
+  directus_shares: Verfolgen von extern geteilten Inhalten
+  directus_users: Benutzer des Systems für die Plattform
+  directus_translations: Individuelle Übersetzungen
+  directus_versions: Versions für Artikel
+  directus_extensions: Konfiguration von Erweiterungen
+fields:
+  directus_activity:
+    item: Primärschlüssel
+    action: Massnahmen
+    collection: Sammlung
+    timestamp: Handlung
+    user: Massnahmen von
+    comment: Kommentar
+    user_agent: Benutzer-Agent
+    origin: Herkunft
+    ip: IP-Adresse
+    revisions: Überprüfungen
+  directus_collections:
+    collection: Sammlung
+    icon: Symbol
+    note: Hinweis
+    color: Farbe
+    display_template: Vorlage für die Darstellung
+    hidden: Versteckt
+    singleton: Einzigartiges Exemplar
+    translations: Übersetzungen für die Benennung von Sammlungen
+    archive_app_filter: Filter für die Archiv-App
+    archive_value: Wert der Archivierung
+    unarchive_value: Wert wiederherstellen
+    sort_field: Feld sortieren
+    accountability: Aktivitäten und Überprüfung
+    versioning: Versionsverwaltung
+    archive_field: Archivfeld
+    item_duplication_fields: Felder zur Duplizierung von Artikeln
+  directus_files:
+    $thumbnail: Kleinstversion
+    title: Titel
+    description: Beschreibung
+    tags: Schlagwörter
+    location: Lage
+    storage: Lagerung
+    filename_disk: Dateiname (Festplatte)
+    filename_download: Dateiname (Download)
+    metadata: Metadaten
+    type: Medientyp
+    filesize: Dateigröße
+    modified_by: Geändert von
+    modified_on: Geändert am
+    created_on: Erstellt am
+    created_by: Erstellt von
+    embed: Einbetten
+    uploaded_by: Hochgeladen von
+    folder: Ordner
+    width: Breite
+    uploaded_on: Hochgeladen am
+    height: Höhe
+    charset: Zeichenkodierung
+    duration: Dauer
+    focal_point_x: X-Koordinate
+    focal_point_y: Y-Koordinate
+  directus_users:
+    first_name: Vorname
+    last_name: Nachname
+    email: E-Mail
+    password: Passwort
+    avatar: Avatar
+    location: Lage
+    title: Titel
+    description: Beschreibung
+    tags: Schlagwörter
+    user_preferences: Benutzerpräferenzen
+    language: Sprache
+    text_direction: Textrichtung
+    tfa_secret: Zwei-Faktor-Authentifizierung
+    admin_options: Verwaltungsoptionen
+    status: Status
+    status_draft: Entwurf
+    status_invited: Einladung
+    status_unverified: Nicht bestätigt
+    status_active: Aktiv
+    status_suspended: Ausgesetzt
+    status_archived: Archiviert
+    role: Rolle
+    token: Token
+    provider: Anbieter
+    external_identifier: Externer Bezeichner
+    last_page: Letzte Seite
+    last_access: Letzte Zugabe
+    email_notifications: E-Mail-Benachrichtigungen
+    appearance: Aussehen
+    theme_light: "Thema: Helles Licht"
+    theme_dark: "Thema: Dunkel"
+    theme_light_overrides: Anpassung für Helles Design
+    theme_dark_overrides: Anpassen des Dunkelmodus
+  directus_settings:
+    jpg: JPEG
+    png: PNG
+    webP: WebP
+    tiff: TIFF
+    avif: AVIF
+    reporting: Berichterstattung
+    mapping: Kartierung
+    basemaps: Grundkarten
+    basemaps_raster: Raster
+    basemaps_tile: Raster-TileJSON
+    basemaps_style: Mapbox-Stil
+    mapbox_key: Mapbox Zugangs-Token
+    mapbox_placeholder: pk.eyJ1Ijo.....
+    attribution: Zuschreibung
+    attribution_placeholder: © Beitrag der OpenStreetMap-Mitwirkenden
+    transforms_note: Der Name der Sharp-Methode und ihre Argumente. Weitere Informationen finden Sie unter https://sharp.pixelplumbing.com/api-constructor.
+    additional_transforms: Weitere Transformationen
+    project_name: Projektname
+    project_descriptor: Projektbeschreibung
+    project_url: URL des Projekts
+    project_color: Projekt Farbe
+    project_logo: Logo des Projekts
+    default_language: Standard-Sprache
+    project_owner: Projektverantwortlicher
+    branding: Markenbildung
+    public_foreground: Öffentliche Aufmerksamkeit
+    public_background: Öffentliche Informationen
+    public_note: Öffentliche Mitteilung
+    theming: Standardeinstellungen für das Design
+    default_appearance: Standardeinstellungen
+    default_theme_light: "Standardthema: Hell"
+    default_theme_dark: "Standardthema: Dunkel"
+    auth_password_policy: Richtlinien für Passwörter
+    auth_login_attempts: Versuche zur Anmeldung
+    files_and_thumbnails: Dateien und Speicher
+    storage_default_folder: Standardordner
+    storage_asset_presets: Vordefinierte Einstellungen
+    storage_asset_transform: Erlaubte Umwandlungen
+    overrides: App-Einstellungen überschreiben
+    custom_css: Benutzerdefinierte CSS
+    module_bar: Modul-Bar
+    transformations_all: Erlaube alle Änderungen
+    transformations_none: Aktivierung von Transformationen deaktivieren
+    transformations_presets: Beschränken Sie die Transformationen auf vordefinierte Einstellungen
+    image_editor: Bildbearbeitung
+    custom_aspect_ratios: Benutzerdefinierte Seitenverhältnisse
+    theme_light_overrides: Individuelle Anpassung für das helle Design
+    theme_dark_overrides: Anpassen des Dunkelmodus
+    public_registration: Benutzerregistrierung
+    public_registration_note: Ermöglicht es Benutzern, sich über den [Registrierungsbereich](/admin/register) anzumelden.
+    public_registration_role: Rolle des Benutzers
+    public_registration_role_note: Diese Rolle wird Benutzern zugewiesen, die sich mit dieser Methode registrieren. Hat keinen Einfluss auf bereits registrierte Benutzer.
+    public_registration_email_filter: E-Mail-Adressfilter
+    public_registration_email_filter_note: Nur E-Mail-Adressen, die diesem Filter entsprechen, dürfen sich registrieren.
+    public_registration_verify_email: E-Mail bestätigen
+    public_registration_verify_email_note: Sendet eine E-Mail an den registrierten Benutzer, in der er gebeten wird, auf einen Verifizierungslink zu klicken, bevor er sich anmelden kann.
+    visual_editor_urls: URLs für den visuellen Editor
+    report_feature_url: URL für die Funktion «Bericht»
+    report_bug_url: Link zur Fehlerberichterstattung
+    report_error_url: Fehler melden
+    collaborative_editing: Gemeinsames Bearbeiten
+    collaborative_editing_enabled: Ermöglichen Sie die gemeinsame Bearbeitung
+    collaborative_editing_note: WebSockets sind erforderlich, damit die Zusammenarbeit beim Bearbeiten von Dateien funktioniert.
+    ai_notice: Der KI-Assistent bietet eine Seitenleiste innerhalb der App, mit der Sie mit einem LLM kommunizieren können. Sobald er aktiviert ist, öffnen Sie die KI-Seitenleiste aus der Werkzeugleiste, um Fragen zu stellen, Inhalte zu generieren und Unterstützung bei der Arbeit an Ihrem Projekt zu erhalten. <a href="https://directus.io/docs/guides/ai/assistant" target="_blank">Erfahren Sie mehr über die Konfiguration und Verwendung des KI-Assistenten.</a>
+    mcp_enabled: MCP-Server
+    mcp_enabled_note: Verbinden Sie KI-/LLM-Tools mit Ihrem Directus-Projekt über das <a href="https://directus.io/docs/guides/ai/mcp" target="_blank">Model Context Protocol (MCP)</a>. Dadurch können KI-Assistenten Ihre Directus-Daten sicher lesen und darauf interagieren.
+    mcp_notice: Das Model Context Protocol ist ein Standard, um LLMs mit Anwendungen wie Directus zu verbinden. Sobald es aktiviert wurde, steht der Directus MCP-Server unter `/mcp` zur Verfügung. <a href="https://directus.io/docs/guides/ai/mcp" target="_blank">Erfahren Sie mehr über MCP und wie Sie es einrichten.</a>
+    mcp_allow_deletes: Ermöglichen Löschungen
+    mcp_allow_deletes_note: "Ermöglichen Sie die Löschung von Elementen, Dateien, Flows, Feldern, Beziehungen und Sammlungen über die MCP-Tools. <strong style=\"color:red\">WARNUNG: Kann zu Datenverlust führen.</strong> Standardmässig deaktiviert, um die Sicherheit zu gewährleisten."
+    mcp_prompts_collection: Sammlung von Aufforderungen für KI
+    mcp_prompts_collection_note: Auswahl für die Speicherung von wiederverwendbaren Prompt-Vorlagen für KI-Interaktionen.
+    mcp_system_prompt_divider: Konfiguration der Systemanweisungen
+    mcp_system_prompt_enabled: Nutze die System-Anweisung
+    mcp_system_prompt_enabled_note: Nutzen Sie den Standard-System-Prompt unter <a href='https://directus.io/docs/guides/ai/mcp#system-prompt' target='_blank'>, um das Verhalten des LLMs zu steuern. Deaktivieren Sie diesen, um ihn zu entfernen oder durch Ihren eigenen Prompt unten zu ersetzen.
+    mcp_system_prompt: Angepasste Systemanweisung
+    mcp_system_prompt_note: Benutzerdefinierte Systemanweisung, um die Standardanweisung zu ersetzen. Lassen Sie dieses Feld leer, um die Standardanweisung zu verwenden (falls diese oben aktiviert ist).
+    ai_system_prompt: Anweisung für das KI-System
+    ai_system_prompt_note: Individuelle Anweisungen für das KI-System, um das Verhalten des LLM (Large Language Model) bei Interaktionen im KI-Assistent zu steuern. Lassen Sie dieses Feld leer, um die Standardeinstellungen zu verwenden.
+    ai_openai_api_key: Schlüssel für die OpenAI API
+    ai_openai_allowed_models: Modelle, die von OpenAI zugelassen sind
+    ai_anthropic_api_key: API-Schlüssel von Anthropic
+    ai_anthropic_allowed_models: Erlaubte Modelle von Anthropic
+    ai_google_api_key: Google API-Schlüssel
+    ai_google_allowed_models: Google-kompatible Modelle
+    ai_openai_compatible: Anbieter, der mit OpenAI kompatibel ist
+    ai_openai_compatible_name: Name des Anbieters
+    ai_openai_compatible_base_url: Basis-URL
+    ai_openai_compatible_api_key: API-Schlüssel
+    ai_openai_compatible_models: Modelle
+    ai_openai_compatible_headers: Individuelle Überschriften
+    ai_model_id: Modell-ID
+    ai_context_limit: Kontextlimit
+    ai_output_limit: Ausgabe-Limit
+    ai_supports_attachments: Unterstützt Anhänge
+    ai_supports_reasoning: Unterstützt das logische Denken
+    ai_provider_options: Mögliche Anbieter
+    ai_provider_options_note: Optionen, die spezifisch für den Anbieter sind und an die KI-Endpunkte übergeben werden.
+    ai_header_name: Überschrift
+  directus_shares:
+    name: Name
+    role: Rolle
+    password: Passwort
+    date_start: Datum, Beginn
+    date_end: Datum Ende
+    max_uses: Max' Anwendungen
+    times_used: Verwendete Zeiträume
+  directus_fields:
+    collection: Sammlung
+    icon: Symbol für die Sammlung
+    note: Hinweis
+    hidden: Versteckt
+    singleton: Einzigartiges Exemplar
+    translation: Übersetzungen für Feldnamen
+    display_template: Vorlage
+  directus_roles:
+    name: Bezeichnung
+    icon: Symbol für die Rolle
+    description: Beschreibung
+    users: Nutzer in einer bestimmten Rolle
+    parent: Rolle der Eltern
+    children: Rollen für Kinder
+    policies: Richtlinien
+  directus_policies:
+    name: Name der Richtlinie
+    description: Beschreibung
+    app_access: Zugang zur App
+    admin_access: Zugriff für Administratoren
+    ip_access: Zugang über IP
+    enforce_tfa: Erfordert 2-Faktor-Authentifizierung
+field_options:
+  directus_settings:
+    project_name_placeholder: Mein Projekt...
+    project_color_note: Anmeldung & Hintergrundbild
+    project_logo_note: Weiss, 40×40 SVG/PNG
+    project_favicon_note: 32×32 Pixel
+    public_note_placeholder: Eine kurze, öffentliche Nachricht, die die Verwendung von Markdown-Formatierung unterstützt…
+    security_divider_title: Sicherheit
+    auth_password_policy:
+      none_text: Nicht empfohlen
+      weak_text: Kurz – Mindestens 8 Zeichen
+      strong_text: Stark – Grossbuchstaben / Kleinbuchstaben / Zahlen / Sonderzeichen
+    storage_asset_presets:
+      fit_label: Angemessen
+      upscaling: Vergrössern
+      fit:
+        contain_text: Behalten (Verhältnis beibehalten)
+        cover_text: Abdeckung (genaue Grösse)
+        fit_text: Passt
+        outside_text: Ideal für den Einsatz im Freien
+    additional_transforms: Weitere Umwandlungen
+    transforms_note: Der Name der Sharp-Methode und ihre Argumente. Weitere Informationen finden Sie unter https://sharp.pixelplumbing.com/api-constructor.
+    mapbox_key: Mapbox-Zugangs-Token
+    mapbox_placeholder: pk.eyJ1Ijo.....
+    basemaps: Basisdaten
+    basemaps_name_placeholder: Geben Sie den Namen der Basiskarte ein...
+    basemaps_raster: Raster
+    basemaps_tile: Raster-TileJSON
+    basemaps_style: Mapbox-Stil
+    files_divider_title: Dateien und Vorschaubilder
+    overrides_divider_title: App-Einstellungen überschreiben
+  directus_activity:
+    login: Anmelden
+    logout: Abmelden
+    create: Erstellen
+    update: Aktualisierung
+    delete: Löschen
+  directus_collections:
+    track_activity_revisions: Aktivitäten und Änderungen verfolgen
+    only_track_activity: Nur Aktivitäten aufzeichnen
+    do_not_track_anything: Keine Informationen über das Nutzerverhalten erfassen
+    collection_setup: Einrichtung der Sammlung
+    collection_naming_translations_note: Die Anzeige des Namens der Sammlung in der App anpassen, basierend auf der Sprache des Benutzers.
+    note_placeholder: Eine Beschreibung dieser Sammlung…
+    hidden_label: Verstecken innerhalb der App
+    singleton: Behandle als einzelnes Objekt
+    language: Sprache
+    translation: Übersetzung
+    translation_placeholder: Gib einen Text zur Übersetzung ein...
+    collection_name: Sammlung
+    singular_unit: Einzigartige Einheit
+    plural_unit: Mehrere Einheiten
+    archive_divider: Archiv
+    archive_field_placeholder: Wählen Sie ein Gebiet...
+    archive_app_filter: Aktivieren Sie die Filterfunktion für App-Archiv
+    archive_value: Wert, der beim Archivieren festgelegt wird…
+    unarchive_value: Wert, der beim Entpacken festgelegt wird...
+    sort_divider: Sortieren
+    sort_field: Wählen Sie ein Feld aus...
+    accountability_divider: Verantwortung
+    duplication_divider: Duplizieren
+    preview_divider: Vorschau
+    content_translations_divider: Übersetzung von Inhalten
+    content_versioning_divider: Versionsverwaltung
+    enable_versioning: Versionierung aktivieren
+  directus_files:
+    title: Ein einzigartiger Titel...
+    description: Ein optionales Beschreibungsverfahren...
+    location: Eine optionale Lage...
+    storage_divider: Dateinamen
+    focal_point_divider: Schwerpunkt
+    filename_disk: Name auf der Festplatte...
+    filename_download: Name beim Herunterladen...
+  directus_policies:
+    name: Ein einzigartiger Name für diese Richtlinie...
+    description: Eine Beschreibung dieser Richtlinie...
+    ip_access: Fügen Sie die erlaubten IP-Adressen, IP-Adressbereiche und CIDR-Blöcke hinzu. Lassen Sie das Feld leer, um alle zu erlauben…
+    enforce_tfa: Erzwingen Sie die Zwei-Faktor-Authentifizierung
+    assigned_to: Zuweisung
+  directus_roles:
+    name: Die einzigartige Bezeichnung für diese Position...
+    description: Eine Beschreibung dieser Position…
+    fields:
+      icon_name: Symbol
+      name_name: Name
+      name_placeholder: Gib einen Titel ein...
+      link_name: Link
+      link_placeholder: Relative oder absolute URL...
+    parent_note: Optionale Rolle für Eltern, die Berechtigungen von dieser Rolle übernehmen
+    children_note: Kindrollen, die diese Berechtigungen erben
+    collections_name: Sammlungen
+    collections_addLabel: Artikel hinzufügen...
+  directus_users:
+    preferences_divider: Benutzerpräferenzen
+    dropdown_auto: Automatisch (basierend auf dem System)
+    dropdown_light: Hellste Modus
+    dropdown_dark: Dunkelmodus
+    admin_divider: Verwaltungsoptionen
+    status_dropdown_draft: Entwurf
+    status_dropdown_invited: Einladung
+    status_dropdown_active: Aktiv
+    status_dropdown_suspended: Ausgesetzt, aufgehängt
+    status_dropdown_archived: Archiviert
+    token: Geben Sie einen sicheren Zugangs-Token ein...
+no_fields_in_collection: Es gibt derzeit keine Felder in der Sammlung "{collection}"
+no_value: Kein Wert
+do_nothing: Nichts tun
+generate_and_save_uuid: UUID generieren und speichern
+save_current_user_id: Aktuelle Benutzer-ID speichern
+save_current_user_role: Aktuelle Benutzerrolle speichern
+save_current_datetime: Heutiges Datum/Uhrzeit speichern
+always_open: Immer geöffnet
+start_open: Beginnen
+start_collapsed: Beginn gestört
+block: Block
+inline: Im Text
+comment: Kommentar
+live_preview:
+  enable: Funktioniert die Vorschau
+  disable: Voransicht deaktivieren
+  change_size: Ändere die Bildschirmabmessungen
+  refresh: Vorschau aktualisieren
+  new_window: Öffnen im neuen Fenster
+  close_window: Öffnen im Zweiteilsicht
+  toggle_3d: 3D-Ansicht einschalten/ausschalten
+  iframe_title: Vorschau der Webseite in Echtzeit
+  display_options: Auswahlen
+  exit_full_width: Zurück zur vollen Breite
+  open_in_visual_editor: Öffnen in Visual-Editor
+shares: Aktien
+unlimited_usage: Unbegrenzte Nutzung
+uses_left: Keine weiteren Anwendungen verfügbar | Eine Anwendung noch verfügbar | {n} Anwendungen noch verfügbar
+no_shares: Keine Aktien im Besitz
+new_share: Neue Aktie
+show_more: Mehr anzeigen
+show_less: Weniger anzeigen
+ai:
+  thinking: Nachdenken...
+  input: Eingabe
+  output: Ausgabe
+  streaming: Live-Übertragung...
+  ready: Bereit
+  complete: Vollständig
+  error: Fehler
+  error_message: Es ist ein Fehler aufgetreten
+  unknown_error: Unbekannter Fehler
+  unknown: Unbekannt
+  approval_requested: Genehmigung erwünscht
+  approve: Genehmigen
+  always_allow: Immer zulassen
+  deny: Leugnen
+  approve_tool_execution: Ausführung des Werkzeugs genehmigen?
+  retry: Versuchen erneut
+  prompt_input_placeholder: Geben Sie Ihre Nachricht hier ein...
+  clear_conversation: Klare Kommunikation
+  build_with_assistant: Erstelle mit dem KI-Assistenten
+  responses_may_be_inaccurate: Antworten von KI-Systemen können ungenau sein.
+  add_content: Inhalte hinzufügen
+  prompt: Anweisung
+  prompts: Anregungen
+  items: Artikel
+  content: Inhalt
+  insert_prompt: Eingabeaufforderung
+  insert_reusable_prompt: Fügen Sie ein wiederverwendbares Prompt-Template ein
+  insert_item_context: Kontext des Artikels
+  coming_soon: Bald verfügbar
+  failed_to_load_prompts: Fehlende Auslöser
+  failed_to_load_items: Fehlende Ladung der Artikel
+  some_context_failed: "{Anzahl} Kontextelemente konnten nicht geladen werden."
+  prompt_inserted: Hinweis eingefügt
+  prompt_staged: Vorab vorbereitet
+  items_staged: Artikel, die aufgestellt/präsentiert wurden
+  some_items_staged: "{Anzahl} Artikel ausgewählt (Limit erreicht)"
+  files_staged: Dateien vorbereitet
+  some_files_staged: "{Anzahl} Dateien vorbereitet (Limit erreicht)"
+  attach_file_subtitle: Anhänge vorhandene Dateien
+  upload_file_subtitle: Dateien vom lokalen Speicher hochladen
+  file_upload_failed: Nicht möglich, {name} hochzuladen
+  file_upload_not_supported: Hochladen von Dateien wird von diesem Anbieter nicht unterstützt.
+  unsupported_file_type: Nicht unterstütztes Dateiformat
+  provider_locked_tooltip: Es ist nicht möglich, nach dem Hochladen von Dateien einen neuen Anbieter zu wählen. Um den Anbieter zu wechseln, müssen Sie das bisherige Gespräch löschen.
+  image_preview: Vorschau des Bildes
+  item_staged: Artikel ist vorbereitet
+  invalid_collection: Ungültige Sammlung
+  element_already_staged: Das Element ist bereits umgesetzt/realisiert
+  max_elements_reached: Maximale Anzahl erreicht
+  element_staged: Element ist vorbereitet
+  failed_to_insert_prompt: Fehlgeschlagen beim Einfügen des Hinweises
+  go_to_settings: Gehen Sie zu den Einstellungen
+  setup_ai_assistant: Einrichtung des KI-Assistenten
+  setup_ai_assistant_admin_description: Fügen Sie Ihre API-Schlüssel Ihres KI-Anbieters in den Einstellungen ein, um den KI-Assistenten zu aktivieren.
+  setup_ai_assistant_user_description: Kontaktieren Sie Ihren Administrator, um den KI-Assistenten zu aktivieren.
+  settings: Einstellungen
+  tool_approval:
+    always: Immer erlaubt
+    ask: Benötigt Genehmigung
+    disabled: Menschen mit Behinderung
+  enabled_tools: Verfügbare Werkzeuge
+  disabled_tools: Werkzeuge für Menschen mit Behinderung
+  ask_user_submit: Absenden
+  ask_user_next: Nächster
+  ask_user_skip: Überspringen
+  ask_user_chat_about_this: Diskutiert darüber
+  ask_user_type_answer: Bitte geben Sie Ihre Antwort ein...
+  ask_user_skipped: Übersprungen
+  tool_descriptions:
+    items: Erstellen, lesen, aktualisieren und löschen von Inhalten
+    files: Dateien suchen und verwalten
+    folders: Ordner erstellen und organisieren
+    flows: Erstellen und aktualisieren von Abläufen
+    trigger-flow: Manuell auslösbare Prozesse ausführen
+    operations: Betreibe die Abläufe innerhalb von Prozessen
+    schema: Abrufen von Informationen zur Datenbankstruktur
+    collections: Erstellen und verwalten von Sammlungen
+    fields: Erstelle und konfiguriere Sammlungsfelder
+    relations: Erstelle Beziehungen zwischen den Sammlungen
+ai_tools:
+  ask_user: Frage den Nutzer
+  update_form_values: Formularwerte aktualisieren
+  read_form_values: Formwerte lesen
+  items: Artikel
+  files: Dateien
+  folders: Ordner
+  flows: Ströme
+  trigger-flow: Auslöser-Prozess
+  operations: Betrieb
+  schema: Struktur
+  collections: Sammlungen
+  fields: Felder
+  relations: Beziehungen
+mcp_prompts_collection:
+  no_collection_selected: Keine Auswahl getroffen
+  no_collection_selected_copy: Wählen Sie eine Sammlung, um wiederverwendbare Vorlagen für Anfragen zu aktivieren.
+  collection_not_found: Artikel nicht gefunden
+  collection_not_found_description: Die Sammlung "{collection}" existiert in der Datenbank nicht.
+  generate: Sammlung von KI-Prompts erstellen
+  already_exists: Die Sammlung von KI-Prompts existiert bereits.
+  generate_collection_dialog_title: Sammlung von KI-Prompts erstellen
+  generate_fields_dialog_title: Felder zur Eingabe von KI-Prompts
+  generate_collection_dialog_description: Dies erstellt eine neue Sammlung "{collection}" mit den notwendigen Feldern und Einstellungen, um wiederverwendbare Prompt-Vorlagen zu speichern.
+  generate_fields_dialog_description: Dies wird die erforderlichen Felder in Ihrer "{collection}"-Sammlung erstellen.
+  validation_success: Sammlung ist bereit, als Teil der Sammlung "KI-Eingabeaufforderungen" verwendet zu werden.
+  validation_error_invalid: Die Sammlung kann nicht verwendet werden
+  validation_error_missing: Die Sammlung kann noch nicht verwendet werden
+  invalid_fields: "Die folgenden Felder existieren, sind aber von inkompatiblen Typen:"
+  missing_fields: "Die folgenden Felder sind obligatorisch, aber fehlen:"
+  generate_missing: Fehlende Felder generieren...
+mcp_prompts_collection_schema:
+  system_prompt_note: Anweisungen, die bestimmen, wie das LLM antwortet.
+  messages_note: "Optional: Definieren Sie die Struktur des Gesprächs zwischen Nutzern und LLMs. Wird verwendet, um Kontext hinzuzufügen und die Ergebnisse zu verbessern."
+  messages_role_user: Benutzer
+  messages_role_assistant: Unterstützer/in
+  messages_role_note: Wer ist der Verfasser dieser Nachricht?
+  meta_prompts_notice: Diese Vorlagen sind wiederverwendbar und können über den Directus MCP Server, Flows oder andere KI-Anwendungen mit LLMs verwendet werden. <a href="https://directus.io/docs/guides/ai/mcp/prompts" target="_blank">Erfahren Sie mehr über die Erstellung effektiver Prompts.</a>
+expired: Verlaufen
+upcoming: Was kommt noch
+share: Teilen
+share_item: Artikel teilen
+shared_with_you: Ein Artikel wurde Ihnen zugestellt
+shared_enter_passcode: Geben Sie Ihren Passwortein für die Fortsetzung ein...
+generate: Erzeugen
+shared_leave_blank_for_passwordless_access: Lassen Sie dieses Feld leer, wenn Sie keinen Passwort benötigen
+shared_leave_blank_for_unlimited: Lassen Sie dieses Feld leer, um unbegrenzt zu verwenden
+shared_times_remaining: Dieser Link kann nur {n} Mal verwendet werden.
+shared_last_remaining: Dieser Link kann nur einmal verwendet werden.
+shared_uses_left: Zur zusätzlichen Sicherheit wurde diese gemeinsame Seite mit einer begrenzten Anzahl von Aufrufen konfiguriert. Derzeit sind noch {n} Aufrufe möglich, danach wird die Seite nicht mehr zugänglich sein.
+share_access_page: Seite gemeinsam einsehen
+share_access_not_found: Diese gemeinsame Seite existiert entweder nicht oder wurde bereits die maximale Anzahl an erlaubten Nutzungen überschritten.
+share_access_not_found_desc: Bitte wenden Sie sich an einen autorisierten Nutzer dieses Projekts, um Zugang zu beantragen.
+share_access_not_found_title: Seite mit unbekanntem Inhalt
+share_copy_link: Link kopieren
+share_copy_link_success: Link kopiert
+share_copy_link_error: Nicht möglich, Link zu kopieren
+share_send_link: Link senden
+relational_triggers: Auslöser, die auf Beziehungen basieren
+referential_action_field_label_m2o: Bei der Löschung von {Sammlung}...
+referential_action_field_label_o2m: Bei der Deaktivierung von {Sammlung}...
+referential_action_no_action: Verhindern Sie die Löschung
+referential_action_cascade: Lösche das Element {collection} (rekursiv)
+referential_action_set_null: Den Feld {field} leeren
+referential_action_set_default: Setze {Feld} auf seinen Standardwert
+choose_action: Wähle die Aktion
+continue_label: Weiter
+continue_as: "{Name} ist aktuell erfolgreich angemeldet. Wenn Sie diesen Account erkennen, bitte «Weiter» klicken."
+editing_role: "{Rolle} Rolle"
+editing_policy: "{Richtlinie} Richtlinie"
+no_permissions: Keine Genehmigung
+permission_add_collection: Artikel hinzufügen
+default_label: Standardwert
+delete_label: Löschen
+discard_label: Entsorgen
+delete_are_you_sure: Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Sind Sie sicher, dass Sie fortfahren möchten?
+delete_field_are_you_sure: Sind Sie sicher, dass Sie das Feld "{feld}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+description: Beschreibung
+done: Erledigt
+duplicate: Duplizieren
+limit: Grenze
+email: E-Mail
+embed: Einbetten
+fallback_icon: Icon für den Fall, dass keine andere Option verfügbar ist
+field: Bereich | Bereiche
+file: Datei
+file_library: Medienbibliothek
+forgot_password: Passwort vergessen
+hidden: Versteckt
+hidden_in_group: Versteckt in {Gruppe}
+icon: Symbol
+info: Information
+normal: Normal
+success: Erfolg
+warning: Warnung
+danger: Gefahr
+colors:
+  purple: Lila
+  blue: Blau
+  green: Grün
+  yellow: Gelb
+  orange: Orange
+  red: Rot
+  black: Schwarz
+  gray: Grau
+  white: Weiss
+junction_collection: Sammlung an Kreuzpunkten
+latency: Verzögerung
+login: Anmelden
+logout: Abmelden
+my_activity: Meine Aktivitäten
+not_authenticated: Nicht verifiziert
+authenticated: Verifiziert
+options: Möglichkeiten
+otp: Einmaliger Passwort
+password: Passwort
+confirm_password: Bestätigungs-Passwort
+permissions: Genehmigungen
+relationship: Beziehung
+reset: Zurücksetzen
+reset_password: Passwort zurücksetzen
+revisions: Überprüfungen
+no_revisions: Noch keine Änderungen
+no_logs: Noch keine Protokolle vorhanden
+show_failed_only: Fehler beim Anzeigen
+no_logs_on_page: Keine Protokolle auf dieser Seite
+revert: Zurücksetzen
+save: Speichern
+schema: Struktur
+search: Suche
+select_existing: Ausgewählte
+select_field_type: Wählen Sie den gewünschten Feldtyp aus
+select_interface: Wählen Sie eine Schnittstelle
+select_display: Wählen Sie ein Display aus
+settings: Einstellungen
+register: Registrierung
+registration_successful_headline: Erfolg!
+registration_successful_note: Sie können nun zur Anmeldeseite übergehen.
+registration_successful_check_email_note: Bitte beachten Sie, dass Sie vor dem Anmelden Ihre E-Mail-Adresse bestätigen müssen, indem Sie auf den entsprechenden Link klicken, der Ihnen zugestellt wurde.
+dont_have_an_account: Haben Sie noch kein Konto?
+already_have_an_account: Haben Sie bereits ein Konto?
+sign_up_now: Melden Sie sich jetzt an
+sign_in: Anmelden
+sign_out: Abmelden
+sign_out_confirm: Sind Sie sicher, dass Sie sich abmelden möchten?
+something_went_wrong: Etwas ist schiefgegangen.
+sort_direction: Sortierreihenfolge
+export_location: Ausstellungsort
+export_started: Export hat begonnen
+export_started_copy: Der Export hat begonnen. Sie werden benachrichtigt, sobald er zum Download bereit ist.
+sort_asc: Sortieren, aufsteigend
+sort_desc: Sortieren, absteigend
+disable_sort: Sortierfunktion deaktivieren
+template: Vorlage
+require_value_to_be_set: Es ist erforderlich, dass der Wert bei der Erstellung festgelegt wird.
+translation: Übersetzung
+translation_placeholder: Gib einen Text zur Übersetzung ein…
+value: Wert
+view_project: Projekt ansehen
+report_error: Fehler melden
+table: Tisch
+list: Liste
+search_filter: Suche und Filter
+enable_search_filter: Möglichkeit zur Suche und zum Filtern
+item_link: Link zum Artikel
+show_link_to_item: Zeigen Sie einen Link zum Artikel
+navigate_to_item: Navigieren Sie zum Artikel
+undo_removed_item: "Aktionen rückgängig machen: Entferntes Element"
+remove_item: Artikel entfernen
+delete_item: Artikel löschen
+pause: Pausieren
+resume: Lebenslauf
+interfaces:
+  list-m2a:
+    prefix_note: Verwendet standardmässig den Namen der zugehörigen Sammlung.
+    sorting_disabled: Die Sortierung ist deaktiviert, da es mehr Artikel gibt, die nicht auf einer einzigen Seite Platz finden.
+  filter:
+    name: Filter
+    description: Eine Filter-Objekt konfigurieren.
+    add_filter: Filter hinzufügen
+    add_group: Und/oder Gruppe
+    add_value: Mehrwert schaffen
+    logic_type_and: UND
+    logic_type_or: ODER
+    all: Alles
+    any: Jeder
+    and: und
+    of_the_following: von folgenden
+    no_rules: Keine definierten Regeln
+    change_value: Klicken Sie, um den Wert zu ändern
+    placeholder: Ziehe die Regeln hierher
+    add_key_placeholder: Fügen Sie einen Schlüssel hinzu und drücken Sie die Eingabetaste…
+  fields:
+    name: Felder
+  group-accordion:
+    name: Akordeon
+    description: Felder oder Gruppen als Accordion-Abschnitte darstellen
+    start: Beginnen
+    all_closed: Alle geschlossen
+    first_opened: Erstmals eröffnet
+    all_opened: Alle geöffnet
+    accordion_mode: Akordeon-Modus
+    max_one_section_open: Max. 1 Abschnitt geöffnet
+  group-tabs:
+    name: Tabellen
+    description: Felder oder Gruppen als Tabs darstellen
+    overwrite_group_width: Breite der Gruppe überschreiben
+    fill_width: Breite
+    fill_width_note: Ermöglichen Sie, dass diese Gruppe die gesamte Breite der Seite ausfüllt.
+  presentation-links:
+    presentation-links: Knöpfe
+    description: Anpassbare Schaltflächen zum Auslösen dynamischer URLs oder zum Starten von Abläufen
+    style: Stil
+    primary: Haupt
+    link: Links
+    button: Knöpfe
+    error: Nicht möglich, Aktion durchzuführen
+    action_type: Art der Aktion
+    select_manual_flow_note: Der Fluss muss mit einem manuellen Auslöser für diese Sammlung konfiguriert werden.
+  select-multiple-checkbox:
+    checkboxes: Kontrollkästchen
+    description: Wählen Sie aus verschiedenen Optionen mithilfe von Kontrollkästen aus
+    allow_other: Ermöglichen anderen
+    show_more: Zeige weitere {count}
+    items_shown: Vorhandene Artikel
+  select-multiple-checkbox-tree:
+    name: Abrunden (Baumstruktur)
+    description: Wählen Sie aus verschiedenen Optionen, indem Sie verschachtelte Checkboxen verwenden
+    value_combining: Wertkombination
+    value_combining_note: Steuert, welchen Wert gespeichert wird, wenn verschachtelte Auswahlen getroffen werden.
+    show_all: Alle anzeigen
+    show_selected: Ausgewählte anzeigen
+  input-code:
+    code: Code
+    description: Schreibe oder teile Code-Ausschnitte
+    line_number: Zeilennummer
+    line_wrapping: Zeilenumbruch
+    placeholder: Bitte Code hier eingeben...
+  system-collection:
+    collection: Sammlung
+    description: Wählen Sie aus den vorhandenen Sammlungen
+    include_system_collections: Fügen Sie System-Sammlungen hinzu
+  system-owner:
+    update: Projektverantwortlicher informieren
+    edit: Projektverantwortlicher bearbeiten
+    system-owner: Systemverantwortlicher
+    description: Schnittstelle für den Systemverantwortlichen
+  system-collections:
+    collections: Sammlungen
+    description: Wählen Sie aus den vorhandenen Sammlungen
+    include_system_collections: Füge System-Sammlungen hinzu
+  select-color:
+    color: Farbe
+    description: Geben Sie einen Wert für die Farbe ein oder wählen Sie eine Farbe aus.
+    placeholder: Wählen Sie eine Farbe...
+    preset_colors: Vordefinierte Farben
+    opacity: Transparenz
+    preset_colors_add_label: Füge eine neue Farbe hinzu...
+    name_placeholder: Bitte Farbe angeben...
+  datetime:
+    datetime: Datum und Uhrzeit
+    description: Bitte geben Sie Datum und Uhrzeit an
+    include_seconds: Bitte einschliessen
+    set_to_now: Ab sofort
+    use_24: Verwenden Sie das 24-Stunden-Format
+    placeholder: Wählen Sie ein Datum und eine Uhrzeit...
+  system-fields:
+    select_a_collection: Wählen Sie eine Sammlung aus
+    no_fields: Keine Felder
+  system-display-template:
+    display-template: Vorlage für die Darstellung
+    description: Kombinieren Sie statischen Text mit dynamischen Feldwerten.
+    collection_field: Feld zur Sammlung
+    collection_field_not_setup: Die Option zur Auswahl eines Feldes ist falsch konfiguriert.
+    select_a_collection: Wählen Sie eine Sammlung
+  presentation-divider:
+    divider: Trennwand
+    description: Beschriften und die Felder in Abschnitte unterteilen
+    title_placeholder: Geben Sie einen Titel ein, oder lassen Sie das Feld leer, um nur eine Zeile anzuzeigen…
+    inline_title: Überschrift
+    inline_title_label: Titel des Programms innerhalb der Zeile
+    margin_top: Oben Rand
+    margin_top_label: Erhöhe den oberen Rand
+  select-dropdown:
+    description: Wählen Sie einen Wert aus einer Dropdown-Liste aus
+    choices_placeholder: Füge eine neue Option hinzu
+    allow_other: Erlauben
+    allow_other_label: Ermöglichen weiterer Werte
+    allow_none: Keine Erlaubnis
+    allow_none_label: Keine Auswahl zulassen
+    choices_name_placeholder: Geben Sie einen Namen ein...
+    choices_value_placeholder: Geben Sie einen Wert ein...
+    preview_threshold: Schwellenwert für Vorschau
+  select-multiple-dropdown:
+    select-multiple-dropdown: Auswahlliste (mit mehreren Optionen)
+    description: Mehrere Werte aus einer Dropdown-Liste auswählen
+  file:
+    file: Datei
+    description: Datei auswählen oder hochladen
+    allowed_mime_types: Erlaubte MIME-Typen
+    mime_types_placeholder: Wählen Sie aus oder fügen Sie die zulässigen MIME-Typen hinzu...
+    mime_types_note: Bitte beachten Sie, dass die global definierte MIME-Typ-Liste FILES_MIME_TYPE_ALLOW_LIST in Ihrer Umgebung Vorrang hat, gegenüber den oben genannten Auswahlen.
+  files:
+    files: Dateien
+    description: Wählen Sie mehrere Dateien aus oder laden Sie sie hoch
+  input-hash:
+    hash: Hash
+    description: Geben Sie einen Wert ein, der gehasht werden soll
+    masked: Mit Maske
+    masked_label: Verstecken Sie die eigentlichen Werte
+  select-icon:
+    icon: Symbol
+    description: Wählen Sie ein Symbol aus einer Dropdown-Liste aus
+    search_for_icon: Suche nach Symbol...
+  file-image:
+    image: Bild
+    description: Wählen Sie ein Bild aus oder laden Sie ein Bild hoch
+    crop: Anpassen
+    crop_label: Bild zuschneiden, falls erforderlich
+    letterbox: Briefkasten
+    letterbox_label: Füge dem Vorschaubild einen Rand hinzu
+  system-interface:
+    interface: Schnittstelle
+    description: Wählen Sie eine bereits vorhandene Schnittstelle aus
+    placeholder: Wählen Sie eine Schnittstelle...
+  system-interface-options:
+    interface-options: Mögliche Schnittstellenausführungen
+    description: Ein Dialogfenster zur Auswahl von Optionen einer Benutzeroberfläche
+  system-display:
+    display: Anzeige
+    description: Wählen Sie eine bestehende Anzeige
+    placeholder: Wählen Sie ein Display aus…
+  system-display-options:
+    display-options: Auswahlen
+    description: Ein Dialogfenster zur Auswahl von Optionen für eine Anzeige
+  list-m2m:
+    many-to-many: Viele zu vielen
+    description: Mehrere zusammenhängende Elemente auswählen
+    columns_configure_notice: Sie können die Spalten nach der Erstellung dieses Feldes konfigurieren.
+    display_template_configure_notice: Sie können das Anzeigemuster nach der Erstellung dieses Feldes konfigurieren.
+  select-dropdown-m2o:
+    many-to-one: Viele zu Eins
+    description: Wählen Sie ein einzelnes, passendes Element aus
+    display_template: Vorlage für die Darstellung
+  collection-item-dropdown:
+    collection-item-dropdown: Auswahl für Artikel
+    description: Wählen Sie ein Element aus einer Sammlung im JSON-Format aus
+  collection-item-multiple-dropdown:
+    collection-item-multiple-dropdown: Auswahl aus der Liste der Artikel (mehrere)
+    description: Mehrere Elemente aus einer Sammlung im JSON-Format auswählen
+  input-rich-text-md:
+    markdown: Markdown
+    description: Eingabe und Vorschau für Markdown
+    edit: Bearbeiten
+    preview: Vorschau
+    editorFont: Schriftart für die Redaktion
+    previewFont: Vorschau-Schriftart
+    default_view: Standardansicht
+    default_view_editor: Redaktor
+    default_view_preview: Vorschau
+    customSyntax: Massgefertigte Bausteine
+    customSyntax_label: Fügen Sie benutzerdefinierte Syntax-Typen hinzu
+    customSyntax_add: Fügen Sie eine benutzerdefinierte Syntax hinzu
+    box: Blockweise / In einer Reihe
+    imageToken: Statische Zugangs-Token
+    imageToken_label: Der statische Zugriffs-Token wird an die URL der Assets angehängt.
+  map:
+    map: Karte
+    description: Wählen Sie einen Ort auf einer Karte aus
+    zoom: Zoom
+    geometry_type: Art der Geometrie
+    geometry_format: Geometrie-Format
+    default_view: Standardansicht
+    invalid_options: Ungültige Optionen
+    invalid_format: Ungültiges Format ({format})
+    unexpected_geometry: "Erwartet: {erwartet}, erhalten: {erhalten}."
+    fit_bounds: Überblick über die Daten
+    native: Einheimisch
+    geojson: GeoJSON
+    lnglat: Längengrad, Breitengrad
+    wkt: WKT
+    wkb: WKB
+    click_to_select: Klicken Sie, um {Geometrie} auszuwählen
+  presentation-notice:
+    notice: Hinweis
+    description: Zeigen Sie eine kurze Mitteilung
+    text: Bitte den Inhalt der Mitteilung hier einfügen…
+    no_text: Kein Text konfiguriert...
+  list-o2m:
+    one-to-many: Ein-zu-Viele
+    description: Mehrere verwandte Artikel auswählen
+    no_collection: Die Sammlung konnte nicht gefunden werden.
+  system-folder:
+    folder: Hauptverzeichnis
+    description: Wählen Sie einen Ordner
+    field_hint: Standardordner für hochgeladene Dateien, falls kein spezifischer Ordner angegeben wurde. Hat keinen Einfluss auf bereits vorhandene Dateien.
+    root_name: Wurzelverzeichnis der Dateibibliothek
+    system_default: Standardeinstellungen
+  select-radio:
+    radio-buttons: Radio-Buttons
+    description: Wählen Sie eine der verschiedenen Optionen aus
+  list:
+    repeater: Wiederholung
+    description: Mehrere Einträge mit derselben Struktur erstellen
+    edit_fields: Felder bearbeiten
+    add_label: „Neu erstellen“
+    sort: Sortieren
+    sort_placeholder: Bedienungsanleitung
+    field_note_placeholder: Feldnotiz eingeben...
+    incompatible_data: Die aktuellen Daten sind nicht mit der Repeater-Schnittstelle kompatibel und werden bei der Hinzufügung von Elementen zum Repeater überschrieben.
+    interface_group: Mögliche Schnittstellen
+    display_group: Auswahlen
+  slider:
+    slider: Schieberegler
+    description: Wählen Sie eine Zahl mit einem Schieberegler
+    always_show_value: Zeigen Sie stets den Wert
+  tags:
+    tags: Schlagwörter
+    description: Auswählen oder hinzufügen von Schlagwörtern
+    whitespace: Leere Zeichen
+    hyphen: Ersetzen Sie durch Bindestrich
+    underscore: Ersetzen durch Unterstrich
+    remove: Leerzeichen entfernen
+    capitalization: Großschreibung
+    uppercase: In Kleinbuchstaben umwandeln
+    lowercase: In Kleinbuchstaben umwandeln
+    auto_formatter: Nutzen Sie die automatische Überschriftenformatierung
+    alphabetize: Nach alphabetischer Reihenfolge ordnen
+    alphabetize_label: Ordne nach alphabetischer Reihenfolge
+    add_tags: Fügen Sie eine Bezeichnung hinzu und drücken Sie die Eingabetaste…
+  input:
+    input: Eingabe
+    description: Wert manuell eingeben
+    trim: Zuschneiden
+    trim_label: Schneiden Sie den Anfang und das Ende ab
+    mask: Mit Maske
+    mask_label: Verstecken Sie den tatsächlichen Wert
+    clear: Abgeklärter Wert
+    clear_label: Als leere Zeichenkette speichern
+    minimum_value: Mindestwert
+    maximum_value: Höchster Wert
+    step_interval: Schrittweite
+    slug: In eine kürzere, verständlichere Form bringen
+    slug_label: Stellen Sie sicher, dass die eingegebene URL sicher ist.
+  input-multiline:
+    textarea: Textfeld
+    description: Geben Sie einen mehrzeiligen, einfachen Text ein
+  input-translated-string:
+    input-translated-string: Übersetzte Texte
+    description: Wählen Sie eine Übersetzung aus oder erstellen Sie eine eigene
+    search_placeholder: Suche...
+    new_custom_translation: Neue, individuelle Übersetzung
+  boolean:
+    toggle: Umschalten
+    description: Umschalten zwischen eingeschaltet und ausgeschaltet
+    color_on: Farbe auf
+    color_off: Farbe ausschalten
+    label_placeholder: Gib eine Bezeichnung ein...
+    label_default: Aktiviert
+  translations:
+    display_template: Vorlage für die Darstellung
+    no_collection: Keine Einträge
+    toggle_split_view: Anzeigen/Ausblenden Zweiteilsansicht
+    enable: Aktivieren
+    default_split_view_state: Standardansicht
+    user_language: Verwende die Sprache des aktuellen Benutzers
+    default_language: Standard-Sprache
+    language_field: Feld zur Angabe der Sprachauszeichnung
+    language_direction_field: Sprachrichtungsfeld
+  list-o2m-tree-view:
+    description: Baumansicht für verschachtelte, rekursive Elemente mit einer-zu-vielen-Beziehung
+    recursive_only: Die Baumansicht-Oberfläche funktioniert nur für rekursive Beziehungen.
+  user:
+    user: Nutzer
+    description: Wähle einen bereits existierenden Directus-Benutzer aus
+    select_mode: Auswahlmodus
+    modes:
+      auto: Autos
+      dropdown: Auswahlliste
+      modal: Modus
+  input-rich-text-html:
+    wysiwyg: Wie es angezeigt wird
+    description: Ein Texteditor, mit dem HTML-Inhalte erstellt werden können.
+    toolbar: Werkzeugleiste
+    custom_formats: Individuelle Formate
+    custom_formats_note: Liste der TinyMCE-Inhaltsformate. Weitere Informationen finden Sie in der TinyMCE-Dokumentation unter [Inhaltsformatierung](https://www.tiny.cloud/docs/tinymce/latest/content-formatting/).
+    options_override: Optionen überschreiben
+    options_override_note: Die TinyMCE-Benutzerformatierungs-Schlüssel und ihre Werte. Weitere Informationen finden Sie in der TinyMCE-Dokumentation unter [Benutzerformatierungsoptionen](https://www.tiny.cloud/docs/tinymce/latest/user-formatting-options/).
+    folder_note: Ordner für hochgeladene Dateien. Hat keinen Einfluss auf bestehende Dateien.
+    imageToken: Statische Zugangs-Token
+    imageToken_label: Der statische Zugriffs-Token wird an die URL der Assets angehängt.
+    media_preview_iframe_title: Vorschau für Medien
+  input-block-editor:
+    input-block-editor: Block-Editor
+    description: Editor mit Block-Struktur für Geschichten mit Medieninhalten, erzeugt saubere Daten im JSON-Format mit Editor.js
+    tools: Werkzeugleiste
+    tools_options:
+      header: Überschrift
+      nestedlist: Liste
+      embed: Einbetten
+      paragraph: Absatz
+      code: Code
+      image: Bild
+      attaches: Anhänge
+      table: Tisch
+      quote: Zitat
+      underline: Unterstreichen
+      inlinecode: Code direkt im Text
+      delimiter: Trennzeichen
+      checklist: Kontrollliste
+      toggle: Schalter
+      alignment: Ausrichtung
+      raw: Roh-HTML
+  input-autocomplete-api:
+    input-autocomplete-api: Vorschlagsfunktion (API)
+    description: Eine Suchfunktion zur Vorschlagserstellung für Werte aus externen APIs.
+    results_path: Ergebnisweg
+    value_path: Wertpfad
+    text_path: Textpfad
+    trigger: Auslöser
+    rate: Preis
+  group-raw:
+    name: Rohgruppe
+    description: Zeige die Felder so, wie sie sind
+  group-detail:
+    name: Detail Group
+    description: Zeige die Felder als einen zusammenfaltbaren Abschnitt an
+    show_header: Anzeigen von Gruppentitel
+    header_icon: Symbol für die Überschrift
+    header_color: Farbe des Kopfzeilen
+    start_open: Beginnen
+    start_closed: "Beginn: Geschlossen"
+  system-token:
+    system-token: Token
+    description: Verwaltung eines statischen Zugangs-Tokens
+    placeholder: Klicken Sie auf "Token generieren", um ein neues statisches Zugriffs-Token zu erstellen.
+    value_securely_saved: Sicher und zuverlässig gespeichert
+    generate: Token erstellen
+    regenerate: Token neu generieren
+    generate_success_copy: Bitte sichern Sie den obigen Token und erstellen Sie eine Kopie davon. Aus Sicherheitsgründen werden Sie den Token nach dem Speichern nicht mehr einsehen und von dieser Seite abweichen können.
+    remove_token: Token entfernen
+  system-raw-editor:
+    system-raw-editor: Roh-Editor
+    description: Ermöglichen Sie die Eingabe von Roh- oder Mustache-Vorlagenwerten
+  input-password:
+    input-password: Passwort eingeben
+    description: Passworteingabe mit Schalter zur Versteckung des Wertes
+  flow-select:
+    flow-select: Auswahl
+  header:
+    header: Überschrift
+    description: Erstelle eine Überschrift mit Titel, Untertitel, Hilfestellungen und/oder Links, um Benutzern die Navigation oder Ausführung von Flows zu erleichtern.
+    links: Links
+    action_type: Art der Aktion
+    help:
+      title: Hilfe
+      note: Bietet dem Nutzer leicht zugängliche Hilfestellungen.
+    help_display_mode:
+      title: Hilfreiche Anzeige-Modus
+      note: Wählen Sie den Modus für die Anzeige der Hilfsinformationen aus.
+    enable_help_translations:
+      title: Aktivieren Sie die Übersetzungen für die Hilfe
+      note: Wenn dies aktiviert ist, wird dies den Feld "Hilfe" durch Werte aus dem Feld "Übersetzungen für Hilfe" überschreiben.
+    help_translations_string:
+      title: Hilfreiche Übersetzungen
+      note: Sie müssen einen Übersetzungs-Wert für den Schlüssel in den Übersetzungs-Einstellungen Ihres Projekts erstellen, wobei der übersetzte Inhalt für jede Sprache enthalten ist, die Sie unterstützen möchten.
+    collapse: Hilfe
+displays:
+  translations:
+    translations: Übersetzungen
+    description: Vorabübersetzungen
+    enable: Aktivieren
+    user_language: Verwende die Sprache des aktuellen Benutzers
+    default_language: Standard-Sprache
+    language_field: Feld zur Angabe der Sprache
+  boolean:
+    boolean: Boolescher Wert
+    description: Anzeige des Status "Ein" und "Aus"
+    label_on: Etikett
+    label_on_placeholder: Geben Sie den Wert auf dem Etikett ein...
+    label_off: Aufkleber entfernen
+    label_off_placeholder: Geben Sie eine Anwendung an, die nicht für den vorgesehenen Zweck bestimmt ist…
+    icon_on: Symbol
+    icon_off: Symbol ausschalten
+    color_on: Farbe hinzufügen
+    color_off: Farbe ausschalten
+  collection:
+    collection: Sammlung
+    description: Eine Sammlung präsentieren
+    icon_label: Zeige das Icon der Sammlung
+  color:
+    color: Farbe
+    description: Ein farbiger Punkt anzeigen
+    default_color: Standardfarbe
+  datetime:
+    datetime: Datum und Uhrzeit
+    description: Anzeigen von Werten, die sich auf die Zeit beziehen
+    format: Format
+    format_note: Das benutzerdefinierte Format akzeptiert das __[Symboltabelle für Datumsfelder](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table)__
+    long: Lang
+    short: Kurz
+    relative: Verwandter
+    relative_label: Zeige die relative Zeit an, z.B. vor 5 Minuten
+    suffix: Endsilbe
+    suffix_label: Zeige relative Anzeige
+    suffix_note: Verwendet Wörter wie «in» und «vor»
+    strict: Strenge
+    strict_label: Verwenden Sie genaue Einheiten
+    strict_note: Entfernt Wörter wie «fast», «über», «weniger als»
+    round: Rund
+    round_note: Wählen Sie eine Rundungsfunktion aus, die Sie verwenden möchten.
+    down: Abwärts
+    nearest: Nächstes
+    up: Auf
+    timezone: Zeitzone
+    timezone_local: Lokale Zeitzone
+    timezone_note: Bezeichner für die Zeitzone nach IANA (z.B. 'America/New_York', 'UTC'). Lassen Sie dieses Feld leer, um die lokale Zeitzone zu verwenden.
+  file:
+    file: Datei
+    description: Dateien zur Anzeige
+  filesize:
+    filesize: Dateigröße
+    description: Die Grösse einer Datei anzeigen
+  formatted-value:
+    formatted-value: Formatierter Wert
+    description: Zeige eine formatierte Version des Textes
+    format: Format
+    format_label: Automatische Formatierung
+    font: Schriftart
+    font_sans_serif: Serif-los
+    font_serif: Serif (Buchstaben mit einem Strich)
+    font_monospace: Einzeiliger Text
+    bold: Hervorheben
+    bold_label: Verwende eine fettgedruckte Schriftart
+    italic: Kursiv
+    italic_label: Verwende eine kursive Schriftart.
+    prefix: Vorwort
+    prefix_label: Text am Anfang hinzufügen
+    suffix: Suffix
+    suffix_label: Zusätzlicher Text
+    color: Farbe
+    background: Hintergrund
+    icon: Symbol
+    border: Grenze
+    border_label: Grenze anzeigen
+    mask: Verdeckt
+    mask_label: Verstecken Sie den tatsächlichen Wert
+    text: Text
+    text_placeholder: Optionaler Wertüberschreibung…
+  formatted-json-value:
+    formatted-json-value: JSON-Wert im formatierten Format
+    description: Zeige eine formatierte Version des Objekts
+  hash:
+    hash: Hash
+    description: Zeige eine version mit ausserhalb gehaltenen Daten
+  icon:
+    icon: Symbol
+    description: Ein Symbol anzeigen
+    filled: Voll
+    filled_label: Verwenden Sie die ausgefüllte Version
+  image:
+    image: Bild
+    description: Zeige eine kleine Vorschau-Abbildung
+    circle: Kreis
+    circle_label: Als Kreis darstellen
+  labels:
+    labels: Etiketten
+    description: Zeige entweder eine einzelne Bezeichnung oder eine Liste von Bezeichnungen an
+    default_foreground: Standard-Hintergrund
+    default_background: Standardhintergrund
+    format_label: Formatiere jede Beschriftung
+    show_as_dot: Anzeigen als Punkt
+    choices_value_placeholder: Geben Sie einen Wert ein...
+    choices_text_placeholder: Gib einen Text ein...
+  mime-type:
+    mime-type: Medientyp
+    description: Zeige den MIME-Typ einer Datei
+    extension_only: Nur Erweiterung
+    extension_only_label: Zeige nur die Dateierweiterung
+  rating:
+    rating: Bewertung
+    description: Stellen Sie sich eine Zahl als Sterne im Verhältnis zum Maximalwert vor.
+    simple: Einfach
+    simple_label: Zeige Sterne in einer einfachen Form
+  raw:
+    raw: Rohwert
+  related-values:
+    related-values: Verwandte Werte
+    description: Zeige die relativen Werte
+    display_template_configure_notice: Sie können das Anzeigemuster nach der Erstellung dieses Feldes konfigurieren.
+  user:
+    user: Nutzer
+    description: Zeige einen Directus-Benutzer an
+    avatar: Avatar
+    name: Name
+    both: Beide
+    circle_label: Zeige den Benutzer in einem Kreis
+layouts:
+  cards:
+    cards: Karten
+    image_source: Quelle der Abbildung
+    image_fit: Bildanpassung
+    crop: Ernte
+    contain: Enthalten
+    title: Titel
+    subtitle: Untertitel
+  tabular:
+    tabular: Tisch
+    spacing: Abstand
+    comfortable: Angenehm
+    compact: Kompakt
+    cozy: Gemütlich
+  calendar:
+    calendar: Kalender
+    start_date_field: Datum
+    end_date_field: Feld für das Enddatum
+    optional: Optional
+    first_day: Erster Tag der Woche
+  map:
+    map: Karte
+    basemap: Grundkarte
+    layers: Schichten
+    cluster_options: Optionen zur Gruppierung
+    cluster: Verwandte Daten in der Nähe
+    cluster_radius: Radius des Clusters
+    cluster_minpoints: Mindestgrösse für Cluster
+    cluster_maxzoom: Maximale Zoomstufe für die Gruppierung
+    field: Geographische Fachrichtung
+    invalid_geometry: Ungültige Geometrie
+    find_location: Ort finden...
+    default_template: Verwendung der Standardeinstellungen...
+    no_compatible_fields: Keine übereinstimmenden Felder
+  kanban:
+    name: Kanban
+    group_field: Gruppieren
+    group_field_placeholder: Feld für die Gruppierung...
+    group_title: Name der Gruppe
+    group_title_placeholder: Feld für Gruppentitel...
+    title: Titel
+    title_placeholder: Optionales Titel-Feld...
+    text: Text auf der Karte
+    text_placeholder: Optionales Textfeld...
+    date: Gültigkeitsdatum
+    date_placeholder: Optionales Datumsfeld...
+    tags: Karten-Anhänger
+    tags_placeholder: Feld für optionale Schlagwörter...
+    user: Karteninhaber
+    user_placeholder: Optionales Feld für Benutzerdaten...
+    image: Bild
+    image_placeholder: Optionales Bildfeld...
+    image_fit: Passende Darstellung auf der Karte
+    crop: Ernte
+    advanced: Fortgeschritten
+    edit_group: Bearbeitungsgruppe
+    delete_group: Gruppe löschen
+    add_group: Gruppe hinzufügen
+    add_group_placeholder: Geben Sie einen neuen Gruppentitel ein...
+    show_ungrouped: Zeige nicht gruppiert
+    show: Zeigen
+    no_group: Keine Gruppe
+horizontal: Horizontal
+vertical: Senkrecht
+axis: Achse
+x_axis: X-Achse
+y_axis: Y-Achse
+y_axis_function: Funktion der Y-Achse
+show_x_only: Zeige nur die X-Achse
+show_y_only: Zeige nur die Y-Achse
+show_data_label: Datenetikett anzeigen
+both: Beide
+show_axis_labels: Zeige Achsenbeschriftungen
+function: Funktion
+half_circle: Halbkreis
+full_circle: Vollständiger Kreislauf
+stroke_width: Linienstärke
+rounded_stroke: Abgerundeter Strich
+thin: Dünn
+medium: Grösse
+broad: Weit
+show_labels: Anzeigen von Beschriftungen
+show_legend: Legende anzeigen
+right: Richtig
+left: Links
+start: Beginnen
+end: Ende
+donut: Donut
+continuous: Kontinuierlich
+gap: Lücke
+panels:
+  metric:
+    name: Maßeinheit
+    description: Zeige einen einzelnen Wert basierend auf einer Abfrage
+    field: Bereich
+  metric_list:
+    name: Liste nach Mass
+    description: Auflisten und visualisieren von aggregierten Metriken aus einer Sammlung
+  time_series:
+    name: Zeitreihen
+    description: Erstelle ein Liniendiagramm basierend auf Werten über die Zeit.
+    date_field: Datum
+    value_field: Feld mit Wert
+    fill_type: Art der Füllung
+    curve_type: Form/Typ
+    missing_data: Fehlende Daten
+  label:
+    name: Beschriftung
+    description: Zeige einen Text
+  list:
+    name: Liste
+    description: Filtriere und liste Felder aus einer Sammlung
+  barchart:
+    name: Balkendiagramm
+    description: Balken- oder Säulendiagramme zur Vergleiche von Wertgruppen
+    horizontal: Horizontal
+    select_collection: Sie müssen eine bestimmte Auswahl treffen.
+  linechart:
+    name: Liniendiagramm
+    description: Liniendiagramm zur Vergleiche der Veränderung eines Feldes
+    disabled_grouping: Deaktiviert, wenn Gruppierung ausgewählt ist.
+    disabled_no_grouping: Deaktiviert, wenn keine Gruppierung ausgewählt ist.
+    show_marker: Zeige Tooltip-Marker
+    curve_type: Form/Typ
+    smooth: Gleichmässig
+    straight: Gerade
+    step_line: Schritt
+    show_legend: Legende anzeigen
+  meter:
+    name: Messgerät
+    description: Messgerät zur Erfassung von Werten
+  piechart:
+    name: Kreis- oder Donut-Diagramm
+    description: Kreisdiagramm, das die Verhältnisse zwischen Gruppen entlang einer Achse zeigt
+  variable:
+    name: Globale Variable
+    description: Definieren Sie einen globalen Wert, der in den Filtern anderer Panels verwendet werden kann.
+    variable_key: Variabler Schlüssel
+  relational-variable:
+    name: Globale Variable, die Beziehungen beschreibt
+    description: Definiere einen globalen relationalen Wert, der in den Filtern anderer Panels verwendet werden kann.
+    variable_key: Variabler Schlüssel
+    multiple: Verschiedene
+    multiple-label: Mehrere Artikel auswählen
+triggers:
+  common:
+    response_body: Antwortkörper
+    response_body_all: Alle Daten
+    response_body_last: Daten der letzten Ausführung
+  event:
+    name: Hauptaussage
+    description: Auslöser auf der Plattform oder bei Datenereignissen
+    action: Aktion (nicht blockierend)
+    filter: Filter (Blockieren)
+  webhook:
+    name: Webhooks
+    error_on_reject: Fehler beim Ablehnen
+    description: Auslöser für eine eingehende HTTP-Anfrage
+    method: Methode
+    async: Asynchron
+  operation:
+    name: Ein weiterer Fluss
+    description: Ausgelöst durch einen anderen Fluss, um eine Kette zu erzeugen
+    preview: Ausgelöst durch eine Operation in einem anderen Prozess
+  schedule:
+    name: Zeitplan (CRON)
+    description: Auslöser zu regelmässigen Zeitpunkten
+    cron: Zeitabstand
+  manual:
+    name: Bedienungsanleitung
+    description: Auslöser bei manueller Ausführung innerhalb ausgewählter Sammlungen
+    collection_and_item: Seiten für Sammlungen und einzelne Artikel
+    collection_only: Seite nur für die Sammlung
+    item_only: Nur Seite für das Produkt
+    collection_page: Seite mit Sammlungen
+    require_selection: Erfordert eine Auswahl
+a_flow_uuid: Wählen Sie einen Auslöser für den Ablauf...
+any_string_or_json: Jeder Text oder JSON-String...
+item_payload_placeholder: Dies ist das JSON, das verwendet wird, um die Werte der Felder des Artikels zu aktualisieren…
+operation_variables_note: Sie können Daten aus dem Flow-System mit Variablen wie **{'{'}{'{'}$letzte_Aktion{'}'}{'}'}, **{'{'}{'{'}$Auslöser{'}'}{'}'** und **{'{'}{'{'}$Verantwortlichkeit{'}'}{'}'** abrufen, oder frühere Vorgänge anhand der **{'{'}{'{'}Operation_Schlüssel{'}'}{'}'}** referenzieren.
+operations:
+  condition:
+    name: Zustand
+    description: Erstelle einen Fluss basierend auf der Logik «Wenn / Dann»
+  exec:
+    name: Skript ausführen
+    description: Ermöglichen Sie die Ausführung von beliebigem Code, um den Payload zu verändern.
+    modules: "Die folgenden **Node-Module** können verwendet werden:"
+  item-create:
+    name: Daten erstellen
+    description: Einträge in der Datenbank erstellen
+    payload: Lastgewicht
+    emit_events: Emit Veranstaltungen
+  item-delete:
+    name: Daten löschen
+    description: Elemente in der Datenbank löschen
+    emit_events: Emit Veranstaltungen
+    key: Identifikationsnummern
+    query: Anfrage
+  item-read:
+    name: Daten einsehen
+    description: Daten aus der Datenbank abrufen
+    key: Eindeutige Kennungen
+    query: Anfrage
+    emit_events: Emit Events
+  item-update:
+    name: Daten aktualisieren
+    description: Datenbankeinträge aktualisieren
+    emit_events: Emit Veranstaltungen
+    key: Eindeutige Kennungen
+    payload: Lastgewicht
+    query: Anfrage
+  json-web-token:
+    name: JSON-Web-Token (JWT)
+    description: Signieren und verifizieren Sie JSON Web Tokens
+    operation: Durchführung
+    secret: Geheim
+    secret_placeholder: Entdecke ein Geheimnis...
+    payload: Lastgewicht
+    token: Token
+    token_placeholder: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpSSU4i.
+    options: Möglichkeiten
+    options_placeholder: Weitere Informationen finden Sie unter https://www.npmjs.com/package/jsonwebtoken#usage
+    sign: Token-Symbol
+    verify: Token überprüfen
+    decode: Token entschlüsseln
+  log:
+    name: Protokollierung im Konsolenfenster
+    description: Gib etwas auf der Konsole aus
+    message: Nachricht
+    message_placeholder: Geben Sie eine Nachricht ein, die im Konsolenfenster angezeigt werden soll...
+  mail:
+    name: E-Mail senden
+    description: Senden Sie eine E-Mail an eine oder mehrere Personen
+    to: Zu
+    to_placeholder: Fügen Sie E-Mail-Adressen hinzu und drücken Sie die Eingabetaste…
+    body: Körper
+    template: Vorlage
+    data: Daten
+    cc: CC
+    cc_placeholder: Fügen Sie die E-Mail-Adressen für die Kopie hinzu und drücken Sie die Eingabetaste...
+    bcc: CC
+    bcc_placeholder: Fügen Sie die E-Mail-Adressen für die Kopie (BCC) hinzu und drücken Sie die Eingabetaste…
+    reply_to: Antworten an
+    reply_to_placeholder: Fügen Sie die E-Mail-Adressen für die Rückantwort hinzu und drücken Sie die Eingabetaste…
+  notification:
+    name: Benachrichtigung senden
+    description: Sende eine Benachrichtigung innerhalb der App an einen oder mehrere Nutzer
+    recipient: Nutzer
+    recipient_placeholder: Geben Sie eine UUID ein...
+    recipient_note: Fügen Sie die UUID des Benutzers hinzu und bestätigen Sie mit Enter…
+    item_note: Schlüssel oder relative URL
+    message: Nachricht
+    subject: Thema
+  request:
+    name: Webhook-URL / URL für die Anfrage
+    description: Eine Anfrage an eine URL senden
+    url: Webadresse
+    url_placeholder: https://example.com/example
+    method: Methode
+    data: Daten
+    headers: Überschriften
+    header: Überschrift
+    header_placeholder: Genehmigung…
+    value_placeholder: "Inhaber: eyJhbGciOi..."
+  sleep:
+    name: Schlafen
+    description: Warten für eine bestimmte Anzahl von Millisekunden
+    milliseconds: Millisekunden
+  throw-error:
+    name: Fehler auslösen
+    description: Führen Sie einen Fehler auf dem Pfad zur Ablehnung ein
+    code: Fehlercode
+    status: HTTP-Statuscode
+    message: Fehlermeldung
+  transform:
+    name: Payload umwandeln
+    description: Ändere den JSON-Payload von Alter the Flow
+  trigger:
+    name: Auslöser-Prozess
+    description: Übertragen Sie diese Daten an einen anderen Flow
+    flows: Ströme
+    flow: Fluss
+    data: Daten
+    iteration_mode: Modus für wiederholte Ausführung
+    iteration_mode_note: Methode zur Iteration über Arrays.
+    serial: Folge
+    parallel: Gleichzeitig
+    batch: Los
+    batch_size: Batchgrösse
+    cache: Zwischenspeicher
+unit: Einheit
+standard: Standard
+scientific: Wissenschaftlich
+engineering: Ingenieurwesen
+compact: Kompakt
+currency: Währung
+notation: Notierung
+style: Stil
+fonts:
+  thin: Dünn
+  extra_light: Sehr hell
+  light: Licht
+  normal: Normal
+  medium: Grösse
+  semi_bold: Halbstärkt
+  bold: Hervorheben
+  extra_bold: Sehr kräftig
+  black: Schwarz
+  italic: Kursiv
+  oblique: Schräg
+  small: Klein
+  large: Gross
+  auto: Autos
+text_wrap: Textumbettung
+center: Zentrum
+justify: Begründen
+text_align: Ausrichtung
+font_weight: Schriftstärke
+font_style: Schriftart
+font_size: Schriftgrösse
+minimum_fraction_digits: Mindestdezimalstellen
+maximum_fraction_digits: Maximale Dezimalstellen
+show_percentage: Anzeigen in Prozent
+aggregation: Zusammenfassung
+series_grouping: Gruppierung nach Serien
+date_precision: Genauigkeit der Datumsangabe
+export_dashboard: Dashboard für Exporte
+duplicate_dashboard: Duplizierte Übersicht
+duplicate_policy: Richtlinien für die Duplizierung
+search_dashboard: Suchfeld...
+search_flow: Suchprozess...
+percent: Prozent
+show_password: Passwort anzeigen
+hide_password: Passwort verbergen
+bsl_banner:
+  title: Sie haben noch keinen Projektverantwortlichen bestimmt.
+  license: Wir benötigen dies, um die Einhaltung unserer Lizenz BSL 1.1 sicherzustellen. Diese Person sollte der Hauptkontakt für Ihr Projekt sein.
+  set_owner: Eigentümer
+  remind_later: Erinnerung später einstellen
+  remind_next_login: Wir werden Sie erneut daran erinnern, wenn Sie sich beim nächsten Mal anmelden.
+accepted: Angenommen
+text_direction_auto: Automatisch (Sprache anpassen)
+text_direction_ltr: Von links nach rechts (von links nach rechts)
+text_direction_rtl: Von rechts nach links (RTL)
+set_to_now: Jetzt

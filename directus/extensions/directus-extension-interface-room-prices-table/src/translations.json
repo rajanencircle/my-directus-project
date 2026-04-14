@@ -1,0 +1,16 @@
+{
+  "default": {
+    "loading": "Loading room prices...",
+    "save_bar_msg": "You have unsaved changes",
+    "save_btn": "Save Changes",
+    "discard_btn": "Discard",
+    "prices": "prices",
+    "price_date": "Price Date",
+    "room_ctegory": "Room Category",
+    "price_type": "Price Type",
+    "buy": "Buy",
+    "sell": "Sell",
+    "no_rooms_configured": "No room prices configured yet",
+    "add_basics": "Add price dates, room categories, and occupancies to see them here."
+  }
+}

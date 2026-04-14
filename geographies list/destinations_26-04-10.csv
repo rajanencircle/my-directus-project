@@ -1,0 +1,15 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,destinations_cluster_id,short_code
+1,Africa,Afrika,Afrika,Afrika,1,AF
+2,Antarctica,Antarktis,Antarktis,Antarctica,7,AN
+3,Arctic,Arktis,Arktis,Arctisch,7,AR
+4,Asia,Asien,Asien,Azië,2,AS
+5,Australia,Australien,Australien,Australië,6,AU
+6,Caribbean,Karibik,Karibik,Caraïben,4,CB
+7,Central America,Mittelamerika,Mittelamerika,Midden-Amerika,4,CA
+8,Europe,Europa,Europa,Europa,7,EU
+9,Indian Ocean,Indischer Ozean,Indischer Ozean,Indische Oceaan,3,IO
+10,Middle East,Orient,Orient,Midden-Oosten,2,ME
+11,New Zealand,Neuseeland,Neuseeland,Nieuw-Zeeland,6,NZ
+12,North America,Nordamerika,Nordamerika,Noord-Amerika,5,NA
+13,South America,Südamerika,Südamerika,Zuid-Amerika,4,SA
+14,South Pacific,Südsee,Südsee,Stille Zuidzee,6,SP

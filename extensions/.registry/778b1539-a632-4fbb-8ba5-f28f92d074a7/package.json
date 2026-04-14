@@ -1,0 +1,63 @@
+{
+  "name": "@altipla/directus-extension-datepicker",
+  "author": "Altipla Consulting",
+  "bugs": {
+    "url": "https://github.com/altipla-consulting/directus-datepicker/issues"
+  },
+  "homepage": "https://github.com/altipla-consulting/directus-datepicker#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/altipla-consulting/directus-datepicker.git"
+  },
+  "description": "Directus datepicker with localization support.",
+  "icon": "extension",
+  "version": "0.1.10",
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "directus-extension-bundle"
+  ],
+  "type": "module",
+  "main": "dist/app.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "directus:extension": {
+    "type": "bundle",
+    "path": {
+      "app": "dist/app.js",
+      "api": "dist/api.js"
+    },
+    "entries": [
+      {
+        "type": "interface",
+        "name": "interface-datepicker",
+        "source": "src/interface-datepicker/index.ts"
+      }
+    ],
+    "host": "^10.10.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@altipla/eslint-config-vue-ts": "^1.0.7",
+    "@directus/extensions-sdk": "^17.0.9",
+    "dotenv": "^17.3.1",
+    "eslint": "^9.39.2",
+    "flatpickr": "^4.6.13",
+    "prettier": "^3.8.1",
+    "sass": "^1.97.3",
+    "typescript": "^5.9.3",
+    "vue": "^3.5.28",
+    "vue-tsc": "^2.2.12"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w --no-minify",
+    "add": "directus-extension add",
+    "lint": "vue-tsc --noEmit && eslint --ext .ts,.tsx,.vue src",
+    "fix": "eslint --fix --ext .ts,.tsx,.vue src"
+  }
+}

@@ -1,0 +1,67 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,destination_id,cid_primarix,id_primarix
+1,Alaska,Alaska,Alaska,Alaska,9,22,121641
+2,Antarctica,Antarktis,Antarktis,Antarctica,12,22,121800
+3,Argentina,Argentinien,Argentinien,Argentinië,11,22,291
+4,Aruba,Aruba,Aruba,Aruba,10,22,119561
+5,Ethiopia,Äthiopien,Äthiopien,Ethiopië,2,22,346
+6,Australia,Australien,Australien,Australië,6,22,294
+7,Belize,Belize,Belize,Belize,10,22,122041
+8,Bhutan,Bhutan,Bhutan,Bhutan,4,22,119526
+9,Bolivia,Bolivien,Bolivien,Bolivia,11,22,308
+10,Botswana,Botswana,Botswana,Botswana,2,22,313
+11,Brazil,Brasilien,Brasilien,Brazilië,11,22,309
+12,Chile,Chile,Chile,Chili,11,22,324
+13,China,China,China,China,4,22,326
+14,Cook Islands,Cook Islands,Cook Islands,Cookeilanden,8,22,323
+15,Costa Rica,Costa Rica,Costa Rica,Costa Rica,10,22,121671
+16,Germany,Deutschland,Deutschland,Duitsland,1,22,4161
+17,Ecuador,Ecuador,Ecuador,Ecuador,11,22,340
+18,Fiji,Fiji,Fiji,Fiji,8,22,349
+19,French Polynesia,Französisch Polynesien,Französisch Polynesien,Frans-Polynesië,8,22,447
+20,Galápagos,Galapagos,Galapagos,Galápagos,11,22,121742
+21,Hawaii,Hawaii,Hawaii,Hawaï,8,22,115763
+22,Hong Kong,Hongkong,Hongkong,Hongkong,4,22,371
+23,India,Indien,Indien,India,4,22,380
+24,Indonesia,Indonesien,Indonesien,Indonesië,4,22,377
+25,Japan,Japan,Japan,Japan,4,22,388
+26,Cambodia,Kambodscha,Kambodscha,Cambodja,4,22,391
+27,Canada,Kanada,Kanada,Canada,9,22,316
+28,Kenya,Kenia,Kenia,Kenia,2,22,389
+29,Colombia,Kolumbien,Kolumbien,Colombia,11,22,327
+30,Cuba,Kuba,Kuba,Cuba,10,22,122009
+31,Réunion,La Réunion,La Réunion,Réunion,5,22,460
+32,Laos,Laos,Laos,Laos,4,22,400
+33,Madagascar,Madagaskar,Madagaskar,Madagaskar,2,22,414
+34,Malawi,Malawi,Malawi,Malawi,2,22,428
+35,Malaysia,Malaysia,Malaysia,Maleisië,4,22,430
+36,Maldives,Malediven,Malediven,Malediven,5,22,427
+37,Mauritius,Mauritius,Mauritius,Mauritius,5,22,426
+38,Mexico,Mexiko,Mexiko,Mexico,10,22,429
+39,Mozambique,Mozambique,Mozambique,Mozambique,2,22,431
+40,Myanmar,Myanmar,Myanmar,Myanmar,4,22,418
+41,Namibia,Namibia,Namibia,Namibië,2,22,432
+42,Nepal,Nepal,Nepal,Nepal,4,22,440
+43,New Caledonia,Neukaledonien,Neukaledonien,Nieuw-Caledonië,8,22,433
+44,New Zealand,Neuseeland,Neuseeland,Nieuw-Zeeland,7,22,443
+45,Easter Island,Osterinsel,Osterinsel,Paaseiland,8,22,5199
+46,Panama,Panama,Panama,Panama,10,22,122007
+47,Papua New Guinea,Papua-Neuguinea,Papua-Neuguinea,Papoea-Nieuw-Guinea,8,22,448
+48,Peru,Peru,Peru,Peru,11,22,446
+49,Pitcairn Islands,Pitcairninseln,Pitcairninseln,Pitcairneilanden,8,22,453
+50,Rwanda,Ruanda,Ruanda,Rwanda,2,22,463
+51,Russia,Russland,Russland,Rusland,4,22,121316
+52,Samoa,Samoa,Samoa,Samoa,8,22,513
+53,Seychelles,Seychellen,Seychellen,Seychellen,5,22,466
+54,Singapore,Singapur,Singapur,Singapore,4,22,469
+55,Sri Lanka,Sri Lanka,Sri Lanka,Sri Lanka,4,22,404
+56,South Africa,Südafrika,Südafrika,Zuid-Afrika,2,22,518
+57,Tanzania,Tansania,Tansania,Tanzania,2,22,497
+58,Thailand,Thailand,Thailand,Thailand,4,22,487
+59,Tonga,Tonga,Tonga,Tonga,8,22,491
+60,Uganda,Uganda,Uganda,Oeganda,2,22,499
+61,USA,USA,USA,VS,9,22,121395
+62,Vanuatu,Vanuatu,Vanuatu,Vanuatu,8,22,511
+63,United Arab Emirates,Vereinigte Arabische Emirate,Vereinigte Arabische Emirate,Verenigde Arabische Emiraten,3,22,283
+64,Vietnam,Vietnam,Vietnam,Vietnam,4,22,510
+65,Zambia,Zambia,Zambia,Zambia,2,22,519
+66,Zimbabwe,Zimbabwe,Zimbabwe,Zimbabwe,2,22,521

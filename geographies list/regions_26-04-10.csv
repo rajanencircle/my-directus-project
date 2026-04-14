@@ -1,0 +1,187 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,country_id,cid_primarix,id_primarix
+1,Tierra del Fuego,Feuerland,Feuerland,Vuurland,10,50,121759
+2,Northwest,Nordwesten,Nordwesten,Noordwesten,10,50,121754
+3,Patagonia,Patagonien,Patagonien,Patagonië,10;43,50,121751
+4,Wine Region,Weinregion,Weinregion,Wijnregio,10,50,121756
+5,Canberra,Canberra,Canberra,Canberra,13,50,3203
+6,Cradle Mountain Lake St. Clair National Park,Cradle Mountain Lake St. Clair Nationalpark,Cradle Mountain Lake St. Clair Nationalpark,Cradle Mountain Lake St. Clair Nationaal Park,13,50,3180
+7,Flinders Ranges,Flinders Ranges,Flinders Ranges,Flinders Ranges,13,50,3121
+8,Freycinet National Park,Freycinet Nationalpark,Freycinet Nationalpark,Freycinet Nationaal Park,13,50,3181
+9,Grampians,Grampians,Grampians,Grampians,13,50,3118
+10,Great Barrier Reef Islands,Great Barrier Reef Inseln,Great Barrier Reef Inseln,Great Barrier Reef Eilanden,13,50,3161
+11,Great Ocean Road,Great Ocean Road,Great Ocean Road,Great Ocean Road,13,50,3119
+12,Kangaroo Island,Kangaroo Island,Kangaroo Island,Kangaroo Island,13,50,3122
+13,Kimberley,Kimberleys,Kimberleys,Kimberley,13,50,3126
+14,Lord Howe Island,Lord Howe Island,Lord Howe Island,Lord Howe Island,13,50,3206
+15,Outback QLD,Outback QLD,Outback QLD,Outback QLD,13,50,3134
+16,Red Centre,Rotes Zentrum,Rotes Zentrum,Rode Centrum,13,50,3128
+17,Other NSW,Sonstiges NSW,Sonstiges NSW,Overig NSW,13,50,3205
+18,Other NT,Sonstiges NT,Sonstiges NT,Overig NT,13,50,3130
+19,Other QLD,Sonstiges QLD,Sonstiges QLD,Overig QLD,13,50,3131
+20,Other SA,Sonstiges SA,Sonstiges SA,Overig SA,13,50,3123
+21,Other TAS,Sonstiges TAS,Sonstiges TAS,Overig TAS,13,50,3132
+22,Other VIC,Sonstiges VIC,Sonstiges VIC,Overig VIC,13,50,3120
+23,Other WA,Sonstiges WA,Sonstiges WA,Overig WA,13,50,3127
+24,Southwest,Südwesten,Südwesten,Zuidwesten,13,50,3124
+25,Top End,Top End,Top End,Top End,13,50,3129
+26,Tropical QLD,Tropisches QLD,Tropisches QLD,Tropisch QLD,13,50,3133
+27,West Coast (Australia),Westküste (Australien),Westküste (Australien),Westkust (Australië),13,50,3125
+28,Inland,Inland,Inland,Binnenland,22,50,122063
+29,Caribbean Coast (Belize),Karibikküste (Belize),Karibikküste (Belize),Caribische Kust (Belize),22,50,122064
+30,Andean Highlands,Andenhochland,Andenhochland,Andeshooglanden,26,50,121768
+31,La Paz,La Paz,La Paz,La Paz,26,50,121767
+32,Chobe River,Chobe Fluss,Chobe Fluss,Chobe Rivier,28,50,3168
+33,Kalahari (Botswana),Kalahari (Botswana),Kalahari (Botswana),Kalahari (Botswana),28,50,3172
+34,Khwai,Khwai,Khwai,Khwai,28,50,82179
+35,Linyanti,Linyanti,Linyanti,Linyanti,28,50,3169
+36,Makgadikgadi Pans,Makgadikgadi Pans,Makgadikgadi Pans,Makgadikgadi Pannen,28,50,3171
+37,Moremi Game Reserve,Moremi Wildreservat,Moremi Wildreservat,Moremi Wildreservaat,28,50,3174
+38,Okavango Delta,Okavango Delta,Okavango Delta,Okavango Delta,28,50,3183
+39,Savuti,Savuti,Savuti,Savuti,28,50,3170
+40,Other Botswana,Sonstiges Botswana,Sonstiges Botswana,Overig Botswana,28,50,101918
+41,Iguazu,Iguacu,Iguacu,Iguazu,30,50,121783
+42,Northeast,Nordosten,Nordosten,Noordoosten,30,50,121781
+43,Pantanal,Pantanal,Pantanal,Pantanal,30,50,121785
+44,Rio de Janeiro / Buzios,Rio de Janeiro / Buzios,Rio de Janeiro / Buzios,Rio de Janeiro / Buzios,30,50,121778
+45,Brazil,Brasilien,Brasilien,Brazilië,30,50,121777
+46,Atacama Desert,Atacama Wüste,Atacama Wüste,Atacamawoestijn,43,50,121746
+48,Santiago / Central Chile,Santiago / Zentral-Chile,Santiago / Zentral-Chile,Santiago / Centraal-Chili,43,50,121748
+49,Lake District,Seenregion,Seenregion,Merendistrict,43,50,121750
+50,Aitutaki,Aitutaki,Aitutaki,Aitutaki,50,50,3151
+51,Atiu,Atiu,Atiu,Atiu,50,50,121371
+53,Boca Tapada,—Boca Tapada,—Boca Tapada,Boca Tapada,51,50,121990
+54,Cahuita National Park,—Cahuita Nationalpark,—Cahuita Nationalpark,Cahuita Nationaal Park,51,50,121985
+55,Nicoya Peninsula,—Nicoja Halbinsel,—Nicoja Halbinsel,Schiereiland Nicoya,51,50,121986
+56,Central Valley,—Zentraltal,—Zentraltal,Centraal Dal,51,50,121989
+57,Guayaquil,Guayaquil,Guayaquil,Guayaquil,62,50,121772
+58,Quito,Quito,Quito,Quito,62,50,121771
+59,Ecuador,Ecuador,Ecuador,Ecuador,62,50,121770
+60,Mamanuca,Mamanuca,Mamanuca,Mamanuca,72,50,3155
+61,Other Fiji,Sonstiges Fiji,Sonstiges Fiji,Overig Fiji,72,50,121365
+62,Taveuni,Taveuni,Taveuni,Taveuni,72,50,115287
+63,Vanua Levu,Vanua Levu,Vanua Levu,Vanua Levu,72,50,3158
+64,Viti Levu,Viti Levu,Viti Levu,Viti Levu,72,50,3154
+65,Yasawas,Yasawas,Yasawas,Yasawas,72,50,3156
+66,Bora Bora,Bora Bora,Bora Bora,Bora Bora,76,50,22183
+67,Fakarava,Fakarava,Fakarava,Fakarava,76,50,22187
+68,Huahine,Huahine,Huahine,Huahine,76,50,22182
+69,Moorea,Moorea,Moorea,Moorea,76,50,22181
+70,Raiatea,Raiatea,Raiatea,Raiatea,76,50,22185
+71,Rangiroa,Rangiroa,Rangiroa,Rangiroa,76,50,22186
+72,Tahaá,Tahaá,Tahaá,Tahaá,76,50,22184
+73,Tahiti,Tahiti,Tahiti,Tahiti,76,50,22179
+74,Tikehau,Tikehau,Tikehau,Tikehau,76,50,22188
+75,Galápagos,Galapagos,Galapagos,Galápagos,62,50,121773
+76,Bogotá,Bogota,Bogota,Bogota,47,50,121787
+77,Caribbean Coast (Colombia),Karibikküste (Kolumbien),Karibikküste (Kolumbien),Caribische Kust (Colombia),47,50,121791
+78,Medellín,Medellin,Medellin,Medellín,47,50,121866
+79,Colombia,Kolumbien,Kolumbien,Colombia,47,50,121786
+80,Lake Malawi,Malawisee,Malawisee,Malawimeer,127,50,121859
+81,North Coast,Nordküste,Nordküste,Noordkust,135,50,121385
+82,Northwest Coast,Nordwestküste,Nordwestküste,Noordwestkust,135,50,121386
+83,East Coast,Ostküste,Ostküste,Oostkust,135,50,121388
+84,South Coast,Südküste,Südküste,Zuidkust,135,50,121389
+85,West Coast (Mauritius),Westküste (Mauritius),Westküste (Mauritius),Westkust (Mauritius),135,50,121387
+86,Mexico City,Mexiko City,Mexiko City,Mexico-Stad,137,50,122061
+87,Yucatán,—Yucatan,—Yucatan,Yucatán,137,50,121999
+88,Damaraland & Kaokoveld,Damaraland & Kaokoveld,Damaraland & Kaokoveld,Damaraland & Kaokoveld,147,50,3195
+89,Etosha National Park,Etosha Nationalpark,Etosha Nationalpark,Etosha Nationaal Park,147,50,3201
+90,Fish River Canyon,Fish River Canyon,Fish River Canyon,Fish River Canyon,147,50,3194
+91,Kalahari (Namibia),Kalahari (Namibia),Kalahari (Namibia),Kalahari (Namibië),147,50,3193
+92,Coast,Küste,Küste,Kust,147,50,3200
+93,Namib Naukluft Park,Namib Naukluft Park,Namib Naukluft Park,Namib Naukluft Park,147,50,24568
+94,Other Namibia,Sonstiges Namibia,Sonstiges Namibia,Overig Namibië,147,50,3199
+95,Zambezi Region,Zambezi Region,Zambezi Region,Zambezi Regio,147,50,4860
+96,Abel Tasman,Abel Tasman,Abel Tasman,Abel Tasman,152,50,3165
+97,Auckland,Auckland,Auckland,Auckland,152,50,121374
+98,Bay of Plenty,Bay of Plenty,Bay of Plenty,Bay of Plenty,152,50,121360
+99,Canterbury,Canterbury,Canterbury,Canterbury,152,50,121367
+100,Coromandel-Waikato,Coromandel-Waikato,Coromandel-Waikato,Coromandel-Waikato,152,50,121359
+101,Hawke's Bay,Hawkes Bay,Hawkes Bay,Hawke's Bay,152,50,3164
+102,Marlborough,Marlborough,Marlborough,Marlborough,152,50,3166
+103,Nelson,Nelson,Nelson,Nelson,152,50,121364
+104,Northland,Northland,Northland,Northland,152,50,121358
+105,Otago,Otago,Otago,Otago,152,50,121368
+106,Southland,Southland,Southland,Southland,152,50,121369
+107,Taranaki,Taranaki,Taranaki,Taranaki,152,50,121361
+108,Whanganui,Wanganui,Wanganui,Whanganui,152,50,121363
+109,Wellington,Wellington,Wellington,Wellington,152,50,121375
+110,West Coast,West Coast,West Coast,Westkust,152,50,121366
+111,Panama,Panama,Panama,Panama,166,50,121994
+112,Amazon Rainforest,Amazonas Regenwald,Amazonas Regenwald,Amazoneregenwoud,169;26,50,121765
+113,Cusco / Sacred Valley,Cusco / Heiliges Tal,Cusco / Heiliges Tal,Cusco / Heilige Vallei,169,50,121764
+114,Northern Peru,Nordperu,Nordperu,Noord-Peru,169,50,121761
+115,Southern Peru,Südperu,Südperu,Zuid-Peru,169,50,121762
+116,Lake Titicaca,Titicaca-See,Titicaca-See,Titicacameer,169,50,121763
+117,Drakensberg,Drakensberge,Drakensberge,Drakensbergen,197,50,3191
+118,Eswatini,Eswatini,Eswatini,Eswatini,197,50,121798
+119,Garden Route & Eastern Cape,Garden Route & Eastern Cape,Garden Route & Eastern Cape,Garden Route & Oost-Kaap,197,50,3185
+120,Cape Peninsula,Kaphalbinsel,Kaphalbinsel,Kaapschiereiland,197,50,121856
+121,Kruger National Park & Private Game Reserves,Krüger Nationalpark & private Wildreservate,Krüger Nationalpark & private Wildreservate,Kruger Nationaal Park & private wildreservaten,197,50,3187
+122,Madikwe,Madikwe,Madikwe,Madikwe,197,50,3186
+123,North West Province & Limpopo,North West Provinz & Limpopo,North West Provinz & Limpopo,Noordwest Provincie & Limpopo,197,50,121857
+125,Panorama Route,Panorama Route,Panorama Route,Panoramaroute,197,50,3190
+126,Other South Africa,Sonstiges Südafrika,Sonstiges Südafrika,Overig Zuid-Afrika,197,50,3189
+127,Wine Regions,Weinanbaugebiete,Weinanbaugebiete,Wijngebieden,197,50,22195
+128,Zululand,Zululand,Zululand,Zululand,197,50,3188
+129,Big Island,Big Island,Big Island,Big Island,221,50,121380
+130,Kauai,Kauai,Kauai,Kauai,221,50,121379
+131,Lanaʻi,Lanai,Lanai,Lanaʻi,221,50,121382
+132,Maui,Maui,Maui,Maui,221,50,121378
+133,Molokaʻi,Molokai,Molokai,Molokaʻi,221,50,121381
+134,Oahu,Oahu,Oahu,Oahu,221,50,121377
+135,Lower Zambezi National Park,Lower Zambezi Nationalpark,Lower Zambezi Nationalpark,Lower Zambezi Nationaal Park,234,50,3178
+136,South Luangwa,South Luangwa,South Luangwa,South Luangwa,234,50,3176
+137,Zambia,Zambia,Zambia,Zambia,234,50,3175
+138,Hwange National Park,Hwange Nationalpark,Hwange Nationalpark,Hwange Nationaal Park,235,50,101903
+139,Nyanga National Park,Nyanga Nationalpark,Nyanga Nationalpark,Nyanga Nationaal Park,235,50,101909
+140,Victoria Falls,Victoria Falls,Victoria Falls,Victoria Falls,235;234,50,3179
+141,Zimbabwe,Zimbabwe,Zimbabwe,Zimbabwe,235,50,101902
+142,Aberdares National Park,Aberdares Nationalpark,Aberdares Nationalpark,Aberdares Nationaal Park,112,,
+143,Amboseli National Park,Amboseli Nationalpark,Amboseli Nationalpark,Amboseli Nationaal Park,112,,
+144,Lake Baringo,Lake Baringo,Lake Baringo,Baringo-meer,112,,
+145,Lake Naivasha,Lake Naivasha,Lake Naivasha,Naivasha-meer,112,,
+146,Lake Nakuru,Lake Nakuru,Lake Nakuru,Nakuru-meer,112,,
+147,Lake Victoria,Victoriasee,Victoriasee,Victoriameer,112,,
+148,Lamu Island,Lamu Insel,Lamu Insel,Lamu-eiland,112,,
+149,Masai Mara Game Reserve,Masai Mara Wildreservat,Masai Mara Wildreservat,Masai Mara Wildreservaat,112,,
+150,Mombasa,Mombasa,Mombasa,Mombasa,112,,
+151,Mount Kenya National Park,Mount Kenya Nationalpark,Mount Kenya Nationalpark,Mount Kenya Nationaal Park,112,,
+152,Nairobi,Nairobi,Nairobi,Nairobi,112,,
+153,Samburu National Park,Samburu Nationalpark,Samburu Nationalpark,Samburu Nationaal Park,112,,
+154,Tsavo East National Park,Tsavo East Nationalpark,Tsavo East Nationalpark,Tsavo East Nationaal Park,112,,
+155,Arusha,Arusha,Arusha,Arusha,210,,
+156,Dar es Salaam,Dar es Salaam,Dar es Salaam,Dar es Salaam,210,,
+157,Grumeti Reserve,Grumeti Reservat,Grumeti Reservat,Grumeti Reservaat,210,,
+158,Lake Manyara,Lake Manyara,Lake Manyara,Manyara-meer,210,,
+159,Lake Natron,Lake Natron,Lake Natron,Natron-meer,210,,
+160,Mount Kilimanjaro,Mount Kilimanjaro,Mount Kilimanjaro,Mount Kilimanjaro,210,,
+161,Ngorongoro National Park,Ngorongoro Nationalpark,Ngorongoro Nationalpark,Ngorongoro Nationaal Park,210,,
+162,Nyerere National Park,Nyerere Nationalpark,Nyerere Nationalpark,Nyerere Nationaal Park,210,,
+163,Ruaha National Park,Ruaha Nationalpark,Ruaha Nationalpark,Ruaha Nationaal Park,210,,
+164,Selous National Park,Selous Nationalpark,Selous Nationalpark,Selous Nationaal Park,210,,
+165,Serengeti National Park,Serengeti Nationalpark,Serengeti Nationalpark,Serengeti Nationaal Park,210,,
+166,Tarangire National Park,Tarangire Nationalpark,Tarangire Nationalpark,Tarangire Nationaal Park,210,,
+167,Zanzibar,Sansibar,Sansibar,Zanzibar,210,,
+168,Bwindi National Park,Bwindi Nationalpark,Bwindi Nationalpark,Bwindi Nationaal Park,222,,
+169,Bazaruto Archipelago,Bazaruto Archipel,Bazaruto Archipel,Bazaruto Archipel,145,,
+170,Maputo,Maputo,Maputo,Maputo,145,,
+171,Quirimbas Archipelago,Quirimba Archipel,Quirimba Archipel,Quirimba Archipel,145,,
+172,La Digue,La Digue,La Digue,La Digue,190,,
+173,Mahé,Mahé,Mahé,Mahé,190,,
+174,Praslin,Praslin,Praslin,Praslin,190,,
+175,Ha Long Bay,Halongbucht,Halongbucht,Halong Baai,231,,
+176,Hanoi,Hanoi,Hanoi,Hanoi,231,,
+177,Hoi An,Hoi An,Hoi An,Hoi An,231,,
+178,Mekong Delta,Mekong,Mekong,Mekong Delta,231,,
+179,Ho Chi Minh City,Saigon,Saigon,Ho Chi Minh-stad,231,,
+180,Bali,Bali,Bali,Bali,100,,
+181,Nxai Pan National Park,Nxai Pan Nationalpark,Nxai Pan Nationalpark,Nxai Pan Nationaal Park,10,,
+182,Kwando River,Kwando Fluss,Kwando Fluss,Kwando Rivier,10,,
+183,North Luangwa National Park,North Luangwa Nationalpark,North Luangwa Nationalpark,North Luangwa Nationaal Park,65,,
+184,Matobo National Park,Matobo Nationalpark,Matobo Nationalpark,Matobo Nationaal Park,66,,
+185,Zambezi River,Zambezi Fluss,Zambezi Fluss,Zambezi Rivier,66,,
+186,Wild Coast,Wild Coast,Wild Coast,Wild Coast,56,,
+187,Cederberg,Cederberge,Cederberge,Cederberg,56,,
+188,Maputaland,Maputaland,Maputaland,Maputaland,56,,
+189,Waterberg,Waterberg,Waterberg,Waterberg,56,,

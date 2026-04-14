@@ -1,0 +1,2809 @@
+[
+  {
+    "id": "1fd42c3d-f1ff-4a82-8275-38ac65048ece",
+    "name": "[Margin Preset] Apply to Rental Cars",
+    "icon": "car_rental",
+    "color": "#E07B39",
+    "description": "Reads margin_presets and applies margin_selected/remaining per locale to all batch_rental_car items based on their destination, then recalculates sell_price.",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "margin_presets"
+      ],
+      "requireSelection": false,
+      "requireConfirmation": true,
+      "confirmationDescription": "Apply margin presets to all rental cars and recalculate sell prices?",
+      "async": true
+    },
+    "operation": "9b6d73d1-3d6e-4a23-87de-9ba832a9ed7f",
+    "operations": [
+      {
+        "id": "3c2cf01b-b24a-4a68-be52-c5f815707eca",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rental_car_exchange_rate_translations.translations_id",
+              "rental_car_exchange_rate_translations.exchange_rate",
+              "rental_car_destinations.exception_destination",
+              "rental_car_destinations.translations.translations_id",
+              "rental_car_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "cfc40dd8-480e-4825-9a92-8c0e1e6ef42b",
+        "reject": null
+      },
+      {
+        "id": "6d92c596-4d42-4908-9d5e-e5e5177f2d77",
+        "name": "Get All Rental Cars",
+        "key": "get_batch_items",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_rental_car",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "9a363be4-cd24-4bb1-83e9-6c1023ecd12b",
+        "reject": null
+      },
+      {
+        "id": "9a363be4-cd24-4bb1-83e9-6c1023ecd12b",
+        "name": "Calculate Margin & Sell Price Updates",
+        "key": "calculate_updates",
+        "type": "exec",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n  const items = data.get_batch_items;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const updates = [];\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  for (const item of items) {\n    const buyPrice = item.buy_price;\n    const destinationId = item.destination;\n\n    let marginMatchedException = null;\n    if (defaultMarginPreset) {\n      marginMatchedException = (defaultMarginPreset.rental_car_destinations || []).find(d => d.exception_destination === destinationId);\n    }\n\n    let exchangeMatchedException = null;\n    if (defaultExchangePreset) {\n      exchangeMatchedException = (defaultExchangePreset.rental_car_destinations || []).find(d => d.exception_destination === destinationId);\n    }\n\n    for (const trans of (item.translations || [])) {\n      const localeId = trans.translations_id;\n      \n      let margin = 0;\n      if (marginMatchedException) {\n        const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n        margin = et ? et.exception_margin : 0;\n      } else if (defaultMarginPreset) {\n        const pt = (defaultMarginPreset.rental_car_margin_translation || []).find(t => t.translations_id === localeId);\n        margin = pt ? pt.margin : 0;\n      }\n\n      let exchangeRateId = null;\n      if (exchangeMatchedException) {\n        const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n        exchangeRateId = et ? et.exception_exchange_rate : null;\n      } else if (defaultExchangePreset) {\n        const pt = (defaultExchangePreset.rental_car_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n        exchangeRateId = pt ? pt.exchange_rate : null;\n      }\n\n      let rateValue = 1;\n      if (exchangeRateId) {\n        const r = rates.find(rate => rate.id === exchangeRateId);\n        rateValue = r ? parseFloat(r.rate) : 1;\n      }\n\n      const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n      \n      updates.push({ \n        id: trans.id, \n        margin, \n        exchange_rate: exchangeRateId,\n        sell_price: sellPrice \n      });\n    }\n  }\n\n  return updates;\n};"
+        },
+        "resolve": "9c774e0b-8b7f-4e31-a18c-70631a58a12f",
+        "reject": null
+      },
+      {
+        "id": "9b6d73d1-3d6e-4a23-87de-9ba832a9ed7f",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rental_car_margin_translation.translations_id",
+              "rental_car_margin_translation.margin",
+              "rental_car_destinations.exception_destination",
+              "rental_car_destinations.translations.translations_id",
+              "rental_car_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "3c2cf01b-b24a-4a68-be52-c5f815707eca",
+        "reject": null
+      },
+      {
+        "id": "9c774e0b-8b7f-4e31-a18c-70631a58a12f",
+        "name": "Update Rental Car Translations",
+        "key": "update_translations",
+        "type": "item-update",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_rental_car_locale",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_updates}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "cfc40dd8-480e-4825-9a92-8c0e1e6ef42b",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "6d92c596-4d42-4908-9d5e-e5e5177f2d77",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "25ef4365-8268-479f-818e-282e0bee98a3",
+    "name": "[Margin Preset] Apply to Tours",
+    "icon": "tour",
+    "color": "#E07B39",
+    "description": "Reads margin_presets and applies margin_selected/remaining per locale to all batch_tours items based on their destination, then recalculates sell_price.",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "margin_presets"
+      ],
+      "requireSelection": false,
+      "requireConfirmation": true,
+      "confirmationDescription": "Apply margin presets to all tours and recalculate sell prices?",
+      "async": true
+    },
+    "operation": "a48b819d-d716-4a2b-a80a-f92689ee75dd",
+    "operations": [
+      {
+        "id": "3f1e1e1f-f8c7-42d1-8294-08e4cbd45858",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "68ed1d06-f100-4dee-b825-e98580a636a8",
+        "reject": null
+      },
+      {
+        "id": "49ffcee0-a07e-426f-bd15-43b476ad8340",
+        "name": "Update Tours Translations",
+        "key": "update_translations",
+        "type": "item-update",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_tours_locale",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_updates}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "68ed1d06-f100-4dee-b825-e98580a636a8",
+        "name": "Get All Tours",
+        "key": "get_batch_items",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_tours",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "f9aa2ece-ffc6-4099-8c82-2e240c1eeb07",
+        "reject": null
+      },
+      {
+        "id": "a48b819d-d716-4a2b-a80a-f92689ee75dd",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "margin_presets",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "fields": [
+              "id",
+              "tours_destinations.destinations_id",
+              "tours_margin_translations.translations_id",
+              "tours_margin_translations.margin_selected",
+              "tours_margin_translations.margin_remaining"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "e39af869-9277-4532-803d-63cae42732d8",
+        "reject": null
+      },
+      {
+        "id": "e39af869-9277-4532-803d-63cae42732d8",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "tours_exchange_rate_translations.translations_id",
+              "tours_exchange_rate_translations.exchange_rate",
+              "tours_destinations.destinations_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "3f1e1e1f-f8c7-42d1-8294-08e4cbd45858",
+        "reject": null
+      },
+      {
+        "id": "f9aa2ece-ffc6-4099-8c82-2e240c1eeb07",
+        "name": "Calculate Margin & Sell Price Updates",
+        "key": "calculate_updates",
+        "type": "exec",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\\n  const marginPresets = data.get_presets;\\n  const exchangePresets = data.get_exchange_presets;\\n  const rates = data.get_rates;\\n  const items = data.get_batch_items;\\n\\n  function roundHalf(val) {\\n    if (val == null) return null;\\n    const floored = Math.floor(val);\\n    return val - floored >= 0.5 ? floored + 1 : floored;\\n  }\\n\\n  const updates = [];\\n  const defaultMarginPreset = marginPresets[0];\\n  const defaultExchangePreset = exchangePresets[0];\\n\\n  for (const item of items) {\\n    const buyPrice = item.buy_price;\\n    const destinationId = item.destination;\\n\\n    let marginMatchedPreset = defaultMarginPreset;\\n    for (const preset of marginPresets) {\\n      const selectedDestIds = (preset.tours_destinations || []).map(d => d.destinations_id);\\n      if (selectedDestIds.includes(destinationId)) {\\n        marginMatchedPreset = preset;\\n        break;\\n      }\\n    }\\n\\n    let exchangeMatchedPreset = defaultExchangePreset;\\n    for (const preset of exchangePresets) {\\n      const selectedDestIds = (preset.tours_destinations || []).map(d => d.destinations_id);\\n      if (selectedDestIds.includes(destinationId)) {\\n        exchangeMatchedPreset = preset;\\n        break;\\n      }\\n    }\\n\\n    for (const trans of (item.translations || [])) {\\n      const localeId = trans.translations_id;\\n      let margin = 0;\\n\\n      if (marginMatchedPreset) {\\n        const pt = (marginMatchedPreset.tours_margin_translations || []).find(t => t.translations_id === localeId);\\n        margin = marginMatchedPreset !== defaultMarginPreset ? (pt?.margin_selected ?? 0) : (pt?.margin_remaining ?? 0);\\n      }\\n\\n      let exchangeRateId = null;\\n      if (exchangeMatchedPreset) {\\n        const pt = (exchangeMatchedPreset.tours_exchange_rate_translations || []).find(t => t.translations_id === localeId);\\n        exchangeRateId = pt ? pt.exchange_rate : null;\\n      }\\n\\n      let rateValue = 1;\\n      if (exchangeRateId) {\\n        const r = rates.find(rate => rate.id === exchangeRateId);\\n        rateValue = r ? parseFloat(r.rate) : 1;\\n      }\\n\\n      const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\\n      updates.push({ id: trans.id, margin, exchange_rate: exchangeRateId, sell_price: sellPrice });\\n    }\\n  }\\n\\n  return updates;\\n};"
+        },
+        "resolve": "49ffcee0-a07e-426f-bd15-43b476ad8340",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "2fe777be-4c57-4b9e-b53d-cb433b17e07a",
+    "name": "[Margin Preset] Apply to Campers",
+    "icon": "directions_car",
+    "color": "#E07B39",
+    "description": "Reads margin_presets and applies margin_selected/remaining per locale to all batch_camper items based on their destination, then recalculates sell_price.",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "margin_presets"
+      ],
+      "requireSelection": false,
+      "requireConfirmation": true,
+      "confirmationDescription": "Apply margin presets to all campers and recalculate sell prices?",
+      "async": true
+    },
+    "operation": "505ac2b9-2ce5-466e-89cf-55e1c1dd5bf4",
+    "operations": [
+      {
+        "id": "1ba8a90e-1c07-44e8-ac9c-e5fa0132f349",
+        "name": "Calculate Margin & Sell Price Updates",
+        "key": "calculate_updates",
+        "type": "exec",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n  const items = data.get_batch_items;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const updates = [];\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  for (const item of items) {\n    const buyPrice = item.buy_price;\n    const destinationId = item.destination;\n\n    let marginMatchedException = null;\n    if (defaultMarginPreset) {\n      marginMatchedException = (defaultMarginPreset.camper_destinations || []).find(d => d.exception_destination === destinationId);\n    }\n\n    let exchangeMatchedException = null;\n    if (defaultExchangePreset) {\n      exchangeMatchedException = (defaultExchangePreset.camper_destinations || []).find(d => d.exception_destination === destinationId);\n    }\n\n    for (const trans of (item.translations || [])) {\n      const localeId = trans.translations_id;\n      \n      let margin = 0;\n      if (marginMatchedException) {\n        const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n        margin = et ? et.exception_margin : 0;\n      } else if (defaultMarginPreset) {\n        const pt = (defaultMarginPreset.camper_margin_translations || []).find(t => t.translations_id === localeId);\n        margin = pt ? pt.margin : 0;\n      }\n\n      let exchangeRateId = null;\n      if (exchangeMatchedException) {\n        const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n        exchangeRateId = et ? et.exception_exchange_rate : null;\n      } else if (defaultExchangePreset) {\n        const pt = (defaultExchangePreset.camper_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n        exchangeRateId = pt ? pt.exchange_rate : null;\n      }\n\n      let rateValue = 1;\n      if (exchangeRateId) {\n        const r = rates.find(rate => rate.id === exchangeRateId);\n        rateValue = r ? parseFloat(r.rate) : 1;\n      }\n\n      const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n      \n      updates.push({ \n        id: trans.id, \n        margin, \n        exchange_rate: exchangeRateId,\n        sell_price: sellPrice \n      });\n    }\n  }\n\n  return updates;\n};"
+        },
+        "resolve": "2550b21b-3cc9-4123-bb6a-bda4d3c2c6c2",
+        "reject": null
+      },
+      {
+        "id": "2550b21b-3cc9-4123-bb6a-bda4d3c2c6c2",
+        "name": "Update Camper Translations",
+        "key": "update_translations",
+        "type": "item-update",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_camper_locale",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_updates}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "37938cec-c81a-4dbf-9a3e-32222d71fa52",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "d4bfefb5-33e7-40b6-9d6d-43b677b15b97",
+        "reject": null
+      },
+      {
+        "id": "505ac2b9-2ce5-466e-89cf-55e1c1dd5bf4",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "camper_margin_translations.translations_id",
+              "camper_margin_translations.margin",
+              "camper_destinations.exception_destination",
+              "camper_destinations.translations.translations_id",
+              "camper_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "d2fdfbfe-7e1f-49c7-965e-1b5f3b033379",
+        "reject": null
+      },
+      {
+        "id": "d2fdfbfe-7e1f-49c7-965e-1b5f3b033379",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "camper_exchange_rate_translations.translations_id",
+              "camper_exchange_rate_translations.exchange_rate",
+              "camper_destinations.exception_destination",
+              "camper_destinations.translations.translations_id",
+              "camper_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "37938cec-c81a-4dbf-9a3e-32222d71fa52",
+        "reject": null
+      },
+      {
+        "id": "d4bfefb5-33e7-40b6-9d6d-43b677b15b97",
+        "name": "Get All Campers",
+        "key": "get_batch_items",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_camper",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "1ba8a90e-1c07-44e8-ac9c-e5fa0132f349",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "319ae087-dc42-4145-8cf5-980903582a05",
+    "name": "[Margin Preset] Apply to Round Trips",
+    "icon": "route",
+    "color": "#E07B39",
+    "description": "Reads margin_presets and applies margin_selected/remaining per locale to all batch_round_trip items based on their destination, then recalculates sell_price.",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "margin_presets"
+      ],
+      "requireSelection": false,
+      "requireConfirmation": true,
+      "confirmationDescription": "Apply margin presets to all round trips and recalculate sell prices?",
+      "async": true
+    },
+    "operation": "6b6265bf-9aa6-4de8-8412-5933e6df5158",
+    "operations": [
+      {
+        "id": "67cd1df0-3052-4cd6-9257-00fdd3f57822",
+        "name": "Get All Round Trips",
+        "key": "get_batch_items",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_round_trip",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "d360953f-6125-4e56-9d97-256a0976fd98",
+        "reject": null
+      },
+      {
+        "id": "6b6265bf-9aa6-4de8-8412-5933e6df5158",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "round_trip_margin_translations.translations_id",
+              "round_trip_margin_translations.margin",
+              "round_trip_destinations.exception_destination",
+              "round_trip_destinations.translations.translations_id",
+              "round_trip_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "6e07f816-6996-4cda-869c-9bb9b17d5445",
+        "reject": null
+      },
+      {
+        "id": "6e07f816-6996-4cda-869c-9bb9b17d5445",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "round_trip_exchange_rate_translations.translations_id",
+              "round_trip_exchange_rate_translations.exchange_rate",
+              "round_trip_destinations.exception_destination",
+              "round_trip_destinations.translations.translations_id",
+              "round_trip_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "c25d3f2d-011c-478a-8fd7-f61916fb0abc",
+        "reject": null
+      },
+      {
+        "id": "c25d3f2d-011c-478a-8fd7-f61916fb0abc",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "67cd1df0-3052-4cd6-9257-00fdd3f57822",
+        "reject": null
+      },
+      {
+        "id": "d360953f-6125-4e56-9d97-256a0976fd98",
+        "name": "Calculate Margin & Sell Price Updates",
+        "key": "calculate_updates",
+        "type": "exec",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n  const items = data.get_batch_items;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const updates = [];\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  for (const item of items) {\n    const buyPrice = item.buy_price;\n    const destinationId = item.destination;\n\n    let marginMatchedException = null;\n    if (defaultMarginPreset) {\n      marginMatchedException = (defaultMarginPreset.round_trip_destinations || []).find(d => d.exception_destination === destinationId);\n    }\n\n    let exchangeMatchedException = null;\n    if (defaultExchangePreset) {\n      exchangeMatchedException = (defaultExchangePreset.round_trip_destinations || []).find(d => d.exception_destination === destinationId);\n    }\n\n    for (const trans of (item.translations || [])) {\n      const localeId = trans.translations_id;\n      \n      let margin = 0;\n      if (marginMatchedException) {\n        const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n        margin = et ? et.exception_margin : 0;\n      } else if (defaultMarginPreset) {\n        const pt = (defaultMarginPreset.round_trip_margin_translations || []).find(t => t.translations_id === localeId);\n        margin = pt ? pt.margin : 0;\n      }\n\n      let exchangeRateId = null;\n      if (exchangeMatchedException) {\n        const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n        exchangeRateId = et ? et.exception_exchange_rate : null;\n      } else if (defaultExchangePreset) {\n        const pt = (defaultExchangePreset.round_trip_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n        exchangeRateId = pt ? pt.exchange_rate : null;\n      }\n\n      let rateValue = 1;\n      if (exchangeRateId) {\n        const r = rates.find(rate => rate.id === exchangeRateId);\n        rateValue = r ? parseFloat(r.rate) : 1;\n      }\n\n      const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n      \n      updates.push({ \n        id: trans.id, \n        margin, \n        exchange_rate: exchangeRateId,\n        sell_price: sellPrice \n      });\n    }\n  }\n\n  return updates;\n};"
+        },
+        "resolve": "f95c1b35-d860-41d1-92e2-12786d2c2f03",
+        "reject": null
+      },
+      {
+        "id": "f95c1b35-d860-41d1-92e2-12786d2c2f03",
+        "name": "Update Round Trip Translations",
+        "key": "update_translations",
+        "type": "item-update",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_round_trip_locale",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_updates}}"
+        },
+        "resolve": null,
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "3b730975-cafd-4c0b-b012-d61f5c895f94",
+    "name": "[Init] Default Margins - Batch Rental Car",
+    "icon": "car_rental",
+    "color": "#4CAF50",
+    "description": "On item creation, auto-creates translation records with margin=0 and sell_price=buy_price for any locales not already set.",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create"
+      ],
+      "collections": [
+        "batch_rental_car"
+      ]
+    },
+    "operation": "e6c0d479-39b0-4e89-8a6d-e69f2d897ae4",
+    "operations": [
+      {
+        "id": "1062e795-9c64-4d45-b0b5-bd7af376df14",
+        "name": "Create Default Locale Records",
+        "key": "create_defaults",
+        "type": "item-create",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_rental_car_locale",
+          "permissions": "$full",
+          "payload": "{{find_missing}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "143e3214-8be4-4be2-91b2-86fb040e2c00",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rental_car_margin_translation.translations_id",
+              "rental_car_margin_translation.margin",
+              "rental_car_destinations.exception_destination",
+              "rental_car_destinations.translations.translations_id",
+              "rental_car_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "3780d933-af7b-4c7c-bd76-c66c8f4943b8",
+        "reject": null
+      },
+      {
+        "id": "2cfed4e6-e116-4963-9b25-55cc9d96d5a4",
+        "name": "Find Missing Locales",
+        "key": "find_missing",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const item = data.get_item[0];\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n\n  const buyPrice = item.buy_price;\n  const destinationId = item.destination;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const ALL_LOCALES = [\n    'a66beb5e-af3c-4e47-9c7a-101bd5be1a2a',\n    'a2358e99-f939-4957-9b4f-6b0dcbaadb0c',\n    '263b1ac9-aa7a-48f4-b472-b816dfa3d921',\n    'fe5d14c3-0051-47a5-97a3-679e05fa3dc9',\n  ];\n  const existingLocaleIds = (item.translations || []).map(t => t.translations_id);\n  const missingLocaleIds = ALL_LOCALES.filter(id => !existingLocaleIds.includes(id));\n\n  if (missingLocaleIds.length === 0) return null;\n\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  let marginMatchedException = null;\n  if (defaultMarginPreset) {\n    marginMatchedException = (defaultMarginPreset.rental_car_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  let exchangeMatchedException = null;\n  if (defaultExchangePreset) {\n    exchangeMatchedException = (defaultExchangePreset.rental_car_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  return missingLocaleIds.map(localeId => {\n    let margin = 0;\n    if (marginMatchedException) {\n      const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n      margin = et ? et.exception_margin : 0;\n    } else if (defaultMarginPreset) {\n      const pt = (defaultMarginPreset.rental_car_margin_translation || []).find(t => t.translations_id === localeId);\n      margin = pt ? pt.margin : 0;\n    }\n\n    let exchangeRateId = null;\n    if (exchangeMatchedException) {\n      const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = et ? et.exception_exchange_rate : null;\n    } else if (defaultExchangePreset) {\n      const pt = (defaultExchangePreset.rental_car_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = pt ? pt.exchange_rate : null;\n    }\n\n    let rateValue = 1;\n    if (exchangeRateId) {\n      const r = rates.find(rate => rate.id === exchangeRateId);\n      rateValue = r ? parseFloat(r.rate) : 1;\n    }\n\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n\n    return {\n      batch_rental_car_id: item.id,\n      translations_id: localeId,\n      margin: margin,\n      exchange_rate: exchangeRateId,\n      sell_price: sellPrice\n    };\n  });\n};"
+        },
+        "resolve": "43b8a5d3-49fe-44e7-891b-5605a230f755",
+        "reject": null
+      },
+      {
+        "id": "3780d933-af7b-4c7c-bd76-c66c8f4943b8",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rental_car_exchange_rate_translations.translations_id",
+              "rental_car_exchange_rate_translations.exchange_rate",
+              "rental_car_destinations.exception_destination",
+              "rental_car_destinations.translations.translations_id",
+              "rental_car_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "c71e625a-15bb-4b47-8f3e-caa87c0bbe08",
+        "reject": null
+      },
+      {
+        "id": "43b8a5d3-49fe-44e7-891b-5605a230f755",
+        "name": "Has Missing Locales?",
+        "key": "condition_has_missing",
+        "type": "condition",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "find_missing": {
+              "_nnull": true
+            }
+          }
+        },
+        "resolve": "1062e795-9c64-4d45-b0b5-bd7af376df14",
+        "reject": null
+      },
+      {
+        "id": "c71e625a-15bb-4b47-8f3e-caa87c0bbe08",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "2cfed4e6-e116-4963-9b25-55cc9d96d5a4",
+        "reject": null
+      },
+      {
+        "id": "e6c0d479-39b0-4e89-8a6d-e69f2d897ae4",
+        "name": "Get Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_rental_car",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ]
+          },
+          "schema": {},
+          "table": "batch_rental_car"
+        },
+        "resolve": "143e3214-8be4-4be2-91b2-86fb040e2c00",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "4900c463-a724-4562-b9a8-14b51818be77",
+    "name": "[Init] Default Margins - Batch Hotel",
+    "icon": "hotel",
+    "color": "#4CAF50",
+    "description": "On item creation, auto-creates translation records with margin=0 and sell_price=buy_price for any locales not already set.",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create"
+      ],
+      "collections": [
+        "batch_hotel"
+      ]
+    },
+    "operation": "76d017c9-6756-42d2-8542-80b6a9f20076",
+    "operations": [
+      {
+        "id": "72d9f52f-29d7-4790-864c-902cfb9c4a62",
+        "name": "Create Default Locale Records",
+        "key": "create_defaults",
+        "type": "item-create",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_hotel_translations",
+          "permissions": "$full",
+          "payload": "{{find_missing}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "76d017c9-6756-42d2-8542-80b6a9f20076",
+        "name": "Get Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_hotel",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ]
+          },
+          "schema": {},
+          "table": "batch_hotel"
+        },
+        "resolve": "aa9ce905-81f4-4791-b6a5-75f6736658c8",
+        "reject": null
+      },
+      {
+        "id": "7e1860a0-ff62-4d1b-859c-c94940ef4cdc",
+        "name": "Has Missing Locales?",
+        "key": "condition_has_missing",
+        "type": "condition",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "find_missing": {
+              "_nnull": true
+            }
+          }
+        },
+        "resolve": "72d9f52f-29d7-4790-864c-902cfb9c4a62",
+        "reject": null
+      },
+      {
+        "id": "aa9ce905-81f4-4791-b6a5-75f6736658c8",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_margin_translations.translations_id",
+              "hotel_margin_translations.margin",
+              "hotel_destinations.exception_destination",
+              "hotel_destinations.translations.translations_id",
+              "hotel_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "d2a6c39e-99f5-4e23-b606-29e520631869",
+        "reject": null
+      },
+      {
+        "id": "cf5fded6-ff84-4f1e-b4e5-ed68aba8467b",
+        "name": "Find Missing Locales",
+        "key": "find_missing",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const item = data.get_item[0];\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n\n  const buyPrice = item.buy_price;\n  const destinationId = item.destination;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const ALL_LOCALES = [\n    'a66beb5e-af3c-4e47-9c7a-101bd5be1a2a',\n    'a2358e99-f939-4957-9b4f-6b0dcbaadb0c',\n    '263b1ac9-aa7a-48f4-b472-b816dfa3d921',\n    'fe5d14c3-0051-47a5-97a3-679e05fa3dc9',\n  ];\n  const existingLocaleIds = (item.translations || []).map(t => t.translations_id);\n  const missingLocaleIds = ALL_LOCALES.filter(id => !existingLocaleIds.includes(id));\n\n  if (missingLocaleIds.length === 0) return null;\n\n  // Use first preset record as default\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  // 1. Find Margin Exception for this destination\n  let marginMatchedException = null;\n  if (defaultMarginPreset) {\n    marginMatchedException = (defaultMarginPreset.hotel_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  // 2. Find Exchange Rate Exception for this destination\n  let exchangeMatchedException = null;\n  if (defaultExchangePreset) {\n    exchangeMatchedException = (defaultExchangePreset.hotel_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  return missingLocaleIds.map(localeId => {\n    // Get Margin Value\n    let margin = 0;\n    if (marginMatchedException) {\n      const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n      margin = et ? et.exception_margin : 0;\n    } else if (defaultMarginPreset) {\n      const pt = (defaultMarginPreset.hotel_margin_translations || []).find(t => t.translations_id === localeId);\n      margin = pt ? pt.margin : 0;\n    }\n\n    // Get Exchange Rate ID\n    let exchangeRateId = null;\n    if (exchangeMatchedException) {\n      const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = et ? et.exception_exchange_rate : null;\n    } else if (defaultExchangePreset) {\n      const pt = (defaultExchangePreset.hotel_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = pt ? pt.exchange_rate : null;\n    }\n\n    // Get Exchange Rate Value\n    let rateValue = 1;\n    if (exchangeRateId) {\n      const r = rates.find(rate => rate.id === exchangeRateId);\n      rateValue = r ? parseFloat(r.rate) : 1;\n    }\n\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n\n    return {\n      batch_hotel_id: item.id,\n      translations_id: localeId,\n      margin: margin,\n      exchange_rate: exchangeRateId,\n      sell_price: sellPrice\n    };\n  });\n};"
+        },
+        "resolve": "7e1860a0-ff62-4d1b-859c-c94940ef4cdc",
+        "reject": null
+      },
+      {
+        "id": "d2a6c39e-99f5-4e23-b606-29e520631869",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_exchange_rate_translations.translations_id",
+              "hotel_exchange_rate_translations.exchange_rate",
+              "hotel_destinations.exception_destination",
+              "hotel_destinations.translations.translations_id",
+              "hotel_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "ddd4b8f0-f02e-49ff-8afa-bb773d93257c",
+        "reject": null
+      },
+      {
+        "id": "ddd4b8f0-f02e-49ff-8afa-bb773d93257c",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "cf5fded6-ff84-4f1e-b4e5-ed68aba8467b",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "4ee5f58c-9999-4dae-af1d-bf2bc0dd64a7",
+    "name": "[Margin Preset] Apply to Hotels",
+    "icon": "hotel",
+    "color": "#E07B39",
+    "description": "Reads margin_presets and applies margin_selected/remaining per locale to all batch_hotel items based on their destination, then recalculates sell_price.",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "margin_presets"
+      ],
+      "requireSelection": false,
+      "requireConfirmation": true,
+      "confirmationDescription": "Apply margin presets to all hotels and recalculate sell prices?",
+      "async": true
+    },
+    "operation": "514a46f0-a2e8-4441-b751-7565e1aff192",
+    "operations": [
+      {
+        "id": "008a0bbd-65e9-4c3f-83b5-2b33684bfcfe",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_exchange_rate_translations.translations_id",
+              "hotel_exchange_rate_translations.exchange_rate",
+              "hotel_destinations.exception_destination",
+              "hotel_destinations.translations.translations_id",
+              "hotel_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "de576e5c-47fb-49c3-9251-e81bbf7870fc",
+        "reject": null
+      },
+      {
+        "id": "35b90bef-cb08-4c45-85c0-c47525f4a031",
+        "name": "Get All Hotels",
+        "key": "get_batch_items",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_hotel",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "464757f5-8bc6-486e-afcf-b772a1b36ee2",
+        "reject": null
+      },
+      {
+        "id": "464757f5-8bc6-486e-afcf-b772a1b36ee2",
+        "name": "Calculate Margin & Sell Price Updates",
+        "key": "calculate_updates",
+        "type": "exec",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n  const items = data.get_batch_items;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const updates = [];\n  // Use first preset record as default\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  for (const item of items) {\n    const buyPrice = item.buy_price;\n    const destinationId = item.destination;\n\n    // 1. Find Margin\n    let marginMatchedException = null;\n    if (defaultMarginPreset) {\n      marginMatchedException = (defaultMarginPreset.hotel_destinations || []).find(d => d.exception_destination === destinationId);\n    }\n\n    // 2. Find Exchange Rate\n    let exchangeMatchedException = null;\n    if (defaultExchangePreset) {\n      exchangeMatchedException = (defaultExchangePreset.hotel_destinations || []).find(d => d.exception_destination === destinationId);\n    }\n\n    for (const trans of (item.translations || [])) {\n      const localeId = trans.translations_id;\n      \n      // Get Margin Value\n      let margin = 0;\n      if (marginMatchedException) {\n        const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n        margin = et ? et.exception_margin : 0;\n      } else if (defaultMarginPreset) {\n        const pt = (defaultMarginPreset.hotel_margin_translations || []).find(t => t.translations_id === localeId);\n        margin = pt ? pt.margin : 0;\n      }\n\n      // Get Exchange Rate ID\n      let exchangeRateId = null;\n      if (exchangeMatchedException) {\n        const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n        exchangeRateId = et ? et.exception_exchange_rate : null;\n      } else if (defaultExchangePreset) {\n        const pt = (defaultExchangePreset.hotel_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n        exchangeRateId = pt ? pt.exchange_rate : null;\n      }\n\n      // Get Exchange Rate Value\n      let rateValue = 1;\n      if (exchangeRateId) {\n        const r = rates.find(rate => rate.id === exchangeRateId);\n        rateValue = r ? parseFloat(r.rate) : 1;\n      }\n\n      const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n      \n      updates.push({ \n        id: trans.id, \n        margin: margin, \n        exchange_rate: exchangeRateId,\n        sell_price: sellPrice \n      });\n    }\n  }\n\n  return updates;\n};"
+        },
+        "resolve": "cef4a982-2620-42de-8d0b-843fb9ea68ed",
+        "reject": null
+      },
+      {
+        "id": "514a46f0-a2e8-4441-b751-7565e1aff192",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_margin_translations.translations_id",
+              "hotel_margin_translations.margin",
+              "hotel_destinations.exception_destination",
+              "hotel_destinations.translations.translations_id",
+              "hotel_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "008a0bbd-65e9-4c3f-83b5-2b33684bfcfe",
+        "reject": null
+      },
+      {
+        "id": "cef4a982-2620-42de-8d0b-843fb9ea68ed",
+        "name": "Update Hotel Translations",
+        "key": "update_translations",
+        "type": "item-update",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_hotel_translations",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_updates}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "de576e5c-47fb-49c3-9251-e81bbf7870fc",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "35b90bef-cb08-4c45-85c0-c47525f4a031",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "54508ef8-3839-4b14-999b-1dba7e820add",
+    "name": "[Init] Default Margins - Batch Tours",
+    "icon": "tour",
+    "color": "#4CAF50",
+    "description": "On item creation, auto-creates translation records with margin=0 and sell_price=buy_price for any locales not already set.",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create"
+      ],
+      "collections": [
+        "batch_tours"
+      ]
+    },
+    "operation": "63fa628d-9ebc-46bb-9642-f6964e048e9d",
+    "operations": [
+      {
+        "id": "05acaa1d-d8c5-4e51-b235-c6ea0408c725",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "tours_destinations.destinations_id",
+              "tours_margin_translations.translations_id",
+              "tours_margin_translations.margin_selected",
+              "tours_margin_translations.margin_remaining"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "f1e97c10-baba-4ef2-91e5-bf2a758a6879",
+        "reject": null
+      },
+      {
+        "id": "50b5b527-cade-45d1-9ae1-d9b82c7aa70f",
+        "name": "Find Missing Locales",
+        "key": "find_missing",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\\n  const item = data.get_item[0];\\n  const marginPresets = data.get_presets;\\n  const exchangePresets = data.get_exchange_presets;\\n  const rates = data.get_rates;\\n\\n  const buyPrice = item.buy_price;\\n  const destinationId = item.destination;\\n\\n  function roundHalf(val) {\\n    if (val == null) return null;\\n    const floored = Math.floor(val);\\n    return val - floored >= 0.5 ? floored + 1 : floored;\\n  }\\n\\n  const ALL_LOCALES = [\\n    'a66beb5e-af3c-4e47-9c7a-101bd5be1a2a',\\n    'a2358e99-f939-4957-9b4f-6b0dcbaadb0c',\\n    '263b1ac9-aa7a-48f4-b472-b816dfa3d921',\\n    'fe5d14c3-0051-47a5-97a3-679e05fa3dc9',\\n  ];\\n  const existingLocaleIds = (item.translations || []).map(t => t.translations_id);\\n  const missingLocaleIds = ALL_LOCALES.filter(id => !existingLocaleIds.includes(id));\\n\\n  if (missingLocaleIds.length === 0) return null;\\n\\n  const defaultMarginPreset = marginPresets[0];\\n  const defaultExchangePreset = exchangePresets[0];\\n\\n  let marginMatchedPreset = defaultMarginPreset;\\n  for (const preset of marginPresets) {\\n    const selectedDestIds = (preset.tours_destinations || []).map(d => d.destinations_id);\\n    if (selectedDestIds.includes(destinationId)) {\\n      marginMatchedPreset = preset;\\n      break;\\n    }\\n  }\\n\\n  let exchangeMatchedPreset = defaultExchangePreset;\\n  for (const preset of exchangePresets) {\\n    const selectedDestIds = (preset.tours_destinations || []).map(d => d.destinations_id);\\n    if (selectedDestIds.includes(destinationId)) {\\n      exchangeMatchedPreset = preset;\\n      break;\\n    }\\n  }\\n\\n  return missingLocaleIds.map(localeId => {\\n    let margin = 0;\\n    if (marginMatchedPreset) {\\n      const pt = (marginMatchedPreset.tours_margin_translations || []).find(t => t.translations_id === localeId);\\n      margin = marginMatchedPreset !== defaultMarginPreset ? (pt?.margin_selected ?? 0) : (pt?.margin_remaining ?? 0);\\n    }\\n\\n    let exchangeRateId = null;\\n    if (exchangeMatchedPreset) {\\n      const pt = (exchangeMatchedPreset.tours_exchange_rate_translations || []).find(t => t.translations_id === localeId);\\n      exchangeRateId = pt ? pt.exchange_rate : null;\\n    }\\n\\n    let rateValue = 1;\\n    if (exchangeRateId) {\\n      const r = rates.find(rate => rate.id === exchangeRateId);\\n      rateValue = r ? parseFloat(r.rate) : 1;\\n    }\\n\\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\\n\\n    return {\\n      batch_tours_id: item.id,\\n      translations_id: localeId,\\n      margin: margin,\\n      exchange_rate: exchangeRateId,\\n      sell_price: sellPrice\\n    };\\n  });\\n};"
+        },
+        "resolve": "78a2c681-1c8a-435e-bbee-5291e04cc310",
+        "reject": null
+      },
+      {
+        "id": "63fa628d-9ebc-46bb-9642-f6964e048e9d",
+        "name": "Get Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_tours",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ]
+          }
+        },
+        "resolve": "05acaa1d-d8c5-4e51-b235-c6ea0408c725",
+        "reject": null
+      },
+      {
+        "id": "70ce7b8f-1715-4a44-9654-4b4057b22a7f",
+        "name": "Create Default Locale Records",
+        "key": "create_defaults",
+        "type": "item-create",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_tours_locale",
+          "permissions": "$full",
+          "payload": "{{find_missing}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "78a2c681-1c8a-435e-bbee-5291e04cc310",
+        "name": "Has Missing Locales?",
+        "key": "condition_has_missing",
+        "type": "condition",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "find_missing": {
+              "_nnull": true
+            }
+          }
+        },
+        "resolve": "70ce7b8f-1715-4a44-9654-4b4057b22a7f",
+        "reject": null
+      },
+      {
+        "id": "89714fec-40b5-4449-8e97-90896ef85a92",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "50b5b527-cade-45d1-9ae1-d9b82c7aa70f",
+        "reject": null
+      },
+      {
+        "id": "f1e97c10-baba-4ef2-91e5-bf2a758a6879",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "tours_exchange_rate_translations.translations_id",
+              "tours_exchange_rate_translations.exchange_rate",
+              "tours_destinations.destinations_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "89714fec-40b5-4449-8e97-90896ef85a92",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "5833c6f2-8b23-4683-b32c-d83d67d56eb8",
+    "name": "[Batch] Calculate Sell Prices - Round Trip",
+    "icon": "route",
+    "color": "#6644AA",
+    "description": "Calculates sell_price per locale for a batch_round_trip item: sell_price = buy_price * (1 + margin/100)",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "batch_round_trip"
+      ],
+      "location": "item",
+      "requireConfirmation": true,
+      "confirmationDescription": "Recalculate sell prices for all locales?",
+      "async": false
+    },
+    "operation": "1437997b-2287-4487-a9ed-b267765bb58d",
+    "operations": [
+      {
+        "id": "0a09e851-9e35-4ed3-a322-76c6ed13ddae",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "316721d0-9649-4ba7-96f2-81306be54444",
+        "reject": null
+      },
+      {
+        "id": "101fd4ab-9a48-4818-90e8-b0a64c11e859",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "round_trip_margin_translations.translations_id",
+              "round_trip_margin_translations.margin",
+              "round_trip_destinations.exception_destination",
+              "round_trip_destinations.translations.translations_id",
+              "round_trip_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "eeeb1721-745b-47d0-a6a7-f1e45065f93b",
+        "reject": null
+      },
+      {
+        "id": "1437997b-2287-4487-a9ed-b267765bb58d",
+        "name": "Get Round Trip Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_round_trip",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.margin",
+              "translations.translations_id"
+            ],
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.body.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": "101fd4ab-9a48-4818-90e8-b0a64c11e859",
+        "reject": null
+      },
+      {
+        "id": "316721d0-9649-4ba7-96f2-81306be54444",
+        "name": "Calculate Sell Prices",
+        "key": "calculate_sell_prices",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const item = data.get_item[0];\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n\n  const buyPrice = item.buy_price;\n  const destinationId = item.destination;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  let marginMatchedException = null;\n  if (defaultMarginPreset) {\n    marginMatchedException = (defaultMarginPreset.round_trip_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  let exchangeMatchedException = null;\n  if (defaultExchangePreset) {\n    exchangeMatchedException = (defaultExchangePreset.round_trip_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  return (item.translations || []).map(trans => {\n    const localeId = trans.translations_id;\n    \n    let margin = 0;\n    if (marginMatchedException) {\n      const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n      margin = et ? et.exception_margin : 0;\n    } else if (defaultMarginPreset) {\n      const pt = (defaultMarginPreset.round_trip_margin_translations || []).find(t => t.translations_id === localeId);\n      margin = pt ? pt.margin : 0;\n    }\n\n    let exchangeRateId = null;\n    if (exchangeMatchedException) {\n      const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = et ? et.exception_exchange_rate : null;\n    } else if (defaultExchangePreset) {\n      const pt = (defaultExchangePreset.round_trip_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = pt ? pt.exchange_rate : null;\n    }\n\n    let rateValue = 1;\n    if (exchangeRateId) {\n      const r = rates.find(rate => rate.id === exchangeRateId);\n      rateValue = r ? parseFloat(r.rate) : 1;\n    }\n\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n\n    return {\n      id: trans.id,\n      margin: margin,\n      exchange_rate: exchangeRateId,\n      sell_price: sellPrice\n    };\n  });\n};"
+        },
+        "resolve": "3da3e4f3-9640-4984-b3ba-69e10c5bb19d",
+        "reject": null
+      },
+      {
+        "id": "3da3e4f3-9640-4984-b3ba-69e10c5bb19d",
+        "name": "Update Sell Prices",
+        "key": "update_sell_prices",
+        "type": "item-update",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_round_trip_locale",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_sell_prices}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "eeeb1721-745b-47d0-a6a7-f1e45065f93b",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "round_trip_exchange_rate_translations.translations_id",
+              "round_trip_exchange_rate_translations.exchange_rate",
+              "round_trip_destinations.exception_destination",
+              "round_trip_destinations.translations.translations_id",
+              "round_trip_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "0a09e851-9e35-4ed3-a322-76c6ed13ddae",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "587baa5a-3c14-4bc6-85c2-99ecba7ecf39",
+    "name": "[TEST] Notification Check - Delete After",
+    "icon": "science",
+    "color": "#999999",
+    "description": null,
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "publication_date",
+        "hotels"
+      ],
+      "requireSelection": false,
+      "requireConfirmation": false,
+      "location": "item"
+    },
+    "operation": "db2567ac-5529-41af-9a13-a3a066192c67",
+    "operations": [
+      {
+        "id": "0cd757b7-01a0-4916-9abb-21f89c92f842",
+        "name": "log",
+        "key": "log",
+        "type": "log",
+        "position_x": 42,
+        "position_y": 2,
+        "options": {
+          "message": "{{$trigger}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "102b2a8e-0df0-4ed6-a247-02f05b8e374b",
+        "name": "condition",
+        "key": "condition",
+        "type": "condition",
+        "position_x": 61,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "compute_target_date": {
+              "isSendNotification": {
+                "_eq": true
+              }
+            }
+          }
+        },
+        "resolve": "96dbc18a-6795-4028-8bcc-2e4c43fb2bd4",
+        "reject": "b474ce26-8b9b-48c2-bc73-2a5eaead0348"
+      },
+      {
+        "id": "96dbc18a-6795-4028-8bcc-2e4c43fb2bd4",
+        "name": "Trigger Notification Flow",
+        "key": "trigger_notify",
+        "type": "trigger",
+        "position_x": 83,
+        "position_y": 1,
+        "options": {
+          "iterationMode": "parallel",
+          "flow": "357e2900-2702-45ee-9a15-f9e0641a7511",
+          "payload": [
+            {
+              "id": "{{read_data[0].id}}",
+              "name": "{{read_data[0].hotel_name}}",
+              "end_date": "{{read_data[0].end_date}}",
+              "user_updated": "{{read_data[0].user_updated}}"
+            }
+          ]
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "a53650ac-6c17-4c0e-8de6-e212d1335053",
+        "name": "Compute Target Date (+5 days)",
+        "key": "compute_target_date",
+        "type": "exec",
+        "position_x": 42,
+        "position_y": 2,
+        "options": {
+          "code": "/*module.exports = async function(data) {\n  const d = new Date();\n  d.setDate(d.getDate() + 5);\n  const target = d.toISOString().split('T')[0];\n  let isSendNotification = false;\n\n  const endDate = new Date(data.read_data.end_date);\n  const targetDate = new Date(target);\n\n  if (endDate <= targetDate) {\n    isSendNotification = true;\n  }\n  return { target_date: target,isSendNotification,endDate,targetDate,read_data:data.read_data };\n}*/\n\nmodule.exports = async function(data) {\n  const d = new Date();\n  d.setDate(d.getDate() + 5);\n  const target = d.toISOString().split('T')[0];\n\n  let isSendNotification = false;\n\n  const endDateStr = data.read_data?.[0]?.end_date;\n\n  if (endDateStr) {\n    const endDate = (new Date(endDateStr)).getTime();\n    const targetDate = (new Date(target)).getTime();\n\n    if (endDate <= targetDate) {\n      isSendNotification = true;\n    }\n\n    return { target_date: target, isSendNotification, endDate, targetDate, read_data: data.read_data ,endDateStr};\n  }\n\n  return { target_date: target, isSendNotification, read_data: data.read_data ,endDateStr};\n};"
+        },
+        "resolve": "102b2a8e-0df0-4ed6-a247-02f05b8e374b",
+        "reject": null
+      },
+      {
+        "id": "b474ce26-8b9b-48c2-bc73-2a5eaead0348",
+        "name": "log_2",
+        "key": "log_2",
+        "type": "log",
+        "position_x": 81,
+        "position_y": 20,
+        "options": {
+          "message": "{{condition}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "db2567ac-5529-41af-9a13-a3a066192c67",
+        "name": "read_data",
+        "key": "read_data",
+        "type": "item-read",
+        "position_x": 23,
+        "position_y": 2,
+        "options": {
+          "permissions": "$trigger",
+          "emitEvents": false,
+          "collection": "hotels",
+          "query": {
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.body.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": "a53650ac-6c17-4c0e-8de6-e212d1335053",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "7d04e457-9105-4c14-b2d3-67716fb8ff9a",
+    "name": "[Batch] Calculate Sell Prices - Hotel",
+    "icon": "hotel",
+    "color": "#6644AA",
+    "description": "Calculates sell_price per locale for a batch_hotel item: sell_price = buy_price * (1 + margin/100)",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "batch_hotel"
+      ],
+      "location": "item",
+      "requireConfirmation": true,
+      "confirmationDescription": "Recalculate sell prices for all locales?",
+      "async": false
+    },
+    "operation": "48c1d86b-cd2f-4f43-978c-12e9c584adb0",
+    "operations": [
+      {
+        "id": "48c1d86b-cd2f-4f43-978c-12e9c584adb0",
+        "name": "Get Hotel Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_hotel",
+          "permissions": "$full",
+          "emitEvents": false,
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "translations.id",
+              "translations.margin",
+              "translations.translations_id"
+            ],
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.body.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": "4d2493b0-b2ad-4520-a7a4-f690fe504055",
+        "reject": null
+      },
+      {
+        "id": "4d2493b0-b2ad-4520-a7a4-f690fe504055",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_margin_translations.translations_id",
+              "hotel_margin_translations.margin",
+              "hotel_destinations.exception_destination",
+              "hotel_destinations.translations.translations_id",
+              "hotel_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "ea2692cb-424d-4f8a-ab4a-ae8d38debd65",
+        "reject": null
+      },
+      {
+        "id": "778b2fa7-1942-445e-abf7-ccd0e3a9c28f",
+        "name": "Update Sell Prices",
+        "key": "update_sell_prices",
+        "type": "item-update",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_hotel_translations",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_sell_prices}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "a5c53b30-4c45-46e3-987b-94be9083f5dd",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "ceda9c46-87b6-4ad7-9040-dd7996063846",
+        "reject": null
+      },
+      {
+        "id": "ceda9c46-87b6-4ad7-9040-dd7996063846",
+        "name": "Calculate Sell Prices",
+        "key": "calculate_sell_prices",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const item = data.get_item[0];\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n\n  const buyPrice = item.buy_price;\n  const destinationId = item.destination;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  // Use first preset record as default\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  // 1. Find Margin Exception for this destination\n  let marginMatchedException = null;\n  if (defaultMarginPreset) {\n    marginMatchedException = (defaultMarginPreset.hotel_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  // 2. Find Exchange Rate Exception for this destination\n  let exchangeMatchedException = null;\n  if (defaultExchangePreset) {\n    exchangeMatchedException = (defaultExchangePreset.hotel_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  return (item.translations || []).map(trans => {\n    const localeId = trans.translations_id;\n    \n    // Get Margin Value\n    let margin = 0;\n    if (marginMatchedException) {\n      const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n      margin = et ? et.exception_margin : 0;\n    } else if (defaultMarginPreset) {\n      const pt = (defaultMarginPreset.hotel_margin_translations || []).find(t => t.translations_id === localeId);\n      margin = pt ? pt.margin : 0;\n    }\n\n    // Get Exchange Rate ID\n    let exchangeRateId = null;\n    if (exchangeMatchedException) {\n      const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = et ? et.exception_exchange_rate : null;\n    } else if (defaultExchangePreset) {\n      const pt = (defaultExchangePreset.hotel_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = pt ? pt.exchange_rate : null;\n    }\n\n    // Get Exchange Rate Value\n    let rateValue = 1;\n    if (exchangeRateId) {\n      const r = rates.find(rate => rate.id === exchangeRateId);\n      rateValue = r ? parseFloat(r.rate) : 1;\n    }\n\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n\n    return {\n      id: trans.id,\n      margin: margin,\n      exchange_rate: exchangeRateId,\n      sell_price: sellPrice\n    };\n  });\n};"
+        },
+        "resolve": "778b2fa7-1942-445e-abf7-ccd0e3a9c28f",
+        "reject": null
+      },
+      {
+        "id": "ea2692cb-424d-4f8a-ab4a-ae8d38debd65",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_exchange_rate_translations.translations_id",
+              "hotel_exchange_rate_translations.exchange_rate",
+              "hotel_destinations.exception_destination",
+              "hotel_destinations.translations.translations_id",
+              "hotel_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "a5c53b30-4c45-46e3-987b-94be9083f5dd",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "c4874ad2-648d-4545-81be-159e031bcc88",
+    "name": "[Batch] Calculate Sell Prices - Camper",
+    "icon": "directions_car",
+    "color": "#6644AA",
+    "description": "Calculates sell_price per locale for a batch_camper item: sell_price = buy_price * (1 + margin/100)",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "batch_camper"
+      ],
+      "location": "item",
+      "requireConfirmation": true,
+      "confirmationDescription": "Recalculate sell prices for all locales?",
+      "async": false
+    },
+    "operation": "677b5903-1f18-417c-b776-2f4211cdb3ef",
+    "operations": [
+      {
+        "id": "1490b219-ff1c-4bde-a89d-78a04261b23b",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "camper_margin_translations.translations_id",
+              "camper_margin_translations.margin",
+              "camper_destinations.exception_destination",
+              "camper_destinations.translations.translations_id",
+              "camper_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "712f9d7b-331c-4bda-85d2-f4f03ad714e6",
+        "reject": null
+      },
+      {
+        "id": "24ae9257-ac30-4100-92c5-78644ac8cc1b",
+        "name": "Update Sell Prices",
+        "key": "update_sell_prices",
+        "type": "item-update",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_camper_locale",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_sell_prices}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "4fc266e1-5249-49fe-885f-9ca66d2ae266",
+        "name": "Calculate Sell Prices",
+        "key": "calculate_sell_prices",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const item = data.get_item[0];\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n\n  const buyPrice = item.buy_price;\n  const destinationId = item.destination;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  let marginMatchedException = null;\n  if (defaultMarginPreset) {\n    marginMatchedException = (defaultMarginPreset.camper_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  let exchangeMatchedException = null;\n  if (defaultExchangePreset) {\n    exchangeMatchedException = (defaultExchangePreset.camper_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  return (item.translations || []).map(trans => {\n    const localeId = trans.translations_id;\n    \n    let margin = 0;\n    if (marginMatchedException) {\n      const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n      margin = et ? et.exception_margin : 0;\n    } else if (defaultMarginPreset) {\n      const pt = (defaultMarginPreset.camper_margin_translations || []).find(t => t.translations_id === localeId);\n      margin = pt ? pt.margin : 0;\n    }\n\n    let exchangeRateId = null;\n    if (exchangeMatchedException) {\n      const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = et ? et.exception_exchange_rate : null;\n    } else if (defaultExchangePreset) {\n      const pt = (defaultExchangePreset.camper_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = pt ? pt.exchange_rate : null;\n    }\n\n    let rateValue = 1;\n    if (exchangeRateId) {\n      const r = rates.find(rate => rate.id === exchangeRateId);\n      rateValue = r ? parseFloat(r.rate) : 1;\n    }\n\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n\n    return {\n      id: trans.id,\n      margin: margin,\n      exchange_rate: exchangeRateId,\n      sell_price: sellPrice\n    };\n  });\n};"
+        },
+        "resolve": "24ae9257-ac30-4100-92c5-78644ac8cc1b",
+        "reject": null
+      },
+      {
+        "id": "677b5903-1f18-417c-b776-2f4211cdb3ef",
+        "name": "Get Camper Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_camper",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.margin",
+              "translations.translations_id"
+            ],
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.body.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": "1490b219-ff1c-4bde-a89d-78a04261b23b",
+        "reject": null
+      },
+      {
+        "id": "712f9d7b-331c-4bda-85d2-f4f03ad714e6",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "camper_exchange_rate_translations.translations_id",
+              "camper_exchange_rate_translations.exchange_rate",
+              "camper_destinations.exception_destination",
+              "camper_destinations.translations.translations_id",
+              "camper_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "a573dc19-3da5-44d3-8ae3-589d73404b36",
+        "reject": null
+      },
+      {
+        "id": "a573dc19-3da5-44d3-8ae3-589d73404b36",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "4fc266e1-5249-49fe-885f-9ca66d2ae266",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "c770875c-a771-41a4-b2be-15d8f1cd83f2",
+    "name": "[Batch] Calculate Sell Prices - Rental Car",
+    "icon": "car_rental",
+    "color": "#6644AA",
+    "description": "Calculates sell_price per locale for a batch_rental_car item: sell_price = buy_price * (1 + margin/100)",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "batch_rental_car"
+      ],
+      "location": "item",
+      "requireConfirmation": true,
+      "confirmationDescription": "Recalculate sell prices for all locales?",
+      "async": false
+    },
+    "operation": "9a0626c7-a967-42d1-8ca9-95533c9e7c8d",
+    "operations": [
+      {
+        "id": "28015257-1de0-4720-8231-926063c022fb",
+        "name": "Update Sell Prices",
+        "key": "update_sell_prices",
+        "type": "item-update",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_rental_car_locale",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_sell_prices}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "339e7039-6938-4046-9b72-e172a02139b9",
+        "name": "Calculate Sell Prices",
+        "key": "calculate_sell_prices",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const item = data.get_item[0];\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n\n  const buyPrice = item.buy_price;\n  const destinationId = item.destination;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  let marginMatchedException = null;\n  if (defaultMarginPreset) {\n    marginMatchedException = (defaultMarginPreset.rental_car_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  let exchangeMatchedException = null;\n  if (defaultExchangePreset) {\n    exchangeMatchedException = (defaultExchangePreset.rental_car_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  return (item.translations || []).map(trans => {\n    const localeId = trans.translations_id;\n    \n    let margin = 0;\n    if (marginMatchedException) {\n      const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n      margin = et ? et.exception_margin : 0;\n    } else if (defaultMarginPreset) {\n      const pt = (defaultMarginPreset.rental_car_margin_translation || []).find(t => t.translations_id === localeId);\n      margin = pt ? pt.margin : 0;\n    }\n\n    let exchangeRateId = null;\n    if (exchangeMatchedException) {\n      const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = et ? et.exception_exchange_rate : null;\n    } else if (defaultExchangePreset) {\n      const pt = (defaultExchangePreset.rental_car_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = pt ? pt.exchange_rate : null;\n    }\n\n    let rateValue = 1;\n    if (exchangeRateId) {\n      const r = rates.find(rate => rate.id === exchangeRateId);\n      rateValue = r ? parseFloat(r.rate) : 1;\n    }\n\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n\n    return {\n      id: trans.id,\n      margin: margin,\n      exchange_rate: exchangeRateId,\n      sell_price: sellPrice\n    };\n  });\n};"
+        },
+        "resolve": "28015257-1de0-4720-8231-926063c022fb",
+        "reject": null
+      },
+      {
+        "id": "9a0626c7-a967-42d1-8ca9-95533c9e7c8d",
+        "name": "Get Rental Car Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_rental_car",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.margin",
+              "translations.translations_id"
+            ],
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.body.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": "a0a293cd-f50f-4f07-85f2-29592616cb75",
+        "reject": null
+      },
+      {
+        "id": "a0a293cd-f50f-4f07-85f2-29592616cb75",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rental_car_margin_translation.translations_id",
+              "rental_car_margin_translation.margin",
+              "rental_car_destinations.exception_destination",
+              "rental_car_destinations.translations.translations_id",
+              "rental_car_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "bbfd7383-2470-49e0-a94b-72e77314f509",
+        "reject": null
+      },
+      {
+        "id": "bbfd7383-2470-49e0-a94b-72e77314f509",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rental_car_exchange_rate_translations.translations_id",
+              "rental_car_exchange_rate_translations.exchange_rate",
+              "rental_car_destinations.exception_destination",
+              "rental_car_destinations.translations.translations_id",
+              "rental_car_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "c6a787fa-b129-4721-9b5f-e19c85621d7b",
+        "reject": null
+      },
+      {
+        "id": "c6a787fa-b129-4721-9b5f-e19c85621d7b",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "339e7039-6938-4046-9b72-e172a02139b9",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "d0b20377-7515-475a-9ad4-e88754ec151f",
+    "name": "[Init] Default Margins - Batch Round Trip",
+    "icon": "loop",
+    "color": "#4CAF50",
+    "description": "On item creation, auto-creates translation records with margin=0 and sell_price=buy_price for any locales not already set.",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create"
+      ],
+      "collections": [
+        "batch_round_trip"
+      ]
+    },
+    "operation": "fc849854-b15e-4c73-8963-f763921b5dd9",
+    "operations": [
+      {
+        "id": "18c148e4-0b29-497c-b9b3-32d4369fcb5d",
+        "name": "Create Default Locale Records",
+        "key": "create_defaults",
+        "type": "item-create",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_round_trip_locale",
+          "permissions": "$full",
+          "payload": "{{find_missing}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "2ce5abc1-7b43-4254-aff7-fbf330d86b43",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "round_trip_margin_translations.translations_id",
+              "round_trip_margin_translations.margin",
+              "round_trip_destinations.exception_destination",
+              "round_trip_destinations.translations.translations_id",
+              "round_trip_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "31137bdd-e006-432e-b91e-fc07f3ae27fc",
+        "reject": null
+      },
+      {
+        "id": "31137bdd-e006-432e-b91e-fc07f3ae27fc",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "round_trip_exchange_rate_translations.translations_id",
+              "round_trip_exchange_rate_translations.exchange_rate",
+              "round_trip_destinations.exception_destination",
+              "round_trip_destinations.translations.translations_id",
+              "round_trip_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "76a099f7-60bd-4330-ae86-42962f88a400",
+        "reject": null
+      },
+      {
+        "id": "7015b18a-c69d-482d-b551-5f7168d2c40a",
+        "name": "Has Missing Locales?",
+        "key": "condition_has_missing",
+        "type": "condition",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "find_missing": {
+              "_nnull": true
+            }
+          }
+        },
+        "resolve": "18c148e4-0b29-497c-b9b3-32d4369fcb5d",
+        "reject": null
+      },
+      {
+        "id": "76a099f7-60bd-4330-ae86-42962f88a400",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "e5ed0f38-6c76-463c-914d-6498b108199c",
+        "reject": null
+      },
+      {
+        "id": "e5ed0f38-6c76-463c-914d-6498b108199c",
+        "name": "Find Missing Locales",
+        "key": "find_missing",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const item = data.get_item[0];\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n\n  const buyPrice = item.buy_price;\n  const destinationId = item.destination;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const ALL_LOCALES = [\n    'a66beb5e-af3c-4e47-9c7a-101bd5be1a2a',\n    'a2358e99-f939-4957-9b4f-6b0dcbaadb0c',\n    '263b1ac9-aa7a-48f4-b472-b816dfa3d921',\n    'fe5d14c3-0051-47a5-97a3-679e05fa3dc9',\n  ];\n  const existingLocaleIds = (item.translations || []).map(t => t.translations_id);\n  const missingLocaleIds = ALL_LOCALES.filter(id => !existingLocaleIds.includes(id));\n\n  if (missingLocaleIds.length === 0) return null;\n\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  let marginMatchedException = null;\n  if (defaultMarginPreset) {\n    marginMatchedException = (defaultMarginPreset.round_trip_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  let exchangeMatchedException = null;\n  if (defaultExchangePreset) {\n    exchangeMatchedException = (defaultExchangePreset.round_trip_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  return missingLocaleIds.map(localeId => {\n    let margin = 0;\n    if (marginMatchedException) {\n      const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n      margin = et ? et.exception_margin : 0;\n    } else if (defaultMarginPreset) {\n      const pt = (defaultMarginPreset.round_trip_margin_translations || []).find(t => t.translations_id === localeId);\n      margin = pt ? pt.margin : 0;\n    }\n\n    let exchangeRateId = null;\n    if (exchangeMatchedException) {\n      const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = et ? et.exception_exchange_rate : null;\n    } else if (defaultExchangePreset) {\n      const pt = (defaultExchangePreset.round_trip_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = pt ? pt.exchange_rate : null;\n    }\n\n    let rateValue = 1;\n    if (exchangeRateId) {\n      const r = rates.find(rate => rate.id === exchangeRateId);\n      rateValue = r ? parseFloat(r.rate) : 1;\n    }\n\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n\n    return {\n      batch_round_trip_id: item.id,\n      translations_id: localeId,\n      margin: margin,\n      exchange_rate: exchangeRateId,\n      sell_price: sellPrice\n    };\n  });\n};"
+        },
+        "resolve": "7015b18a-c69d-482d-b551-5f7168d2c40a",
+        "reject": null
+      },
+      {
+        "id": "fc849854-b15e-4c73-8963-f763921b5dd9",
+        "name": "Get Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_round_trip",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ]
+          },
+          "schema": {},
+          "table": "batch_round_trip"
+        },
+        "resolve": "2ce5abc1-7b43-4254-aff7-fbf330d86b43",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "e839b8cc-d63b-4d46-a1d9-ce4a83873d85",
+    "name": "[Margin Preset] Apply to ALL Products",
+    "icon": "sync",
+    "color": "#C0392B",
+    "description": "Master batch flow: reads margin_presets and applies margin_selected/remaining per locale to ALL batch products (hotels, campers, rental cars, round trips, tours) based on their destination, then recalculates sell_price for each.",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "margin_presets"
+      ],
+      "requireConfirmation": true,
+      "confirmationDescription": "Apply margin presets to ALL products (hotels, campers, rental cars, round trips, tours) and recalculate all sell prices?.",
+      "async": true,
+      "requireSelection": false
+    },
+    "operation": "09f1d0db-cd08-45f8-a662-bcb281946041",
+    "operations": [
+      {
+        "id": "000a7e45-79f6-4332-87cb-1458561af59b",
+        "name": "Get Tours",
+        "key": "get_tours",
+        "type": "item-read",
+        "position_x": 109,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_tours",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id",
+              "translations.margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "b9736978-c1fb-4045-836b-59a4f0ed6daf",
+        "reject": null
+      },
+      {
+        "id": "0719075b-b7fa-4af3-8573-7325d84a70bf",
+        "name": "Update Round Trips",
+        "key": "update_round_trips",
+        "type": "item-update",
+        "position_x": 199,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_round_trip_locale",
+          "permissions": "$full",
+          "payload": "{{calculate_all.round_trips}}"
+        },
+        "resolve": "878117fb-dd50-4478-8057-392a62fad725",
+        "reject": null
+      },
+      {
+        "id": "09f1d0db-cd08-45f8-a662-bcb281946041",
+        "name": "Get All Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 1,
+        "position_y": 1,
+        "options": {
+          "collection": "margin_presets",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_destinations.exception_destination",
+              "hotel_destinations.translations.translations_id",
+              "hotel_destinations.translations.exception_margin",
+              "hotel_margin_translations.translations_id",
+              "hotel_margin_translations.margin",
+              "camper_destinations.exception_destination",
+              "camper_destinations.translations.translations_id",
+              "camper_destinations.translations.exception_margin",
+              "camper_margin_translations.translations_id",
+              "camper_margin_translations.margin",
+              "rental_car_destinations.exception_destination",
+              "rental_car_margin_translation.translations_id",
+              "rental_car_margin_translation.margin_selected",
+              "rental_car_margin_translation.margin_remaining",
+              "round_trips_destinations.exception_destination",
+              "round_trips_margin_translations.translations_id",
+              "round_trips_margin_translations.margin_selected",
+              "round_trips_margin_translations.margin_remaining",
+              "tours_destinations.exception_destination",
+              "tours_margin_translations.translations_id",
+              "tours_margin_translations.margin_selected",
+              "tours_margin_translations.margin_remaining"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "26735184-72af-4c0f-83cf-4d0c880ca0a4",
+        "reject": null
+      },
+      {
+        "id": "0cf2fb9b-ac67-4c4c-b281-ede8fb788e9c",
+        "name": "Update Rental Cars",
+        "key": "update_rental_cars",
+        "type": "item-update",
+        "position_x": 181,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_rental_car_locale",
+          "permissions": "$full",
+          "payload": "{{calculate_all.rental_cars}}"
+        },
+        "resolve": "0719075b-b7fa-4af3-8573-7325d84a70bf",
+        "reject": null
+      },
+      {
+        "id": "0ff827a5-0c77-4625-a545-03ab4ef183ef",
+        "name": "Get Campers",
+        "key": "get_campers",
+        "type": "item-read",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_camper",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id",
+              "translations.margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "b3b5e0c9-f0da-4c11-b271-709551a48bea",
+        "reject": null
+      },
+      {
+        "id": "26735184-72af-4c0f-83cf-4d0c880ca0a4",
+        "name": "Get All Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 1,
+        "position_y": 19,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "hotel_destinations.exception_destination",
+              "hotel_destinations.translations.translations_id",
+              "hotel_destinations.translations.exception_exchange_rate",
+              "hotel_exchange_rate_translations.translations_id",
+              "hotel_exchange_rate_translations.exchange_rate",
+              "camper_destinations.exception_destination",
+              "camper_destinations.translations.translations_id",
+              "camper_destinations.translations.exception_exchange_rate",
+              "camper_exchange_rate_translations.translations_id",
+              "camper_exchange_rate_translations.exchange_rate",
+              "rental_car_destinations.exception_destination",
+              "rental_car_exchange_rate_translations.translations_id",
+              "rental_car_exchange_rate_translations.exchange_rate_selected",
+              "rental_car_exchange_rate_translations.exchange_rate_remaining",
+              "round_trips_destinations.exception_destination",
+              "round_trips_exchange_rate_translations.translations_id",
+              "round_trips_exchange_rate_translations.exchange_rate_selected",
+              "round_trips_exchange_rate_translations.exchange_rate_remaining",
+              "tours_destinations.exception_destination",
+              "tours_exchange_rate_translations.translations_id",
+              "tours_exchange_rate_translations.exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "6c252570-9bff-4abd-9887-bcac24d6330d",
+        "reject": null
+      },
+      {
+        "id": "5a175539-95da-4291-8049-3b1cc2346acb",
+        "name": "Get Hotels",
+        "key": "get_hotels",
+        "type": "item-read",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_hotel",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id",
+              "translations.margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "0ff827a5-0c77-4625-a545-03ab4ef183ef",
+        "reject": null
+      },
+      {
+        "id": "6c252570-9bff-4abd-9887-bcac24d6330d",
+        "name": "Get All Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 1,
+        "position_y": 37,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "5a175539-95da-4291-8049-3b1cc2346acb",
+        "reject": null
+      },
+      {
+        "id": "822f6b4a-a6c1-44ee-bae2-944317b5018d",
+        "name": "Get Round Trips",
+        "key": "get_round_trips",
+        "type": "item-read",
+        "position_x": 91,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_round_trip",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id",
+              "translations.margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "000a7e45-79f6-4332-87cb-1458561af59b",
+        "reject": null
+      },
+      {
+        "id": "878117fb-dd50-4478-8057-392a62fad725",
+        "name": "Update Tours",
+        "key": "update_tours",
+        "type": "item-update",
+        "position_x": 217,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_tours_locale",
+          "permissions": "$full",
+          "payload": "{{calculate_all.tours}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "b3b5e0c9-f0da-4c11-b271-709551a48bea",
+        "name": "Get Rental Cars",
+        "key": "get_rental_cars",
+        "type": "item-read",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_rental_car",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id",
+              "translations.margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "822f6b4a-a6c1-44ee-bae2-944317b5018d",
+        "reject": null
+      },
+      {
+        "id": "b9736978-c1fb-4045-836b-59a4f0ed6daf",
+        "name": "Calculate All Sell Prices",
+        "key": "calculate_all",
+        "type": "exec",
+        "position_x": 127,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\\n  const marginPresets = data.get_presets;\\n  const exchangePresets = data.get_exchange_presets;\\n  const rates = data.get_rates;\\n\\n  const defaultMarginPreset = marginPresets[0];\\n  const defaultExchangePreset = exchangePresets[0];\\n\\n  function roundHalf(val) {\\n    if (val == null) return null;\\n    const floored = Math.floor(val);\\n    return val - floored >= 0.5 ? floored + 1 : floored;\\n  }\\n\\n  function calculateProductUpdates(items, type) {\\n    const results = [];\\n    const destProp = type === 'round_trip' ? 'round_trips_destinations' : (type === 'rental_car' ? 'rental_car_destinations' : `${type}_destinations`);\\n    \\n    for (const item of items) {\\n      const buyPrice = item.buy_price || 0;\\n      const destinationId = item.destination;\\n\\n      let mMatchedPreset = null;\\n      let eMatchedPreset = null;\\n      let mException = null;\\n      let eException = null;\\n\\n      if (type === 'hotel' || type === 'camper') {\\n        if (defaultMarginPreset) {\\n          mException = (defaultMarginPreset[destProp] || []).find(d => d.exception_destination === destinationId);\\n          mMatchedPreset = defaultMarginPreset;\\n        }\\n        if (defaultExchangePreset) {\\n          eException = (defaultExchangePreset[destProp] || []).find(d => d.exception_destination === destinationId);\\n          eMatchedPreset = defaultExchangePreset;\\n        }\\n      } else {\\n        for (const p of marginPresets) {\\n          if ((p[destProp] || []).map(d => d.exception_destination).includes(destinationId)) {\\n            mMatchedPreset = p;\\n            break;\\n          }\\n        }\\n        for (const p of exchangePresets) {\\n          if ((p[destProp] || []).map(d => d.exception_destination).includes(destinationId)) {\\n            eMatchedPreset = p;\\n            break;\\n          }\\n        }\\n      }\\n\\n      const baseMarginPreset = mMatchedPreset || defaultMarginPreset;\\n      const baseExchangePreset = eMatchedPreset || defaultExchangePreset;\\n\\n      for (const trans of (item.translations || [])) {\\n        const localeId = trans.translations_id;\\n        let margin = 0;\\n        let exchangeRateId = null;\\n\\n        // Margin Logic\\n        if (type === 'hotel' || type === 'camper') {\\n            if (mException) {\\n                const et = (mException.translations || []).find(t => t.translations_id === localeId);\\n                margin = et ? et.exception_margin : 0;\\n            } else if (baseMarginPreset) {\\n                const pt = (baseMarginPreset[`${type}_margin_translations`] || []).find(t => t.translations_id === localeId);\\n                margin = pt ? pt.margin : 0;\\n            }\\n        } else {\\n            if (baseMarginPreset) {\\n                const pt = (baseMarginPreset[type === 'round_trip' ? 'round_trips_margin_translations' : (type === 'rental_car' ? 'rental_car_margin_translation' : 'tours_margin_translations')] || []).find(t => t.translations_id === localeId);\\n                margin = mMatchedPreset ? (pt?.margin_selected ?? 0) : (pt?.margin_remaining ?? 0);\\n            }\\n        }\\n\\n        // Exchange Logic\\n        if (type === 'hotel' || type === 'camper') {\\n            if (eException) {\\n                const et = (eException.translations || []).find(t => t.translations_id === localeId);\\n                exchangeRateId = et ? et.exception_exchange_rate : null;\\n            } else if (baseExchangePreset) {\\n                const pt = (baseExchangePreset[`${type}_exchange_rate_translations`] || []).find(t => t.translations_id === localeId);\\n                exchangeRateId = pt ? pt.exchange_rate : null;\\n            }\\n        } else {\\n            if (baseExchangePreset) {\\n                const pt = (baseExchangePreset[type === 'round_trip' ? 'round_trips_exchange_rate_translations' : (type === 'rental_car' ? 'rental_car_exchange_rate_translations' : 'tours_exchange_rate_translations')] || []).find(t => t.translations_id === localeId);\\n                if (type === 'tours') {\\n                    exchangeRateId = pt ? pt.exchange_rate : null;\\n                } else {\\n                    exchangeRateId = eMatchedPreset ? (pt?.exchange_rate_selected ?? null) : (pt?.exchange_rate_remaining ?? null);\\n                }\\n            }\\n        }\\n\\n        let rateValue = 1;\\n        if (exchangeRateId) {\\n          const r = rates.find(rate => rate.id === exchangeRateId);\\n          rateValue = r ? parseFloat(r.rate) : 1;\\n        }\\n\\n        const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\\n        results.push({ id: trans.id, margin, exchange_rate: exchangeRateId, sell_price: sellPrice });\\n      }\\n    }\\n    return results;\\n  }\\n\\n  return {\\n    hotels: calculateProductUpdates(data.get_hotels, 'hotel'),\\n    campers: calculateProductUpdates(data.get_campers, 'camper'),\\n    rental_cars: calculateProductUpdates(data.get_rental_cars, 'rental_car'),\\n    round_trips: calculateProductUpdates(data.get_round_trips, 'round_trip'),\\n    tours: calculateProductUpdates(data.get_tours, 'tours')\\n  };\\n};"
+        },
+        "resolve": "e1210174-533c-4ced-b0b0-4ef64fdbbd88",
+        "reject": null
+      },
+      {
+        "id": "cbf323cd-d17d-49c2-8890-b432e3b8e137",
+        "name": "Update Campers",
+        "key": "update_campers",
+        "type": "item-update",
+        "position_x": 163,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_camper_locale",
+          "permissions": "$full",
+          "payload": "{{calculate_all.campers}}"
+        },
+        "resolve": "0cf2fb9b-ac67-4c4c-b281-ede8fb788e9c",
+        "reject": null
+      },
+      {
+        "id": "e1210174-533c-4ced-b0b0-4ef64fdbbd88",
+        "name": "Update Hotels",
+        "key": "update_hotels",
+        "type": "item-update",
+        "position_x": 145,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_hotel_translations",
+          "permissions": "$full",
+          "payload": "{{calculate_all.hotels}}"
+        },
+        "resolve": "cbf323cd-d17d-49c2-8890-b432e3b8e137",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "ea507a6a-5d18-4590-8449-94fc0da81e81",
+    "name": "[Init] Default Margins - Batch Camper",
+    "icon": "directions_car",
+    "color": "#4CAF50",
+    "description": "On item creation, auto-creates translation records with margin=0 and sell_price=buy_price for any locales not already set.",
+    "trigger": "event",
+    "options": {
+      "type": "action",
+      "scope": [
+        "items.create"
+      ],
+      "collections": [
+        "batch_camper"
+      ]
+    },
+    "operation": "ac2c2cc6-049c-4a30-afc7-51936cd560ed",
+    "operations": [
+      {
+        "id": "2445ab53-90dd-460c-b35f-2fc5d0c6d001",
+        "name": "Create Default Locale Records",
+        "key": "create_defaults",
+        "type": "item-create",
+        "position_x": 73,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_camper_locale",
+          "permissions": "$full",
+          "payload": "{{find_missing}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "a38a76bb-b795-48f2-a5a5-452c208e192e",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "camper_margin_translations.translations_id",
+              "camper_margin_translations.margin",
+              "camper_destinations.exception_destination",
+              "camper_destinations.translations.translations_id",
+              "camper_destinations.translations.exception_margin"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "fba4ccc9-ca41-4543-b86a-c4cba3119dc3",
+        "reject": null
+      },
+      {
+        "id": "a7bcc7d0-8b82-46ff-b95a-e87a6be94af1",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "dc2d8429-ac08-4c81-844f-77f2399e8767",
+        "reject": null
+      },
+      {
+        "id": "ab1c2e87-0972-4135-b16c-202c63ee9ec4",
+        "name": "Has Missing Locales?",
+        "key": "condition_has_missing",
+        "type": "condition",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "filter": {
+            "find_missing": {
+              "_nnull": true
+            }
+          }
+        },
+        "resolve": "2445ab53-90dd-460c-b35f-2fc5d0c6d001",
+        "reject": null
+      },
+      {
+        "id": "ac2c2cc6-049c-4a30-afc7-51936cd560ed",
+        "name": "Get Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_camper",
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.translations_id"
+            ]
+          },
+          "schema": {},
+          "table": "batch_camper"
+        },
+        "resolve": "a38a76bb-b795-48f2-a5a5-452c208e192e",
+        "reject": null
+      },
+      {
+        "id": "dc2d8429-ac08-4c81-844f-77f2399e8767",
+        "name": "Find Missing Locales",
+        "key": "find_missing",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\n  const item = data.get_item[0];\n  const marginPresets = data.get_presets;\n  const exchangePresets = data.get_exchange_presets;\n  const rates = data.get_rates;\n\n  const buyPrice = item.buy_price;\n  const destinationId = item.destination;\n\n  function roundHalf(val) {\n    if (val == null) return null;\n    const floored = Math.floor(val);\n    return val - floored >= 0.5 ? floored + 1 : floored;\n  }\n\n  const ALL_LOCALES = [\n    'a66beb5e-af3c-4e47-9c7a-101bd5be1a2a',\n    'a2358e99-f939-4957-9b4f-6b0dcbaadb0c',\n    '263b1ac9-aa7a-48f4-b472-b816dfa3d921',\n    'fe5d14c3-0051-47a5-97a3-679e05fa3dc9',\n  ];\n  const existingLocaleIds = (item.translations || []).map(t => t.translations_id);\n  const missingLocaleIds = ALL_LOCALES.filter(id => !existingLocaleIds.includes(id));\n\n  if (missingLocaleIds.length === 0) return null;\n\n  const defaultMarginPreset = marginPresets[0];\n  const defaultExchangePreset = exchangePresets[0];\n\n  let marginMatchedException = null;\n  if (defaultMarginPreset) {\n    marginMatchedException = (defaultMarginPreset.camper_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  let exchangeMatchedException = null;\n  if (defaultExchangePreset) {\n    exchangeMatchedException = (defaultExchangePreset.camper_destinations || []).find(d => d.exception_destination === destinationId);\n  }\n\n  return missingLocaleIds.map(localeId => {\n    let margin = 0;\n    if (marginMatchedException) {\n      const et = (marginMatchedException.translations || []).find(t => t.translations_id === localeId);\n      margin = et ? et.exception_margin : 0;\n    } else if (defaultMarginPreset) {\n      const pt = (defaultMarginPreset.camper_margin_translations || []).find(t => t.translations_id === localeId);\n      margin = pt ? pt.margin : 0;\n    }\n\n    let exchangeRateId = null;\n    if (exchangeMatchedException) {\n      const et = (exchangeMatchedException.translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = et ? et.exception_exchange_rate : null;\n    } else if (defaultExchangePreset) {\n      const pt = (defaultExchangePreset.camper_exchange_rate_translations || []).find(t => t.translations_id === localeId);\n      exchangeRateId = pt ? pt.exchange_rate : null;\n    }\n\n    let rateValue = 1;\n    if (exchangeRateId) {\n      const r = rates.find(rate => rate.id === exchangeRateId);\n      rateValue = r ? parseFloat(r.rate) : 1;\n    }\n\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\n\n    return {\n      batch_camper_id: item.id,\n      translations_id: localeId,\n      margin: margin,\n      exchange_rate: exchangeRateId,\n      sell_price: sellPrice\n    };\n  });\n};"
+        },
+        "resolve": "ab1c2e87-0972-4135-b16c-202c63ee9ec4",
+        "reject": null
+      },
+      {
+        "id": "fba4ccc9-ca41-4543-b86a-c4cba3119dc3",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "camper_exchange_rate_translations.translations_id",
+              "camper_exchange_rate_translations.exchange_rate",
+              "camper_destinations.exception_destination",
+              "camper_destinations.translations.translations_id",
+              "camper_destinations.translations.exception_exchange_rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "a7bcc7d0-8b82-46ff-b95a-e87a6be94af1",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  },
+  {
+    "id": "ee6bd01f-c60f-41b8-8f30-5c7a4eecc3dc",
+    "name": "[Batch] Calculate Sell Prices - Tours",
+    "icon": "tour",
+    "color": "#6644AA",
+    "description": "Calculates sell_price per locale for a batch_tours item: sell_price = buy_price * (1 + margin/100)",
+    "trigger": "manual",
+    "options": {
+      "collections": [
+        "batch_tours"
+      ],
+      "location": "item",
+      "requireConfirmation": true,
+      "confirmationDescription": "Recalculate sell prices for all locales?",
+      "async": false
+    },
+    "operation": "1ecf8170-5f8f-40c5-aeb0-b6290474e098",
+    "operations": [
+      {
+        "id": "1ecf8170-5f8f-40c5-aeb0-b6290474e098",
+        "name": "Get Tours Item",
+        "key": "get_item",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_tours",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "buy_price",
+              "destination",
+              "translations.id",
+              "translations.margin_manual",
+              "translations.translations_id"
+            ],
+            "filter": {
+              "id": {
+                "_eq": "{{$trigger.body.keys[0]}}"
+              }
+            }
+          }
+        },
+        "resolve": "b0f06aec-c283-4840-9180-18fd10035f51",
+        "reject": null
+      },
+      {
+        "id": "82c23394-449a-4d24-aba4-e19e84d940f0",
+        "name": "Update Sell Prices",
+        "key": "update_sell_prices",
+        "type": "item-update",
+        "position_x": 55,
+        "position_y": 1,
+        "options": {
+          "collection": "batch_tours_locale",
+          "permissions": "$full",
+          "emitEvents": false,
+          "payload": "{{calculate_sell_prices}}"
+        },
+        "resolve": null,
+        "reject": null
+      },
+      {
+        "id": "b0f06aec-c283-4840-9180-18fd10035f51",
+        "name": "Get Margin Presets",
+        "key": "get_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 19,
+        "options": {
+          "collection": "margin_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "tours_destinations.destinations_id",
+              "tours_margin_translations.translations_id",
+              "tours_margin_translations.margin_selected",
+              "tours_margin_translations.margin_remaining"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "b2dd121c-980e-4596-981e-6488b5598aed",
+        "reject": null
+      },
+      {
+        "id": "b2dd121c-980e-4596-981e-6488b5598aed",
+        "name": "Get Exchange Rate Presets",
+        "key": "get_exchange_presets",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 37,
+        "options": {
+          "collection": "exchange_rate_presets",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "tours_exchange_rate_translations.translations_id",
+              "tours_exchange_rate_translations.exchange_rate",
+              "tours_destinations.destinations_id"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "faafbc9a-26a1-4f47-b356-a239cb8085a8",
+        "reject": null
+      },
+      {
+        "id": "f4b9aa9e-b51b-4cf2-b90f-37ac9ced1f14",
+        "name": "Calculate Sell Prices",
+        "key": "calculate_sell_prices",
+        "type": "exec",
+        "position_x": 37,
+        "position_y": 1,
+        "options": {
+          "code": "module.exports = async function(data) {\\n  const item = data.get_item[0];\\n  const marginPresets = data.get_presets;\\n  const exchangePresets = data.get_exchange_presets;\\n  const rates = data.get_rates;\\n\\n  const buyPrice = item.buy_price;\\n  const destinationId = item.destination;\\n\\n  function roundHalf(val) {\\n    if (val == null) return null;\\n    const floored = Math.floor(val);\\n    return val - floored >= 0.5 ? floored + 1 : floored;\\n  }\\n\\n  const defaultMarginPreset = marginPresets[0];\\n  const defaultExchangePreset = exchangePresets[0];\\n\\n  let marginMatchedPreset = defaultMarginPreset;\\n  for (const preset of marginPresets) {\\n    const selectedDestIds = (preset.tours_destinations || []).map(d => d.destinations_id);\\n    if (selectedDestIds.includes(destinationId)) {\\n      marginMatchedPreset = preset;\\n      break;\\n    }\\n  }\\n\\n  let exchangeMatchedPreset = defaultExchangePreset;\\n  for (const preset of exchangePresets) {\\n    const selectedDestIds = (preset.tours_destinations || []).map(d => d.destinations_id);\\n    if (selectedDestIds.includes(destinationId)) {\\n      exchangeMatchedPreset = preset;\\n      break;\\n    }\\n  }\\n\\n  return (item.translations || []).map(trans => {\\n    const localeId = trans.translations_id;\\n    let margin = 0;\\n\\n    if (marginMatchedPreset) {\\n      const pt = (marginMatchedPreset.tours_margin_translations || []).find(t => t.translations_id === localeId);\\n      margin = marginMatchedPreset !== defaultMarginPreset ? (pt?.margin_selected ?? 0) : (pt?.margin_remaining ?? 0);\\n    }\\n\\n    let exchangeRateId = null;\\n    if (exchangeMatchedPreset) {\\n      const pt = (exchangeMatchedPreset.tours_exchange_rate_translations || []).find(t => t.translations_id === localeId);\\n      exchangeRateId = pt ? pt.exchange_rate : null;\\n    }\\n\\n    let rateValue = 1;\\n    if (exchangeRateId) {\\n      const r = rates.find(rate => rate.id === exchangeRateId);\\n      rateValue = r ? parseFloat(r.rate) : 1;\\n    }\\n\\n    const sellPrice = buyPrice != null ? roundHalf(buyPrice * rateValue * (1 + margin / 100)) : null;\\n\\n    return {\\n      id: trans.id,\\n      margin: margin,\\n      exchange_rate: exchangeRateId,\\n      sell_price: sellPrice\\n    };\\n  });\\n};"
+        },
+        "resolve": "82c23394-449a-4d24-aba4-e19e84d940f0",
+        "reject": null
+      },
+      {
+        "id": "faafbc9a-26a1-4f47-b356-a239cb8085a8",
+        "name": "Get Rates Values",
+        "key": "get_rates",
+        "type": "item-read",
+        "position_x": 19,
+        "position_y": 55,
+        "options": {
+          "collection": "rates",
+          "emitEvents": false,
+          "permissions": "$full",
+          "query": {
+            "fields": [
+              "id",
+              "rate"
+            ],
+            "limit": -1
+          }
+        },
+        "resolve": "f4b9aa9e-b51b-4cf2-b90f-37ac9ced1f14",
+        "reject": null
+      }
+    ],
+    "flow_manager_category": null,
+    "accountability": "all"
+  }
+]
