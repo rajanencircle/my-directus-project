@@ -32,6 +32,7 @@ export default {
   component: InterfaceComponent,
   types: ["string", "uuid", "json"],
   relational: false,
+  useValues: true,
   options: [
     {
       field: "target_collection",

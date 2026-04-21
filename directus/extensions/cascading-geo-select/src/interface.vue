@@ -67,10 +67,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, watch, onMounted, onBeforeUnmount, inject } from "vue";
+import type { Ref } from "vue";
 import { useApi } from "@directus/extensions-sdk";
 
 const api = useApi();
+
+// Directus v11 provides form values via inject; fall back to the values prop
+const injectedValues = inject<Ref<Record<string, unknown>> | null>(
+  "values",
+  null,
+);
+const currentValues = computed<Record<string, unknown> | null>(
+  () =>
+    (injectedValues?.value as Record<string, unknown> | null) ??
+    props.values ??
+    null,
+);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -109,7 +122,7 @@ const props = withDefaults(
     disabled?: boolean;
     /** Target collection this field selects from */
     collection?: string;
-    target_collection?: string;
+    target_collection: string;
     icon?: string;
     labelField?: string;
     languageCode?: string;
@@ -288,7 +301,6 @@ async function fetchSearchResults(
   }
   if (clauses.length === 1) params.filter = clauses[0];
   else if (clauses.length > 1) params.filter = { _and: clauses };
-  console.log("fetchSearchResults", searchTerm, upstreamFilters);
   try {
     const res = await api.get(`/items/${props.target_collection}`, { params });
     return (res.data?.data ?? []).map((item: Record<string, unknown>) => ({
@@ -310,7 +322,6 @@ async function fetchById(
   extraFields: string[] = [],
 ): Promise<Record<string, unknown> | null> {
   const fields = [...new Set([...buildLabelFields(), ...extraFields])];
-  console.log("fetchById", collection, id, fields);
   try {
     const res = await api.get(`/items/${collection}/${id}`, {
       params: { fields },
@@ -327,7 +338,6 @@ async function fetchParentRecord(
   id: string,
   fields: string[],
 ): Promise<Record<string, unknown> | null> {
-  console.log("fetchParentRecord", collection, id, fields);
   try {
     const res = await api.get(`/items/${collection}/${id}`, {
       params: { fields: ["id", ...fields] },
@@ -351,7 +361,7 @@ function getActiveFilters(): Array<{
 }> {
   const active: Array<{ fk: string; id: string; fieldKey: string }> = [];
   for (const f of parsedFilterBy.value) {
-    const parentId = extractId(props.values?.[f.fieldKey]);
+    const parentId = extractId(currentValues.value?.[f.fieldKey]);
     if (parentId) active.push({ fk: f.fk, id: parentId, fieldKey: f.fieldKey });
   }
   return active;
@@ -361,7 +371,6 @@ const filterHint = computed<string>(() => {
   const filters = getActiveFilters();
   return filters.map((f) => `Filtered by ${f.fieldKey}`).join("  ·  ");
 });
-
 // ─── Init from existing value ─────────────────────────────────────────────────
 
 async function initFromValue() {
@@ -475,23 +484,15 @@ async function onDrawerInput(val: Record<string, unknown>) {
 watch(
   () => {
     const snapshot: Record<string, unknown> = {};
-    console.log("props", props);
-    console.log("props.values", props.values);
-    console.log("parsedCascadeFrom.value", parsedCascadeFrom.value);
     for (const c of parsedCascadeFrom.value) {
-      snapshot[c.fieldKey] = props.values?.[c.fieldKey] ?? null;
+      snapshot[c.fieldKey] = currentValues.value?.[c.fieldKey] ?? null;
     }
-    console.log("snapshot", snapshot);
     return snapshot;
   },
   async (newParents, oldParents) => {
     for (const c of parsedCascadeFrom.value) {
-      console.log("c", c);
-
       const newId = extractId(newParents[c.fieldKey]);
       const oldId = extractId(oldParents?.[c.fieldKey]);
-      console.log("newId", newId);
-      console.log("oldId", oldId);
       if (newId === oldId) continue;
 
       if (!newId) {
@@ -503,8 +504,6 @@ watch(
       const parentCollection =
         c.parentCollection || extractCollection(newParents[c.fieldKey]);
       if (!parentCollection) continue;
-      console.log("parentCollection", parentCollection);
-      console.log("newId", newId);
 
       // Fetch FK value from parent record
       const parentRecord = await fetchParentRecord(parentCollection, newId, [
