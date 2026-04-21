@@ -8,7 +8,7 @@
  * Usage:
  *   node scripts/import-csv.js destinations_cluster
  *   node scripts/import-csv.js destinations
- *   node scripts/import-csv.js countries_geo
+ *   node scripts/import-csv.js countries
  *   ... (etc.)
  *
  * Requirements: Node.js >= 18 (uses built-in fetch)
@@ -26,10 +26,8 @@
 const fs = require("fs");
 
 const CONFIG = {
-  // directusUrl: "http://localhost:8055",
-  // directusToken: "x9BhgTAKg_fRO3Dd2obJMYCd4o2Rumh3",
-  directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
-  directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
+  directusUrl: "http://localhost:8055",
+  directusToken: "bn5wXhoMyyTXaxElVChZBsiCbmSH66Fl",
 };
 
 // =============================================================================
@@ -93,11 +91,11 @@ const PROFILES = {
     clearBeforeImport: false,
   },
 
-  countries_geo: {
+  countries: {
     csvFile: "./geographies list/countries_26-04-10.csv",
-    collection: "countries_geo",
-    translationsCollection: "countries_geo_translations",
-    parentFkField: "countries_geo_id",
+    collection: "countries",
+    translationsCollection: "countries_translations",
+    parentFkField: "countries_id",
     localeFkField: "translations_id",
 
     mainFields: {
@@ -130,15 +128,16 @@ const PROFILES = {
     clearBeforeImport: false,
   },
 
-  regions_geo: {
+  regions: {
     csvFile: "./geographies list/regions_26-04-10.csv",
-    collection: "regions_geo",
-    translationsCollection: "regions_geo_translations",
-    parentFkField: "regions_geo_id",
+    collection: "regions",
+    translationsCollection: "regions_translations",
+    parentFkField: "regions_id",
     localeFkField: "translations_id",
 
     mainFields: {
       id: "id",
+      country_id: "country_id",
       cid_primarix: "cid_primarix",
       id_primarix: "id_primarix",
     },
@@ -171,14 +170,14 @@ const PROFILES = {
 
     mainFields: {
       id: "id",
-      ISO: "ISO",
       country_id: "country_id",
+      ISO: "ISO",
     },
 
     foreignKeys: {
       country_id: {
         csvColumn: "country_id",
-        targetCollection: "countries_geo",
+        targetCollection: "countries",
         targetField: "sort",
         directusField: "country_id",
         optional: false,
@@ -204,6 +203,10 @@ const PROFILES = {
 
     mainFields: {
       id: "id",
+      location_tour32: "location_tour32",
+      country_id: "country_id",
+      state_id: "state_id",
+      region_id: "region_id",
       cid_primarix: "cid_primarix",
       id_primarix: "id_primarix",
     },
@@ -218,7 +221,7 @@ const PROFILES = {
       },
       country_id: {
         csvColumn: "country_id",
-        targetCollection: "countries_geo",
+        targetCollection: "countries",
         targetField: "id",
         directusField: "country_id",
         optional: false,
@@ -232,7 +235,7 @@ const PROFILES = {
       },
       region_id: {
         csvColumn: "region_id",
-        targetCollection: "regions_geo",
+        targetCollection: "regions",
         targetField: "id",
         directusField: "region_id",
         optional: true,

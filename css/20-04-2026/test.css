@@ -1,0 +1,1187 @@
+/* ============================================================
+   GLOBAL COLOR VARIABLES
+   ============================================================ */
+:root {
+  /* Brand / Accent */
+  --color-accent: #3399ff;
+  --color-accent-hover: #3399ff;
+
+  /* Neutrals */
+  --color-white: #ffffff;
+  --color-bg-page: #f8fafc;
+  --color-bg-surface: #f3f4f6;
+
+  /* Text */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+
+  /* Borders */
+  --color-border-default: #e5e7eb;
+  --color-border-light: #f1f5f9;
+
+  /* Icon / Module Bar */
+  --color-icon-muted: #555962;
+
+  /* Status Indicators */
+  --color-dot-default: #1f2937;
+  --color-badge-bg: #1f2937;
+  --color-revision-dot: #1f2937;
+
+  /* Stroke / SVG */
+  --color-stroke-progress: #000000;
+  --color-stroke-hover: #ffffff;
+
+  /* Sidebar */
+  --color-sidebar-scroll-bg: #f8fafc;
+}
+
+/* ============================================================
+   FONT IMPORT
+   ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..200");
+
+/* ============================================================
+   ICON OVERRIDES
+   ============================================================ */
+#app .v-icon i {
+  font-family: "Material Symbols Outlined" !important;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 300,
+    "GRAD" -25,
+    "opsz" 24 !important;
+  font-weight: 200 !important;
+}
+#app .v-icon i::after {
+  font-variation-settings: inherit !important;
+  font-weight: inherit !important;
+}
+
+/* ============================================================
+   PUBLIC VIEW / LOGO
+   ============================================================ */
+.public-view .logo img {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.module-bar-logo {
+  padding: 0px !important;
+}
+
+.module-bar-logo .custom-logo {
+  inline-size: 100% !important;
+  block-size: auto !important;
+}
+
+/* ============================================================
+   MODULE BAR
+   ============================================================ */
+.module-bar .v-icon {
+  color: var(--color-icon-muted) !important;
+}
+
+.module-bar .v-button {
+  margin-bottom: 5px;
+}
+
+/* ============================================================
+   HEADER BAR
+   ============================================================ */
+.header-bar {
+  background-color: var(--color-bg-page) !important;
+  box-shadow: none !important;
+  margin: 10px 0 !important;
+  border: none !important;
+}
+
+.header-bar::before {
+  background-color: transparent !important;
+}
+
+.header-bar:not(.small):before {
+  background-color: transparent !important;
+}
+
+/* ============================================================
+   CONTENT NAVIGATION
+   ============================================================ */
+.content-navigation .v-icon {
+  color: var(--color-icon-muted) !important;
+}
+
+.content-navigation .link {
+  color: var(--color-icon-muted) !important;
+}
+
+.v-list-item.link .label {
+  color: var(--color-icon-muted) !important;
+}
+
+.v-list-item.link .v-icon {
+  color: var(--color-icon-muted) !important;
+}
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+#main-content {
+  background-color: var(--color-bg-page) !important;
+}
+
+#main-content .content {
+  display: flex;
+  flex-direction: row;
+}
+
+[data-v-79b23505] .content {
+  display: flex;
+  flex-direction: column !important;
+}
+
+.table-header .cell .content {
+  justify-content: space-around !important;
+}
+
+.header-bar .title-container {
+  padding: 30px 0px !important;
+}
+
+.private-view #main-content .content-wrapper,
+.private-view #main-content main {
+  display: block !important;
+}
+
+/* ============================================================
+   FORMS
+   ============================================================ */
+.v-form > div {
+  background-color: var(--color-white) !important;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+input: {
+  border-radius: 8px !important;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+#main-content main .button {
+  border-color: var(--color-accent) !important;
+  background-color: var(--color-white) !important;
+  color: var(--color-accent) !important;
+}
+
+#main-content main .button:hover {
+  background-color: var(--color-accent) !important;
+  color: var(--color-white) !important;
+}
+
+.button {
+  border-radius: 8px !important;
+}
+
+.content .button:not(:disabled) {
+  border-color: var(--color-accent) !important;
+  background-color: var(--color-white) !important;
+  color: var(--color-accent) !important;
+}
+
+.content .button:not(:disabled):hover {
+  background-color: var(--color-accent) !important;
+  color: var(--color-white) !important;
+}
+
+.header-bar .actions .button {
+  border-width: 1px !important;
+  border-radius: 8px !important;
+  border-color: var(--color-border-default) !important;
+  background-color: var(--color-white) !important;
+  color: var(--color-text-primary) !important;
+  inline-size: 38px;
+  block-size: 38px;
+}
+
+.header-bar .actions .button:hover {
+  background-color: var(--color-text-primary) !important;
+  color: var(--color-white) !important;
+}
+
+.prepend {
+  background-color: inherit;
+}
+
+.header-bar .title-outer-prepend .button {
+  border-width: 1px !important;
+  border-radius: 10px !important;
+  border-color: var(--color-border-default) !important;
+  background-color: var(--color-white) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.button {
+  border-width: 1px !important;
+}
+
+/* ============================================================
+   PROGRESS / CIRCLE
+   ============================================================ */
+.circle-path {
+  color: var(--color-stroke-progress) !important;
+  border-color: var(--color-border-default) !important;
+}
+
+.circle-background {
+  color: var(--color-stroke-progress) !important;
+  border-color: var(--color-border-default) !important;
+}
+
+.v-progress-circular {
+  color: var(--color-stroke-progress) !important;
+  border-color: var(--color-border-default) !important;
+}
+
+.circle {
+  color: var(--color-stroke-progress) !important;
+  border-color: var(--color-border-default) !important;
+}
+
+.indeterminate {
+  color: var(--color-stroke-progress) !important;
+  border-color: var(--color-border-default) !important;
+}
+
+.v-progress-circular .circle-path[data-v-a45a93ed] {
+  stroke: var(--color-stroke-progress) !important;
+}
+
+button:hover .v-progress-circular .circle-path[data-v-a45a93ed] {
+  stroke: var(--color-stroke-hover) !important;
+}
+
+/* ============================================================
+   FANCY SELECT / FIELD LABELS
+   ============================================================ */
+.v-fancy-select-option {
+  background-color: transparent !important;
+  color: var(--color-text-secondary) !important;
+}
+
+.field .label .label-inner {
+  color: var(--color-text-secondary) !important;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+table {
+  background-color: var(--color-white) !important;
+}
+
+.table-row:hover .cell {
+  background-color: var(--color-white) !important;
+}
+
+/* ============================================================
+   PRIVATE VIEW / LAYOUT
+   ============================================================ */
+.v-form.with-fill {
+  grid-template-columns: [start] minmax(0, 1fr) [half] minmax(0, 1fr) [full] !important;
+}
+
+.private-view {
+  background-color: var(--color-bg-page) !important;
+}
+
+#main-content .content-wrapper {
+  padding-inline: 10px !important;
+}
+
+@media only screen and (min-width: 600px) {
+  #main-content .content-wrapper {
+    padding-inline: 32px !important;
+  }
+}
+
+@media only screen and (min-width: 1512px) {
+  .private-view #main-content .header-bar,
+  #main-content .content-wrapper {
+    padding-inline: 80px !important;
+  }
+}
+
+.private-view #main-content .header-bar {
+  margin: 40px 0px 32px !important;
+}
+
+#main-content .content-wrapper table[data-v-fb2625e4] {
+  margin: 0 !important;
+  min-inline-size: 100% !important;
+}
+
+#main-content .content-wrapper main > .v-form {
+  padding-inline: 0px;
+  padding-top: 0px;
+}
+
+#main-content .content-wrapper .settings[data-v-9513f06e] {
+  padding-top: 0;
+  padding-inline: 0;
+}
+
+/* ============================================================
+   V-FORM INPUT FIELDS
+   ============================================================ */
+.content-wrapper .v-form .field .v-input .input {
+  padding: 0px !important;
+  border-color: var(--color-border-default);
+}
+
+.content-wrapper .v-form .field .v-input .input input::placeholder,
+.content-wrapper .v-form .field .v-input .input input {
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.005em;
+}
+
+/* ============================================================
+   MENU / DROPDOWN
+   ============================================================ */
+#menu-outlet .v-menu-popper.active .v-menu-content .item-text,
+.v-form .field .v-list-item .placeholder {
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.005em;
+}
+
+.v-form .field .v-list-item {
+  padding: 10px 12px;
+}
+
+#menu-outlet .v-menu-popper.active .v-menu-content .v-list-item-icon {
+  margin-left: 10px;
+  margin-right: 0px;
+}
+
+.content-wrapper .v-form .field .v-input .input .prepend {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+.content-wrapper .v-form .field .v-input .input .append {
+  margin-left: 0;
+  margin-right: 10px;
+}
+
+.content-wrapper .v-form .field .v-input .input .append .v-icon i,
+.content-wrapper .v-form .field .v-input .input .prepend .v-icon i,
+#menu-outlet .v-menu-popper.active .v-menu-content .v-icon i {
+  font-size: 20px;
+}
+
+.content-wrapper .v-form .field .v-input .input .append .v-icon,
+.content-wrapper .v-form .field .v-input .input .prepend .v-icon,
+#menu-outlet .v-menu-popper.active .v-menu-content .v-icon {
+  color: var(--color-text-secondary) !important;
+  inline-size: 20px;
+  min-inline-size: 20px;
+  block-size: 20px;
+}
+
+#menu-outlet .v-menu-popper.active .v-menu-content {
+  background: var(--color-white);
+  border: 1px solid var(--color-border-default);
+  border-radius: 4px;
+  padding: 0;
+  box-shadow: 0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+#menu-outlet .v-menu-popper.active .v-menu-content .v-list-item {
+  margin: 0;
+  padding: 0;
+}
+
+#menu-outlet .v-menu-popper.active .v-menu-content .v-list-item-content {
+  padding: 10px 12px;
+}
+
+#menu-outlet .v-menu-popper.active .v-menu-content .v-list-item.active,
+#menu-outlet .v-menu-popper.active .v-menu-content .v-list-item:hover {
+  background: var(--color-bg-page) !important;
+}
+
+#menu-outlet .v-menu-popper.active .v-menu-content .v-list {
+  padding: 0;
+}
+
+.content .actions .action-buttons[data-v-fa2fd988] > *:not(:last-child) {
+  margin-inline-end: 10px;
+}
+
+.content-wrapper .v-form .field .v-input {
+  block-size: 37px;
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+#sidebar .sidebar-detail-group .sidebar-detail .v-icon,
+#sidebar .sidebar-detail-group .sidebar-detail .title,
+.module-nav-content .content-navigation .v-list-item .v-text-overflow {
+  color: var(--color-text-primary);
+}
+
+.module-nav-content .v-list-item .v-text-overflow {
+  color: var(--color-text-primary) !important;
+}
+
+#sidebar .sidebar-detail-group .sidebar-detail .title,
+.module-nav-content .v-list-item .v-text-overflow,
+#sidebar .notifications-preview .sidebar-button .title {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.005em;
+  font-weight: 400;
+}
+
+#sidebar .sidebar-detail-group .sidebar-detail .scroll-container {
+  background-color: var(--color-sidebar-scroll-bg);
+}
+
+.module-nav-content .content-navigation .v-list-item.active,
+.module-nav-content .content-navigation .v-list-item:hover,
+.module-nav-content
+  .content-navigation
+  .v-list.nav.dense
+  .v-list-item:not(.dense) {
+  background-color: var(--color-bg-surface) !important;
+  border-radius: 8px !important;
+}
+
+.module-nav-content .v-list-item .v-icon,
+.private-view #navigation .module-bar .v-icon,
+.header-bar .title-container .bookmark-controls button.v-icon,
+.content-wrapper .v-table button.v-icon,
+.content-wrapper .v-table button.v-checkbox {
+  color: var(--color-text-primary) !important;
+}
+
+.content-wrapper .v-table .v-icon *,
+.content-wrapper .v-table .v-checkbox * {
+  color: var(--color-text-primary) !important;
+}
+
+.module-nav-content .content-navigation .v-list-item {
+  padding-block: 6px !important;
+}
+
+.private-view #navigation .module-nav {
+  inline-size: 300px !important;
+}
+
+.module-nav-content .content-navigation .items .v-list-item .v-text-overflow {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.content .v-list-item.block {
+  padding: 5px 12px !important;
+}
+
+.content div[data-field="partner_id_filter"] .v-list-item.block span.value {
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.005em;
+}
+
+/* ============================================================
+   BREADCRUMB / TITLE
+   ============================================================ */
+.title-container .v-breadcrumb .section-link {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-text-secondary) !important;
+  font-weight: 400;
+  margin-bottom: 4px;
+  letter-spacing: 0.005em;
+}
+
+.content .header-bar .title-container[data-v-3a7af4ee] {
+  margin-inline-start: 16px;
+  max-inline-size: 100%;
+  margin-top: 14px;
+}
+
+.content .header-bar.collapsed .title-container {
+  margin-top: 0 !important;
+}
+
+.header-bar .title-container .bookmark-controls {
+  margin-left: -14px;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   TABLE CELLS / FIELD LABELS
+   ============================================================ */
+.content-wrapper .v-table .table-row .cell,
+.v-form .field .field-label .v-text-overflow {
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+
+.v-form .field .field-label {
+  margin-bottom: 4px;
+}
+
+.content-wrapper .v-table tbody .table-row,
+.content-wrapper .v-table .table-header .cell {
+  block-size: 42px;
+}
+
+/* ============================================================
+   SEARCH INPUT
+   ============================================================ */
+.header-bar .action-buttons .search-input.show-filter {
+  inline-size: max-content;
+  background: transparent;
+  border: none;
+  min-block-size: auto;
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+.header-bar .action-buttons .search-input.show-filter button.v-icon {
+  border-radius: 8px !important;
+  border: 1px solid var(--color-border-default) !important;
+  background-color: var(--color-white) !important;
+  color: var(--color-text-primary) !important;
+  inline-size: 38px;
+  block-size: 38px;
+  margin: 0;
+}
+
+.header-bar
+  .action-buttons
+  .search-input.show-filter
+  button.v-icon.icon-search {
+  margin-right: 2px;
+}
+
+.header-bar .action-buttons .search-input.show-filter .v-icon {
+  color: var(--color-text-primary) !important;
+}
+
+.header-bar .action-buttons .search-input.active input {
+  inline-size: 200px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.005em;
+}
+
+@media only screen and (max-width: 767px) {
+  .v-drawer .header-bar .action-buttons .search-input.active input {
+    inline-size: 100px;
+  }
+}
+
+/* ============================================================
+   ITEM COUNT / TABLE HEADERS
+   ============================================================ */
+.content .header-bar .item-count {
+  margin: 0 10px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.005em;
+  font-weight: 400;
+}
+
+.content-wrapper .v-table th.cell {
+  block-size: 40px;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.005em;
+  font-weight: 500;
+}
+
+.content-wrapper .v-table th.cell span.name {
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ============================================================
+   LAYOUT LIST
+   ============================================================ */
+.v-form .layout-list button.v-list-item {
+  block-size: 37px;
+  padding: 10px 12px;
+}
+
+.v-form .layout-list button.v-list-item .render-template {
+  block-size: auto;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.005em;
+}
+
+.v-form .layout-list button.v-list-item .render-template * {
+  vertical-align: top;
+}
+
+/* ============================================================
+   LIST ITEMS
+   ============================================================ */
+.content .v-list-item.block {
+  block-size: 37px !important;
+}
+
+.results .v-list-item.block {
+  block-size: auto !important;
+}
+
+.draggable-list .v-list-item.block {
+  block-size: 42px !important;
+}
+
+.system-modules .v-list-item.block {
+  block-size: 45px !important;
+}
+
+.content .v-notice {
+  padding: 5px 16px !important;
+  min-block-size: 35px !important;
+}
+
+.content .label .field-name {
+  font-size: 18px !important;
+}
+
+/* ============================================================
+   SVG / ICONS
+   ============================================================ */
+svg {
+  transform: scale(0.95);
+  shape-rendering: geometricPrecision;
+}
+
+.modules .x-large svg path {
+  fill: black;
+  stroke: var(--color-white);
+  stroke-width: 0.8px;
+  stroke-linejoin: round;
+}
+
+.sign-out .x-large svg path {
+  stroke-width: 0.8px;
+  stroke: var(--color-white);
+}
+
+/* ============================================================
+   TABLE RESIZE HANDLE
+   ============================================================ */
+.v-table .table-header .resize-handle::after {
+  display: none !important;
+}
+
+/* ============================================================
+   GROUP RAW / ACCORDION SECTIONS
+   ============================================================ */
+.content-wrapper .v-form .group-raw.full,
+.content-wrapper .v-form .group-raw.full.first-visible-field {
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-default);
+}
+
+.content-wrapper .v-form .group-raw .group-accordion .accordion-section {
+  padding: 30px 40px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-default);
+}
+
+@media only screen and (max-width: 1024px) {
+  .content-wrapper .v-form .group-raw.full,
+  .content-wrapper .v-form .group-raw.full.first-visible-field,
+  .content-wrapper .v-form .group-raw .group-accordion .accordion-section,
+  .content-wrapper
+    .v-form
+    .group-raw
+    .group-accordion
+    .accordion-section:has(.active) {
+    padding: 20px;
+  }
+}
+
+.content-wrapper .v-form .group-raw .group-accordion .accordion-section {
+  background: var(--color-white) !important;
+  margin-bottom: 32px;
+}
+
+.content-wrapper
+  .v-form
+  .group-raw
+  .group-accordion
+  .accordion-section:last-child {
+  margin-bottom: 0;
+}
+
+.group-raw .v-form .group-accordion .accordion-section button.label {
+  margin-block: 0;
+  position: relative;
+}
+
+.group-raw .v-form .group-accordion .accordion-section button.label::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translateY(-50%);
+  background-image: url("data:image/svg+xml,%3Csvg width='22px' height='22px' viewBox='0 0 0.412 0.412' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M0.22 0.076a0.014 0.014 0 0 0 -0.028 0V0.193H0.076a0.014 0.014 0 0 0 0 0.028H0.193v0.117a0.014 0.014 0 0 0 0.028 0V0.22h0.117a0.014 0.014 0 0 0 0 -0.028H0.22z' fill='%231F2937'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+@media only screen and (max-width: 1024px) {
+  .group-raw .v-form .group-accordion .accordion-section button.label::after {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.group-raw
+  .v-form
+  .group-accordion
+  .accordion-section
+  button.label.active::after {
+  top: 30%;
+  background-image: url("data:image/svg+xml,%3Csvg width='22px' height='22px' viewBox='0 0 0.55 0.55' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%231F2937' d='M0.019 0.286A0.019 0.019 0 0 1 0.019 0.247h0.512a0.019 0.019 0 0 1 0 0.038z'/%3E%3C/svg%3E");
+}
+
+.group-raw .v-form .group-accordion .accordion-section button.active {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.group-raw .v-form .group-accordion .accordion-section button.label .v-icon {
+  display: none;
+}
+
+.group-raw
+  .v-form
+  .group-accordion
+  .accordion-section
+  button.label
+  .field-name {
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--color-text-primary);
+  letter-spacing: 0.005em;
+}
+
+.group-raw .v-form .group-accordion .accordion-section .fields {
+  margin-top: 20px !important;
+  margin-bottom: 0px !important;
+}
+
+.content-wrapper .v-form .group-raw.full .group-raw,
+.content-wrapper .v-form .group-raw.full:has(.group-accordion) {
+  padding: 0;
+  border-radius: 0;
+  border: none;
+}
+
+.content-wrapper .v-form .group-raw.full:has(.group-accordion),
+.content-wrapper .v-form .v-item-group.group-accordion {
+  background: transparent !important;
+}
+
+.content-wrapper .v-form .group-raw.full .field,
+.content-wrapper .v-form .v-item-group.group-accordion {
+  padding: 0;
+}
+
+.content-wrapper .group-raw .v-form.grid {
+  gap: 20px;
+}
+
+/* ============================================================
+   TABLE COLOR DOT
+   ============================================================ */
+.v-table .color-dot .dot {
+  background-color: var(--color-dot-default) !important;
+}
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+.content-wrapper .v-form .group-raw.full .field .v-divider {
+  margin: 0;
+  --v-divider-color: transparent;
+}
+
+/* ============================================================
+   SIDEBAR SIZING
+   ============================================================ */
+.private-view #sidebar.is-open[data-v-9704d1ea] {
+  flex-basis: 300px !important;
+  inline-size: 300px !important;
+  border-color: var(--color-border-default) !important;
+}
+
+.private-view #sidebar .flex-container {
+  inline-size: 100% !important;
+}
+
+.private-view #sidebar[data-v-9704d1ea]:not(.is-open) {
+  flex-basis: 78px !important;
+  border-color: var(--color-border-default) !important;
+  transform: translate(
+    calc(100% - 78px - var(--theme--sidebar--border-width))
+  ) !important;
+}
+
+#sidebar .sidebar-detail .toggle {
+  block-size: 64px;
+  border-color: var(--color-border-default);
+}
+
+#sidebar .sidebar-detail-group .sidebar-detail:not(.open) .toggle {
+  block-size: 60px;
+}
+
+#sidebar
+  .sidebar-detail-group
+  .sidebar-detail:not(.open):first-child
+  .toggle:not(.open) {
+  block-size: 78px;
+}
+
+#sidebar .sidebar-detail-group .sidebar-detail .close {
+  inline-size: 64px;
+  block-size: 64px;
+}
+
+#sidebar .sidebar-detail:not(.open) .toggle:not(.open) .icon,
+#sidebar:not(.is-open) .notifications-preview .sidebar-button .icon {
+  inline-size: 78px;
+}
+
+#sidebar .sidebar-detail:not(.open) .toggle .icon:has(.expand-icon) {
+  display: none;
+}
+
+#sidebar .sidebar-detail .scroll-container > .content {
+  padding: 10px;
+}
+
+#sidebar .sidebar-detail .content .v-input input {
+  padding: 0;
+}
+
+#sidebar .sidebar-detail .content .v-input {
+  block-size: 37px;
+}
+
+#sidebar .sidebar-detail .content .v-input .input {
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 17px;
+  letter-spacing: 0.005em;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+#sidebar .sidebar-detail .content .empty {
+  margin-top: 0;
+}
+
+.sidebar-detail .v-menu .v-template-input.multiline {
+  margin-bottom: 10px;
+}
+
+.sidebar-detail .scroll-container .layout-options,
+.sidebar-detail .scroll-container .content .fields {
+  row-gap: 10px;
+}
+
+#sidebar
+  .sidebar-detail-group
+  .sidebar-detail:not(.open):first-child
+  .v-icon
+  i {
+  display: none;
+}
+
+#sidebar .sidebar-detail-group .sidebar-detail:not(.open):first-child .v-icon {
+  position: relative;
+  inline-size: 16px;
+  min-inline-size: 16px;
+  block-size: 16px;
+}
+
+#sidebar .sidebar-detail-group .sidebar-detail:not(.open):first-child .v-badge {
+  padding: 11px;
+  line-height: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-default);
+}
+
+#sidebar
+  .sidebar-detail-group
+  .sidebar-detail:not(.open):first-child
+  .v-icon::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%236B7280' style='transform:rotate(180deg)' width='24px' height='24px' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M7.22 14.47L9.69 12 7.22 9.53a.75.75 0 111.06-1.06l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 01-1.06-1.06z'/%3E%3Cpath fill-rule='evenodd' d='M3.75 2A1.75 1.75 0 002 3.75v16.5c0 .966.784 1.75 1.75 1.75h16.5A1.75 1.75 0 0022 20.25V3.75A1.75 1.75 0 0020.25 2H3.75zM3.5 3.75a.25.25 0 01.25-.25H15v17H3.75a.25.25 0 01-.25-.25V3.75zm13 16.75v-17h3.75a.25.25 0 01.25.25v16.5a.25.25 0 01-.25.25H16.5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+#sidebar .sidebar-detail .content .v-list-item-icon .preview {
+  margin-inline-start: -12px;
+}
+
+.sidebar-detail .content .page-description p,
+.sidebar-detail .content .revisions-date-group .content *,
+.sidebar-detail .content .revisions-date-group .type-text {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.005em;
+  color: var(--color-text-primary);
+  font-weight: 400;
+}
+
+/* ============================================================
+   NAVIGATION MODULE BAR ACTIVE STATE
+   ============================================================ */
+#navigation .module-bar .router-link-active,
+#navigation .modules .v-button .button:hover {
+  border-radius: 0px !important;
+  background: var(--color-bg-surface) !important;
+}
+
+/* ============================================================
+   SIDEBAR NOTIFICATIONS / BADGES
+   ============================================================ */
+#sidebar .field .download-local,
+#sidebar .notifications-preview .sidebar-button * {
+  color: var(--color-text-primary);
+}
+
+#sidebar .notifications-preview .sidebar-button.active {
+  background: var(--color-bg-page);
+}
+
+#sidebar .v-badge .badge {
+  background: var(--color-badge-bg);
+}
+
+#sidebar .revision-item .header .dot {
+  background: var(--color-revision-dot);
+  inset-block-start: 4px;
+}
+
+/* ============================================================
+   V-MENU TEMPLATE INPUT
+   ============================================================ */
+.v-menu .v-template-input.multiline {
+  padding: 10px 12px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 17px;
+  letter-spacing: 0.005em;
+  font-weight: 400;
+}
+
+/* ============================================================
+   NAV ITEMS VERTICAL LINE
+   ============================================================ */
+.content-navigation .items .v-list-item-icon {
+  margin-block: 0 !important;
+}
+
+#navigation .module-nav-content .items {
+  padding-inline-start: 30px;
+  position: relative;
+}
+
+#navigation .module-nav-content .items::after {
+  content: "";
+  height: 100%;
+  width: 2px;
+  background: var(--color-border-default);
+  display: block;
+  position: absolute;
+  left: 20px;
+  top: 0;
+}
+
+/* ============================================================
+   RADIO BUTTONS
+   ============================================================ */
+.sidebar-detail .content .v-radio .label {
+  font-size: 14px;
+  line-height: 17px;
+  letter-spacing: 0.005em;
+  font-weight: 400;
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+   TABLE DESCRIPTION DOT
+   ============================================================ */
+.v-table th .description-dot {
+  background: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+
+/* ============================================================
+   ACCORDION SECTION CONTROLS
+   ============================================================ */
+.content-wrapper .accordion-section .v-menu .toggle {
+  block-size: 37px;
+  padding: 10px 12px;
+}
+
+.content-wrapper .accordion-section .radio-buttons .v-radio {
+  block-size: 37px;
+}
+
+.content-wrapper .accordion-section .radio-buttons .v-radio .v-icon {
+  inline-size: 20px;
+  min-inline-size: 20px;
+  block-size: 20px;
+}
+
+.content-wrapper .accordion-section .radio-buttons .v-radio .v-icon i {
+  font-size: 20px;
+}
+
+/* ============================================================
+   MISC LIST ITEMS
+   ============================================================ */
+li.v-list-item.grow.block.list-item {
+  height: auto !important;
+  block-size: auto !important;
+}
+
+.preview {
+  height: auto !important;
+}
+
+.permissions-list {
+  width: 50vw;
+}
+
+/* ============================================================
+   MAIN SPLIT VIEW
+   ============================================================ */
+.main-split .sp-start .scrolling-container .header-bar .actions {
+  margin-right: 20px;
+}
+
+@media only screen and (min-width: 600px) {
+  .main-split .sp-start .scrolling-container .main-content-container {
+    padding-inline: 32px !important;
+  }
+}
+
+@media only screen and (min-width: 1512px) {
+  .main-split .sp-start .scrolling-container .main-content-container {
+    padding-inline: 80px !important;
+  }
+}
+
+.main-split
+  .sp-start
+  .scrolling-container
+  .main-content-container
+  .layout-tabular
+  .v-table[data-v-e58a9696]
+  > table {
+  margin-inline-start: 0px !important;
+}
+
+.main-split
+  .sp-start
+  .scrolling-container
+  .header-bar
+  .primary
+  .title-outer-prepend
+  .icon {
+  border-width: 1px !important;
+  border-radius: 10px !important;
+  border-color: var(--color-border-default) !important;
+  background-color: var(--color-white) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border-light) !important;
+  height: 44px !important;
+  width: 44px !important;
+}
+
+.main-split
+  .sp-start
+  .scrolling-container
+  .header-bar
+  .primary
+  .title-outer-prepend
+  .icon
+  .v-icon {
+  --v-icon-size: 1.5rem !important;
+}
+
+.main-split
+  .sp-start
+  .scrolling-container
+  .header-bar
+  .primary
+  .title-outer-append
+  .bookmark-controls
+  .v-dialog
+  .v-icon.small {
+  --v-icon-size: 1.5rem !important;
+}
+
+.main-split
+  .sp-start
+  .scrolling-container
+  .header-bar
+  .primary
+  .title-container
+  .headline
+  .v-breadcrumb
+  section
+  .section-link {
+  font-size: 12px !important;
+}
+
+.main-split
+  .sp-start
+  .scrolling-container
+  .header-bar
+  .primary
+  .title-container
+  .title
+  .type-title {
+  font-size: 22px !important;
+}

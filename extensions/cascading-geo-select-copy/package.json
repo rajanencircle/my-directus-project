@@ -1,5 +1,5 @@
 {
-  "name": "cascading-geo-select",
+  "name": "cascading-geo-select-copy",
   "version": "1.1.8",
   "description": "Cascading geography selector interface for Directus",
   "keywords": [
@@ -11,7 +11,7 @@
     "type": "interface",
     "path": "dist/index.js",
     "source": "src/index.ts",
-    "host": "*"
+    "host": "^10.0.0"
   },
   "scripts": {
     "build": "directus-extension build",
