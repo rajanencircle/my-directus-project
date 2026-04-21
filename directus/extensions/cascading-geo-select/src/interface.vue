@@ -43,7 +43,7 @@
           <v-icon name="filter_alt" x-small />
           {{ filterHint }}
         </div>
-        <div v-if="loading && !searchText" class="dropdown-item loading">
+        <div v-if="loading && searchText" class="dropdown-item loading">
           <v-progress-circular x-small indeterminate />
           Loading...
         </div>
@@ -58,7 +58,7 @@
             {{ item.label }}
           </div>
         </template>
-        <div v-else class="dropdown-item empty">No results found</div>
+        <div v-else-if="searchText && !loading" class="dropdown-item empty">No results found</div>
       </div>
     </div>
   </div>
