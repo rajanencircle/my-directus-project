@@ -17,14 +17,12 @@
           <v-icon
             v-if="selectedItem"
             name="close"
-            small
             clickable
             @click.stop="onClear"
           />
           <v-icon
             v-else-if="!disabled"
             name="add"
-            small
             clickable
             @click.stop="openDrawer"
           />
@@ -34,7 +32,7 @@
       <drawer-item
         v-if="drawerOpen"
         :active="drawerOpen"
-        :collection="collection"
+        :collection="target_collection"
         primary-key="+"
         @update:active="closeDrawer"
         @input="onDrawerInput"
@@ -45,7 +43,7 @@
           <v-icon name="filter_alt" x-small />
           {{ filterHint }}
         </div>
-        <div v-if="loading" class="dropdown-item loading">
+        <div v-if="loading && !searchText" class="dropdown-item loading">
           <v-progress-circular x-small indeterminate />
           Loading...
         </div>
@@ -436,6 +434,7 @@ function onSelect(item: DropdownItem) {
 }
 
 function onClear() {
+  console.log("onClear");
   clearSelf();
 }
 
@@ -447,31 +446,83 @@ function closeDrawer() {
   drawerOpen.value = false;
 }
 
+// ─── Path traversal (for displayField on new entries) ────────────────────────
+
+/**
+ * Walk a dot-notation path through an object that may contain arrays
+ * (e.g. translations relations). Arrays are resolved by matching
+ * `languages_code` to the configured languageCode, falling back to [0].
+ *
+ * Example: extractFromPath({ translations: [{ name: "Paris", languages_code: "en-GB" }] }, "translations.name")
+ *   → "Paris"
+ */
+function extractFromPath(
+  obj: Record<string, unknown>,
+  path: string,
+): string | null {
+  const parts = path.split(".");
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current == null) return null;
+
+    // Directus relation delta format: { create: [...], update: [...], delete: [...] }
+    // Flatten to the create array so we can treat it like a normal array.
+    if (
+      !Array.isArray(current) &&
+      typeof current === "object" &&
+      Array.isArray((current as Record<string, unknown>).create)
+    ) {
+      current = (current as Record<string, unknown>).create;
+    }
+
+    if (Array.isArray(current)) {
+      const arr = current as Record<string, unknown>[];
+      // Match by languages_code OR translations_id (Directus uses both depending on setup)
+      const match =
+        arr.find(
+          (item) =>
+            item.languages_code === props.languageCode ||
+            item.translations_id === props.languageCode,
+        ) ?? arr[0];
+      current = match?.[part];
+    } else {
+      current = (current as Record<string, unknown>)[part];
+    }
+  }
+  return current != null ? String(current) : null;
+}
+
 async function onDrawerInput(val: Record<string, unknown>) {
-  console.log("onDrawerInput", val);
   if (!val) return;
-  drawerOpen.value = false;
   try {
     let id: string;
     let itemData: Record<string, unknown>;
 
     if (val.id) {
+      // Existing item (shouldn't happen with primary-key="+" but handle gracefully)
       id = String(val.id);
       itemData = val;
     } else {
+      // DrawerItem returns edits only — save to DB ourselves
       const response = await api.post(`/items/${props.target_collection}`, val);
       itemData = response.data?.data ?? {};
       id = String(itemData.id);
     }
 
     if (!id) return;
-    onSelect({ id, label: extractLabel(itemData) });
+
+    // Match copy version's robust label extraction: try drawer form data first, then saved record
+    const label =
+      extractFromPath(val, props.labelField) ?? extractLabel(itemData) ?? id;
+
+    onSelect({ id, label });
   } catch (e) {
     console.error(
       `[cascading-geo-select] Error creating item in ${props.target_collection}:`,
       e,
     );
   }
+  drawerOpen.value = false;
 }
 
 // ─── Cascade watching ─────────────────────────────────────────────────────────

@@ -30,8 +30,9 @@ export default {
   description:
     "Single-field autocomplete with cascade auto-fill and parent-scoped filtering. Add one instance per M2O field; wire fields together via cascadeFrom and filterBy.",
   component: InterfaceComponent,
-  types: ["string", "uuid", "json"],
-  relational: false,
+  types: ["string", "uuid", "json", "integer"],
+  relational: true,
+  localTypes: ["m2o"],
   useValues: true,
   options: [
     {
