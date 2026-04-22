@@ -2,13 +2,13 @@
 // CONFIGURATION
 // ------------------------------------------
 
-//local
+// // local
 // const env = {
 //   DIRECTUS_URL: "http://localhost:8055",
-//   DIRECTUS_TOKEN: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
+//   DIRECTUS_TOKEN: "bn5wXhoMyyTXaxElVChZBsiCbmSH66Fl",
 // };
 
-//staging
+// staging
 const env = {
   DIRECTUS_URL:
     "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
@@ -84,20 +84,16 @@ async function transformCollectionData(
         const transformedValue = transformFn(originalValue);
 
         // Only trigger an API update if the value actually changed
-        if (transformedValue !== originalValue) {
-          await directusRequest(
-            "PATCH",
-            `/items/${collectionName}/${item.id}`,
-            {
-              [updateFieldName]: transformedValue,
-            },
-          );
+        // if (transformedValue !== originalValue) {
+        await directusRequest("PATCH", `/items/${collectionName}/${item.id}`, {
+          [updateFieldName]: transformedValue,
+        });
 
-          console.log(
-            `[SUCCESS] Updated item ID ${item.id}: "${originalValue}" -> "${transformedValue}"`,
-          );
-          updatedCount++;
-        }
+        console.log(
+          `[SUCCESS] Updated item ID ${item.id}: "${originalValue}" -> "${transformedValue}"`,
+        );
+        updatedCount++;
+        // }
       }
     }
 
@@ -119,19 +115,20 @@ async function transformCollectionData(
 // Define your custom transformation function.
 // For your specific case: removes '#' symbols and capitalizes words.
 const myTransformFunction = (value) => {
-  if (typeof value !== "string") return value;
+  // if (typeof value !== "string") return value;
 
-  // 1. Remove all '#' symbols
-  let cleaned = value.replace(/--/g, "");
+  // // 1. Remove all '#' symbols
+  // let cleaned = value.replace(/--/g, "");
 
-  // Remove any leading/trailing whitespace just in case
-  return cleaned.trim();
+  // // Remove any leading/trailing whitespace just in case
+  // return cleaned.trim();
+  return parseInt(value) ?? null;
 };
 
 // Run the script
 transformCollectionData(
-  "regions", // Collection Name
-  "label", // Field to read from
-  "label", // Field to update (can be the same or different)
+  "hotels", // Collection Name
+  "oid", // Field to read from
+  "object_id", // Field to update (can be the same or different)
   myTransformFunction, // Your transformation function
 );
