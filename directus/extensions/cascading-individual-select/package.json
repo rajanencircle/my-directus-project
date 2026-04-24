@@ -1,6 +1,6 @@
 {
   "name": "cascading-individual-select",
-  "version": "1.1.11",
+  "version": "1.1.14",
   "description": "Cascading individual select interface for Directus",
   "keywords": [
     "directus",

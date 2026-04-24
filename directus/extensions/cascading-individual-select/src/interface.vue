@@ -248,8 +248,11 @@ function extractLabel(item: Record<string, unknown>): string {
     const translations =
       (item.translations as Array<Record<string, string>>) ?? [];
     const match =
-      translations.find((t) => t.translations_id === props.languageCode) ??
-      translations[0];
+      translations.find(
+        (t) =>
+          t.translations_id === props.languageCode ||
+          t.code === props.languageCode,
+      ) ?? translations[0];
     return match?.[parts[1]] ?? `[${item.id}]`;
   }
   let val: unknown = item;
@@ -262,13 +265,29 @@ function extractLabel(item: Record<string, unknown>): string {
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
+// function buildLabelFields(): string[] {
+//   const base = ["id"];
+//   const parts = (props.labelField ?? "translations.name").split(".");
+//   if (parts[0] === "translations") {
+//     base.push("translations.name", "translations.translations_id");
+//   } else {
+//     base.push(props.labelField ?? "name");
+//   }
+//   return base;
+// }
+
 function buildLabelFields(): string[] {
   const base = ["id"];
-  const parts = (props.labelField ?? "translations.name").split(".");
-  if (parts[0] === "translations") {
-    base.push("translations.name", "translations.translations_id");
+  const path = props.labelField ?? "translations.name";
+  const parts = path.split(".");
+  if (parts[0] === "translations" && parts[1]) {
+    base.push(
+      `${parts[0]}.${parts[1]}`,
+      `${parts[0]}.translations_id`,
+      `${parts[0]}.translations_id.code`,
+    );
   } else {
-    base.push(props.labelField ?? "name");
+    base.push(path);
   }
   return base;
 }
@@ -483,7 +502,7 @@ function extractFromPath(
       const match =
         arr.find(
           (item) =>
-            item.languages_code === props.languageCode ||
+            item.code === props.languageCode ||
             item.translations_id === props.languageCode,
         ) ?? arr[0];
       current = match?.[part];
@@ -571,6 +590,23 @@ watch(
       }
       if (selectedItem.value?.id === targetId) return;
 
+      // If the stored value already matches targetId the field hasn't changed —
+      // only sync the display label without emitting to avoid marking the item dirty on reload.
+      if (extractId(props.value) === targetId) {
+        if (!selectedItem.value) {
+          const targetRecord = await fetchById(
+            props.target_collection,
+            targetId,
+          );
+          if (targetRecord) {
+            const label = extractLabel(targetRecord);
+            selectedItem.value = { id: targetId, label };
+            searchText.value = label;
+          }
+        }
+        return;
+      }
+
       // Fetch target item to get its display label
       const targetRecord = await fetchById(props.target_collection, targetId);
       if (targetRecord) {
@@ -584,6 +620,38 @@ watch(
     }
   },
   { deep: true, immediate: false },
+);
+
+/**
+ * Watch the parent fields listed in filterBy.
+ * When a parent filter changes, the current value might become invalid in the new scope.
+ * Clear this field to force re-selection within the new parent context.
+ */
+watch(
+  () => {
+    const snapshot: Record<string, unknown> = {};
+    for (const f of parsedFilterBy.value) {
+      snapshot[f.fieldKey] = currentValues.value?.[f.fieldKey] ?? null;
+    }
+    return snapshot;
+  },
+  (newFilters, oldFilters) => {
+    if (!oldFilters) return;
+    for (const f of parsedFilterBy.value) {
+      const oldVal = extractId(oldFilters[f.fieldKey]);
+      const newVal = extractId(newFilters[f.fieldKey]);
+      if (newVal !== oldVal) {
+        // null → value is the initial form load, not a user-driven change — skip to avoid dirty state
+        if (oldVal === null) return;
+        // Parent genuinely changed by the user; clear this field to force re-selection
+        if (selectedItem.value) {
+          clearSelf();
+        }
+        return;
+      }
+    }
+  },
+  { deep: true },
 );
 
 // Watch external value changes (record navigation, undo/redo)
