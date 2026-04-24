@@ -393,13 +393,8 @@ const filterHint = computed<string>(() => {
 // ─── Init from existing value ─────────────────────────────────────────────────
 
 async function initFromValue() {
-  console.log(1, "props", props);
-  console.log(2, "value", props.value);
-  console.log(3, "currentValues", currentValues.value);
-
   const id = extractId(props.value);
-  console.log(4, "id", id);
-  console.log("----------");
+
   if (id && props.target_collection) {
     const item = await fetchById(props.target_collection, id);
     if (item) {
