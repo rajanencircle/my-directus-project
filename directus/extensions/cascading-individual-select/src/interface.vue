@@ -393,7 +393,13 @@ const filterHint = computed<string>(() => {
 // ─── Init from existing value ─────────────────────────────────────────────────
 
 async function initFromValue() {
+  console.log(1, "props", props);
+  console.log(2, "value", props.value);
+  console.log(3, "currentValues", currentValues.value);
+
   const id = extractId(props.value);
+  console.log(4, "id", id);
+  console.log("----------");
   if (id && props.target_collection) {
     const item = await fetchById(props.target_collection, id);
     if (item) {
@@ -455,7 +461,6 @@ function onSelect(item: DropdownItem) {
 }
 
 function onClear() {
-  console.log("onClear");
   clearSelf();
 }
 
@@ -566,6 +571,10 @@ watch(
       const newId = extractId(newParents[c.fieldKey]);
       const oldId = extractId(oldParents?.[c.fieldKey]);
       if (newId === oldId) continue;
+
+      // Skip auto-fill during initialization if this field already has a value.
+      // This prevents overwriting saved values on page reload.
+      if (oldId === null && extractId(props.value) !== null) continue;
 
       if (!newId) {
         clearSelf();
