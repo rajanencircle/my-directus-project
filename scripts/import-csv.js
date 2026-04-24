@@ -31,10 +31,16 @@ const fs = require("fs");
 //   directusToken: "bn5wXhoMyyTXaxElVChZBsiCbmSH66Fl",
 // };
 
-// staging
+// // staging
+// const CONFIG = {
+//   directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
+//   directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
+// };
+
+// dev
 const CONFIG = {
-  directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
-  directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
+  directusUrl: "https://cms.dev-54ta5gq-sxbqtq6mu5vgm.de-2.platformsh.site",
+  directusToken: "ojKBg1_90-3NgGPXpFL04G257Wu-VxYE",
 };
 
 // =============================================================================
