@@ -31,17 +31,17 @@ const fs = require("fs");
 //   directusToken: "bn5wXhoMyyTXaxElVChZBsiCbmSH66Fl",
 // };
 
-// // staging
-// const CONFIG = {
-//   directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
-//   directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
-// };
-
-// dev
+// staging
 const CONFIG = {
-  directusUrl: "https://cms.dev-54ta5gq-sxbqtq6mu5vgm.de-2.platformsh.site",
-  directusToken: "ojKBg1_90-3NgGPXpFL04G257Wu-VxYE",
+  directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
+  directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
 };
+
+// // dev
+// const CONFIG = {
+//   directusUrl: "https://cms.dev-54ta5gq-sxbqtq6mu5vgm.de-2.platformsh.site",
+//   directusToken: "ojKBg1_90-3NgGPXpFL04G257Wu-VxYE",
+// };
 
 // =============================================================================
 // PROFILES — one per CSV/collection pair
@@ -283,6 +283,54 @@ const PROFILES = {
     ],
 
     clearBeforeImport: false,
+  },
+
+  occupancies: {
+    csvFile: "./data/hotels_rooms_occupancies.csv",
+    collection: "occupancies",
+    translationsCollection: "occupancies_translations",
+    parentFkField: "occupancies_id",
+    localeFkField: "translations_id",
+
+    mainFields: {
+      name: "name",
+      value: "value",
+      from_price: "from_price",
+    },
+
+    foreignKeys: {},
+
+    translationColumns: [
+      { csvColumn: "name_de-DE", localeCode: "de-DE", field: "occupancy" },
+      { csvColumn: "name_ch-DE", localeCode: "de-CH", field: "occupancy" },
+      { csvColumn: "name_nl-NL", localeCode: "nl-NL", field: "occupancy" },
+    ],
+
+    clearBeforeImport: true,
+  },
+
+  cruises_types: {
+    csvFile: "./data/cruises_types.csv",
+    collection: "cruises_types",
+    translationsCollection: "cruises_types_translations",
+    parentFkField: "cruises_types_id",
+    localeFkField: "translations_id",
+
+    mainFields: {
+      cid_primarix: "cid_primarix",
+      id_primarix: "id_primarix",
+    },
+
+    foreignKeys: {},
+
+    translationColumns: [
+      { csvColumn: "name_de-DE", localeCode: "de-DE", field: "cruise_type" },
+      { csvColumn: "name_ch-DE", localeCode: "de-CH", field: "cruise_type" },
+      // { csvColumn: "name_nl-NL", localeCode: "nl-NL", field: "cruise_type" },
+      // { csvColumn: "name_en-GB", localeCode: "en-GB", field: "cruise_type" },
+    ],
+
+    clearBeforeImport: true,
   },
 };
 
@@ -565,14 +613,20 @@ async function importCollection(profileName, localeMap) {
 
     // c. Create translation records
     if (newItem && profile.translationColumns.length > 0) {
+      console.log("newItem", newItem);
       for (const colDef of profile.translationColumns) {
+        console.log("colDef", colDef);
+
         const value = row[colDef.csvColumn];
+        console.log("value", value);
 
         if (value === undefined || value === "") {
           continue;
         }
 
         const localeUUID = localeMap[colDef.localeCode];
+        console.log("localeUUID", localeUUID);
+
         if (!localeUUID) {
           warnings.push(
             `Item ${newItem.id}: locale "${colDef.localeCode}" not found — skipped`,
@@ -585,6 +639,7 @@ async function importCollection(profileName, localeMap) {
           [profile.localeFkField]: localeUUID,
           [colDef.field]: value,
         };
+        console.log("transPayload", transPayload);
 
         try {
           await directusRequest(

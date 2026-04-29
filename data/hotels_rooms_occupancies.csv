@@ -1,0 +1,49 @@
+name,name_de-DE,name_ch-DE,name_en-GB,name_nl-NL,value,from_price
+1 Pers.,1 Pers.,1 Pers.,1 Pers.,1 pers.,1,true
+2 Pers.,2 Pers.,2 Pers.,2 Pers.,2 pers.,2,true
+3 Pers.,3 Pers.,3 Pers.,3 Pers.,3 pers.,3,true
+4 Pers.,4 Pers.,4 Pers.,4 Pers.,4 pers.,4,true
+5 Pers.,5 Pers.,5 Pers.,5 Pers.,5 pers.,5,true
+6 Pers.,6 Pers.,6 Pers.,6 Pers.,6 pers.,6,true
+7 Pers.,7 Pers.,7 Pers.,7 Pers.,7 pers.,7,true
+Adult,Erw.,Erw.,Adult,Volw.,1,true
+Child,Kind,Kind,Child,Kind,1,true
+Child 2-11,Kind 2-11,Kind 2-11,Child 2-11,Kind 2-11,1,true
+Child 2-17,Kind 2-17,Kind 2-17,Child 2-17,Kind 2-17,1,true
+Child 3-11,Kind 3-11,Kind 3-11,Child 3-11,Kind 3-11,1,true
+Child 3-12,Kind 3-12,Kind 3-12,Child 3-12,Kind 3-12,1,true
+Child 4-11,Kind 4-11,Kind 4-11,Child 4-11,Kind 4-11,1,true
+Child 4-13,Kind 4-13,Kind 4-13,Child 4-13,Kind 4-13,1,true
+Child 6-11,Kind 6-11,Kind 6-11,Child 6-11,Kind 6-11,1,true
+Child 7-12,Kind 7-12,Kind 7-12,Child 7-12,Kind 7-12,1,true
+Child 8-11,Kind 8-11,Kind 8-11,Child 8-11,Kind 8-11,1,true
+Child 12-17,Kind 12-17,Kind 12-17,Child 12-17,Kind 12-17,1,true
+Child 12-18,Kind 12-18,Kind 12-18,Child 12-18,Kind 12-18,1,true
+VIP Stop 1,VIP Stop 1,VIP Stop 1,VIP Stop 1,VIP-stop 1,1,true
+VIP Stop 2,VIP-Stop 2,VIP-Stop 2,VIP Stop 2,VIP-stop 2,1,true
+Ext. Night 1,Verl. Nacht 1,Verl. Nacht 1,Ext. Night 1,Verl. nacht 1,1,true
+Ext. Night 2,Verl. Nacht 2,Verl. Nacht 2,Ext. Night 2,Verl. nacht 2,1,true
+1 Pers.,1 Pers.,1 Pers.,1 Pers.,1 pers.,1,false
+2 Pers.,2 Pers.,2 Pers.,2 Pers.,2 pers.,2,false
+3 Pers.,3 Pers.,3 Pers.,3 Pers.,3 pers.,3,false
+4 Pers.,4 Pers.,4 Pers.,4 Pers.,4 pers.,4,false
+5 Pers.,5 Pers.,5 Pers.,5 Pers.,5 pers.,5,false
+6 Pers.,6 Pers.,6 Pers.,6 Pers.,6 pers.,6,false
+7 Pers.,7 Pers.,7 Pers.,7 Pers.,7 pers.,7,false
+Adult,Erw.,Erw.,Adult,Volw.,1,false
+Child,Kind,Kind,Child,Kind,1,false
+Child 2-11,Kind 2-11,Kind 2-11,Child 2-11,Kind 2-11,1,false
+Child 2-17,Kind 2-17,Kind 2-17,Child 2-17,Kind 2-17,1,false
+Child 3-11,Kind 3-11,Kind 3-11,Child 3-11,Kind 3-11,1,false
+Child 3-12,Kind 3-12,Kind 3-12,Child 3-12,Kind 3-12,1,false
+Child 4-11,Kind 4-11,Kind 4-11,Child 4-11,Kind 4-11,1,false
+Child 4-13,Kind 4-13,Kind 4-13,Child 4-13,Kind 4-13,1,false
+Child 6-11,Kind 6-11,Kind 6-11,Child 6-11,Kind 6-11,1,false
+Child 7-12,Kind 7-12,Kind 7-12,Child 7-12,Kind 7-12,1,false
+Child 8-11,Kind 8-11,Kind 8-11,Child 8-11,Kind 8-11,1,false
+Child 12-17,Kind 12-17,Kind 12-17,Child 12-17,Kind 12-17,1,false
+Child 12-18,Kind 12-18,Kind 12-18,Child 12-18,Kind 12-18,1,false
+VIP Stop 1,VIP Stop 1,VIP Stop 1,VIP Stop 1,VIP-stop 1,1,false
+VIP Stop 2,VIP-Stop 2,VIP-Stop 2,VIP Stop 2,VIP-stop 2,1,false
+Ext. Night 1,Verl. Nacht 1,Verl. Nacht 1,Ext. Night 1,Verl. nacht 1,1,false
+Ext. Night 2,Verl. Nacht 2,Verl. Nacht 2,Ext. Night 2,Verl. nacht 2,1,false
