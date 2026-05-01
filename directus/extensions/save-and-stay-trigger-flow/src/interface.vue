@@ -2,7 +2,7 @@
   <form @submit.prevent="handleClick">
     <v-button
       type="submit"
-      :class="['action', classType]"
+      :class="['save-and-stay-trigger-flow-class', 'action', classType]"
       :loading="isLoading"
       :secondary="classType !== 'primary'"
       :icon="!label"
@@ -200,15 +200,15 @@ async function waitForSaveComplete() {
     const unwatch = watch(isDirty, (dirty) => {
       if (!dirty) {
         unwatch();
-        setTimeout(done, 200);
+        done(); // Removed 200ms delay
       }
     });
 
-    // Fallback: resolve after 10s regardless
-    setTimeout(() => {
-      unwatch();
-      done();
-    }, 10000);
+    // // Fallback: resolve after 10s regardless
+    // setTimeout(() => {
+    //   unwatch();
+    //   done();
+    // }, 10000);
   });
 }
 
@@ -218,35 +218,60 @@ async function handleClick() {
   isLoading.value = true;
 
   try {
-    // 1. Trigger native Ctrl+S save
+    console.log(1);
+    // 1. Trigger native Ctrl+S save and wait for it to complete
     await triggerNativeSave();
+    console.log(2);
 
-    // 2. If a flow is configured, wait for save to complete then trigger it
-    if (props.flowId) {
-      await waitForSaveComplete();
+    // Force a snapshot sync to ensure isDirty is checking current state
+    syncCurrentSnapshot();
+    console.log(3);
 
-      let itemId = props.primaryKey;
-      if (!itemId) {
-        const urlParts = window.location.pathname.split("/");
-        itemId = urlParts[urlParts.length - 1];
-      }
+    // await waitForSaveComplete();
+  } catch (err) {
+    console.error("[save-and-stay-trigger-flow] Save error:", err);
+  } finally {
+    console.log(4);
 
-      const collection =
-        props.collection ||
-        (() => {
-          const urlParts = window.location.pathname.split("/");
-          return urlParts[urlParts.length - 2];
-        })();
+    // Stop loader as soon as save is done — flow runs in background
+    isLoading.value = false;
+    isDirty.value = false;
+  }
 
-      await api.post(`/flows/trigger/${props.flowId}`, {
+  // 2. Fire flow in background if configured (does not block the loader)
+  if (props.flowId) {
+    const urlParts = window.location.pathname.split("/");
+    const itemId = props.primaryKey || urlParts[urlParts.length - 1];
+    const collection = props.collection || urlParts[urlParts.length - 2];
+
+    api
+      .post(`/flows/trigger/${props.flowId}`, {
         collection,
         keys: [itemId],
-      });
-    }
-  } catch (err) {
-    console.error("[save-and-stay-trigger-flow] Error:", err);
-  } finally {
-    isLoading.value = false;
+      })
+      .catch((err) =>
+        console.error("[save-and-stay-trigger-flow] Flow error:", err),
+      );
   }
 }
 </script>
+<style>
+.save-and-stay-trigger-flow-class > .button:disabled {
+  background-color: var(
+    --v-button-background-color,
+    var(--theme--primary)
+  ) !important;
+  color: #6b7280 !important;
+  border: none !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+.save-and-stay-trigger-flow-class > .button:not(:disabled) {
+  background-color: #07a4de !important;
+  color: #ffffff !important;
+  border: none !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
+</style>
