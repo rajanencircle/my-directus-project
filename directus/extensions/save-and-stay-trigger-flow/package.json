@@ -15,7 +15,8 @@
   },
   "scripts": {
     "build": "directus-extension build",
-    "dev": "directus-extension build -w --no-minify"
+    "dev": "directus-extension build -w --no-minify",
+    "rb": "docker compose down && npm run build && docker compose up -d"
   },
   "devDependencies": {
     "@directus/extensions-sdk": "^17.1.3"
