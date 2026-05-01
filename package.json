@@ -31,9 +31,12 @@
   "keywords": [],
   "author": "",
   "dependencies": {
+    "@directus/sdk": "^21.2.2",
     "axios": "^1.15.0",
+    "cross-fetch": "^4.1.0",
     "directus-extension-flow-manager": "^1.4.14",
     "fs-extra": "^11.3.4",
-    "js-yaml": "^4.1.1"
+    "js-yaml": "^4.1.1",
+    "mysql2": "^3.22.3"
   }
 }
