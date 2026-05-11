@@ -102,7 +102,7 @@ export default defineComponent({
 .accordion {
   background: var(--theme--background, #fff);
   border-radius: 10px;
-  overflow: hidden;
+  overflow: auto;
 }
 .accordion.has-header {
   border: 1px solid var(--theme--border-color, #e0e0e0);
