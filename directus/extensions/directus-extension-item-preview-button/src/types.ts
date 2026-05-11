@@ -42,8 +42,7 @@ export interface PreviewConfig {
 }
 
 export interface Language {
-  /** UUID primary key from the languages/translations collection */
-  id?: string;
+  id: string | number;
   code: string;
   name: string;
 }

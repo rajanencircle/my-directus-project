@@ -77,11 +77,7 @@
       <!-- Ungrouped fields (shown without accordion header when no groups exist) -->
       <AccordionSection
         v-if="sections.ungrouped.length"
-        :title="
-          sections.groups.length
-            ? resolveLabel(ungroupedLabel, currentLang)
-            : ''
-        "
+        :title="sections.groups.length ? ungroupedTitle : ''"
         :nodes="sections.ungrouped"
         :default-open="true"
         :show-header="sections.groups.length > 0"
@@ -109,10 +105,12 @@ import {
   onMounted,
   PropType,
 } from "vue";
+import { useI18n } from "vue-i18n";
 import { useApi } from "@directus/extensions-sdk";
 import LanguageSelector from "./LanguageSelector.vue";
 import AccordionSection from "./AccordionSection.vue";
 import { useLanguages } from "../composables/useLanguages";
+import { useFieldLabels } from "../composables/useFieldLabels";
 import {
   extractApiFields,
   buildFieldNodes,
@@ -133,9 +131,12 @@ export default defineComponent({
     console.log("PreviewOverlay props", props);
 
     const api = useApi();
+    const { locale: systemLocale } = useI18n();
+
     const { languages } = useLanguages(
       props.config?.translation_collection ?? "languages",
     );
+    const { fieldLabels } = useFieldLabels(props.collection);
 
     const rawItem = ref<Record<string, unknown>>({});
     const loading = ref(false);
@@ -188,8 +189,10 @@ export default defineComponent({
         rawItem.value,
         cfg.fields,
         currentLang.value,
+        systemLocale.value,
         langField,
         languages.value,
+        fieldLabels.value,
       );
     });
 
@@ -213,7 +216,7 @@ export default defineComponent({
           nodes.forEach((n) => assignedKeys.add(n.key));
           return {
             id: g.id,
-            label: resolveLabel(g.label as LangMap, currentLang.value),
+            label: resolveLabel(g.label as LangMap, systemLocale.value),
             defaultOpen: g.defaultOpen !== false,
             nodes,
           };
@@ -229,10 +232,12 @@ export default defineComponent({
       return (rawItem.value[tf] as string) ?? "";
     });
 
-    const ungroupedLabel = computed<LangMap>(() => ({
-      "de-DE": "Allgemein",
-      "en-US": "General",
-    }));
+    const ungroupedTitle = computed(() =>
+      resolveLabel(
+        { "de-DE": "Allgemein", "en-US": "General" } as LangMap,
+        systemLocale.value,
+      ),
+    );
 
     return {
       currentLang,
@@ -242,7 +247,7 @@ export default defineComponent({
       hasConfig,
       itemTitle,
       sections,
-      ungroupedLabel,
+      ungroupedTitle,
       resolveLabel,
     };
   },

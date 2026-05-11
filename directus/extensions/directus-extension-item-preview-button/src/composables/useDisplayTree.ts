@@ -20,7 +20,7 @@ export function resolveLabel(label: LangMap, lang: string): string {
   );
 }
 
-export function prettify(key: string): string {
+function prettify(key: string): string {
   return key
     .replace(/_id$/, "")
     .replace(/([A-Z])/g, " $1")
@@ -213,21 +213,21 @@ export function extractApiFields(config: PreviewConfig): string[] {
   return [...new Set(paths)];
 }
 
-/**
- * Build a flat list of display nodes from the resolved item data.
- * Each FieldConfig becomes exactly one DisplayNode. Translated fields are
- * resolved to the selected language inline — including UUID-keyed schemas.
- */
 export function buildFieldNodes(
   data: Record<string, unknown>,
   fields: FieldConfig[],
   currentLang: string,
+  systemLang: string,
   langField: string,
   languages: Language[],
+  fieldMetaLabels?: Map<string, LangMap>,
 ): DisplayNode[] {
   return fields.map((fc) => {
-    const rawLabel: LangMap = fc.label ?? prettify(fc.key);
-    const label = resolveLabel(rawLabel, currentLang);
+    // Label priority: explicit config label > Directus field meta > prettified key
+    const metaLabel =
+      fc.type === "direct" ? fieldMetaLabels?.get(fc.value) : undefined;
+    const rawLabel: LangMap = fc.label ?? metaLabel ?? prettify(fc.key);
+    const label = resolveLabel(rawLabel, systemLang);
     const value = resolveFieldValue(
       data,
       fc.value,

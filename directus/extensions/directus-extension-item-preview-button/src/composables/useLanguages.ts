@@ -14,7 +14,7 @@ export function useLanguages(translation_collection: string) {
         params: { fields: ["id", "code", "name"], limit: -1 },
       });
       languages.value = (res.data?.data ?? []).map(
-        (l: Record<string, string>) => ({
+        (l: Record<string, any>) => ({
           id: l.id,
           code: l.code ?? l.id,
           name: l.name ?? l.code ?? l.id,
