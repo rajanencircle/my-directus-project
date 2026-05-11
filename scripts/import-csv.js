@@ -25,17 +25,17 @@
 
 const fs = require("fs");
 
-// // local
-// const CONFIG = {
-//   directusUrl: "http://localhost:8055",
-//   directusToken: "bn5wXhoMyyTXaxElVChZBsiCbmSH66Fl",
-// };
-
-// staging
+// local
 const CONFIG = {
-  directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
-  directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
+  directusUrl: "http://localhost:8055",
+  directusToken: "2cpd1MiSahgbSQqyu_pUfz0MK8BJOjqV",
 };
+
+// // staging
+// const CONFIG = {
+//   directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
+//   directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
+// };
 
 // // dev
 // const CONFIG = {

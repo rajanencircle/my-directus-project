@@ -5,7 +5,7 @@
 // // local
 // const env = {
 //   DIRECTUS_URL: "http://localhost:8055",
-//   DIRECTUS_TOKEN: "2cpd1MiSahgbSQqyu_pUfz0MK8BJOjqV",
+//   DIRECTUS_TOKEN: "bn5wXhoMyyTXaxElVChZBsiCbmSH66Fl",
 // };
 
 // // staging
@@ -14,16 +14,12 @@
 //     "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
 //   DIRECTUS_TOKEN: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
 // };
-const env = {
-  DIRECTUS_URL: "https://directus.staging.functional.team",
-  DIRECTUS_TOKEN: "S2MuaWxtPP5GVmhSykH6Z1RVh_LWoDmC",
-};
 
-// // dev
-// const env = {
-//   DIRECTUS_URL: "https://directus-dev-botg.func.team",
-//   DIRECTUS_TOKEN: "QARPY7qs65GsrPUs35LEgN7ApexarinS",
-// };
+// dev
+const env = {
+  DIRECTUS_URL: "https://directus-dev-botg.func.team",
+  DIRECTUS_TOKEN: "QARPY7qs65GsrPUs35LEgN7ApexarinS",
+};
 
 // Initialize Directus client URL
 const DIRECTUS_URL = env.DIRECTUS_URL;
@@ -71,23 +67,13 @@ async function transformCollectionData(
   fieldName,
   updateFieldName,
   transformFn,
-  startId = null,
-  endId = null,
 ) {
   try {
     console.log(`Fetching items from ${collectionName}...`);
 
     // Fetch items. Using limit: -1 to get all, but for very large
     // collections you might need to implement pagination here.
-    let path = `/items/${collectionName}?fields=id,${fieldName}&limit=-1&sort=id`;
-
-    if (startId !== null && startId !== undefined) {
-      path += `&filter[id][_gte]=${startId}`;
-    }
-    if (endId !== null && endId !== undefined) {
-      path += `&filter[id][_lte]=${endId}`;
-    }
-
+    const path = `/items/${collectionName}?fields=id,${fieldName}&limit=-1`;
     const response = await directusRequest("GET", path);
     const items = response.data || [];
 
@@ -142,86 +128,78 @@ const myTransformFunction = async (value) => {
   // // Remove any leading/trailing whitespace just in case
   // return cleaned.trim();
 
-  //   const fetchCountryCode = async (destination) => {
-  //     try {
-  //       const response = await fetch(
-  //         "https://botg.ai-playground.pro/api/chat/completions",
-  //         {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             Authorization: "Bearer sk-00ffbf07910743b4b3a30bcb3d16bcf2",
-  //           },
-  //           body: JSON.stringify({
-  //             model: "-hotel-translator-vlaams-beta-v2",
-  //             messages: [
-  //               {
-  //                 role: "user",
-  //                 content: `
-  // You are a country code generator.
+  const fetchCountryCode = async (destination) => {
+    try {
+      const response = await fetch(
+        "https://botg.ai-playground.pro/api/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer sk-00ffbf07910743b4b3a30bcb3d16bcf2",
+          },
+          body: JSON.stringify({
+            model: "-hotel-translator-vlaams-beta-v2",
+            messages: [
+              {
+                role: "user",
+                content: `
+You are a country code generator.
 
-  // Task:
-  // I will provide a country name in one of these languages:
-  // - de-DE (German - Germany)
-  // - nl-NL (Dutch - Netherlands/Belgium)
-  // - de-CH (German - Switzerland)
+Task:
+I will provide a country name in one of these languages:
+- de-DE (German - Germany)
+- nl-NL (Dutch - Netherlands/Belgium)
+- de-CH (German - Switzerland)
 
-  // Your job is to identify the country and return its standard 3-letter uppercase code.
+Your job is to identify the country and return its standard 3-letter uppercase code.
 
-  // Rules:
-  // - Output only the 3-letter uppercase code.
-  // - No explanation.
-  // - No punctuation.
-  // - Understand translated/localized country names.
+Rules:
+- Output only the 3-letter uppercase code.
+- No explanation.
+- No punctuation.
+- Understand translated/localized country names.
 
-  // Examples:
-  // Deutschland -> DEU
-  // Schweiz -> CHE
-  // Belgien -> BEL
-  // Niederlande -> NLD
+Examples:
+Deutschland -> DEU
+Schweiz -> CHE
+Belgien -> BEL
+Niederlande -> NLD
 
-  // Input: ${destination}
-  //               `,
-  //               },
-  //             ],
-  //           }),
-  //         },
-  //       );
+Input: ${destination}
+              `,
+              },
+            ],
+          }),
+        },
+      );
 
-  //       const data = await response.json();
+      const data = await response.json();
 
-  //       console.log("Full Response:", data);
+      console.log("Full Response:", data);
 
-  //       // Extract only the AI response text
-  //       const code = data.choices?.[0]?.message?.content?.trim();
+      // Extract only the AI response text
+      const code = data.choices?.[0]?.message?.content?.trim();
 
-  //       console.log("Country/Continent Code:", code);
+      console.log("Country/Continent Code:", code);
 
-  //       return code;
-  //     } catch (error) {
-  //       console.error("API Error:", error);
-  //     }
-  //   };
-  //   let code = "";
-  //   // Example
-  //   if (value && Array.isArray(value) && value.length > 0) {
-  //     code = await fetchCountryCode(value[0].name);
-  //   }
-  //   return code;
-
-  return;
+      return code;
+    } catch (error) {
+      console.error("API Error:", error);
+    }
+  };
+  let code = "";
+  // Example
+  if (value && Array.isArray(value) && value.length > 0) {
+    code = await fetchCountryCode(value[0].name);
+  }
+  return code;
 };
-
-// Parse command line arguments for optional range
-const startIdArg = process.argv[2] ? parseInt(process.argv[2]) : null;
-const endIdArg = process.argv[3] ? parseInt(process.argv[3]) : null;
 
 // Run the script
 transformCollectionData(
-  "posts", // Collection Name
+  "countries", // Collection Name
   "translations.*", // Field to read from
-  "content", // Field to update (can be the same or different)
+  "ISO_alpha_3_code", // Field to update (can be the same or different)
   myTransformFunction, // Your transformation function
-  // startIdArg, // Optional Start ID
-  // startIdArg, // Optional End ID
 );

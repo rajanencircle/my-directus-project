@@ -1,0 +1,569 @@
+/* ========================================================================== */
+/* ================== MAIN CONTENT LAYOUT STYLES ============================ */
+/* ========================================================================== */
+.private-view #main-content .content-wrapper,
+.private-view #main-content main {
+  display: block !important;
+}
+#main-content .content-wrapper {
+  padding-inline: 10px !important;
+}
+
+@media only screen and (min-width: 600px) {
+  #main-content .content-wrapper {
+    padding-inline: 32px !important;
+  }
+}
+@media only screen and (min-width: 1512px) {
+  .private-view #main-content .header-bar,
+  #main-content .content-wrapper {
+    padding-inline: 80px !important;
+  }
+}
+.private-view #main-content .header-bar {
+  margin: 40px 0px 32px !important;
+}
+#main-content .content-wrapper table[data-v-fb2625e4] {
+  margin: 0 !important;
+  min-inline-size: 100% !important;
+}
+#main-content .content-wrapper main > .v-form {
+  padding-inline: 0px;
+  padding-top: 0px;
+}
+#main-content .content-wrapper .settings[data-v-9513f06e] {
+  padding-top: 0;
+  padding-inline: 0;
+}
+.content-wrapper .v-form .field .v-input .input {
+  padding: 0px !important;
+  border-color: #e5e7eb;
+}
+.content-wrapper .v-form .field .v-input .input input::placeholder,
+.content-wrapper .v-form .field .v-input .input input {
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 17px;
+  color: #6b7280;
+  letter-spacing: 0.005em;
+}
+.content-wrapper .v-form .field .v-input .input .prepend {
+  margin-right: 0;
+  margin-left: 10px;
+}
+.content-wrapper .v-form .field .v-input .input .append {
+  margin-left: 0;
+  margin-right: 10px;
+}
+.content-wrapper .v-form .field .v-input .input .append .v-icon i,
+.content-wrapper .v-form .field .v-input .input .prepend .v-icon i,
+#menu-outlet .v-menu-popper.active .v-menu-content .v-icon i {
+  font-size: 20px;
+}
+.content-wrapper .v-form .field .v-input .input .append .v-icon,
+.content-wrapper .v-form .field .v-input .input .prepend .v-icon,
+#menu-outlet .v-menu-popper.active .v-menu-content .v-icon {
+  color: #6b7280 !important;
+  inline-size: 20px;
+  min-inline-size: 20px;
+  block-size: 20px;
+}
+.content-wrapper .v-form .field .v-input {
+  block-size: 37px;
+}
+.content-wrapper .v-table .v-icon *,
+.content-wrapper .v-table .v-checkbox * {
+  color: #1f2937 !important;
+}
+.content-wrapper .v-table .table-row .cell,
+.v-form .field .field-label .v-text-overflow {
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+
+.content-wrapper .v-table tbody .table-row,
+.content-wrapper .v-table .table-header .cell {
+  block-size: 42px;
+}
+.content-wrapper .v-table th.cell {
+  block-size: 40px;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.005em;
+  font-weight: 500;
+}
+
+.content-wrapper .v-table th.cell span.name {
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+/* ========================================================================== */
+/* ================== ALL GROUP LAYOUT STYLES ============================== */
+/* ========================================================================== */
+
+.content-wrapper .v-form .group-raw.full,
+.content-wrapper .v-form .group-raw.full.first-visible-field {
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+.content-wrapper .v-form .group-raw .group-accordion .accordion-section {
+  padding: 30px 40px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+@media only screen and (max-width: 1024px) {
+  .content-wrapper .v-form .group-raw.full,
+  .content-wrapper .v-form .group-raw.full.first-visible-field,
+  .content-wrapper .v-form .group-raw .group-accordion .accordion-section,
+  .content-wrapper
+    .v-form
+    .group-raw
+    .group-accordion
+    .accordion-section:has(.active) {
+    padding: 20px;
+  }
+}
+.content-wrapper .v-form .group-raw .group-accordion .accordion-section {
+  background: #fff !important;
+  margin-bottom: 32px;
+}
+.content-wrapper
+  .v-form
+  .group-raw
+  .group-accordion
+  .accordion-section:last-child {
+  margin-bottom: 0;
+}
+.group-raw .v-form .group-accordion .accordion-section button.label {
+  margin-block: 0;
+  position: relative;
+}
+.group-raw .v-form .group-accordion .accordion-section button.label::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translateY(-50%);
+  background-image: url("data:image/svg+xml,%3Csvg width='22px' height='22px' viewBox='0 0 0.412 0.412' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M0.22 0.076a0.014 0.014 0 0 0 -0.028 0V0.193H0.076a0.014 0.014 0 0 0 0 0.028H0.193v0.117a0.014 0.014 0 0 0 0.028 0V0.22h0.117a0.014 0.014 0 0 0 0 -0.028H0.22z' fill='%231F2937'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+@media only screen and (max-width: 1024px) {
+  .group-raw .v-form .group-accordion .accordion-section button.label::after {
+    width: 18px;
+    height: 18px;
+  }
+}
+.group-raw
+  .v-form
+  .group-accordion
+  .accordion-section
+  button.label.active::after {
+  top: 30%;
+  background-image: url("data:image/svg+xml,%3Csvg width='22px' height='22px' viewBox='0 0 0.55 0.55' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%231F2937' d='M0.019 0.286A0.019 0.019 0 0 1 0.019 0.247h0.512a0.019 0.019 0 0 1 0 0.038z'/%3E%3C/svg%3E");
+}
+.group-raw .v-form .group-accordion .accordion-section button.active {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.group-raw .v-form .group-accordion .accordion-section button.label .v-icon {
+  display: none;
+}
+.group-raw
+  .v-form
+  .group-accordion
+  .accordion-section
+  button.label
+  .field-name {
+  font-size: 18px;
+  line-height: 22px;
+  color: #1f2937;
+  letter-spacing: 0.005em;
+}
+.group-raw .v-form .group-accordion .accordion-section .fields {
+  margin-top: 20px !important;
+  margin-bottom: 0px !important;
+}
+.content-wrapper .v-form .group-raw.full .group-raw,
+.content-wrapper .v-form .group-raw.full:has(.group-accordion) {
+  padding: 0;
+  border-radius: 0;
+  border: none;
+}
+.content-wrapper .v-form .group-raw.full:has(.group-accordion),
+.content-wrapper .v-form .v-item-group.group-accordion {
+  background: transparent !important;
+}
+.content-wrapper .v-form .group-raw.full .field,
+.content-wrapper .v-form .v-item-group.group-accordion {
+  padding: 0;
+}
+.content-wrapper .group-raw .v-form.grid {
+  gap: 20px;
+}
+.v-table .color-dot .dot {
+  background-color: #1f2937 !important;
+}
+.content-wrapper .v-form .group-raw.full .field .v-divider {
+  margin: 0;
+  --v-divider-color: transparent;
+}
+
+/* .main-content-container .sp-root .sp-start .v-form .group-raw {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+} */
+
+.main-content-container .v-form .group-raw:not(.group-raw .group-raw) {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+/*.main-content-container .sp-root .sp-start .v-form > .group-raw {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}*/
+
+.main-content-container .sp-root .sp-start .v-form .group-accordion {
+  border-block-end: 0 !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-accordion
+  .accordion-section {
+  border-block-start: 0 !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw
+  .v-form
+  .v-item-group
+  .accordion-section
+  .border-block-start {
+  border: 0 !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-accordion
+  .accordion-section
+  .group-raw
+  .v-form
+  .
+  > div {
+  padding: 0px !important;
+}
+
+.main-content-container .sp-root .sp-start > .v-form {
+  padding-inline: 0px !important;
+}
+
+.main-content-container
+  .layout-tabular
+  .table
+  .footer
+  .pagination
+  .v-pagination
+  .previous
+  .button
+  .content
+  .v-icon,
+.main-content-container
+  .layout-tabular
+  .table
+  .footer
+  .pagination
+  .v-pagination
+  .next
+  .button
+  .content
+  .v-icon {
+  color: #1f2937 !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw
+  .v-form
+  .group-accordion
+  .accordion-section
+  .fields {
+  margin-top: 0px !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw
+  .content-wrapper
+  .group-raw
+  .v-form.grid {
+  gap: 20px !important;
+}
+
+/* 3rd group-raw ke andar wale v-form ka gap reset */
+.main-content-container .sp-root .sp-start .v-form .group-raw:nth-child(3) {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Har accordion ko apna alag card do */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(3)
+  .v-item-group {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  padding: 20px !important;
+  border-block-end: 1px solid #e5e7eb !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(3)
+  > .v-form
+  > .v-item-group.first-visible-field
+  .v-item
+  div
+  .fields {
+  padding: 0px !important;
+  padding-top: 15px !important;
+}
+
+/* 6th group-raw ke andar wale v-form ka gap reset
+.main-content-container .sp-root .sp-start .v-form .group-raw:nth-child(6) .v-item-group .v-item {
+    background: transparent !important;
+    padding: 20px !important;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+	margin-bottom:32px;
+}
+.main-content-container .sp-root .sp-start .v-form .group-raw:nth-child(6) .v-item-group .v-item:nth-child(3) {
+    margin-bottom: 0 !important;
+}
+
+  .main-content-container .sp-root .sp-start .v-form .group-raw:nth-child(6) .first-visible-field{
+    border: 0 !important;
+} 
+
+ .main-content-container .sp-root .sp-start .v-form .group-raw:nth-child(6) .v-item { 
+    background: white;
+	border-block-start : 1px solid #e5e7eb !important;
+} */
+
+/* 1. Main Outer Container (The big box for Price Calculator) */
+.main-content-container .sp-root .sp-start .v-form .group-raw:nth-child(6) {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  /* padding: 24px !important;
+    margin-bottom: 32px; */
+}
+
+/* 2. Reset the Header (Price Calculator title) */
+/* We remove the border/padding from the top-level v-item so it looks like a header, not a card */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(6)
+  > .v-form
+  > .v-item-group.first-visible-field
+  > .v-item {
+  border: 0 !important;
+  background: transparent !important;
+  margin-bottom: 0 !important;
+}
+
+/* 3. Inner Cards (Prices, Specials, Surcharges) */
+/* This targets only the v-items inside the nested "fields" div */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(6)
+  .fields
+  .v-item {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important; /* Proper boxed border */
+  border-radius: 12px !important;
+  padding: 20px !important;
+  margin-bottom: 32px !important; /* Gap between cards */
+  display: block;
+}
+
+/* 4. Remove margin from the last card (3rd child) */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(6)
+  .fields
+  .v-item:nth-child(3),
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(6)
+  .fields
+  .v-item:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* 5. Clean up the accordion group container */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(6)
+  .v-item-group {
+  border: 0 !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(6)
+  > .v-form
+  > .v-item-group.first-visible-field
+  .v-item
+  div
+  .fields {
+  padding: 0px !important;
+  padding-top: 15px !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw
+  .v-form
+  .group-accordion
+  .accordion-section
+  button.label
+  .field-name {
+  /* font-size: 16px !important; */
+  font-family: "Inter", sans-serif;
+}
+
+/* 1. Main Outer Container (The big box for Price Calculator) */
+.main-content-container .sp-root .sp-start .v-form .group-raw:nth-child(5) {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  /* padding: 24px !important;
+    margin-bottom: 32px; */
+}
+
+/* 2. Reset the Header (Price Calculator title) */
+/* We remove the border/padding from the top-level v-item so it looks like a header, not a card */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(5)
+  > .v-form
+  > .v-item-group.first-visible-field
+  > .v-item {
+  border: 0 !important;
+  background: transparent !important;
+  margin-bottom: 0 !important;
+}
+
+/* 3. Inner Cards (Prices, Specials, Surcharges) */
+/* This targets only the v-items inside the nested "fields" div */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(5)
+  .fields
+  .v-item {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important; /* Proper boxed border */
+  border-radius: 12px !important;
+  padding: 20px !important;
+  margin-bottom: 20px !important; /* Gap between cards */
+  display: block;
+}
+
+/* 4. Remove margin from the last card (3rd child) */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(5)
+  .fields
+  .v-item:nth-child(3),
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(5)
+  .fields
+  .v-item:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* 5. Clean up the accordion group container */
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(5)
+  .v-item-group {
+  border: 0 !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(5)
+  > .v-form
+  > .v-item-group.first-visible-field
+  .v-item
+  div
+  .fields {
+  padding: 0px !important;
+  padding-top: 15px !important;
+}
+
+.main-content-container
+  .sp-root
+  .sp-start
+  .v-form
+  .group-raw:nth-child(5)
+  > .v-form
+  > .v-item-group.first-visible-field
+  .with-fill {
+  gap: 0 !important;
+}

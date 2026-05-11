@@ -1,0 +1,16 @@
+{
+  "name": "hotel-migration",
+  "version": "3.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env index.js",
+    "start:hotels": "PRODUCT=hotels node --env-file=.env index.js",
+    "start:cruises": "PRODUCT=cruises node --env-file=.env index.js",
+    "start:campers": "PRODUCT=campers node --env-file=.env index.js",
+    "reset-state": "rm -f state/migration-state.json"
+  },
+  "dependencies": {
+    "@directus/sdk": "^18.0.0",
+    "mysql2": "^3.11.0"
+  }
+}
