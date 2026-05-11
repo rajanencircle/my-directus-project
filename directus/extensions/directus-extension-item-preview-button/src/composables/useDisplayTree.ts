@@ -192,22 +192,21 @@ function resolveFieldValue(
  * For translated fields the configured langField is added so filtering works.
  */
 export function extractApiFields(config: PreviewConfig): string[] {
-  const langField = config.langField ?? "languages_code";
   const paths: string[] = [config.title ?? "name"];
 
-  config.fields?.forEach((fc) => {
-    paths.push(fc.value);
-    if (fc.type === "translated") {
-      // Request the langField sibling so the translations array can be identified and filtered
-      const parts = fc.value.split(".");
-      if (parts.length > 1) {
-        const parentPath = parts.slice(0, -1).join(".");
-        // Add both the configured langField AND common alternatives so detection always works
-        // paths.push(`${parentPath}.${langField}`);
-        paths.push(`${parentPath}.translations_id`);
-        // paths.push(`${parentPath}.languages_code`);
+  config.groups?.forEach((g) => {
+    g.fields?.forEach((fc) => {
+      paths.push(fc.value);
+      if (fc.type === "translated") {
+        const parts = fc.value.split(".");
+        if (parts.length > 1) {
+          const parentPath = parts.slice(0, -1).join(".");
+          // Fetch both common FK field names so auto-detection always works
+          paths.push(`${parentPath}.translations_id`);
+          // paths.push(`${parentPath}.languages_code`);
+        }
       }
-    }
+    });
   });
 
   return [...new Set(paths)];

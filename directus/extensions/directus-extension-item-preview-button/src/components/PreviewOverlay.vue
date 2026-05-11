@@ -74,23 +74,13 @@
 
     <!-- ── Content ────────────────────────────────────────────────────────── -->
     <div v-else class="preview-body">
-      <!-- Ungrouped fields (shown without accordion header when no groups exist) -->
       <AccordionSection
-        v-if="sections.ungrouped.length"
-        :title="sections.groups.length ? ungroupedTitle : ''"
-        :nodes="sections.ungrouped"
-        :default-open="true"
-        :show-header="sections.groups.length > 0"
-      />
-
-      <!-- Configured accordion groups -->
-      <AccordionSection
-        v-for="g in sections.groups"
-        :key="g.id"
-        :title="g.label"
-        :nodes="g.nodes"
-        :default-open="g.defaultOpen"
-        show-header
+        v-for="section in sections"
+        :key="section.id"
+        :title="section.label"
+        :nodes="section.nodes"
+        :default-open="section.defaultOpen"
+        :show-header="!!section.label"
       />
     </div>
   </div>
@@ -116,7 +106,7 @@ import {
   buildFieldNodes,
   resolveLabel,
 } from "../composables/useDisplayTree";
-import type { PreviewConfig, DisplayNode, LangMap } from "../types";
+import type { PreviewConfig, LangMap } from "../types";
 
 export default defineComponent({
   name: "PreviewOverlay",
@@ -152,7 +142,9 @@ export default defineComponent({
       { immediate: true },
     );
 
-    const hasConfig = computed(() => (props.config?.fields?.length ?? 0) > 0);
+    const hasConfig = computed(() =>
+      (props.config?.groups?.reduce((sum, g) => sum + (g.fields?.length ?? 0), 0) ?? 0) > 0,
+    );
 
     // ── Fetch item ─────────────────────────────────────────────────────────
     async function fetchData() {
@@ -161,7 +153,6 @@ export default defineComponent({
       error.value = null;
       try {
         const apiFields = extractApiFields(props.config!);
-        console.log("apiFields", apiFields);
         const res = await api.get(
           `/items/${props.collection}/${props.itemId}`,
           { params: { fields: apiFields } },
@@ -180,64 +171,34 @@ export default defineComponent({
       fetchData,
     );
 
-    // ── Build display nodes (reacts to language change) ────────────────────
-    const allNodes = computed((): DisplayNode[] => {
-      const cfg = props.config;
-      if (!cfg?.fields?.length || !Object.keys(rawItem.value).length) return [];
-      const langField = cfg.langField ?? "languages_code";
-      return buildFieldNodes(
-        rawItem.value,
-        cfg.fields,
-        currentLang.value,
-        systemLocale.value,
-        langField,
-        languages.value,
-        fieldLabels.value,
-      );
-    });
-
-    // ── Build sections — group labels also resolve per language ────────────
+    // ── Build sections — each group builds its own nodes ───────────────────
     const sections = computed(() => {
       const cfg = props.config;
-      const groups = cfg?.groups ?? [];
-      if (!groups.length) return { groups: [], ungrouped: allNodes.value };
+      if (!cfg?.groups?.length || !Object.keys(rawItem.value).length) return [];
+      const langField = cfg.langField ?? "languages_code";
 
-      const configFields = cfg?.fields ?? [];
-      const assignedKeys = new Set<string>();
-
-      const builtGroups = groups
-        .map((g) => {
-          const groupKeys = new Set(
-            configFields
-              .filter((fc) => fc.groupBy === g.id)
-              .map((fc) => fc.key),
-          );
-          const nodes = allNodes.value.filter((n) => groupKeys.has(n.key));
-          nodes.forEach((n) => assignedKeys.add(n.key));
-          return {
-            id: g.id,
-            label: resolveLabel(g.label as LangMap, systemLocale.value),
-            defaultOpen: g.defaultOpen !== false,
-            nodes,
-          };
-        })
-        .filter((g) => g.nodes.length);
-
-      const ungrouped = allNodes.value.filter((n) => !assignedKeys.has(n.key));
-      return { groups: builtGroups, ungrouped };
+      return cfg.groups
+        .map((g) => ({
+          id: g.id,
+          label: resolveLabel(g.label as LangMap, systemLocale.value),
+          defaultOpen: g.defaultOpen !== false,
+          nodes: buildFieldNodes(
+            rawItem.value,
+            g.fields ?? [],
+            currentLang.value,
+            systemLocale.value,
+            langField,
+            languages.value,
+            fieldLabels.value,
+          ),
+        }))
+        .filter((s) => s.nodes.length > 0);
     });
 
     const itemTitle = computed(() => {
       const tf = props.config?.title ?? "name";
       return (rawItem.value[tf] as string) ?? "";
     });
-
-    const ungroupedTitle = computed(() =>
-      resolveLabel(
-        { "de-DE": "Allgemein", "en-US": "General" } as LangMap,
-        systemLocale.value,
-      ),
-    );
 
     return {
       currentLang,
@@ -247,8 +208,6 @@ export default defineComponent({
       hasConfig,
       itemTitle,
       sections,
-      ungroupedTitle,
-      resolveLabel,
     };
   },
 });

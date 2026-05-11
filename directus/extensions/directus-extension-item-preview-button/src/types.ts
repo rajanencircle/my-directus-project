@@ -2,40 +2,39 @@ export type LangMap = string | Record<string, string>;
 
 export type FieldType = "direct" | "translated" | "relation" | "array";
 
-/** A single field in the fields config array */
+/** A single field inside a group */
 export interface FieldConfig {
-  /** Display key — also used as fallback label */
+  /** Unique key — used as display label fallback */
   key: string;
   /** Dot-notation path to the value (e.g. "place.translations.name") */
   value: string;
-  /** ID of the group this field belongs to (matches GroupConfig.id) */
-  groupBy?: string;
   /** How the value should be resolved */
   type: FieldType;
   /** Optional multilingual label override */
   label?: LangMap;
 }
 
-/** One accordion group in the preview overlay */
+/** Accordion group — parent node that contains its own fields */
 export interface GroupConfig {
   id: string;
+  /** Header label — plain string or multilingual object */
   label: LangMap;
   /** Whether the accordion starts open (default: true) */
   defaultOpen?: boolean;
+  /** Fields belonging to this group */
+  fields: FieldConfig[];
 }
 
 export interface PreviewConfig {
-  /** Root field key shown as the page title (default: "name") */
+  /** Root field key shown as the overlay title (default: "name") */
   title?: string;
   /** Default language code (default: "de-DE") */
   defaultLang?: string;
-  /** Field in translation records that holds the language code (default: "languages_code") */
+  /** Field in translation records that holds the language identifier (default: "languages_code") */
   langField?: string;
   /** Button label shown on the item form */
   buttonLabel?: string;
-  /** Explicit list of fields to display */
-  fields?: FieldConfig[];
-  /** Accordion groups — organise fields by groupBy id */
+  /** All display config — groups with their nested fields */
   groups?: GroupConfig[];
   translation_collection: string;
   icon: string;

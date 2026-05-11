@@ -44,15 +44,15 @@
 <script lang="ts">
 import { defineComponent, ref, computed, PropType } from "vue";
 import PreviewOverlay from "./components/PreviewOverlay.vue";
-import type { PreviewConfig, FieldConfig, GroupConfig } from "./types";
+import type { PreviewConfig, GroupConfig } from "./types";
 
-function safeParseArray<T>(raw: unknown): T[] | undefined {
+function safeParseGroups(raw: unknown): GroupConfig[] | undefined {
   if (!raw) return undefined;
-  if (Array.isArray(raw)) return raw as T[];
+  if (Array.isArray(raw)) return raw as GroupConfig[];
   if (typeof raw === "string") {
     try {
       const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? (parsed as T[]) : undefined;
+      return Array.isArray(parsed) ? (parsed as GroupConfig[]) : undefined;
     } catch {
       return undefined;
     }
@@ -68,17 +68,12 @@ export default defineComponent({
     collection: { type: String, default: "" },
     primaryKey: { type: [String, Number], default: null },
     disabled: { type: Boolean, default: false },
-    // Individual option fields from index.ts
     translation_collection: { type: String, default: "" },
     buttonLabel: { type: String, default: "" },
     icon: { type: String, default: "preview" },
     title: { type: String, default: "" },
     defaultLang: { type: String, default: "" },
     langField: { type: String, default: "" },
-    fields: {
-      type: [Array, String] as PropType<FieldConfig[] | string | null>,
-      default: null,
-    },
     groups: {
       type: [Array, String] as PropType<GroupConfig[] | string | null>,
       default: null,
@@ -87,7 +82,7 @@ export default defineComponent({
   emits: ["input"],
   setup(props) {
     const showOverlay = ref(false);
-    console.log("ItemPreviewButton props", props);
+
     const isNew = computed(
       () =>
         !props.primaryKey ||
@@ -101,10 +96,9 @@ export default defineComponent({
       defaultLang: props.defaultLang || "de-DE",
       langField: props.langField || "languages_code",
       buttonLabel: props.buttonLabel || "Preview",
-      translation_collection: props.translation_collection || "languages",
+      translation_collection: props.translation_collection || "translations",
       icon: props.icon || "preview",
-      fields: safeParseArray<FieldConfig>(props.fields),
-      groups: safeParseArray<GroupConfig>(props.groups),
+      groups: safeParseGroups(props.groups),
     }));
 
     return { showOverlay, isNew, parsedConfig };
