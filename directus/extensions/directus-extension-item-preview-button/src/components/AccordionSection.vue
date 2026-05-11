@@ -1,11 +1,18 @@
 <template>
-  <section class="accordion" :class="{ 'has-header': showHeader, open: isOpen }">
+  <section
+    class="accordion"
+    :class="{ 'has-header': showHeader, open: isOpen }"
+  >
     <button v-if="showHeader" class="acc-header" @click="toggle">
       <span class="acc-title">{{ title }}</span>
       <svg
         class="acc-chevron"
-        width="14" height="14" viewBox="0 0 24 24"
-        fill="none" stroke="currentColor" stroke-width="2.5"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
       >
         <polyline points="6 9 12 15 18 9" />
       </svg>
@@ -19,33 +26,46 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, nextTick, onMounted, computed, PropType } from 'vue';
-import DataNode from './DataNode.vue';
-import type { DisplayNode } from '../types';
+import {
+  defineComponent,
+  ref,
+  watch,
+  nextTick,
+  onMounted,
+  computed,
+  PropType,
+} from "vue";
+import DataNode from "./DataNode.vue";
+import type { DisplayNode } from "../types";
 
 export default defineComponent({
-  name: 'AccordionSection',
+  name: "AccordionSection",
   components: { DataNode },
   props: {
-    title: { type: String, default: '' },
+    title: { type: String, default: "" },
     nodes: { type: Array as PropType<DisplayNode[]>, default: () => [] },
     defaultOpen: { type: Boolean, default: true },
     showHeader: { type: Boolean, default: true },
   },
   setup(props) {
+    console.log("AccordionSection props", props);
     const isOpen = ref(props.defaultOpen);
     const bodyRef = ref<HTMLElement | null>(null);
-    const measuredHeight = ref('auto');
-
+    const measuredHeight = ref("auto");
     async function measure() {
       await nextTick();
-      if (bodyRef.value) measuredHeight.value = bodyRef.value.scrollHeight + 'px';
+      if (bodyRef.value)
+        measuredHeight.value = bodyRef.value.scrollHeight + "px";
     }
 
     function toggle() {
       if (isOpen.value) {
-        if (bodyRef.value) measuredHeight.value = bodyRef.value.scrollHeight + 'px';
-        nextTick(() => { measuredHeight.value = '0px'; isOpen.value = false; });
+        if (bodyRef.value)
+          measuredHeight.value = bodyRef.value.scrollHeight + "px";
+        nextTick(() => {
+          measuredHeight.value = "0px";
+          isOpen.value = false;
+        });
       } else {
         isOpen.value = true;
         measure();
@@ -54,12 +74,24 @@ export default defineComponent({
 
     const bodyStyle = computed(() =>
       props.showHeader
-        ? { height: isOpen.value ? measuredHeight.value : '0px', overflow: 'hidden', transition: 'height 0.22s ease' }
-        : {}
+        ? {
+            height: isOpen.value ? measuredHeight.value : "0px",
+            overflow: "hidden",
+            transition: "height 0.22s ease",
+          }
+        : {},
     );
 
-    watch(() => props.nodes, () => { if (isOpen.value) measure(); }, { deep: true });
-    onMounted(() => { if (isOpen.value && props.showHeader) measure(); });
+    watch(
+      () => props.nodes,
+      () => {
+        if (isOpen.value) measure();
+      },
+      { deep: true },
+    );
+    onMounted(() => {
+      if (isOpen.value && props.showHeader) measure();
+    });
 
     return { isOpen, toggle, bodyRef, bodyStyle };
   },
@@ -89,7 +121,9 @@ export default defineComponent({
   transition: background 0.15s;
   user-select: none;
 }
-.acc-header:hover { background: var(--theme--background-subdued, #f5f5f5); }
+.acc-header:hover {
+  background: var(--theme--background-subdued, #f5f5f5);
+}
 
 .acc-title {
   font-size: 12px;
@@ -102,7 +136,9 @@ export default defineComponent({
   color: var(--theme--foreground-subdued, #888);
   transition: transform 0.2s ease;
 }
-.open .acc-chevron { transform: rotate(180deg); }
+.open .acc-chevron {
+  transform: rotate(180deg);
+}
 
 .acc-content {
   padding: 8px 16px 12px;

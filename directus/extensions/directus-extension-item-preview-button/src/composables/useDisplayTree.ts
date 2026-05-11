@@ -1,16 +1,15 @@
 import type {
-  FieldTree,
+  FieldConfig,
+  PreviewConfig,
   DisplayNode,
   LangMap,
-  FieldEntry,
-  PreviewConfig,
+  Language,
 } from "../types";
 
 // ── Label helpers ──────────────────────────────────────────────────────────────
 
 export function resolveLabel(label: LangMap, lang: string): string {
   if (typeof label === "string") return label;
-  // Try exact → language prefix → en-US → en → first value
   return (
     label[lang] ??
     label[lang.split("-")[0]] ??
@@ -30,76 +29,96 @@ export function prettify(key: string): string {
     .trim();
 }
 
-// ── Config helpers ─────────────────────────────────────────────────────────────
+// ── Internal helpers ───────────────────────────────────────────────────────────
 
-function fieldPath(e: FieldEntry): string {
-  return typeof e === "string" ? e : e.field;
+/**
+ * Common field names used across Directus schemas to identify the language in
+ * a translations junction row. Tried in order when auto-detecting.
+ */
+const LANG_FIELD_CANDIDATES = [
+  "languages_code",
+  "translations_id",
+  "language_code",
+  "lang",
+  "locale",
+  "language",
+];
+
+/**
+ * Detect which field in a translations array row identifies the language.
+ * Uses the configured langField first, then falls back to known candidates.
+ */
+function detectLangField(
+  row: Record<string, unknown>,
+  configuredLangField: string,
+): string | null {
+  if (configuredLangField in row) return configuredLangField;
+  for (const candidate of LANG_FIELD_CANDIDATES) {
+    if (candidate in row) return candidate;
+  }
+  return null;
 }
 
-/** Extract all dot-notation field paths from a config (for the Directus API call) */
-export function extractApiFields(config: PreviewConfig): string[] {
-  const paths: string[] = [];
-  config.fields?.forEach((f) => paths.push(fieldPath(f)));
-  config.groups?.forEach((g) =>
-    g.fields.forEach((f) => paths.push(fieldPath(f))),
+/** True if the array looks like a Directus translations junction */
+function isTranslationsArray(
+  arr: unknown[],
+  configuredLangField: string,
+): boolean {
+  if (arr.length === 0 || typeof arr[0] !== "object" || arr[0] === null)
+    return false;
+  return (
+    detectLangField(arr[0] as Record<string, unknown>, configuredLangField) !==
+    null
   );
-  return [...new Set(paths)];
 }
 
 /**
- * Build a map of fieldPath → LangMap for custom label overrides.
- * Also maps root keys, so "country.name" label applies to the "country" root display node.
+ * Find the translation record matching the current language.
+ *
+ * Handles three common Directus patterns:
+ *   1. Direct string:  row.languages_code === "de-DE"
+ *   2. Nested object:  row.translations_id.code === "de-DE"
+ *   3. UUID FK:        row.translations_id === "3a45f078-..." where languages[].id === uuid
  */
-export function buildLabelMap(config: PreviewConfig): Map<string, LangMap> {
-  const map = new Map<string, LangMap>();
-  const process = (e: FieldEntry) => {
-    if (typeof e !== "string" && e.label) {
-      map.set(e.field, e.label);
-      // Also map the root key so relation headers pick up the label
-      const root = e.field.split(".")[0];
-      if (!map.has(root)) map.set(root, e.label);
-    }
-  };
-  config.fields?.forEach(process);
-  config.groups?.forEach((g) => g.fields.forEach(process));
-  return map;
-}
+function findTranslationMatch(
+  arr: Record<string, unknown>[],
+  langField: string,
+  currentLang: string,
+  languages: Language[],
+): Record<string, unknown> | null {
+  for (const row of arr) {
+    const v = row[langField];
 
-// ── Field tree builder ─────────────────────────────────────────────────────────
+    // Pattern 1 — direct string code
+    if (v === currentLang) return row;
 
-export function parseFieldsToTree(fields: string[]): FieldTree {
-  const tree: FieldTree = {};
-  for (const f of fields) {
-    let node = tree;
-    const parts = f.split(".");
-    for (let i = 0; i < parts.length; i++) {
-      const p = parts[i];
-      if (i === parts.length - 1) {
-        if (!(p in node)) node[p] = null;
-      } else {
-        if (!node[p]) node[p] = {};
-        node = node[p] as FieldTree;
-      }
+    // Pattern 2 — nested object (e.g. when the FK was expanded via deep fields)
+    if (typeof v === "object" && v !== null) {
+      const obj = v as Record<string, unknown>;
+      if (
+        obj.code === currentLang ||
+        obj.languages_code === currentLang ||
+        obj.id === currentLang
+      )
+        return row;
     }
   }
-  return tree;
-}
 
-// ── Display node builder ───────────────────────────────────────────────────────
+  // Pattern 3 — UUID FK: resolve code → UUID via the fetched languages list
+  const langRecord = languages.find((l) => l.code === currentLang);
+  if (langRecord?.id) {
+    const uuidMatch = arr.find((row) => row[langField] === langRecord.id);
+    if (uuidMatch) return uuidMatch;
+  }
 
-function isTranslationsLike(arr: unknown[], langField: string): boolean {
-  return (
-    arr.length > 0 &&
-    typeof arr[0] === "object" &&
-    arr[0] !== null &&
-    langField in (arr[0] as object)
-  );
+  // Last resort — return first entry rather than null so something is shown
+  return arr[0] ?? null;
 }
 
 function formatScalar(v: unknown): string {
   if (v === null || v === undefined) return "—";
   if (typeof v === "boolean") return v ? "Yes" : "No";
-  if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v)) {
+  if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}(T[\d:.Z+-]+)?$/.test(v)) {
     try {
       return new Date(v).toLocaleString();
     } catch {
@@ -109,118 +128,124 @@ function formatScalar(v: unknown): string {
   return String(v);
 }
 
-export function buildDisplayNodes(
+/**
+ * Walk a dot-notation path through item data.
+ * Translation arrays are resolved to the current language inline using
+ * smart detection + UUID lookup.
+ */
+function resolveFieldValue(
   data: Record<string, unknown>,
-  tree: FieldTree,
-  language: string,
-  langField: string,
-  labelMap?: Map<string, LangMap>,
-  /** dot-path prefix for nested recursive calls — used to look up deep labels */
-  keyPrefix?: string,
-): DisplayNode[] {
-  const nodes: DisplayNode[] = [];
+  valuePath: string,
+  currentLang: string,
+  configuredLangField: string,
+  languages: Language[],
+): unknown {
+  const parts = valuePath.split(".");
+  let current: unknown = data;
 
-  for (const [key, subTree] of Object.entries(tree)) {
-    if (key === langField) continue;
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (current === null || current === undefined) return null;
 
-    const fullKey = keyPrefix ? `${keyPrefix}.${key}` : key;
-    const value = data[key];
+    if (Array.isArray(current)) {
+      const arr = current as Record<string, unknown>[];
 
-    // Resolve label: full path → root key → auto-prettify
-    const rawLabel: LangMap =
-      labelMap?.get(fullKey) ?? labelMap?.get(key) ?? prettify(key);
-    const label = resolveLabel(rawLabel, language);
+      if (isTranslationsArray(arr, configuredLangField)) {
+        // Find the effective langField (may differ from the configured one)
+        const effectiveLangField =
+          detectLangField(arr[0], configuredLangField) ?? configuredLangField;
 
-    // ── Leaf scalar ───────────────────────────────────────────────────────────
-    if (subTree === null) {
-      nodes.push({ key, label, type: "scalar", value });
-      continue;
-    }
-
-    // ── Null / missing relation ───────────────────────────────────────────────
-    if (value === null || value === undefined) {
-      nodes.push({ key, label, type: "scalar", value: null });
-      continue;
-    }
-
-    // ── Array relation ────────────────────────────────────────────────────────
-    if (Array.isArray(value)) {
-      if (value.length === 0) {
-        nodes.push({ key, label, type: "scalar", value: null });
-        continue;
-      }
-
-      // Translations-like → resolve current language inline (don't render as a list)
-      if (isTranslationsLike(value, langField)) {
-        const match =
-          (value as Record<string, unknown>[]).find(
-            (t) => t[langField] === language,
-          ) ??
-          value[0] ??
-          {};
-        const children = buildDisplayNodes(
-          match as Record<string, unknown>,
-          subTree,
-          language,
-          langField,
-          labelMap,
-          fullKey,
+        const match = findTranslationMatch(
+          arr,
+          effectiveLangField,
+          currentLang,
+          languages,
         );
-        // Push translated sub-fields directly (without a wrapper node)
-        nodes.push(...children);
-        continue;
-      }
-
-      // Regular o2m / m2m array
-      const items = (value as Record<string, unknown>[]).map((item) =>
-        buildDisplayNodes(
-          item,
-          subTree,
-          language,
-          langField,
-          labelMap,
-          fullKey,
-        ),
-      );
-
-      // If every item resolves to a single scalar → compact tag list
-      const allSingleScalar = items.every(
-        (row) => row.length === 1 && row[0].type === "scalar",
-      );
-      if (allSingleScalar) {
-        nodes.push({
-          key,
-          label,
-          type: "flat-list",
-          value: null,
-          list: items.map((row) => formatScalar(row[0].value)),
-        });
+        current = match ? match[part] : null;
       } else {
-        nodes.push({ key, label, type: "array", value: null, items });
+        // Regular array mid-path — map over all items
+        const remainingPath = parts.slice(i).join(".");
+        return arr.map((item) =>
+          resolveFieldValue(
+            item as Record<string, unknown>,
+            remainingPath,
+            currentLang,
+            configuredLangField,
+            languages,
+          ),
+        );
       }
-      continue;
-    }
-
-    // ── Object (m2o) relation ─────────────────────────────────────────────────
-    if (typeof value === "object") {
-      const children = buildDisplayNodes(
-        value as Record<string, unknown>,
-        subTree,
-        language,
-        langField,
-        labelMap,
-        fullKey,
-      );
-      if (children.length === 0) {
-        nodes.push({ key, label, type: "scalar", value: null });
-      } else if (children.length === 1 && children[0].type === "scalar") {
-        // Single scalar child → inline (e.g. hotel_group.name → "Hotel Group: Marriott")
-        nodes.push({ key, label, type: "scalar", value: children[0].value });
-      } else {
-        nodes.push({ key, label, type: "relation", value: null, children });
-      }
+    } else if (typeof current === "object") {
+      current = (current as Record<string, unknown>)[part];
+    } else {
+      return null;
     }
   }
 
-  return nodes;
+  return current;
+}
+
+// ── Public API ─────────────────────────────────────────────────────────────────
+
+/**
+ * Extract all dot-notation paths needed for the Directus /items API call.
+ * For translated fields the configured langField is added so filtering works.
+ */
+export function extractApiFields(config: PreviewConfig): string[] {
+  const langField = config.langField ?? "languages_code";
+  const paths: string[] = [config.title ?? "name"];
+
+  config.fields?.forEach((fc) => {
+    paths.push(fc.value);
+    if (fc.type === "translated") {
+      // Request the langField sibling so the translations array can be identified and filtered
+      const parts = fc.value.split(".");
+      if (parts.length > 1) {
+        const parentPath = parts.slice(0, -1).join(".");
+        // Add both the configured langField AND common alternatives so detection always works
+        // paths.push(`${parentPath}.${langField}`);
+        paths.push(`${parentPath}.translations_id`);
+        // paths.push(`${parentPath}.languages_code`);
+      }
+    }
+  });
+
+  return [...new Set(paths)];
+}
+
+/**
+ * Build a flat list of display nodes from the resolved item data.
+ * Each FieldConfig becomes exactly one DisplayNode. Translated fields are
+ * resolved to the selected language inline — including UUID-keyed schemas.
+ */
+export function buildFieldNodes(
+  data: Record<string, unknown>,
+  fields: FieldConfig[],
+  currentLang: string,
+  langField: string,
+  languages: Language[],
+): DisplayNode[] {
+  return fields.map((fc) => {
+    const rawLabel: LangMap = fc.label ?? prettify(fc.key);
+    const label = resolveLabel(rawLabel, currentLang);
+    const value = resolveFieldValue(
+      data,
+      fc.value,
+      currentLang,
+      langField,
+      languages,
+    );
+
+    if (Array.isArray(value)) {
+      return {
+        key: fc.key,
+        label,
+        type: "flat-list" as const,
+        value: null,
+        list: (value as unknown[]).map(formatScalar),
+      };
+    }
+
+    return { key: fc.key, label, type: "scalar" as const, value };
+  });
 }

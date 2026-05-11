@@ -6,19 +6,16 @@ export function useLanguages(translation_collection: string) {
   const api = useApi();
   const languages = ref<Language[]>([]);
   const loading = ref(false);
-  console.log(
-    "translation_collection from useLanguages",
-    translation_collection,
-  );
 
   async function fetchLanguages() {
     loading.value = true;
     try {
       const res = await api.get(`/items/${translation_collection}`, {
-        params: { fields: ["code", "name"], limit: -1 },
+        params: { fields: ["id", "code", "name"], limit: -1 },
       });
       languages.value = (res.data?.data ?? []).map(
         (l: Record<string, string>) => ({
+          id: l.id,
           code: l.code ?? l.id,
           name: l.name ?? l.code ?? l.id,
         }),

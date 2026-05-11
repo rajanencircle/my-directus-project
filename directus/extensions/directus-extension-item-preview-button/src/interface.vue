@@ -25,7 +25,7 @@
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
         <circle cx="12" cy="12" r="3" />
       </svg>
-      {{ buttonLabel }}
+      {{ buttonLabel || "Preview" }}
     </button>
     <span v-if="isNew" class="ip-hint">Save the item first</span>
 
@@ -44,15 +44,15 @@
 <script lang="ts">
 import { defineComponent, ref, computed, PropType } from "vue";
 import PreviewOverlay from "./components/PreviewOverlay.vue";
-import type { PreviewConfig, GroupConfig } from "./types";
+import type { PreviewConfig, FieldConfig, GroupConfig } from "./types";
 
-function safeParseGroups(raw: unknown): GroupConfig[] | undefined {
+function safeParseArray<T>(raw: unknown): T[] | undefined {
   if (!raw) return undefined;
-  if (Array.isArray(raw)) return raw as GroupConfig[];
+  if (Array.isArray(raw)) return raw as T[];
   if (typeof raw === "string") {
     try {
       const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : undefined;
+      return Array.isArray(parsed) ? (parsed as T[]) : undefined;
     } catch {
       return undefined;
     }
@@ -69,12 +69,16 @@ export default defineComponent({
     primaryKey: { type: [String, Number], default: null },
     disabled: { type: Boolean, default: false },
     // Individual option fields from index.ts
-    translation_collection: { type: String, default: "translations" },
+    translation_collection: { type: String, default: "" },
     buttonLabel: { type: String, default: "" },
-    icon: { type: String, default: "visibility" },
-    title: { type: String, default: "id" },
-    defaultLang: { type: String, default: "de-DE" },
-    langField: { type: String, default: "code" },
+    icon: { type: String, default: "preview" },
+    title: { type: String, default: "" },
+    defaultLang: { type: String, default: "" },
+    langField: { type: String, default: "" },
+    fields: {
+      type: [Array, String] as PropType<FieldConfig[] | string | null>,
+      default: null,
+    },
     groups: {
       type: [Array, String] as PropType<GroupConfig[] | string | null>,
       default: null,
@@ -83,7 +87,7 @@ export default defineComponent({
   emits: ["input"],
   setup(props) {
     const showOverlay = ref(false);
-
+    console.log("ItemPreviewButton props", props);
     const isNew = computed(
       () =>
         !props.primaryKey ||
@@ -93,13 +97,14 @@ export default defineComponent({
     );
 
     const parsedConfig = computed<PreviewConfig>(() => ({
-      title: props.title || "id",
+      title: props.title || "name",
       defaultLang: props.defaultLang || "de-DE",
-      langField: props.langField || "code",
-      buttonLabel: props.buttonLabel,
-      translation_collection: props.translation_collection || "translations",
-      icon: props.icon || "visibility",
-      groups: safeParseGroups(props.groups),
+      langField: props.langField || "languages_code",
+      buttonLabel: props.buttonLabel || "Preview",
+      translation_collection: props.translation_collection || "languages",
+      icon: props.icon || "preview",
+      fields: safeParseArray<FieldConfig>(props.fields),
+      groups: safeParseArray<GroupConfig>(props.groups),
     }));
 
     return { showOverlay, isNew, parsedConfig };

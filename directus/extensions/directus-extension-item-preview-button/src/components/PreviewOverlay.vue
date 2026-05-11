@@ -7,7 +7,6 @@
         <h1 class="item-title">{{ itemTitle || "#" + itemId }}</h1>
       </div>
 
-      <!-- Language selector -->
       <div v-if="languages.length > 1" class="lang-area">
         <LanguageSelector v-model="currentLang" :languages="languages" />
       </div>
@@ -68,15 +67,14 @@
         <strong>No fields configured</strong>
         <p>
           Open the field settings for this interface and add a
-          <code>groups</code> or <code>fields</code> array to the configuration
-          JSON.
+          <code>fields</code> array to the configuration JSON.
         </p>
       </div>
     </div>
 
     <!-- ── Content ────────────────────────────────────────────────────────── -->
     <div v-else class="preview-body">
-      <!-- Ungrouped section (shown without accordion header if no groups exist) -->
+      <!-- Ungrouped fields (shown without accordion header when no groups exist) -->
       <AccordionSection
         v-if="sections.ungrouped.length"
         :title="
@@ -117,9 +115,7 @@ import AccordionSection from "./AccordionSection.vue";
 import { useLanguages } from "../composables/useLanguages";
 import {
   extractApiFields,
-  buildLabelMap,
-  parseFieldsToTree,
-  buildDisplayNodes,
+  buildFieldNodes,
   resolveLabel,
 } from "../composables/useDisplayTree";
 import type { PreviewConfig, DisplayNode, LangMap } from "../types";
@@ -134,6 +130,8 @@ export default defineComponent({
   },
   emits: ["close"],
   setup(props) {
+    console.log("PreviewOverlay props", props);
+
     const api = useApi();
     const { languages } = useLanguages(
       props.config?.translation_collection ?? "languages",
@@ -145,7 +143,6 @@ export default defineComponent({
 
     const currentLang = ref(props.config?.defaultLang ?? "de-DE");
 
-    // Sync default lang when config prop changes
     watch(
       () => props.config?.defaultLang,
       (v) => {
@@ -154,15 +151,7 @@ export default defineComponent({
       { immediate: true },
     );
 
-    const hasConfig = computed(() => {
-      const cfg = props.config;
-      if (!cfg) return false;
-      return (
-        (cfg.fields?.length ?? 0) +
-          (cfg.groups?.reduce((s, g) => s + g.fields.length, 0) ?? 0) >
-        0
-      );
-    });
+    const hasConfig = computed(() => (props.config?.fields?.length ?? 0) > 0);
 
     // ── Fetch item ─────────────────────────────────────────────────────────
     async function fetchData() {
@@ -171,11 +160,10 @@ export default defineComponent({
       error.value = null;
       try {
         const apiFields = extractApiFields(props.config!);
+        console.log("apiFields", apiFields);
         const res = await api.get(
           `/items/${props.collection}/${props.itemId}`,
-          {
-            params: { fields: apiFields },
-          },
+          { params: { fields: apiFields } },
         );
         rawItem.value = res.data?.data ?? {};
       } catch (e: unknown) {
@@ -191,20 +179,17 @@ export default defineComponent({
       fetchData,
     );
 
-    // ── Build display tree (recomputes on language change) ─────────────────
+    // ── Build display nodes (reacts to language change) ────────────────────
     const allNodes = computed((): DisplayNode[] => {
       const cfg = props.config;
-      if (!cfg || !Object.keys(rawItem.value).length) return [];
-      const langField = cfg.langField ?? "code";
-      const allPaths = extractApiFields(cfg);
-      const tree = parseFieldsToTree(allPaths);
-      const labelMap = buildLabelMap(cfg);
-      return buildDisplayNodes(
+      if (!cfg?.fields?.length || !Object.keys(rawItem.value).length) return [];
+      const langField = cfg.langField ?? "languages_code";
+      return buildFieldNodes(
         rawItem.value,
-        tree,
+        cfg.fields,
         currentLang.value,
         langField,
-        labelMap,
+        languages.value,
       );
     });
 
@@ -214,25 +199,22 @@ export default defineComponent({
       const groups = cfg?.groups ?? [];
       if (!groups.length) return { groups: [], ungrouped: allNodes.value };
 
-      const nodesByKey = new Map(allNodes.value.map((n) => [n.key, n]));
+      const configFields = cfg?.fields ?? [];
       const assignedKeys = new Set<string>();
 
       const builtGroups = groups
         .map((g) => {
-          // Collect root keys for this group
-          const rootKeys = new Set(
-            g.fields.map(
-              (f) => (typeof f === "string" ? f : f.field).split(".")[0],
-            ),
+          const groupKeys = new Set(
+            configFields
+              .filter((fc) => fc.groupBy === g.id)
+              .map((fc) => fc.key),
           );
-          const nodes = allNodes.value.filter((n) => rootKeys.has(n.key));
+          const nodes = allNodes.value.filter((n) => groupKeys.has(n.key));
           nodes.forEach((n) => assignedKeys.add(n.key));
-
           return {
-            id: g.id ?? String(g.label),
-            // Label resolved with current language → updates reactively
+            id: g.id,
             label: resolveLabel(g.label as LangMap, currentLang.value),
-            defaultOpen: g.open !== false,
+            defaultOpen: g.defaultOpen !== false,
             nodes,
           };
         })
@@ -243,11 +225,10 @@ export default defineComponent({
     });
 
     const itemTitle = computed(() => {
-      const tf = props.config?.title ?? "id";
+      const tf = props.config?.title ?? "name";
       return (rawItem.value[tf] as string) ?? "";
     });
 
-    // "General" label — translatable
     const ungroupedLabel = computed<LangMap>(() => ({
       "de-DE": "Allgemein",
       "en-US": "General",
