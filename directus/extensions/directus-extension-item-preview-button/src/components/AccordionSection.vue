@@ -48,7 +48,6 @@ export default defineComponent({
     showHeader: { type: Boolean, default: true },
   },
   setup(props) {
-    console.log("AccordionSection props", props);
     const isOpen = ref(props.defaultOpen);
     const bodyRef = ref<HTMLElement | null>(null);
     const measuredHeight = ref("auto");
@@ -102,7 +101,6 @@ export default defineComponent({
 .accordion {
   background: var(--theme--background, #fff);
   border-radius: 10px;
-  overflow: auto;
 }
 .accordion.has-header {
   border: 1px solid var(--theme--border-color, #e0e0e0);
@@ -120,6 +118,7 @@ export default defineComponent({
   font-family: inherit;
   transition: background 0.15s;
   user-select: none;
+  border-radius: 10px;
 }
 .acc-header:hover {
   background: var(--theme--background-subdued, #f5f5f5);

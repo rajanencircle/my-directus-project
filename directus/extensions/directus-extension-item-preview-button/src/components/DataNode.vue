@@ -10,8 +10,10 @@
     <dt class="kv-label">{{ node.label }}</dt>
     <dd class="kv-value">
       <span v-if="!node.list?.length" class="null-value">—</span>
-      <div v-else class="tag-list">
-        <span v-for="(item, i) in node.list" :key="i" class="tag">{{ item }}</span>
+      <div v-else>
+        <span v-for="(item, i) in node.list" :key="i" class="tag"
+          >• {{ item }}<br
+        /></span>
       </div>
     </dd>
   </div>
@@ -47,7 +49,6 @@ export default defineComponent({
 .kv-label {
   font-size: 11.5px;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.055em;
   color: var(--theme--foreground-subdued, #888);
   margin: 0;
@@ -59,17 +60,13 @@ export default defineComponent({
   margin: 0;
   line-height: 1.5;
   word-break: break-word;
+  text-wrap: auto;
 }
 .null-value {
   color: var(--theme--foreground-subdued, #bbb);
   font-style: italic;
 }
 
-.tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
 .tag {
   padding: 2px 10px;
   background: var(--theme--background-subdued, #f0f0f0);
@@ -83,6 +80,8 @@ export default defineComponent({
     grid-template-columns: 1fr;
     gap: 2px;
   }
-  .kv-label { font-size: 10.5px; }
+  .kv-label {
+    font-size: 10.5px;
+  }
 }
 </style>

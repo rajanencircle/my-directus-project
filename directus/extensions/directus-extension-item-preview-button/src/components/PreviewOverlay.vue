@@ -118,8 +118,6 @@ export default defineComponent({
   },
   emits: ["close"],
   setup(props) {
-    console.log("PreviewOverlay props", props);
-
     const api = useApi();
     const { locale: systemLocale } = useI18n();
 
@@ -142,8 +140,12 @@ export default defineComponent({
       { immediate: true },
     );
 
-    const hasConfig = computed(() =>
-      (props.config?.groups?.reduce((sum, g) => sum + (g.fields?.length ?? 0), 0) ?? 0) > 0,
+    const hasConfig = computed(
+      () =>
+        (props.config?.groups?.reduce(
+          (sum, g) => sum + (g.fields?.length ?? 0),
+          0,
+        ) ?? 0) > 0,
     );
 
     // ── Fetch item ─────────────────────────────────────────────────────────
@@ -351,14 +353,45 @@ export default defineComponent({
 .preview-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px 48px;
+  padding: 20px 200px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-width: 960px;
   width: 100%;
-  margin: 0 auto;
   box-sizing: border-box;
+  overflow: auto;
+}
+
+@media (max-width: 1600px) {
+  .preview-body {
+    padding: 20px 180px;
+  }
+}
+
+@media (max-width: 1440px) {
+  .preview-body {
+    padding: 20px 160px;
+  }
+}
+@media (max-width: 1280px) {
+  .preview-body {
+    padding: 20px 130px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .preview-body {
+    padding: 20px 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 8px 14px;
+  }
+  .preview-body {
+    padding: 20px 70px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -366,7 +399,7 @@ export default defineComponent({
     padding: 8px 14px;
   }
   .preview-body {
-    padding: 12px 12px 40px;
+    padding: 20px 40px;
   }
 }
 </style>

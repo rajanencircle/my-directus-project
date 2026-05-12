@@ -68,9 +68,6 @@ export default defineComponent({
       return String(v);
     },
   },
-  setup(props) {
-    console.log("FieldValue props", props);
-  },
 });
 </script>
 
@@ -125,5 +122,6 @@ export default defineComponent({
 
 .scalar-value {
   word-break: break-word;
+  text-wrap: auto;
 }
 </style>
