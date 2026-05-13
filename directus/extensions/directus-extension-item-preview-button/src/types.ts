@@ -12,13 +12,26 @@ export interface FieldConfig {
   type: FieldType;
   /** Optional multilingual label override */
   label?: LangMap;
+  /**
+   * Where to auto-detect the label from when no explicit `label` is set.
+   *  "parent" — first path segment on the root collection (e.g. hotels.country → "Country")
+   *  "leaf"   — leaf field resolved to its actual collection (e.g. countries_translations.name → "Name")
+   * Default: "parent" for translated/relation/array types, "leaf" for direct.
+   */
+  labelType?: "leaf" | "parent";
 }
 
 /** Accordion group — parent node that contains its own fields */
 export interface GroupConfig {
   id: string;
-  /** Header label — plain string or multilingual object */
-  label: LangMap;
+  /** Header label — plain string or multilingual object. Auto-detected from field meta if omitted. */
+  label?: LangMap;
+  /**
+   * Controls accordion header auto-detection when no explicit `label` is set.
+   *  "parent" (default) — look up g.id as a field on the root collection
+   *  "leaf"             — skip API lookup; use g.label or prettify(g.id)
+   */
+  labelType?: "leaf" | "parent";
   /** Whether the accordion starts open (default: true) */
   defaultOpen?: boolean;
   /** Fields belonging to this group */

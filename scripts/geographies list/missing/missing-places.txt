@@ -1,0 +1,328 @@
+# Missing count: 326
+
+Caracas
+Santa Marta
+Kansas City
+Tulsa
+Sandakan
+Koya-san
+Guwahati
+San Jose
+Copiapo
+Tofino
+Whistler
+Columbia Icefield
+Telegraph Cove
+Maligne Lake
+Denali Nationalpark
+Seward
+Yellowknife
+Dallas
+Fort Worth
+Cincinnati
+Belém
+Las Vegas
+Los Angeles
+Seattle
+Vancouver
+Denver
+Salt Lake City
+Chicago
+Boston
+Atlanta
+New Orleans
+Miami
+Honolulu (Hawaii)
+Kona (Hawaii)
+Kahului (Hawaii)
+Kahului
+Cody
+Cody (USA)
+Phoenix
+Houston
+Calgary
+Anchorage
+Montreal
+Halifax
+Edmonton
+Québec
+Toronto
+Winnipeg
+Whitehorse
+Campbell River (Vancouver Island)
+Florianopolis
+Sao Luis
+Belo Horizonte
+Daydream Island
+Aruba
+Nitmiluk Nationalpark Besucherzentrum
+Kakadu Lodge Cooinda
+Derby
+Jinghong
+Hongkong
+Maputo
+Moskau
+Walindi Plantation Resort
+Bangkok
+Kyoto
+Tokyo
+Huahine
+Yangon
+Hat Yai
+Chumphon
+Cajamarca
+Cochabamba
+Trinidad
+Diego Suarez
+Maroantsetra
+Abu Dhabi
+Tahiti
+Waitangi
+Pa Harakeke
+Havelock
+Ayr
+Jakarta
+Heiliges Tal
+Amritsar
+Goa
+Flores
+Yogyakarta
+Koh Samui
+Kyaing Tong
+Bagan
+Phillip Island
+Skukuza
+Penneshaw
+Abel Tasman Nationalpark
+Cape Jervis
+Walvis Bay
+Bariloche
+Tully
+Karijini Eco Retreat
+Home Valley Station
+Oongkalkada Wilderness Camp
+Eaglereach Wilderness Resort
+Bullo River Station
+Mildura
+Broken Hill
+Tutukaka
+Kampala
+Raiatea
+Fakarava
+Campo Grande
+Recife
+Wudinna
+Puerto Montt
+Puerto Maldonado
+Kigali
+Shute Harbour
+Sunshine Coast
+Noosa
+Krabi
+Khao Lak
+Solo
+Phuket
+Sibu
+Bali
+Ubon Ratchathani
+Mulu
+Medan
+Padang
+Langkawi
+Khon Kaen
+Mandalay
+Siem Reap
+Lombok
+Lahad Datu
+Kunming
+Ubud
+Niederlande
+Europa
+La Réunion
+Deutschland
+Mauritius
+Galapagos
+Dar es Salaam
+Medellin
+La Serena
+Kuala Lumpur
+Manaus
+Lautoka
+Iquitos
+Harare
+Calama
+Shanghai
+Peking
+Chiclayo
+Kovalam
+Serengeti
+Kathmandu
+Kalkutta
+Varanasi
+Hastings
+Paraparaumu
+Colombo
+Jakarta
+Port Elizabeth
+Port Moresby
+Rabaul
+Alotau
+Tom Price
+Byron Bay
+Mataram
+Luang Prabang
+Mannum
+Northern Beaches
+Mackay
+Ayers Rock
+Bluff
+Milford Sound
+Doubtful Sound
+Invercargill
+Russell
+Rangiroa
+Tasmanien
+Gold Coast
+Moorea
+Rarotonga
+Nadi
+Denarau
+Tonga
+Durban
+Palmwag Lodge
+Lusaka
+Mfuwe
+Lilongwe
+Mahébourg
+Mombasa
+Österreich
+Schweiz
+Brussel
+Coromandel Halbinsel
+Curitiba
+Arica
+Ovalle
+Vicuña
+Iquique
+Balmaceda
+Torres del Paine
+Temuco
+Trelew
+Iguazu
+Mendoza
+Trujillo
+Baltra
+Vientiane
+Hanoi
+Yangon
+Phnom Penh
+Saigon
+Pakse
+Chiang Mai
+Koh Chang
+Chiang Rai
+Kota Kinabalu
+Kuching
+Denpasar
+Delhi
+Mumbai
+Chennai
+Marari
+Cochin
+Bangalore
+Trivandrum
+Kolkata
+Osaka
+Minneapolis
+Portland
+Devonport
+Jaen
+Fortaleza
+Puerto Madryn
+Mohua Park Cottages
+Matamata
+Orlando
+Fort Myers
+Efate
+Tanna
+Washington DC
+Rapid City
+Addis Abeba
+Kawthaung
+Nashville
+Jabiru
+Tampa
+Augusta
+Dunsborough
+Beira
+Entebbe
+Corroboree Tavern
+Bucaramanga
+Town of 1770
+Bundaberg
+Monkey Mia Flughafen
+Tidal River
+Schaffhausen
+Rorschach
+Helsinki
+Barcelona
+Heraklion
+Vilnius
+Tallin
+Xanten
+Panama City
+Hotel
+Westküste
+Südwestküste
+St. John‘s
+Mexico City
+Cancun
+Cabo San Lucas
+Campeche
+Palenque
+Tulum
+Merida
+Valladolid
+Chichen Itza
+Havanna
+Santiago de Cuba
+Holguin
+Varadero
+Santa Clara
+Cienfuegos
+La Fortuna
+Cahuita
+Samara
+Puerto Jimenez
+Liberia
+Nosara
+Quepos
+Cartago
+Puerto Viejo de Sarapiqui
+Puerto Limon
+Guapiles
+Golfito Sierpe
+Guadalajara
+Los Cabos
+Belize City
+Guadalavaca
+Corroboree Billabong
+Cordoba
+David
+Blantyre
+Lake Barrine
+Sydney, The Rocks
+Cuvu
+Kilimanjaro
+Omapere
+Clyde
+Savaii
+Manapouri
+Collingwood
+San Antonio
+Upington
+Barossa Valley
+Bremer Bay
+Kangaroo Island
+Paro
+Upolu

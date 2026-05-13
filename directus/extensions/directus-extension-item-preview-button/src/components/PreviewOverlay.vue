@@ -93,6 +93,7 @@ import {
   computed,
   watch,
   onMounted,
+  toRef,
   PropType,
 } from "vue";
 import { useI18n } from "vue-i18n";
@@ -105,6 +106,7 @@ import {
   extractApiFields,
   buildFieldNodes,
   resolveLabel,
+  prettify,
 } from "../composables/useDisplayTree";
 import type { PreviewConfig, LangMap } from "../types";
 
@@ -124,7 +126,7 @@ export default defineComponent({
     const { languages } = useLanguages(
       props.config?.translation_collection ?? "languages",
     );
-    const { fieldLabels } = useFieldLabels(props.collection);
+    const { fieldLabels, groupLabels } = useFieldLabels(props.collection, toRef(props, "config"));
 
     const rawItem = ref<Record<string, unknown>>({});
     const loading = ref(false);
@@ -180,20 +182,30 @@ export default defineComponent({
       const langField = cfg.langField ?? "languages_code";
 
       return cfg.groups
-        .map((g) => ({
-          id: g.id,
-          label: resolveLabel(g.label as LangMap, systemLocale.value),
-          defaultOpen: g.defaultOpen !== false,
-          nodes: buildFieldNodes(
-            rawItem.value,
-            g.fields ?? [],
-            currentLang.value,
-            systemLocale.value,
-            langField,
-            languages.value,
-            fieldLabels.value,
-          ),
-        }))
+        .map((g) => {
+          // Group label priority:
+          //  1. Explicit label in config JSON
+          //  2. Directus field-meta translation for this group's id on the root collection
+          //  3. prettify(g.id) as last resort
+          const rawGroupLabel =
+            g.label ??
+            groupLabels.value.get(g.id) ??
+            prettify(g.id);
+          return {
+            id: g.id,
+            label: resolveLabel(rawGroupLabel, systemLocale.value),
+            defaultOpen: g.defaultOpen !== false,
+            nodes: buildFieldNodes(
+              rawItem.value,
+              g.fields ?? [],
+              currentLang.value,
+              systemLocale.value,
+              langField,
+              languages.value,
+              fieldLabels.value,
+            ),
+          };
+        })
         .filter((s) => s.nodes.length > 0);
     });
 

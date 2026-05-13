@@ -118,6 +118,22 @@ export default defineInterface({
       },
     },
     {
+      field: "displayMode",
+      name: "Display Mode",
+      type: "string",
+      schema: { default_value: "grid" },
+      meta: {
+        interface: "select-dropdown",
+        options: {
+          choices: [
+            { text: "Grid (2 columns)", value: "grid" },
+            { text: "Stack (full width)", value: "stack" },
+          ],
+        },
+        width: "half",
+      },
+    },
+    {
       field: "groups",
       name: "Preview Configuration (JSON)",
       type: "json",
@@ -136,7 +152,8 @@ Array of accordion groups. Each group is the parent and contains its own \`field
 | key | Description |
 |-----|-------------|
 | \`id\` | Unique group identifier |
-| \`label\` | Header text — plain string or \`{ "de-DE": "...", "en-US": "..." }\` |
+| \`label\` | Header text — plain string or \`{ "de-DE": "...", "en-US": "..." }\`. Auto-detected from field meta if omitted. |
+| \`labelType\` | \`"parent"\` (default) auto-detects header from root-collection field meta using \`id\`; \`"leaf"\` skips auto-detection and uses \`label\` or prettified \`id\` |
 | \`defaultOpen\` | \`true\` (default) to start expanded, \`false\` to start collapsed |
 | \`fields\` | Array of field objects belonging to this group |
 
@@ -146,7 +163,8 @@ Array of accordion groups. Each group is the parent and contains its own \`field
 | \`key\` | Unique identifier — used as display label if no \`label\` is set |
 | \`value\` | Dot-notation path to the value (e.g. \`"place.translations.name"\`) |
 | \`type\` | \`"direct"\` · \`"translated"\` · \`"relation"\` · \`"array"\` |
-| \`label\` | Optional label — string or \`{ "de-DE": "...", "en-US": "..." }\` |
+| \`label\` | Optional label override — string or \`{ "de-DE": "...", "en-US": "..." }\` |
+| \`labelType\` | \`"parent"\` (default for translated/relation/array) reads the label from the first path segment on the root collection (e.g. \`hotels.country\` → "Country"); \`"leaf"\` reads from the leaf field's own collection (e.g. \`countries_translations.name\` → "Name") |
 
 For **translated** fields the translation array is filtered to the selected language automatically.
         `.trim(),

@@ -1,0 +1,92 @@
+# Missing count: 90
+
+bitte wählen
+Alaska
+Mauritius
+--Inland
+Fiji Inseln
+Australien
+--Norfolk Island
+--Blue Mountains
+Neuseeland
+--Gisborne
+--Stewart Island
+--Catham Islands
+Südsee
+Französisch Polynesien
+--Manihi
+--Marquesas
+Cook Inseln
+--Mangaia
+--Rarotonga
+--Sonstiges Cook Islands
+Botswana
+--Ghanzi
+--North Luangwa
+--Harare
+--Masvingo
+--Matopo Nationalpark
+Südafrika
+--Northern Cape
+Namibia
+Malawi
+Malaysia
+--Ostküste
+--Westküste
+--Sonstiges Malaysia
+Thailand
+--Bangkok
+--Phuket
+--Chiang Mai / Chiang Rai
+--Koh Samui
+--Krabi / Koh Lanta
+--Koh Phangan / Koh Tao
+--Kaoh Lak / Koh Phi Phi / Koh Yao Noi
+--Hua Hin / Koh Chang / Koh Samet
+Vietnam
+--Saigon / Hanoi
+--Hoi An / Quy Nhon / Danang
+--Nha Trang / Phan Thiet
+--Phu Quoc
+Hawaii Inseln
+Chile
+--Altiplano
+--Osterinsel
+Argentinien
+--Iguazu
+--Buenos Aires
+--Patagonien
+--Seenregion
+Peru
+Bolivien
+--Amazonas Regenwald
+--Andenhochland
+--Amazonas Regenwald
+--Küste
+--Sao Paulo
+--Brasilia
+--Südküste
+--Amazonas Regenwald
+--Cartagena
+--Kaffeezone
+--Amazonas Regenwald
+--Pazifikküste
+Costa Rica
+—Tortuguero Nationalpark 
+—Corcovado Nationalpark 
+—Manuel Antonio Nationalpark 
+—Rincon de la Vieja Nationalpark 
+—Montverde
+—Vulkan Arenal Nationalpark 
+—Bocas del Toro
+—El Valle de Anton
+—Boquete
+Mexiko
+—Baja California 
+—Sierra Gorda
+Kuba
+—Ostkuba
+—Westkuba
+—Zentralkuba
+—Vinales Tal
+Belize
