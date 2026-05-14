@@ -25,7 +25,7 @@
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
         <circle cx="12" cy="12" r="3" />
       </svg>
-      {{ buttonLabel || "Preview" }}
+      {{ buttonLabel }}
     </button>
     <span v-if="isNew" class="ip-hint">Save the item first</span>
 
@@ -74,6 +74,7 @@ export default defineComponent({
     title: { type: String, default: "" },
     defaultLang: { type: String, default: "" },
     langField: { type: String, default: "" },
+    displayPlace: { type: String, default: "start" },
     groups: {
       type: [Array, String] as PropType<GroupConfig[] | string | null>,
       default: null,
@@ -95,13 +96,15 @@ export default defineComponent({
       title: props.title || "name",
       defaultLang: props.defaultLang || "de-DE",
       langField: props.langField || "languages_code",
-      buttonLabel: props.buttonLabel || "Preview",
+      buttonLabel: props.buttonLabel || "",
       translation_collection: props.translation_collection || "translations",
-      icon: props.icon || "preview",
+      icon: props.icon || "visibility",
       groups: safeParseGroups(props.groups),
     }));
 
-    return { showOverlay, isNew, parsedConfig };
+    const place = computed(() => props.displayPlace || "start");
+
+    return { showOverlay, isNew, parsedConfig, place };
   },
 });
 </script>
@@ -112,6 +115,7 @@ export default defineComponent({
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: v-bind(place);
 }
 
 .ip-btn {

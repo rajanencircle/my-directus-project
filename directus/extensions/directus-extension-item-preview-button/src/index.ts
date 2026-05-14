@@ -134,6 +134,22 @@ export default defineInterface({
       },
     },
     {
+      field: "displayPlace",
+      name: "Display Place",
+      type: "string",
+      schema: { default_value: "start" },
+      meta: {
+        interface: "select-dropdown",
+        options: {
+          choices: [
+            { text: "Start", value: "start" },
+            { text: "End", value: "end" },
+          ],
+        },
+        width: "half",
+      },
+    },
+    {
       field: "groups",
       name: "Preview Configuration (JSON)",
       type: "json",
