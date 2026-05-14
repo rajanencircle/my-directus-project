@@ -1,0 +1,26 @@
+{
+  "name": "directus-extension-media-uploader",
+  "version": "1.6.3",
+  "description": "M2M file manager interface for Directus — upload, preview, delete and download files attached to any collection item.",
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "directus-custom-interface"
+  ],
+  "directus:extension": {
+    "type": "interface",
+    "path": "dist/index.js",
+    "source": "src/index.ts",
+    "host": "^11.0.0"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w --no-minify"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "^17.0.0",
+    "typescript": "^5.0.0",
+    "vue": "^3.4.0"
+  },
+  "dependencies": {}
+}
