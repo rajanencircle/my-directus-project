@@ -235,7 +235,6 @@ export function buildFieldNodes(
 
     // ── Dropdown: resolve stored key → display text ───────────────────────────
     if (fc.type === "dropdown") {
-      console.table({ data, fc: fc.value, currentLang, langField, languages });
       const raw = resolveFieldValue(
         data,
         fc.value,
@@ -243,10 +242,7 @@ export function buildFieldNodes(
         langField,
         languages,
       );
-      console.log(raw, "raw");
-      console.log(fieldChoices, "fieldChoices");
       const choices = fieldChoices?.get(fc.value) ?? [];
-      console.log(choices, "choices");
 
       const match = choices.find(
         (c) => c.value === raw || String(c.value) === String(raw),
