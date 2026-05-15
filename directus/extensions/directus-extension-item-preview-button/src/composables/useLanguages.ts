@@ -15,6 +15,7 @@ export function useLanguages(translation_collection: string) {
       });
       languages.value = (res.data?.data ?? []).map(
         (l: Record<string, any>) => ({
+          ...l,                       // preserve all raw fields for custom labelField lookups
           id: l.id,
           code: l.code ?? l.id,
           name: l.name ?? l.code ?? l.id,

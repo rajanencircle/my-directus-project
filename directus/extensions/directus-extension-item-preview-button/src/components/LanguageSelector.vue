@@ -7,22 +7,23 @@
       :class="{ active: modelValue === lang.code }"
       @click="$emit('update:modelValue', lang.code)"
     >
-      {{ lang.name }}
+      {{ (lang[labelField] as string) ?? lang.code }}
     </button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import type { Language } from '../types';
+import { defineComponent, PropType } from "vue";
+import type { Language } from "../types";
 
 export default defineComponent({
-  name: 'LanguageSelector',
+  name: "LanguageSelector",
   props: {
     modelValue: { type: String, required: true },
     languages: { type: Array as PropType<Language[]>, default: () => [] },
+    labelField: { type: String, default: "code" },
   },
-  emits: ['update:modelValue'],
+  emits: ["update:modelValue"],
 });
 </script>
 

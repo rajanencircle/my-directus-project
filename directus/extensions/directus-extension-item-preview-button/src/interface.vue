@@ -74,6 +74,7 @@ export default defineComponent({
     title: { type: String, default: "" },
     defaultLang: { type: String, default: "" },
     langField: { type: String, default: "" },
+    langButtonLabel: { type: String, default: "" },
     displayPlace: { type: String, default: "start" },
     groups: {
       type: [Array, String] as PropType<GroupConfig[] | string | null>,
@@ -99,6 +100,7 @@ export default defineComponent({
       buttonLabel: props.buttonLabel || "",
       translation_collection: props.translation_collection || "translations",
       icon: props.icon || "visibility",
+      langButtonLabel: props.langButtonLabel || "code",
       groups: safeParseGroups(props.groups),
     }));
 

@@ -8,7 +8,12 @@ import type {
 
 // ── Label helpers ──────────────────────────────────────────────────────────────
 
-export function resolveLabel(label: LangMap | undefined | null, lang: string): string {
+export function resolveLabel(
+  label: LangMap | undefined | null,
+  lang: string,
+): string {
+  console.log("label", label);
+  console.log("lang", lang);
   if (!label) return "";
   if (typeof label === "string") return label;
   return (

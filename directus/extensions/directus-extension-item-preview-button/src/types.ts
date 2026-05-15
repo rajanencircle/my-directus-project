@@ -32,7 +32,9 @@ export interface GroupConfig {
    *  "leaf"             — skip API lookup; use g.label or prettify(g.id)
    */
   labelType?: "leaf" | "parent";
-  /** Whether the accordion starts open (default: true) */
+  /** false (default) = plain always-open card; true = collapsible accordion with chevron */
+  accordion?: boolean;
+  /** Whether the accordion starts open (default: true) — only applies when accordion: true */
   defaultOpen?: boolean;
   /** Fields belonging to this group */
   fields: FieldConfig[];
@@ -51,12 +53,15 @@ export interface PreviewConfig {
   groups?: GroupConfig[];
   translation_collection: string;
   icon: string;
+  /** Field key on language records used as the language button label (default: "code") */
+  langButtonLabel?: string;
 }
 
 export interface Language {
   id: string | number;
   code: string;
   name: string;
+  [key: string]: unknown;
 }
 
 export interface DisplayNode {

@@ -1,87 +1,95 @@
 <template>
-  <div class="overlay" role="dialog" aria-modal="true">
-    <!-- ── Topbar ─────────────────────────────────────────────────────────── -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <span class="collection-chip">{{ collection }}</span>
-        <h1 class="item-title">{{ itemTitle || "#" + itemId }}</h1>
+  <!-- ── Backdrop — click outside to close ─────────────────────────────────── -->
+  <div class="modal-backdrop" @click.self="$emit('close')">
+    <div class="modal" role="dialog" aria-modal="true">
+      <!-- ── Topbar ──────────────────────────────────────────────────────────── -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <span class="collection-chip">{{ collection }}</span>
+          <h1 class="item-title">{{ itemTitle || "#" + itemId }}</h1>
+        </div>
+
+        <div v-if="languages.length > 1" class="lang-area">
+          <LanguageSelector
+            v-model="currentLang"
+            :languages="languages"
+            :label-field="config?.langButtonLabel || 'code'"
+          />
+        </div>
+
+        <button class="close-btn" title="Close preview" @click="$emit('close')">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
-      <div v-if="languages.length > 1" class="lang-area">
-        <LanguageSelector v-model="currentLang" :languages="languages" />
+      <!-- ── Loading ──────────────────────────────────────────────────────────── -->
+      <div v-if="loading" class="state-box">
+        <span class="spinner" />
+        <span>Loading data…</span>
       </div>
 
-      <button class="close-btn" title="Close preview" @click="$emit('close')">
+      <!-- ── Error ────────────────────────────────────────────────────────────── -->
+      <div v-else-if="error" class="state-box state-error">
         <svg
-          width="18"
-          height="18"
+          width="22"
+          height="22"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2.5"
+          stroke-width="2"
         >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
         </svg>
-      </button>
-    </div>
-
-    <!-- ── Loading ────────────────────────────────────────────────────────── -->
-    <div v-if="loading" class="state-box">
-      <span class="spinner" />
-      <span>Loading data…</span>
-    </div>
-
-    <!-- ── Error ──────────────────────────────────────────────────────────── -->
-    <div v-else-if="error" class="state-box state-error">
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-      <span>{{ error }}</span>
-    </div>
-
-    <!-- ── No config ──────────────────────────────────────────────────────── -->
-    <div v-else-if="!hasConfig" class="state-box state-warn">
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-      <div>
-        <strong>No fields configured</strong>
-        <p>
-          Open the field settings for this interface and add a
-          <code>fields</code> array to the configuration JSON.
-        </p>
+        <span>{{ error }}</span>
       </div>
-    </div>
 
-    <!-- ── Content ────────────────────────────────────────────────────────── -->
-    <div v-else class="preview-body">
-      <AccordionSection
-        v-for="section in sections"
-        :key="section.id"
-        :title="section.label"
-        :nodes="section.nodes"
-        :default-open="section.defaultOpen"
-        :show-header="!!section.label"
-      />
+      <!-- ── No config ─────────────────────────────────────────────────────────── -->
+      <div v-else-if="!hasConfig" class="state-box state-warn">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <div>
+          <strong>No fields configured</strong>
+          <p>
+            Open the field settings for this interface and add a
+            <code>fields</code> array to the configuration JSON.
+          </p>
+        </div>
+      </div>
+
+      <!-- ── Content ───────────────────────────────────────────────────────────── -->
+      <div v-else class="preview-body">
+        <AccordionSection
+          v-for="section in sections"
+          :key="section.id"
+          :title="section.label"
+          :nodes="section.nodes"
+          :default-open="section.defaultOpen"
+          :show-header="!!section.label"
+          :accordion="section.accordion"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -126,7 +134,10 @@ export default defineComponent({
     const { languages } = useLanguages(
       props.config?.translation_collection ?? "languages",
     );
-    const { fieldLabels, groupLabels } = useFieldLabels(props.collection, toRef(props, "config"));
+    const { fieldLabels, groupLabels } = useFieldLabels(
+      props.collection,
+      toRef(props, "config"),
+    );
 
     const rawItem = ref<Record<string, unknown>>({});
     const loading = ref(false);
@@ -150,7 +161,6 @@ export default defineComponent({
         ) ?? 0) > 0,
     );
 
-    // ── Fetch item ─────────────────────────────────────────────────────────
     async function fetchData() {
       if (!hasConfig.value) return;
       loading.value = true;
@@ -175,7 +185,6 @@ export default defineComponent({
       fetchData,
     );
 
-    // ── Build sections — each group builds its own nodes ───────────────────
     const sections = computed(() => {
       const cfg = props.config;
       if (!cfg?.groups?.length || !Object.keys(rawItem.value).length) return [];
@@ -183,18 +192,13 @@ export default defineComponent({
 
       return cfg.groups
         .map((g) => {
-          // Group label priority:
-          //  1. Explicit label in config JSON
-          //  2. Directus field-meta translation for this group's id on the root collection
-          //  3. prettify(g.id) as last resort
           const rawGroupLabel =
-            g.label ??
-            groupLabels.value.get(g.id) ??
-            prettify(g.id);
+            g.label ?? groupLabels.value.get(g.id) ?? prettify(g.id);
           return {
             id: g.id,
             label: resolveLabel(rawGroupLabel, systemLocale.value),
             defaultOpen: g.defaultOpen !== false,
+            accordion: g.accordion === true,
             nodes: buildFieldNodes(
               rawItem.value,
               g.fields ?? [],
@@ -208,6 +212,8 @@ export default defineComponent({
         })
         .filter((s) => s.nodes.length > 0);
     });
+
+    console.log("sections", sections);
 
     const itemTitle = computed(() => {
       const tf = props.config?.title ?? "name";
@@ -228,16 +234,28 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* ── Full-screen overlay ── */
-.overlay {
+/* ── Backdrop ── */
+.modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 9999;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 40px;
+  box-sizing: border-box;
+  display: flex;
+  font-family: var(--theme--fonts--sans--font-family, system-ui, sans-serif);
+}
+
+/* ── Modal container ── */
+.modal {
+  flex: 1;
+  min-width: 0;
   background: var(--theme--background-normal, #f4f4f8);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  font-family: var(--theme--fonts--sans--font-family, system-ui, sans-serif);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
 }
 
 /* ── Topbar ── */
@@ -365,53 +383,22 @@ export default defineComponent({
 .preview-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 200px;
+  padding: 20px 24px 32px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  width: 100%;
   box-sizing: border-box;
-  overflow: auto;
-}
-
-@media (max-width: 1600px) {
-  .preview-body {
-    padding: 20px 180px;
-  }
-}
-
-@media (max-width: 1440px) {
-  .preview-body {
-    padding: 20px 160px;
-  }
-}
-@media (max-width: 1280px) {
-  .preview-body {
-    padding: 20px 130px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .preview-body {
-    padding: 20px 100px;
-  }
-}
-
-@media (max-width: 768px) {
-  .topbar {
-    padding: 8px 14px;
-  }
-  .preview-body {
-    padding: 20px 70px;
-  }
 }
 
 @media (max-width: 600px) {
+  .modal-backdrop {
+    padding: 16px;
+  }
   .topbar {
     padding: 8px 14px;
   }
   .preview-body {
-    padding: 20px 40px;
+    padding: 12px 12px 24px;
   }
 }
 </style>

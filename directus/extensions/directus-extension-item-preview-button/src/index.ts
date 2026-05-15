@@ -118,22 +118,6 @@ export default defineInterface({
       },
     },
     {
-      field: "displayMode",
-      name: "Display Mode",
-      type: "string",
-      schema: { default_value: "grid" },
-      meta: {
-        interface: "select-dropdown",
-        options: {
-          choices: [
-            { text: "Grid (2 columns)", value: "grid" },
-            { text: "Stack (full width)", value: "stack" },
-          ],
-        },
-        width: "half",
-      },
-    },
-    {
       field: "displayPlace",
       name: "Display Place",
       type: "string",
@@ -147,6 +131,16 @@ export default defineInterface({
           ],
         },
         width: "half",
+      },
+    },
+    {
+      field: "langButtonLabel",
+      name: "Language Button Label Field",
+      type: "string",
+      meta: {
+        interface: "input",
+        width: "half",
+        note: "Field key from the translations collection to display on each language button (default: `code`). Use `name` to show display names like \"Deutsch\".",
       },
     },
     {
@@ -170,7 +164,8 @@ Array of accordion groups. Each group is the parent and contains its own \`field
 | \`id\` | Unique group identifier |
 | \`label\` | Header text — plain string or \`{ "de-DE": "...", "en-US": "..." }\`. Auto-detected from field meta if omitted. |
 | \`labelType\` | \`"parent"\` (default) auto-detects header from root-collection field meta using \`id\`; \`"leaf"\` skips auto-detection and uses \`label\` or prettified \`id\` |
-| \`defaultOpen\` | \`true\` (default) to start expanded, \`false\` to start collapsed |
+| \`accordion\` | \`false\` (default) renders as a plain always-open card; \`true\` makes the group collapsible with a chevron |
+| \`defaultOpen\` | \`true\` (default) to start expanded, \`false\` to start collapsed — only applies when \`accordion: true\` |
 | \`fields\` | Array of field objects belonging to this group |
 
 **Field properties (inside \`fields\`):**
