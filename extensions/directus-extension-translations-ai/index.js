@@ -24,7 +24,6 @@ export default {
    *   relations.m2o  — the many-to-one (languages collection) side
    */
   options: ({ relations }) => {
-    console.log("index", relations);
     const junctionCollection =
       relations?.o2m?.collection ?? "hotel_translate_translations";
 

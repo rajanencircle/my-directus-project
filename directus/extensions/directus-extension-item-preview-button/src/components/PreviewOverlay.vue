@@ -134,7 +134,7 @@ export default defineComponent({
     const { languages } = useLanguages(
       props.config?.translation_collection ?? "languages",
     );
-    const { fieldLabels, groupLabels } = useFieldLabels(
+    const { fieldLabels, fieldChoices, groupLabels } = useFieldLabels(
       props.collection,
       toRef(props, "config"),
     );
@@ -192,8 +192,9 @@ export default defineComponent({
 
       return cfg.groups
         .map((g) => {
+          // Group label priority: auto-detected field meta > explicit config label > prettify
           const rawGroupLabel =
-            g.label ?? groupLabels.value.get(g.id) ?? prettify(g.id);
+            groupLabels.value.get(g.id) ?? g.label ?? prettify(g.id);
           return {
             id: g.id,
             label: resolveLabel(rawGroupLabel, systemLocale.value),
@@ -207,13 +208,12 @@ export default defineComponent({
               langField,
               languages.value,
               fieldLabels.value,
+              fieldChoices.value,
             ),
           };
         })
         .filter((s) => s.nodes.length > 0);
     });
-
-    console.log("sections", sections);
 
     const itemTitle = computed(() => {
       const tf = props.config?.title ?? "name";

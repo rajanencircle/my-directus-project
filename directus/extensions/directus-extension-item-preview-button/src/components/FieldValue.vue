@@ -1,6 +1,6 @@
 <template>
   <span class="field-value">
-    <template v-if="value === null || value === undefined">
+    <template v-if="value === null || value === undefined || value === ''">
       <span class="null-value">—</span>
     </template>
     <template v-else-if="typeof value === 'boolean'">

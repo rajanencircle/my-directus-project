@@ -539,7 +539,6 @@ export default {
   async mounted() {
     await this.fetchLanguages();
     const translationFields = this.translationFields;
-    console.log("translationFields", translationFields);
     // Pick default active language
     if (this.existingCodes.includes(this.defaultLanguage)) {
       this.activeLang = this.defaultLanguage;
@@ -560,7 +559,6 @@ export default {
     async fetchLanguages() {
       const collection = this.languageCollection;
       const junctionCollection = this.junctionCollection;
-      console.log(collection, junctionCollection);
       if (!collection) {
         // Graceful fallback: build from existing data
         this.allLangs = this.existingCodes.map((code) => ({

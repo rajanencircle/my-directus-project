@@ -12,8 +12,6 @@ export function resolveLabel(
   label: LangMap | undefined | null,
   lang: string,
 ): string {
-  console.log("label", label);
-  console.log("lang", lang);
   if (!label) return "";
   if (typeof label === "string") return label;
   return (
@@ -122,7 +120,7 @@ function findTranslationMatch(
 }
 
 function formatScalar(v: unknown): string {
-  if (v === null || v === undefined) return "—";
+  if (v === null || v === undefined || v === "") return "—";
   if (typeof v === "boolean") return v ? "Yes" : "No";
   if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}(T[\d:.Z+-]+)?$/.test(v)) {
     try {
@@ -226,6 +224,7 @@ export function buildFieldNodes(
   langField: string,
   languages: Language[],
   fieldMetaLabels?: Map<string, LangMap>,
+  fieldChoices?: Map<string, Array<{ text: string; value: unknown }>>,
 ): DisplayNode[] {
   return fields.map((fc) => {
     // Label priority: explicit config label > Directus field meta > prettified leaf key
@@ -233,6 +232,99 @@ export function buildFieldNodes(
     const leafKey = fc.key.split(".").pop() ?? fc.key;
     const rawLabel: LangMap = fc.label ?? metaLabel ?? prettify(leafKey);
     const label = resolveLabel(rawLabel, systemLang);
+
+    // ── Dropdown: resolve stored key → display text ───────────────────────────
+    if (fc.type === "dropdown") {
+      console.table({ data, fc: fc.value, currentLang, langField, languages });
+      const raw = resolveFieldValue(
+        data,
+        fc.value,
+        currentLang,
+        langField,
+        languages,
+      );
+      console.log(raw, "raw");
+      console.log(fieldChoices, "fieldChoices");
+      const choices = fieldChoices?.get(fc.value) ?? [];
+      console.log(choices, "choices");
+
+      const match = choices.find(
+        (c) => c.value === raw || String(c.value) === String(raw),
+      );
+      return {
+        key: fc.key,
+        label,
+        type: "scalar" as const,
+        value: match ? String(match.text) : formatScalar(raw),
+      };
+    }
+
+    // ── Repeater: array of objects → nested DisplayNode[][] ──────────────────
+    if (fc.type === "repeater") {
+      const raw = resolveFieldValue(
+        data,
+        fc.value,
+        currentLang,
+        langField,
+        languages,
+      );
+      const arr = Array.isArray(raw) ? (raw as Record<string, unknown>[]) : [];
+
+      const items: DisplayNode[][] = arr.map((item) => {
+        if (fc.fields?.length) {
+          // Use explicit sub-field definitions
+          return fc.fields.map((subFc) => {
+            const subMetaLabel = fieldMetaLabels?.get(
+              `${fc.value}.${subFc.value}`,
+            );
+            const subLeafKey = subFc.key.split(".").pop() ?? subFc.key;
+            const subRawLabel: LangMap =
+              subFc.label ?? subMetaLabel ?? prettify(subLeafKey);
+            const subLabel = resolveLabel(subRawLabel, systemLang);
+            const subVal = item[subFc.value];
+            if (Array.isArray(subVal)) {
+              return {
+                key: subFc.key,
+                label: subLabel,
+                type: "flat-list" as const,
+                value: null,
+                list: (subVal as unknown[]).map(formatScalar),
+              };
+            }
+            return {
+              key: subFc.key,
+              label: subLabel,
+              type: "scalar" as const,
+              value: subVal,
+            };
+          });
+        }
+        // Auto-detect: show every property except null/undefined
+        return Object.entries(item)
+          .filter(([, v]) => v !== null && v !== undefined)
+          .map(([k, v]) => ({
+            key: k,
+            label: prettify(k),
+            type: Array.isArray(v)
+              ? ("flat-list" as const)
+              : ("scalar" as const),
+            value: Array.isArray(v) ? null : v,
+            list: Array.isArray(v)
+              ? (v as unknown[]).map(formatScalar)
+              : undefined,
+          }));
+      });
+
+      return {
+        key: fc.key,
+        label,
+        type: "repeater" as const,
+        value: null,
+        items,
+      };
+    }
+
+    // ── Standard path ─────────────────────────────────────────────────────────
     const value = resolveFieldValue(
       data,
       fc.value,

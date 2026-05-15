@@ -1,6 +1,6 @@
 export type LangMap = string | Record<string, string>;
 
-export type FieldType = "direct" | "translated" | "relation" | "array";
+export type FieldType = "direct" | "translated" | "relation" | "array" | "dropdown" | "repeater";
 
 /** A single field inside a group */
 export interface FieldConfig {
@@ -19,6 +19,8 @@ export interface FieldConfig {
    * Default: "parent" for translated/relation/array types, "leaf" for direct.
    */
   labelType?: "leaf" | "parent";
+  /** Sub-fields for repeater type — if omitted, all object properties are displayed automatically */
+  fields?: FieldConfig[];
 }
 
 /** Accordion group — parent node that contains its own fields */
@@ -67,7 +69,9 @@ export interface Language {
 export interface DisplayNode {
   key: string;
   label: string;
-  type: "scalar" | "flat-list";
+  type: "scalar" | "flat-list" | "repeater";
   value: unknown;
   list?: string[];
+  /** Repeater items — outer array is each item, inner array is that item's display nodes */
+  items?: DisplayNode[][];
 }

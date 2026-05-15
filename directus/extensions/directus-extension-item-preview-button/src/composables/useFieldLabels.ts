@@ -7,23 +7,23 @@ type FieldMeta = {
   meta?: {
     label?: string;
     translations?: { language: string; translation: string }[];
+    options?: { choices?: Array<{ text: string; value: unknown }> };
   };
 };
 
+export type FieldChoice = { text: string; value: unknown };
+
 /**
- * Resolves Directus field-name translations for every path declared in the config.
- *
- * fieldLabels — Map<fc.value, LangMap>  e.g. "country.translations.name" → {de-DE: "Name", en-US: "Name"}
- * groupLabels — Map<group.id, LangMap>  auto-detected by looking up the group id as a field on
- *               the root collection (useful when group id matches a relation field like "country")
+ * Resolves Directus field metadata for every path declared in the config:
+ *   fieldLabels  — Map<fc.value, LangMap>   for label display
+ *   fieldChoices — Map<fc.value, FieldChoice[]>  for dropdown value → text resolution
+ *   groupLabels  — Map<group.id, LangMap>   auto-detected from root-collection field meta
  *
  * Strategy:
- *  1. Fetch ALL relations once (GET /relations) and build a bidirectional lookup
- *     map: `${collection}.${field}` → targetCollection.
- *  2. Walk each fc.value path segment-by-segment through that map to find the
- *     leaf field's actual collection.
- *  3. Fetch /fields/{leafCollection} and pull meta.translations.
- *  4. Collection field responses are cached per-composable-instance.
+ *  1. Fetch ALL relations once (GET /relations) → build bidirectional `col.field → targetCol` map.
+ *  2. Walk each fc.value path through that map to find the leaf collection + field.
+ *  3. Fetch /fields/{leafCollection}, pull meta.translations (labels) and meta.options.choices.
+ *  4. All /fields responses are cached per composable instance.
  */
 export function useFieldLabels(
   collection: string,
@@ -31,48 +31,59 @@ export function useFieldLabels(
 ) {
   const api = useApi();
   const fieldLabels = ref(new Map<string, LangMap>());
+  const fieldChoices = ref(new Map<string, FieldChoice[]>());
   const groupLabels = ref(new Map<string, LangMap>());
 
-  const fieldsCache = new Map<string, Map<string, LangMap>>();
+  // Per-instance caches
+  const labelsCache = new Map<string, Map<string, LangMap>>();
+  const choicesCache = new Map<string, Map<string, FieldChoice[]>>();
 
-  async function fetchFieldsForCollection(col: string): Promise<Map<string, LangMap>> {
-    if (fieldsCache.has(col)) return fieldsCache.get(col)!;
-    const map = new Map<string, LangMap>();
+  async function fetchFieldsForCollection(col: string): Promise<{
+    labels: Map<string, LangMap>;
+    choices: Map<string, FieldChoice[]>;
+  }> {
+    if (labelsCache.has(col)) {
+      return { labels: labelsCache.get(col)!, choices: choicesCache.get(col)! };
+    }
+    const labels = new Map<string, LangMap>();
+    const choices = new Map<string, FieldChoice[]>();
     try {
       const res = await api.get(`/fields/${col}`);
       for (const f of (res.data?.data ?? []) as FieldMeta[]) {
+        // Labels
         const translations = f.meta?.translations;
         if (translations?.length) {
           const langMap: Record<string, string> = {};
           for (const t of translations) langMap[t.language] = t.translation;
-          map.set(f.field, langMap);
+          labels.set(f.field, langMap);
         } else if (f.meta?.label) {
-          map.set(f.field, f.meta.label);
+          labels.set(f.field, f.meta.label);
         }
+        // Choices (for dropdown fields)
+        const fc_choices = f.meta?.options?.choices;
+        if (fc_choices?.length) choices.set(f.field, fc_choices);
       }
     } catch { /* non-critical */ }
-    fieldsCache.set(col, map);
-    return map;
+    labelsCache.set(col, labels);
+    choicesCache.set(col, choices);
+    return { labels, choices };
   }
 
   async function buildLabels() {
     if (!collection) return;
 
-    // ── Step 1: fetch ALL relations once and build bidirectional lookup ───────
-    // relMap key: `${owningCollection}.${fieldName}` → targetCollection
+    // ── Step 1: fetch ALL relations once → bidirectional lookup map ───────────
     const relMap = new Map<string, string>();
     try {
       const res = await api.get("/relations", { params: { limit: -1 } });
       for (const r of res.data?.data ?? []) {
         if (!r.related_collection) continue;
-        // M2O: the field lives on `r.collection` and points to `r.related_collection`
         relMap.set(`${r.collection}.${r.field}`, r.related_collection);
-        // O2M virtual: `meta.one_field` on `r.related_collection` points to `r.collection`
         if (r.meta?.one_field) {
           relMap.set(`${r.related_collection}.${r.meta.one_field}`, r.collection);
         }
       }
-    } catch { /* non-critical — labels fall back to prettify */ }
+    } catch { /* non-critical */ }
 
     // ── Step 2: resolve a dot-notation path to its leaf collection + field ────
     function resolveLeaf(path: string): { leafCollection: string; leafField: string } | null {
@@ -87,53 +98,56 @@ export function useFieldLabels(
       return { leafCollection: current, leafField };
     }
 
-    // ── Step 3: resolve labels for every fc.value in the config ──────────────
-    // Label source is chosen per-field:
-    //   "parent" → first path segment on root collection (default for translated/relation/array)
-    //   "leaf"   → leaf field in its resolved collection   (default for direct)
     const newFieldLabels = new Map<string, LangMap>();
+    const newFieldChoices = new Map<string, FieldChoice[]>();
     const newGroupLabels = new Map<string, LangMap>();
     const cfg = config.value;
 
-    // Pre-fetch root collection labels once (shared by "parent" lookups and groups)
-    const rootLabels = await fetchFieldsForCollection(collection);
+    // ── Step 3: pre-fetch root collection fields (needed for "parent" lookups & groups)
+    const { labels: rootLabels } = await fetchFieldsForCollection(collection);
 
+    // ── Step 4: resolve label + choices for every field path ─────────────────
     for (const g of cfg?.groups ?? []) {
       for (const fc of g.fields ?? []) {
-        const effectiveLabelType =
-          fc.labelType ?? (fc.type === "direct" ? "leaf" : "parent");
+        // "direct", "dropdown", "repeater" → prefer leaf; relational types → prefer parent
+        const defaultLabelType =
+          fc.type === "direct" || fc.type === "dropdown" || fc.type === "repeater"
+            ? "leaf"
+            : "parent";
+        const effectiveLabelType = fc.labelType ?? defaultLabelType;
 
         if (effectiveLabelType === "parent") {
-          // Label comes from the first path segment on the root collection
           const parentField = fc.value.split(".")[0];
           const label = rootLabels.get(parentField);
           if (label) newFieldLabels.set(fc.value, label);
+          // choices on the parent field (unusual but safe to try)
         } else {
-          // "leaf" — walk full path to the leaf collection
           const resolved = resolveLeaf(fc.value);
           if (!resolved) continue;
-          const colLabels = await fetchFieldsForCollection(resolved.leafCollection);
-          const label = colLabels.get(resolved.leafField);
+          const { labels, choices } = await fetchFieldsForCollection(resolved.leafCollection);
+          const label = labels.get(resolved.leafField);
           if (label) newFieldLabels.set(fc.value, label);
+          const choice = choices.get(resolved.leafField);
+          if (choice) newFieldChoices.set(fc.value, choice);
         }
       }
     }
 
-    // ── Step 4: group-header labels — respect group labelType ────────────────
+    // ── Step 5: group-header labels (auto-detect from root collection by g.id) ─
     for (const g of cfg?.groups ?? []) {
       if ((g.labelType ?? "parent") === "parent") {
         const label = rootLabels.get(g.id);
         if (label) newGroupLabels.set(g.id, label);
-        // "leaf": intentionally nothing stored — PreviewOverlay falls back to g.label or prettify
       }
     }
 
     fieldLabels.value = newFieldLabels;
+    fieldChoices.value = newFieldChoices;
     groupLabels.value = newGroupLabels;
   }
 
   onMounted(buildLabels);
   watch(config, buildLabels, { deep: true });
 
-  return { fieldLabels, groupLabels };
+  return { fieldLabels, fieldChoices, groupLabels };
 }

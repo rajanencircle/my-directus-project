@@ -5,7 +5,7 @@
     <dd class="kv-value"><FieldValue :value="node.value" /></dd>
   </div>
 
-  <!-- Flat tag list (array that resolved to a list of scalars) -->
+  <!-- Flat tag list -->
   <div v-else-if="node.type === 'flat-list'" class="kv-row">
     <dt class="kv-label">{{ node.label }}</dt>
     <dd class="kv-value">
@@ -14,6 +14,29 @@
         <span v-for="(item, i) in node.list" :key="i" class="tag"
           >• {{ item }}<br
         /></span>
+      </div>
+    </dd>
+  </div>
+
+  <!-- Repeater — list of object items, each with its own sub-nodes -->
+  <div v-else-if="node.type === 'repeater'" class="kv-row repeater-section">
+    <dt class="kv-label">{{ node.label }}</dt>
+    <dd class="repeater-body">
+      <span v-if="!node.items?.length" class="null-value">—</span>
+      <div v-else class="repeater-list">
+        <div
+          v-for="(itemNodes, idx) in node.items"
+          :key="idx"
+          class="repeater-card"
+        >
+          <div class="repeater-card-fields">
+            <DataNode
+              v-for="subNode in itemNodes"
+              :key="subNode.key"
+              :node="subNode"
+            />
+          </div>
+        </div>
       </div>
     </dd>
   </div>
@@ -34,6 +57,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* ── Shared key-value row ── */
 .kv-row {
   display: grid;
   grid-template-columns: 200px 1fr;
@@ -60,19 +84,43 @@ export default defineComponent({
   margin: 0;
   line-height: 1.5;
   word-break: break-word;
-  text-wrap: auto;
 }
 .null-value {
   color: var(--theme--foreground-subdued, #bbb);
   font-style: italic;
 }
 
+/* ── Tag list ── */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 .tag {
   padding: 2px 10px;
   background: var(--theme--background-subdued, #f0f0f0);
   border-radius: 20px;
   font-size: 12px;
   color: var(--theme--foreground, #1a1a1a);
+}
+
+/* ── Repeater section ── */
+.repeater-body {
+  margin: 0;
+}
+.repeater-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.repeater-card {
+  border: 1px solid var(--theme--border-color, #e0e0e0);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.repeater-card-fields {
+  padding: 0 12px;
 }
 
 @media (max-width: 580px) {

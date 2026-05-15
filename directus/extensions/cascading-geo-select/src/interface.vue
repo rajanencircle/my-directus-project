@@ -58,7 +58,9 @@
             {{ item.label }}
           </div>
         </template>
-        <div v-else-if="searchText && !loading" class="dropdown-item empty">No results found</div>
+        <div v-else-if="searchText && !loading" class="dropdown-item empty">
+          No results found
+        </div>
       </div>
     </div>
   </div>
@@ -434,7 +436,6 @@ function onSelect(item: DropdownItem) {
 }
 
 function onClear() {
-  console.log("onClear");
   clearSelf();
 }
 

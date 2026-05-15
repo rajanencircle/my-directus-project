@@ -1,8 +1,12 @@
-import { matchRoute } from './routeMatcher';
-import { applyActions, applyBodyRouteClass, cleanupActions } from './domActions';
-import type { RouteConfig } from './config';
+import { matchRoute } from "./routeMatcher";
+import {
+  applyActions,
+  applyBodyRouteClass,
+  cleanupActions,
+} from "./domActions";
+import type { RouteConfig } from "./config";
 
-const LOG = '[route-dom-injector]';
+const LOG = "[route-dom-injector]";
 
 interface InjectorState {
   config: RouteConfig[];
@@ -28,8 +32,6 @@ function runForCurrentRoute(): void {
   const currentPath = window.location.pathname;
   const matches = matchRoute(currentPath, state.config);
 
-  console.log(`${LOG} runForCurrentRoute path=${currentPath} matched=[${matches.map(m => m.path).join(', ') || 'none'}]`);
-
   applyBodyRouteClass(currentPath);
 
   if (matches.length === 0) {
@@ -45,7 +47,6 @@ function runForCurrentRoute(): void {
 
   try {
     for (const match of matches) {
-      console.log(`${LOG} applying actions for ${match.path}:`, JSON.stringify({ hideLabels: match.actions.hideLabels, addClasses: match.actions.addClasses, scriptsCount: match.actions.scripts?.length ?? 0 }));
       applyActions(match.actions);
     }
   } catch (err) {
@@ -71,20 +72,27 @@ function patchHistoryApi(): void {
   const _push = history.pushState.bind(history);
   const _replace = history.replaceState.bind(history);
 
-  history.pushState = function (data: unknown, unused: string, url?: string | URL | null) {
+  history.pushState = function (
+    data: unknown,
+    unused: string,
+    url?: string | URL | null,
+  ) {
     _push(data, unused, url);
     onRouteChange(window.location.pathname);
   };
 
-  history.replaceState = function (data: unknown, unused: string, url?: string | URL | null) {
+  history.replaceState = function (
+    data: unknown,
+    unused: string,
+    url?: string | URL | null,
+  ) {
     _replace(data, unused, url);
     onRouteChange(window.location.pathname);
   };
 
-  window.addEventListener('popstate', () => {
+  window.addEventListener("popstate", () => {
     onRouteChange(window.location.pathname);
   });
-
 }
 
 function startObserver(): void {
@@ -96,8 +104,8 @@ function startObserver(): void {
     const currentPath = window.location.pathname;
     if (matchRoute(currentPath, state.config).length === 0) return;
 
-    const hasAddedElement = mutations.some(mutation =>
-      Array.from(mutation.addedNodes).some(node => node instanceof Element)
+    const hasAddedElement = mutations.some((mutation) =>
+      Array.from(mutation.addedNodes).some((node) => node instanceof Element),
     );
 
     if (!hasAddedElement) return;
@@ -112,7 +120,6 @@ function startObserver(): void {
 
   const target = document.body ?? document.documentElement;
   state.observer.observe(target, { childList: true, subtree: true });
-
 }
 
 export function initRouteDomInjector(config: RouteConfig[]): void {
@@ -134,7 +141,7 @@ export function destroyRouteDomInjector(): void {
     state.debounceTimer = null;
   }
   cleanupActions();
-  applyBodyRouteClass('');
+  applyBodyRouteClass("");
   state.lastAppliedPath = null;
   state.isRunning = false;
 }

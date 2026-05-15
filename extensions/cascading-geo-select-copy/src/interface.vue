@@ -594,13 +594,7 @@ async function fetchById(
   extraFields: string[] = [],
 ): Promise<Record<string, unknown> | null> {
   const fields = [...buildFieldsParam(props.labelField), ...extraFields];
-  console.log("===============");
-  console.log(1, fields);
-  console.log(2, props.labelField);
-  console.log(3, extraFields);
-  console.log(4, [...new Set(fields)]);
-  console.log(5, id);
-  console.log("***************");
+
   try {
     const res = await api.get(`/items/${collection}/${id}`, {
       params: { fields: [...new Set(fields)] },
@@ -665,8 +659,6 @@ async function resolveCascade(
       const targetFKFields = (parsedCascades.value[mapping.to] ?? []).map(
         (m) => m.fk,
       );
-      console.log("fetchById", 1);
-      const targetRecord = await fetchById(
         targetLevel.collection,
         fkValue,
         targetFKFields,
@@ -688,7 +680,6 @@ async function initFromValues() {
   for (const level of parsedLevels.value) {
     const currentId = extractId(vals[level.field]);
     if (currentId && currentId !== selectedState[level.field]?.id) {
-      console.log("fetchById", 2);
 
       const item = await fetchById(level.collection, currentId);
       if (item) {
@@ -801,7 +792,6 @@ async function onSelect(level: LevelConfig, item: DropdownItem) {
     const upperFKFields = (parsedCascades.value[upperField] ?? []).map(
       (m) => m.fk,
     );
-    console.log("fetchById", 3);
 
     const upperRecord = await fetchById(
       upperLevel.collection,
@@ -829,7 +819,6 @@ async function onSelect(level: LevelConfig, item: DropdownItem) {
   // 3. Cascade downward: fetch FK fields and populate downstream levels
   if (parsedCascades.value[level.field]?.length) {
     const fkFields = parsedCascades.value[level.field].map((m) => m.fk);
-    console.log("fetchById", 4);
 
     const record = await fetchById(level.collection, item.id, fkFields);
 
@@ -846,14 +835,11 @@ async function onSelect(level: LevelConfig, item: DropdownItem) {
             (l) => l.field === targetField,
           );
           if (targetLevel) {
-            console.log("parsedCascades", parsedCascades.value);
             const labelFields = (parsedCascades.value[targetField] ?? []).map(
               (m) => {
-                console.log(m);
                 return m.fk;
               },
             );
-            console.log("fetchById", 5);
 
             const targetRecord = await fetchById(
               targetLevel.collection,
@@ -1002,7 +988,6 @@ watch(
           const fkFields = (parsedCascades.value[level.field] ?? []).map(
             (m) => m.fk,
           );
-          console.log("fetchById", 6);
 
           const item = await fetchById(level.collection, extId, fkFields);
           if (item) {
