@@ -6,7 +6,7 @@ import {
 } from "./domActions";
 import type { RouteConfig } from "./config";
 
-const LOG = "[route-dom-injector]";
+export const LOG = "[route-dom-injector]";
 
 interface InjectorState {
   config: RouteConfig[];

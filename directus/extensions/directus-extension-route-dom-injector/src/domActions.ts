@@ -10,7 +10,12 @@
  * but that is optional (user can define those classes in their own stylesheet).
  */
 
-import type { RouteActions, HideLabelsByField } from "./config";
+import type {
+  RouteActions,
+  HideLabelsByField,
+  TabGroupRawStyleAction,
+} from "./config";
+import { LOG } from "./observer";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -113,6 +118,42 @@ export function handleAddClasses(
   });
 }
 
+// ─── Tab Group Raw Styles ─────────────────────────────────────────────────────
+
+const TAB_STYLED_ATTR = "data-rdi-tab-styled";
+
+/**
+ * For each tab ID in the action, finds the matching tab panel by its ID suffix
+ * (e.g. "-content-master_data_group"), locates its first .group-raw child inside
+ * .v-form, and applies the configured inline styles with !important priority.
+ *
+ * Uses $= (ends-with) so the dynamic numeric prefix (reka-tabs-v-32-...) is ignored.
+ * Idempotent: skips elements already marked with data-rdi-tab-styled.
+ */
+export function handleTabGroupRawStyles(
+  actions: TabGroupRawStyleAction[],
+): void {
+  actions.forEach(({ tabIds, styles }) => {
+    tabIds.forEach((tabId) => {
+      // The panel's id ends with "-content-{tabId}" regardless of the dynamic numeric prefix.
+      const panel = document.querySelector<HTMLElement>(
+        `[id$="-content-${tabId}"]`,
+      );
+      if (!panel) return;
+
+      const firstGroupRaw = panel.querySelector<HTMLElement>(
+        ":scope > .v-form > .group-raw",
+      );
+      if (!firstGroupRaw || firstGroupRaw.hasAttribute(TAB_STYLED_ATTR)) return;
+
+      firstGroupRaw.setAttribute(TAB_STYLED_ATTR, "true");
+      Object.entries(styles).forEach(([prop, value]) => {
+        firstGroupRaw.style.setProperty(prop, value, "important");
+      });
+    });
+  });
+}
+
 // ─── Run Scripts ─────────────────────────────────────────────────────────────
 
 /**
@@ -124,7 +165,7 @@ export function handleRunScripts(scripts: Array<() => void>): void {
     try {
       fn();
     } catch (err) {
-      console.error(`[route-dom-injector] script[${i}] threw:`, err);
+      console.error(`${LOG} script[${i}] threw:`, err);
     }
   });
 }
@@ -140,6 +181,9 @@ export function applyActions(actions: RouteActions): void {
   }
   if (actions.addClasses?.length) {
     handleAddClasses(actions.addClasses);
+  }
+  if (actions.tabGroupRawStyles?.length) {
+    handleTabGroupRawStyles(actions.tabGroupRawStyles);
   }
   if (actions.scripts?.length) {
     handleRunScripts(actions.scripts);
@@ -165,4 +209,14 @@ export function cleanupActions(): void {
       el.classList.remove(className);
     });
   });
+
+  // Remove tab group raw inline styles
+  document
+    .querySelectorAll<HTMLElement>(`[${TAB_STYLED_ATTR}]`)
+    .forEach((el) => {
+      el.removeAttribute(TAB_STYLED_ATTR);
+      el.style.removeProperty("background-color");
+      el.style.removeProperty("padding");
+      el.style.removeProperty("border");
+    });
 }

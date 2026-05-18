@@ -17,6 +17,20 @@ export interface AddClassAction {
   className: string;
 }
 
+export interface TabGroupRawStyleAction {
+  /**
+   * List of tab group field IDs (e.g. 'master_data_group').
+   * Matched against tab panel IDs like: reka-tabs-v-0-content-master_data_group
+   */
+  tabIds: string[];
+  /**
+   * CSS property → value pairs to apply (with !important) to the first
+   * .group-raw found inside each matched tab panel.
+   * e.g. { 'background-color': 'transparent', 'padding': '0px' }
+   */
+  styles: Record<string, string>;
+}
+
 export interface RouteActions {
   /**
    * Hide field labels.
@@ -30,6 +44,12 @@ export interface RouteActions {
    * Each entry targets one or more elements with a selector and adds a class.
    */
   addClasses?: AddClassAction[];
+
+  /**
+   * Apply inline styles to the first .group-raw inside specific tab panels
+   * of a .group-tabs component. Identified by tab group field ID.
+   */
+  tabGroupRawStyles?: TabGroupRawStyleAction[];
 
   /**
    * Arbitrary DOM scripts to run after the route is matched.
@@ -84,6 +104,16 @@ const routeConfig: RouteConfig[] = [
         ],
       },
       addClasses: [],
+      tabGroupRawStyles: [
+        {
+          tabIds: ["master_data_group"],
+          styles: {
+            "background-color": "transparent",
+            padding: "0px",
+            border: "0px solid #E5E7EB",
+          },
+        },
+      ],
     },
   },
   {
