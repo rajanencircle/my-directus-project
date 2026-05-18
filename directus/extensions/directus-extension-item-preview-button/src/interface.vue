@@ -149,12 +149,8 @@ export default defineComponent({
         ></span>
       </div>
       <span data-v-c79b6f25="" class="accordion-trigger-title" style="    margin-left: 3px;">${label}</span
-      ><span
-        data-v-0317f84d=""
-        data-v-c79b6f25=""
-        class="v-icon accordion-trigger-chevron"
-        ><i data-v-0317f84d="" class="" data-icon="chevron_left"></i
-      ></span>
+      >
+      </span>
     </button>
   </h3>
   <div

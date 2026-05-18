@@ -40,113 +40,103 @@
         :key="groupKey"
         class="price-group"
       >
-        <div class="group-header" @click="toggleGroup(groupKey)">
-          <v-icon
-            :name="expandedGroups[groupKey] ? 'expand_more' : 'chevron_right'"
-            class="accordion-icon"
-          />
-          <h3 class="group-title">{{ getGroupLabel(groupKey) }}</h3>
-        </div>
-
-        <div v-if="expandedGroups[groupKey]" class="group-content">
-          <div class="table-wrapper">
-            <table class="prices-table">
-              <thead>
-                <tr>
-                  <th class="row-header row-label sticky-col">
-                    {{ getRowFieldLabel() }}
-                  </th>
-                  <th class="label-col">Price Type</th>
-                  <th
-                    v-for="col in columns"
-                    :key="col.id"
-                    class="column-header"
-                  >
-                    <div class="column-header-content">
-                      <span class="col-name"
-                        >{{ col.name
-                        }}{{ col.from_price ? " (From)" : "" }}</span
-                      >
-                      <span class="col-value">[{{ col.value }}]</span>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="row in group.rows"
-                  :key="`${groupKey}|${row.id}`"
-                  class="data-row"
+        <div class="table-wrapper">
+          <table class="prices-table">
+            <colgroup>
+              <col class="col-label" />
+              <col class="col-price-type" />
+              <col
+                v-for="col in columns"
+                :key="'cg-' + col.id"
+                class="col-price"
+              />
+            </colgroup>
+            <thead>
+              <tr>
+                <th
+                  class="group-header-cell sticky-col"
+                  colspan="2"
+                  @click="toggleGroup(groupKey)"
                 >
-                  <td class="row-label sticky-col">
-                    <div class="row-label-content">
-                      <strong>{{
-                        row?.name ||
-                        formatDateNumericRange(row.start_date, row.end_date)
-                      }}</strong>
-                      <small class="date-range">
-                        {{ formatDateRange(row.start_date, row.end_date) }}
-                      </small>
-                    </div>
-                  </td>
-
-                  <td class="label-col">
-                    <div class="price-labels">
-                      <label class="input-label buy-label">
-                        <v-icon name="shopping_cart" x-small />
-                        Buy ({{ buyCurrencySymbol }})
-                      </label>
-                      <label class="input-label sell-label">
-                        <v-icon name="sell" x-small />
-                        Sell ({{ sellCurrencySymbol }})
-                      </label>
-                    </div>
-                  </td>
-
-                  <td
-                    v-for="col in columns"
-                    :key="`${groupKey}|${row.id}|${col.id}`"
-                    class="price-cell"
-                    :class="{
-                      'has-changes': isCellModified(groupKey, row.id, col.id),
-                    }"
-                  >
-                    <div class="price-inputs">
-                      <div class="input-group buy-group">
-                        <input
-                          :value="
-                            getCell(groupKey, row.id, col.id)[buyPriceField]
-                          "
-                          type="number"
-                          step="0.01"
-                          class="cell-input buy-price-input"
-                          placeholder="0.00"
-                          :disabled="disabled"
-                          @input="
-                            handleBuyPriceInput(
-                              groupKey,
-                              row.id,
-                              col.id,
-                              $event,
-                            )
-                          "
-                          @focus="($event.target as HTMLInputElement).select()"
-                        />
-                      </div>
-
-                      <span class="price-display">
-                        {{
-                          formatPrice(
-                            getCell(groupKey, row.id, col.id)[sellPriceField],
-                          )
-                        }}
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                  <div class="group-header-inner">
+                    <v-icon
+                      name="expand_more"
+                      class="accordion-icon"
+                      :class="{ 'is-expanded': expandedGroups[groupKey] }"
+                    />
+                    <span class="group-title">{{
+                      getGroupLabel(groupKey)
+                    }}</span>
+                  </div>
+                </th>
+                <th v-for="col in columns" :key="col.id" class="column-header">
+                  {{ col.name }}{{ col.from_price ? " (From)" : "" }}
+                </th>
+              </tr>
+            </thead>
+            <tbody v-if="expandedGroups[groupKey]">
+              <tr
+                v-for="row in group.rows"
+                :key="`${groupKey}|${row.id}`"
+                class="data-row"
+              >
+                <td class="row-label sticky-col">
+                  <div class="row-label-content">
+                    <strong
+                      v-if="row?.name && !isDateRangeName(row.name)"
+                      class="date-name"
+                      >{{ row.name }}</strong
+                    >
+                    <small class="date-range">
+                      {{ formatDateRange(row.start_date, row.end_date) }}
+                    </small>
+                  </div>
+                </td>
+                <td class="label-col">
+                  <div class="price-labels">
+                    <label class="input-label buy-label">
+                      <v-icon name="shopping_cart" x-small />
+                      Buy ({{ buyCurrencySymbol }})
+                    </label>
+                    <label class="input-label sell-label">
+                      <v-icon name="sell" x-small />
+                      Sell ({{ sellCurrencySymbol }})
+                    </label>
+                  </div>
+                </td>
+                <td
+                  v-for="col in columns"
+                  :key="`${groupKey}|${row.id}|${col.id}`"
+                  class="price-cell"
+                  :class="{
+                    'has-changes': isCellModified(groupKey, row.id, col.id),
+                  }"
+                >
+                  <div class="price-inputs">
+                    <input
+                      :value="getCell(groupKey, row.id, col.id)[buyPriceField]"
+                      type="number"
+                      step="0.01"
+                      class="cell-input"
+                      placeholder="0.00"
+                      :disabled="disabled"
+                      @input="
+                        handleBuyPriceInput(groupKey, row.id, col.id, $event)
+                      "
+                      @focus="($event.target as HTMLInputElement).select()"
+                    />
+                    <span class="price-display">
+                      {{
+                        formatPrice(
+                          getCell(groupKey, row.id, col.id)[sellPriceField],
+                        )
+                      }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -183,6 +173,7 @@ import {
   onUnmounted,
 } from "vue";
 import { useApi, useStores } from "@directus/extensions-sdk";
+import { isValid, parse } from "date-fns";
 
 export default defineComponent({
   props: {
@@ -1071,6 +1062,13 @@ export default defineComponent({
       return end ? `${format(start)} – ${format(end)}` : format(start);
     };
 
+    const isDateRangeName = (name: string): boolean => {
+      const parts = name.split(/\s*[-–]\s*/);
+      if (parts.length !== 2) return false;
+      const ref = new Date(2000, 0, 1);
+      return parts.every((p) => isValid(parse(p.trim(), "dd.MM.yyyy", ref)));
+    };
+
     const formatDateNumericRange = (start?: string, end?: string) => {
       if (!start) return "";
       const format = (d: string) => {
@@ -1283,6 +1281,7 @@ export default defineComponent({
       saveChanges,
       discardChanges,
       toggleGroup,
+      isDateRangeName,
       parent_id,
       translations_id,
       buyPriceField: props.buyPriceField,
@@ -1295,301 +1294,228 @@ export default defineComponent({
 <style scoped>
 .room-prices-table {
   width: 100%;
-  /* font-family: var(--theme--fonts--sans--font-family); */
   color: var(--theme--foreground);
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
 }
-
 .loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 5rem 2rem;
+  padding: 4rem 2rem;
   color: var(--theme--foreground-subdued);
-  gap: 1.25rem;
+  gap: 1rem;
 }
-
+.context-header {
+  margin-bottom: 0.75rem;
+}
+.selector-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+.selector-label {
+  font-weight: 600;
+  color: var(--theme--foreground-subdued);
+  white-space: nowrap;
+}
 .save-bar {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0.75rem 0;
-  margin-bottom: 1.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
 }
-
-.save-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
 .price-group {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1rem;
   border-radius: var(--theme--border-radius);
   overflow: hidden;
   border: var(--theme--border-width) solid var(--theme--border-color);
-  background: var(--theme--background-page);
 }
-
-.button-bottom {
-  margin-top: 1.5rem;
-}
-
-.group-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: var(--theme--background-normal);
-  cursor: pointer;
-  user-select: none;
-  transition: background var(--fast) var(--transition);
-}
-
-.group-header:hover {
-  background: color-mix(
-    in srgb,
-    var(--theme--background-normal),
-    var(--theme--foreground-subdued) 20%
-  );
-}
-
-.accordion-icon {
-  color: var(--theme--foreground-subdued);
-  font-size: 1.25rem;
-}
-
-.group-title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--theme--foreground-accent);
-  flex: 1;
-}
-
-.group-count {
-  font-size: 0.8125rem;
-  color: var(--theme--foreground-accent);
-  background: var(--theme--background-subdued);
-  padding: 0.25rem 0.625rem;
-  border-radius: 999px;
-}
-
-.group-content {
-  background: var(--theme--background-page);
-}
-
 .table-wrapper {
   overflow-x: auto;
 }
-
 .prices-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  table-layout: fixed;
 }
-
+col.col-label {
+  width: 220px;
+}
+col.col-price-type {
+  width: 110px;
+}
+col.col-price {
+  width: 120px;
+}
 .prices-table th,
 .prices-table td {
   border: var(--theme--border-width) solid var(--theme--border-color);
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   vertical-align: middle;
 }
-
-.prices-table thead th {
+.group-header-cell {
   background: var(--theme--background-subdued);
-  font-weight: 600;
-  color: var(--theme--foreground-accent);
-  /* text-transform: uppercase; */
-  font-size: 1rem;
-  letter-spacing: 0.4px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  cursor: pointer;
+  user-select: none;
+  width: 320px;
+  min-width: 200px;
+  text-align: left;
+  transition: background var(--fast) var(--transition);
 }
-
+.group-header-cell:hover {
+  background: color-mix(
+    in srgb,
+    var(--theme--background-subdued),
+    var(--theme--foreground-subdued) 15%
+  );
+}
+.group-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.accordion-icon {
+  color: var(--theme--primary);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.accordion-icon.is-expanded {
+  transform: rotate(180deg);
+}
+.group-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--theme--primary);
+  white-space: nowrap;
+}
+.column-header {
+  background: var(--theme--background-subdued);
+  color: var(--theme--primary);
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  min-width: 100px;
+  white-space: nowrap;
+}
 .sticky-col {
   position: sticky;
   left: 0;
-  z-index: 20;
-  background: var(--theme--background-normal) !important;
+  z-index: 10;
 }
-
-.row-header {
-  text-align: left !important;
-  font-weight: 600;
-  min-width: 180px;
-  background: var(--theme--background-normal) !important;
-  font-size: 1.125rem;
-}
-
 .row-label {
-  text-align: left !important;
+  background: var(--theme--background-normal);
+  text-align: left;
   font-weight: 500;
-  background-color: var(--background-normal);
-  min-width: 180px;
+  width: 220px;
+  min-width: 160px;
 }
-
 .row-label-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.date-range {
+  color: var(--theme--foreground-accent);
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+.date-name {
+  color: var(--theme--foreground-accent);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+.label-col {
+  background: var(--theme--banner--title--foreground);
+  text-align: left;
+  width: 110px;
+  min-width: 100px;
+}
+.price-labels {
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
 }
-
-.label-col {
-  min-width: 140px;
-  background: var(--theme--background-subdued) !important;
-  text-align: left !important;
-}
-
-.column-header {
-  background: color-mix(
-    in srgb,
-    var(--theme--background-normal),
-    var(--theme--foreground-subdued) 20%
-  ) !important;
-  color: var(--theme--foreground-accent) !important;
+.input-label {
+  font-size: 0.75rem;
   font-weight: 600;
-  min-width: 110px;
-}
-
-.column-header-content {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  gap: 0.25rem;
+  white-space: nowrap;
 }
-
-.col-name {
-  font-size: 1rem !important;
+.buy-label {
+  color: var(--theme--foreground);
 }
-
-.col-value {
-  font-size: 0.8rem !important;
-  opacity: 0.8;
+.sell-label {
+  color: var(--theme--foreground-subdued);
 }
-
-.data-row:hover {
-  background: var(--theme--background-normal);
-}
-
 .price-cell {
+  background: var(--theme--background-normal);
   padding: 0.5rem !important;
+  min-width: 100px;
 }
-
 .price-cell.has-changes {
   background: var(--theme--warning-background);
   border-color: var(--theme--warning);
 }
-
 .price-inputs {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.3rem;
 }
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.input-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--theme--foreground-subdued);
-  /* text-transform: uppercase; */
-  letter-spacing: 0.4px;
-  margin-bottom: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.buy-label {
-  color: var(--theme--foreground);
-}
-
-.sell-label {
-  color: var(--theme--foreground-subdued);
-}
-
 .cell-input {
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  padding: 0.3rem 0.5rem;
   border: var(--theme--border-width) solid var(--theme--border-color);
   border-radius: var(--theme--border-radius);
-  background: var(--theme--form--field--input--background);
+  background: var(--theme--banner--title--foreground);
   color: var(--theme--foreground);
-  /* font-family: var(--theme--fonts--monospace--font-family); */
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   text-align: center;
-  transition: all var(--fast) var(--transition);
+  transition: border-color var(--fast) var(--transition);
 }
-
 .cell-input:hover:not(:disabled) {
   border-color: var(--theme--primary);
 }
-
 .cell-input:focus {
   outline: none;
   border-color: var(--theme--primary);
-  box-shadow: 0 0 0 3px var(--theme--primary-background);
+  box-shadow: 0 0 0 2px var(--theme--primary-background);
 }
-
 .cell-input:disabled {
   background: var(--theme--background-subdued);
   color: var(--theme--foreground-subdued);
   opacity: 0.7;
 }
-
-.readonly-value {
-  padding: 0.5rem 0.75rem;
-  background: var(--theme--background-subdued);
-  border: var(--theme--border-width) solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius);
-  min-height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--theme--foreground-subdued);
-  /* font-family: var(--theme--fonts--monospace--font-family); */
-}
-
 .price-display {
   text-align: center;
+  font-size: 0.75rem;
   font-weight: 500;
+  color: var(--theme--foreground-subdued);
 }
-
 .empty-state {
-  padding: 6rem 2rem;
+  padding: 4rem 2rem;
   text-align: center;
   color: var(--theme--foreground-subdued);
 }
-
 .empty-title {
-  margin: 1rem 0 0.5rem;
-  font-size: 1.25rem;
+  margin: 0.75rem 0 0.375rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--theme--foreground);
 }
-
 .empty-hint {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
 }
-
-/* Responsive */
+.button-bottom {
+  margin-top: 1rem;
+}
 @media (max-width: 768px) {
-  .save-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .save-actions {
-    flex-direction: column;
-  }
-
   .sticky-col {
     position: static;
   }
