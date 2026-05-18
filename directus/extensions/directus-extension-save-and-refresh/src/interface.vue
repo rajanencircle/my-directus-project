@@ -13,7 +13,12 @@
         </span>
       </v-button>
 
-      <v-notice v-if="errorMessage" type="danger" @close="errorMessage = null" class="notice-spacing">
+      <v-notice
+        v-if="errorMessage"
+        type="danger"
+        @close="errorMessage = null"
+        class="notice-spacing"
+      >
         {{ errorMessage }}
       </v-notice>
     </div>
@@ -27,12 +32,18 @@
     >
       <div class="confirm-panel">
         <div class="confirm-title">{{ confirmTitle }}</div>
-        <div v-if="confirmMessage" class="confirm-message">{{ confirmMessage }}</div>
+        <div v-if="confirmMessage" class="confirm-message">
+          {{ confirmMessage }}
+        </div>
         <div class="confirm-actions">
           <v-button secondary :disabled="loading" @click="closeConfirm">
             {{ confirmCancelLabel }}
           </v-button>
-          <v-button :loading="loading" :disabled="loading" @click="confirmAndSave">
+          <v-button
+            :loading="loading"
+            :disabled="loading"
+            @click="confirmAndSave"
+          >
             {{ confirmContinueLabel }}
           </v-button>
         </div>
@@ -48,7 +59,9 @@
     >
       <div class="confirm-panel">
         <div class="confirm-title">{{ resultTitle }}</div>
-        <div v-if="resultMessage" class="confirm-message">{{ resultMessage }}</div>
+        <div v-if="resultMessage" class="confirm-message">
+          {{ resultMessage }}
+        </div>
         <div class="confirm-actions">
           <v-button @click="closeResult">
             {{ resultCloseLabel }}
@@ -60,77 +73,96 @@
 </template>
 
 <script>
-import { ref, inject, computed, toRaw, unref, watch, nextTick, onMounted } from 'vue';
-import { useApi } from '@directus/extensions-sdk';
-import { useRouter } from 'vue-router';
+import {
+  ref,
+  inject,
+  computed,
+  toRaw,
+  unref,
+  watch,
+  nextTick,
+  onMounted,
+} from "vue";
+import { useApi } from "@directus/extensions-sdk";
+import { useRouter } from "vue-router";
 
 export default {
-  emits: ['refresh', 'setFieldValue'],
+  emits: ["refresh", "setFieldValue"],
   props: {
     value: { type: String, default: null },
-    buttonLabel: { type: String, default: 'Save & Refresh' },
-    buttonIcon: { type: String, default: 'save' },
+    buttonLabel: { type: String, default: "Save & Refresh" },
+    buttonIcon: { type: String, default: "save" },
     refreshType: {
       type: String,
-      default: 'full',
-      validator: (v) => ['form', 'full', 'back', 'none'].includes(v),
+      default: "full",
+      validator: (v) => ["form", "full", "back", "none"].includes(v),
     },
     refreshDelay: { type: Number, default: 1000 },
-    confirmTitle: { type: String, default: 'Save Item' },
-    confirmMessage: { type: String, default: 'Do you want to save this item?' },
+    confirmTitle: { type: String, default: "Save Item" },
+    confirmMessage: { type: String, default: "Do you want to save this item?" },
     confirmEnabled: { type: Boolean, default: true },
-    confirmCancelLabel: { type: String, default: 'Cancel' },
-    confirmContinueLabel: { type: String, default: 'Save' },
+    confirmCancelLabel: { type: String, default: "Cancel" },
+    confirmContinueLabel: { type: String, default: "Save" },
     resultDialogEnabled: { type: Boolean, default: false },
-    resultTitle: { type: String, default: 'Saved' },
-    resultMessage: { type: String, default: 'The item was saved successfully.' },
-    resultCloseLabel: { type: String, default: 'Close' },
+    resultTitle: { type: String, default: "Saved" },
+    resultMessage: {
+      type: String,
+      default: "The item was saved successfully.",
+    },
+    resultCloseLabel: { type: String, default: "Close" },
     collection: { type: String, required: true },
-    primaryKey: { type: [String, Number], default: '+' },
+    primaryKey: { type: [String, Number], default: "+" },
   },
   setup(props, { emit, attrs }) {
     const api = useApi();
     const router = useRouter();
-    const notify = inject('notify', null);
-    const refresh = inject('refresh', null);
-    const values = inject('values', {});
-    const initialValues = inject('initialValues', null);
+    const notify = inject("notify", null);
+    const refresh = inject("refresh", null);
+    const values = inject("values", {});
+    const initialValues = inject("initialValues", null);
 
     const loading = ref(false);
     const errorMessage = ref(null);
     const confirmOpen = ref(false);
     const resultOpen = ref(false);
 
-    const SYSTEM_FIELDS = new Set(['date_created', 'user_created', 'date_updated', 'user_updated', 'id']);
+    const SYSTEM_FIELDS = new Set([
+      "date_created",
+      "user_created",
+      "date_updated",
+      "user_updated",
+      "id",
+    ]);
 
-    const effectiveCollection = computed(() =>
-      props.collection || router.currentRoute.value.params['collection']
+    const effectiveCollection = computed(
+      () => props.collection || router.currentRoute.value.params["collection"],
     );
-    const effectivePrimaryKey = computed(() =>
-      props.primaryKey ?? router.currentRoute.value.params['primaryKey']
+    const effectivePrimaryKey = computed(
+      () => props.primaryKey ?? router.currentRoute.value.params["primaryKey"],
     );
 
     const isNew = computed(() => {
       const pk = effectivePrimaryKey.value;
-      return !pk || String(pk) === '+';
+      return !pk || String(pk) === "+";
     });
 
     function deepToRaw(raw, visited = new WeakMap()) {
       if (raw === null || raw === undefined) return null;
-      if (typeof raw !== 'object' || raw instanceof Date) return raw;
+      if (typeof raw !== "object" || raw instanceof Date) return raw;
       if (visited.has(raw)) return visited.get(raw);
       const val = toRaw(unref(raw));
       if (val === null || val === undefined) return null;
-      if (typeof val !== 'object') return val;
+      if (typeof val !== "object") return val;
       if (Array.isArray(val)) {
         const arr = [];
         visited.set(raw, arr);
-        val.forEach(item => arr.push(deepToRaw(item, visited)));
+        val.forEach((item) => arr.push(deepToRaw(item, visited)));
         return arr;
       }
       const result = {};
       visited.set(raw, result);
-      for (const key of Object.keys(val)) result[key] = deepToRaw(val[key], visited);
+      for (const key of Object.keys(val))
+        result[key] = deepToRaw(val[key], visited);
       return result;
     }
 
@@ -142,16 +174,20 @@ export default {
     };
 
     let debounceTimer = null;
-    watch(values, () => {
-      if (debounceTimer) clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(syncCurrentSnapshot, 120);
-    }, { deep: true });
+    watch(
+      values,
+      () => {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(syncCurrentSnapshot, 120);
+      },
+      { deep: true },
+    );
 
     function isDeeplyDifferent(a, b) {
       if (a == null && b == null) return false;
       if (a == null || b == null) return true;
       if (typeof a !== typeof b) return true;
-      if (typeof a !== 'object' || a instanceof Date) return a !== b;
+      if (typeof a !== "object" || a instanceof Date) return a !== b;
       if (Array.isArray(a)) {
         if (!Array.isArray(b) || a.length !== b.length) return true;
         return a.some((item, i) => isDeeplyDifferent(item, b[i]));
@@ -159,7 +195,7 @@ export default {
       const keysA = Object.keys(a);
       const keysB = Object.keys(b);
       if (keysA.length !== keysB.length) return true;
-      return keysA.some(key => isDeeplyDifferent(a[key], b[key]));
+      return keysA.some((key) => isDeeplyDifferent(a[key], b[key]));
     }
 
     const isDirty = computed(() => {
@@ -185,13 +221,17 @@ export default {
         baselineJson.value = JSON.stringify(deepToRaw(initialValues.value));
       }
 
-      const stop = watch(values, () => {
-        const count = Object.keys(deepToRaw(values) ?? {}).length;
-        if (count >= 40) {
-          captureBaseline();
-          stop();
-        }
-      }, { deep: true, immediate: true });
+      const stop = watch(
+        values,
+        () => {
+          const count = Object.keys(deepToRaw(values) ?? {}).length;
+          if (count >= 40) {
+            captureBaseline();
+            stop();
+          }
+        },
+        { deep: true, immediate: true },
+      );
 
       setTimeout(() => {
         if (baselineJson.value === null) captureBaseline();
@@ -199,7 +239,7 @@ export default {
     });
 
     function showNotice(payload) {
-      if (typeof notify === 'function') notify(payload);
+      if (typeof notify === "function") notify(payload);
     }
 
     const effectiveRefreshDelay = computed(() => {
@@ -211,40 +251,36 @@ export default {
     async function refreshCurrentForm() {
       const collection = effectiveCollection.value;
       const pk = effectivePrimaryKey.value;
-      console.log('[save-refresh] refreshCurrentForm called', { collection, pk });
 
-      if (!collection || !pk || String(pk) === '+') {
-        console.log('[save-refresh] refreshCurrentForm: missing collection or pk, aborting');
+      if (!collection || !pk || String(pk) === "+") {
         return false;
       }
 
-      const onSetFieldValue = typeof attrs.onSetFieldValue === 'function' ? attrs.onSetFieldValue : null;
-      console.log('[save-refresh] onSetFieldValue:', onSetFieldValue ? 'available' : 'not available');
-      console.log('[save-refresh] initialValues:', initialValues ? 'available' : 'not available');
+      const onSetFieldValue =
+        typeof attrs.onSetFieldValue === "function"
+          ? attrs.onSetFieldValue
+          : null;
 
       try {
         const response = await api.get(`/items/${collection}/${pk}`);
         const item = response?.data?.data;
-        console.log('[save-refresh] fetched item:', JSON.parse(JSON.stringify(item ?? null)));
 
-        if (!item || typeof item !== 'object') {
-          console.log('[save-refresh] refreshCurrentForm: invalid item response');
+        if (!item || typeof item !== "object") {
           return false;
         }
 
-        const fields = Object.entries(item).filter(([field]) => !SYSTEM_FIELDS.has(field));
-        console.log('[save-refresh] fields to apply:', fields.map(([f]) => f));
+        const fields = Object.entries(item).filter(
+          ([field]) => !SYSTEM_FIELDS.has(field),
+        );
 
         if (onSetFieldValue) {
           // Chained nextTick pattern required by Directus to update multiple fields
           for (const [field, fieldValue] of fields) {
-            console.log(`[save-refresh] onSetFieldValue("${field}",`, fieldValue, ')');
             onSetFieldValue(field, fieldValue);
             await nextTick();
           }
         } else if (initialValues) {
           for (const [field, fieldValue] of fields) {
-            console.log(`[save-refresh] initialValues.value["${field}"] =`, fieldValue);
             initialValues.value[field] = fieldValue;
           }
           await nextTick();
@@ -252,8 +288,7 @@ export default {
           // Presentation interfaces don't receive onSetFieldValue or initialValues,
           // use emit('setFieldValue') with chained nextTick as per Directus community pattern
           for (const [field, fieldValue] of fields) {
-            console.log(`[save-refresh] emit setFieldValue("${field}",`, fieldValue, ')');
-            emit('setFieldValue', { field, value: fieldValue });
+            emit("setFieldValue", { field, value: fieldValue });
             await nextTick();
           }
         }
@@ -262,37 +297,35 @@ export default {
         baselineJson.value = JSON.stringify(currentSnapshot.value);
         return true;
       } catch (error) {
-        console.warn('[save-refresh] Form reload failed.', error);
+        console.warn("[save-refresh] Form reload failed.", error);
         return false;
       }
     }
 
     async function applyNavigation() {
-      console.log('[save-refresh] applyNavigation called, refreshType =', props.refreshType);
+      if (props.refreshType === "none") return;
 
-      if (props.refreshType === 'none') return;
-
-      if (props.refreshType === 'form') {
+      if (props.refreshType === "form") {
         // Try field-by-field update (only works when onSetFieldValue or initialValues is available)
         const refreshed = await refreshCurrentForm();
-        console.log('[save-refresh] refreshCurrentForm result:', refreshed);
         if (refreshed) return;
 
         // Fall back to Directus-injected refresh
-        console.log('[save-refresh] falling back to injected refresh(), available:', typeof refresh === 'function');
-        if (typeof refresh === 'function') {
-          try { refresh(); return; } catch (e) {
-            console.warn('[save-refresh] injected refresh() threw:', e);
+        if (typeof refresh === "function") {
+          try {
+            refresh();
+            return;
+          } catch (e) {
+            console.warn("[save-refresh] injected refresh() threw:", e);
           }
         }
 
         // Last resort: page reload
-        console.log('[save-refresh] falling back to window.location.reload()');
         window.location.reload();
         return;
       }
 
-      if (props.refreshType === 'back') {
+      if (props.refreshType === "back") {
         if (window.history.length > 1) {
           window.history.back();
           return;
@@ -314,7 +347,10 @@ export default {
       const baseline = baselineJson.value ? JSON.parse(baselineJson.value) : {};
 
       const edits = {};
-      const allKeys = new Set([...Object.keys(current), ...Object.keys(baseline)]);
+      const allKeys = new Set([
+        ...Object.keys(current),
+        ...Object.keys(baseline),
+      ]);
       for (const key of allKeys) {
         if (SYSTEM_FIELDS.has(key)) continue;
         if (isDeeplyDifferent(current[key], baseline[key])) {
@@ -352,20 +388,25 @@ export default {
             return;
           }
 
-          if (props.refreshType === 'none') {
-            showNotice({ title: 'Saved', text: 'Item saved successfully', type: 'success' });
+          if (props.refreshType === "none") {
+            showNotice({
+              title: "Saved",
+              text: "Item saved successfully",
+              type: "success",
+            });
             return;
           }
-          console.log('[save-refresh] applyNavigation() called after save');
           await applyNavigation();
         }, effectiveRefreshDelay.value);
-
       } catch (err) {
         loading.value = false;
         confirmOpen.value = false;
-        const msg = err?.response?.data?.errors?.[0]?.message || err?.message || 'Save failed';
+        const msg =
+          err?.response?.data?.errors?.[0]?.message ||
+          err?.message ||
+          "Save failed";
         errorMessage.value = msg;
-        showNotice({ title: 'Error', text: msg, type: 'error' });
+        showNotice({ title: "Error", text: msg, type: "error" });
       }
     }
 

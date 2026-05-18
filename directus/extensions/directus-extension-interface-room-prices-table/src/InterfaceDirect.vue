@@ -776,10 +776,7 @@ export default defineComponent({
       try {
         const resp = await api.get("/ws-token");
         const token = resp.data?.token ?? null;
-        console.log(
-          "[RoomPricesTable/Direct] WS: token from /ws-token:",
-          token ? token.slice(0, 20) + "..." : "null",
-        );
+
         return token;
       } catch (err) {
         console.warn(
@@ -792,9 +789,6 @@ export default defineComponent({
 
     const connectWebSocket = async () => {
       if (!parent_id.value) {
-        console.log(
-          "[RoomPricesTable/Direct] WS: skipping connect — parent_id not resolved yet",
-        );
         return;
       }
 
@@ -808,27 +802,17 @@ export default defineComponent({
 
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const url = `${protocol}//${window.location.host}/websocket?access_token=${token}`;
-      console.log("[RoomPricesTable/Direct] WS: connecting to", url);
 
       ws = new WebSocket(url);
 
       // With URL token auth, no handshake needed — subscribe immediately on open
       ws.onopen = () => {
-        console.log(
-          "[RoomPricesTable/Direct] WS: connected and authenticated via URL token",
-        );
         ws!.send(
           JSON.stringify({
             type: "subscribe",
             collection: props.parentCollection,
             query: { filter: { id: { _eq: parent_id.value } }, fields: ["id"] },
           }),
-        );
-        console.log(
-          "[RoomPricesTable/Direct] WS: subscribe sent for",
-          props.parentCollection,
-          "id:",
-          parent_id.value,
         );
       };
 
@@ -841,31 +825,15 @@ export default defineComponent({
         }
 
         if (msg.type === "subscription" && msg.status === "ok") {
-          console.log(
-            "[RoomPricesTable/Direct] WS: subscription confirmed for",
-            props.parentCollection,
-          );
         }
 
         if (msg.type === "subscription" && msg.event === "update") {
-          console.log(
-            "[RoomPricesTable/Direct] WS: update received — refreshing table",
-          );
           await fetchParentRecord();
           await fetchItems();
-          console.log(
-            "[RoomPricesTable/Direct] WS: refresh complete. Items loaded:",
-            items.value.length,
-          );
         }
       };
 
       ws.onclose = (event) => {
-        console.log(
-          "[RoomPricesTable/Direct] WS: closed (code:",
-          event.code,
-          ")" + (event.code !== 1000 ? " — reconnecting in 5s" : ""),
-        );
         ws = null;
         if (event.code !== 1000) {
           wsReconnectTimer = setTimeout(connectWebSocket, 5000);

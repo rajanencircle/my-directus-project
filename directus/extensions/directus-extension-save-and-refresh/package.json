@@ -1,6 +1,6 @@
 {
   "name": "directus-extension-save-and-refresh",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Interface to run a manual flow for the current item and optionally refresh the current form, reload the page, or navigate back after completion",
   "type": "module",
   "license": "MIT",

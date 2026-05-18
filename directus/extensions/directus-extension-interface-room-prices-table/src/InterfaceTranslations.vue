@@ -1102,22 +1102,9 @@ export default defineComponent({
       userStore = stores.useUserStore ? stores.useUserStore() : null;
 
       if (userStore) {
-        console.log("[RoomPricesTable] Current User:", userStore.currentUser);
       }
       if (authStore) {
-        console.log(
-          "[RoomPricesTable] Auth Store Keys:",
-          Object.keys(authStore),
-        );
         // Try to safe log essential state
-        console.log(
-          "[RoomPricesTable] Auth State Token Property:",
-          authStore.token,
-        );
-        console.log(
-          "[RoomPricesTable] Auth State AccessToken Property:",
-          authStore.accessToken,
-        );
       }
     } catch (e) {
       console.warn("[RoomPricesTable] useStores error:", e);
@@ -1137,10 +1124,7 @@ export default defineComponent({
       try {
         const resp = await api.get("/ws-token");
         const token = resp.data?.token ?? null;
-        console.log(
-          "[RoomPricesTable] WS: token from /ws-token:",
-          token ? token.slice(0, 20) + "..." : "null",
-        );
+
         return token;
       } catch (err) {
         console.warn("[RoomPricesTable] WS: /ws-token request failed —", err);
@@ -1150,43 +1134,27 @@ export default defineComponent({
 
     const connectWebSocket = async () => {
       if (!parent_id.value) {
-        console.log(
-          "[RoomPricesTable] WS: skipping connect — parent_id not resolved yet",
-        );
         return;
       }
 
       const token = await getAccessToken();
       if (!token) {
-        console.warn(
-          "[RoomPricesTable] WS: cannot connect — no token returned from /ws-token",
-        );
         return;
       }
 
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const url = `${protocol}//${window.location.host}/websocket?access_token=${token}`;
-      console.log("[RoomPricesTable] WS: connecting to", url);
 
       ws = new WebSocket(url);
 
       // With URL token auth, no auth handshake needed — subscribe immediately on open
       ws.onopen = () => {
-        console.log(
-          "[RoomPricesTable] WS: connected and authenticated via URL token",
-        );
         ws!.send(
           JSON.stringify({
             type: "subscribe",
             collection: props.parentCollection,
             query: { filter: { id: { _eq: parent_id.value } }, fields: ["id"] },
           }),
-        );
-        console.log(
-          "[RoomPricesTable] WS: subscribe sent for",
-          props.parentCollection,
-          "id:",
-          parent_id.value,
         );
       };
 
@@ -1199,31 +1167,15 @@ export default defineComponent({
         }
 
         if (msg.type === "subscription" && msg.status === "ok") {
-          console.log(
-            "[RoomPricesTable] WS: subscription confirmed for",
-            props.parentCollection,
-          );
         }
 
         if (msg.type === "subscription" && msg.event === "update") {
-          console.log(
-            "[RoomPricesTable] WS: update received — refreshing table",
-          );
           await fetchHotelAndRates();
           await fetchItems();
-          console.log(
-            "[RoomPricesTable] WS: refresh complete. Items loaded:",
-            items.value.length,
-          );
         }
       };
 
       ws.onclose = (event) => {
-        console.log(
-          "[RoomPricesTable] WS: closed (code:",
-          event.code,
-          ")" + (event.code !== 1000 ? " — reconnecting in 5s" : ""),
-        );
         ws = null;
         if (event.code !== 1000) {
           wsReconnectTimer = setTimeout(connectWebSocket, 5000);
