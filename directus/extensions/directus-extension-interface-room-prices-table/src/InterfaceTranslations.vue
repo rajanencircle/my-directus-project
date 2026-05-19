@@ -74,11 +74,14 @@
                 </th>
               </tr>
             </thead>
-            <tbody v-if="expandedGroups[groupKey]">
+            <TransitionGroup tag="tbody" name="row-cascade">
               <tr
-                v-for="row in group.rows"
+                v-for="(row, rowIndex) in expandedGroups[groupKey]
+                  ? group.rows
+                  : []"
                 :key="`${groupKey}|${row.id}`"
                 class="data-row"
+                :style="{ '--row-index': Math.min(Number(rowIndex), 8) }"
               >
                 <td class="row-label sticky-col">
                   <div class="row-label-content">
@@ -135,7 +138,7 @@
                   </div>
                 </td>
               </tr>
-            </tbody>
+            </TransitionGroup>
           </table>
         </div>
       </div>
@@ -1514,6 +1517,25 @@ col.col-price {
 }
 .button-bottom {
   margin-top: 1rem;
+}
+.row-cascade-enter-active {
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1);
+  transition-delay: calc(var(--row-index) * 18ms);
+}
+.row-cascade-leave-active {
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+.row-cascade-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.row-cascade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 @media (max-width: 768px) {
   .sticky-col {
