@@ -172,12 +172,103 @@ export default {
     {
       field: "label",
       type: "string",
-      name: "$t:label",
+      name: "Button Label",
       meta: {
         width: "full",
         interface: "system-input-translated-string",
-        options: { placeholder: "$t:label" },
+        options: { placeholder: "e.g. Save & Calculate Sell Prices" },
       },
+    },
+    // ─── Labels ──────────────────────────────────────────────────────────────
+    {
+      field: "divider_labels",
+      name: "Labels",
+      type: "alias",
+      meta: {
+        width: "full",
+        interface: "presentation-divider",
+        options: { title: "Labels", color: "var(--theme--primary)" },
+      },
+    },
+    {
+      field: "headerSurchargeLabel",
+      name: "Surcharge Column Header",
+      type: "string",
+      meta: {
+        width: "half",
+        interface: "system-input-translated-string",
+        options: { placeholder: "e.g. Surcharge" },
+      },
+      schema: { default_value: "" },
+    },
+    {
+      field: "headerPricingLabel",
+      name: "Pricing Column Header",
+      type: "string",
+      meta: {
+        width: "half",
+        interface: "system-input-translated-string",
+        options: { placeholder: "e.g. Pricing" },
+      },
+      schema: { default_value: "" },
+    },
+    {
+      field: "buyLabel",
+      name: "Buy Price Label",
+      type: "string",
+      meta: {
+        width: "half",
+        interface: "system-input-translated-string",
+        options: { placeholder: "e.g. Buy" },
+      },
+      schema: { default_value: "" },
+    },
+    {
+      field: "sellLabel",
+      name: "Sell Price Label",
+      type: "string",
+      meta: {
+        width: "half",
+        interface: "system-input-translated-string",
+        options: { placeholder: "e.g. Sell" },
+      },
+      schema: { default_value: "" },
+    },
+    {
+      field: "emptyStateTitle",
+      name: "Empty State Title",
+      type: "string",
+      meta: {
+        width: "half",
+        interface: "system-input-translated-string",
+        options: { placeholder: "e.g. No surcharges linked" },
+      },
+      schema: { default_value: "" },
+    },
+    {
+      field: "emptyStateHint",
+      name: "Empty State Hint",
+      type: "string",
+      meta: {
+        width: "half",
+        interface: "system-input-translated-string",
+        options: {
+          placeholder:
+            "e.g. Add surcharges to the hotel to manage pricing here.",
+        },
+      },
+      schema: { default_value: "" },
+    },
+    {
+      field: "loadingText",
+      name: "Loading Text",
+      type: "string",
+      meta: {
+        width: "half",
+        interface: "system-input-translated-string",
+        options: { placeholder: "e.g. Loading surcharge prices..." },
+      },
+      schema: { default_value: "" },
     },
   ],
 };

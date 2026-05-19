@@ -2,7 +2,7 @@
   <div class="surcharge-prices-table">
     <div v-if="loading" class="loading">
       <v-progress-circular indeterminate />
-      <p class="loading-text">Loading surcharge prices...</p>
+      <p class="loading-text">{{ loadingText || "Loading surcharge prices..." }}</p>
     </div>
 
     <div v-else>
@@ -28,9 +28,9 @@
           <thead>
             <tr>
               <th class="header-cell header-name sticky-col" colspan="2">
-                Surcharge
+                {{ headerSurchargeLabel || "Surcharge" }}
               </th>
-              <th class="header-cell header-pricing">Pricing</th>
+              <th class="header-cell header-pricing">{{ headerPricingLabel || "Pricing" }}</th>
             </tr>
           </thead>
           <tbody>
@@ -42,11 +42,11 @@
                 <div class="price-labels">
                   <label class="input-label buy-label">
                     <v-icon name="shopping_cart" x-small />
-                    Buy ({{ buyCurrencySymbol }})
+                    {{ buyLabel || "Buy" }} ({{ buyCurrencySymbol }})
                   </label>
                   <label class="input-label sell-label">
                     <v-icon name="sell" x-small />
-                    Sell ({{ sellCurrencySymbol }})
+                    {{ sellLabel || "Sell" }} ({{ sellCurrencySymbol }})
                   </label>
                 </div>
               </td>
@@ -75,10 +75,8 @@
       <!-- Empty State -->
       <div v-else class="empty-state-card">
         <v-icon name="inbox" large class="empty-icon" />
-        <p class="empty-title">No surcharges linked</p>
-        <p class="empty-hint">
-          Add surcharges to the hotel to manage pricing here.
-        </p>
+        <p class="empty-title">{{ emptyStateTitle || "No surcharges linked" }}</p>
+        <p class="empty-hint">{{ emptyStateHint || "Add surcharges to the hotel to manage pricing here." }}</p>
       </div>
 
       <!-- Save Bar Bottom -->
@@ -125,6 +123,13 @@ export default defineComponent({
     fieldData: { type: Object, default: null },
     placement: { type: String, default: "bottom" },
     label: { type: String, default: "" },
+    loadingText: { type: String, default: "" },
+    headerSurchargeLabel: { type: String, default: "" },
+    headerPricingLabel: { type: String, default: "" },
+    buyLabel: { type: String, default: "" },
+    sellLabel: { type: String, default: "" },
+    emptyStateTitle: { type: String, default: "" },
+    emptyStateHint: { type: String, default: "" },
   },
 
   emits: ["input"],
