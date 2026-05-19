@@ -66,22 +66,30 @@
                     />
                     <span class="group-title">
                       {{ getGroupLabel(groupKey) }}
-                      <span v-if="fromPriceSymbol && getGroupFromPrice(groupKey)" class="from-price-wrapper">(<v-icon
-                        :name="fromPriceSymbol"
-                        small
-                        class="from-price-icon"
-                      />)</span>
+                      <span
+                        v-if="fromPriceSymbol && getGroupFromPrice(groupKey)"
+                        class="from-price-wrapper"
+                        >(<v-icon
+                          :name="fromPriceSymbol"
+                          small
+                          class="from-price-icon"
+                        />)</span
+                      >
                     </span>
                   </div>
                 </th>
                 <th v-for="col in columns" :key="col.id" class="column-header">
                   {{ col.name }}
                   [{{ col.value }}]
-                  <span v-if="fromPriceSymbol && col.from_price" class="from-price-wrapper">(<v-icon
-                    :name="fromPriceSymbol"
-                    small
-                    class="from-price-icon"
-                  />)</span>
+                  <span
+                    v-if="fromPriceSymbol && col.from_price"
+                    class="from-price-wrapper"
+                    >(<v-icon
+                      :name="fromPriceSymbol"
+                      small
+                      class="from-price-icon"
+                    />)</span
+                  >
                 </th>
               </tr>
             </thead>
@@ -103,11 +111,19 @@
                     </strong>
                     <small class="date-range">
                       {{ formatDateRange(row.start_date, row.end_date) }}
-                      <span v-if="fromPriceSymbol && rowFromPriceField && row[rowFromPriceField]" class="from-price-wrapper">(<v-icon
-                        :name="fromPriceSymbol"
-                        small
-                        class="from-price-icon"
-                      />)</span>
+                      <span
+                        v-if="
+                          fromPriceSymbol &&
+                          rowFromPriceField &&
+                          row[rowFromPriceField]
+                        "
+                        class="from-price-wrapper"
+                        >(<v-icon
+                          :name="fromPriceSymbol"
+                          small
+                          class="from-price-icon"
+                        />)</span
+                      >
                     </small>
                   </div>
                 </td>
@@ -160,12 +176,16 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="items.length === 0" class="empty-state">
-        <v-icon name="inbox" large />
-        <p class="empty-title">No room prices configured yet</p>
+      <div v-if="items.length === 0" class="empty-state-card">
+        <v-icon name="inbox" large class="empty-icon" />
+        <p class="empty-title">
+          {{ emptyStateTitle || "No room prices configured yet" }}
+        </p>
         <p class="empty-hint">
-          Add price dates, room categories, and select occupancies to see them
-          here.
+          {{
+            emptyStateHint ||
+            "Add price dates, room categories, and select occupancies to see them here."
+          }}
         </p>
       </div>
 
@@ -259,6 +279,8 @@ export default defineComponent({
     occupancySortField: { type: String, default: "value" },
     rowSortField: { type: String, default: "start_date" },
     groupSortField: { type: String, default: "" },
+    emptyStateTitle: { type: String, default: "" },
+    emptyStateHint: { type: String, default: "" },
   },
 
   emits: ["input"],
@@ -313,8 +335,8 @@ export default defineComponent({
         value: relatedRecord.value ?? junctionRow?.value ?? null,
         from_price: props.occupancyFromPriceField
           ? (relatedRecord[props.occupancyFromPriceField] ??
-             junctionRow?.[props.occupancyFromPriceField] ??
-             false)
+            junctionRow?.[props.occupancyFromPriceField] ??
+            false)
           : false,
       };
     };
@@ -567,7 +589,9 @@ export default defineComponent({
               `${relatedField}.id`,
               `${relatedField}.name`,
               `${relatedField}.value`,
-              ...(props.occupancyFromPriceField ? [`${relatedField}.${props.occupancyFromPriceField}`] : []),
+              ...(props.occupancyFromPriceField
+                ? [`${relatedField}.${props.occupancyFromPriceField}`]
+                : []),
               ...(props.occupancySortField &&
               props.occupancySortField !== "value"
                 ? [`${relatedField}.${props.occupancySortField}`]
@@ -596,7 +620,9 @@ export default defineComponent({
                 "id",
                 "name",
                 "value",
-                ...(props.occupancyFromPriceField ? [props.occupancyFromPriceField] : []),
+                ...(props.occupancyFromPriceField
+                  ? [props.occupancyFromPriceField]
+                  : []),
                 ...(props.occupancySortField &&
                 props.occupancySortField !== "value"
                   ? [props.occupancySortField]
@@ -691,11 +717,16 @@ export default defineComponent({
                 "id",
                 "room_category",
                 "sharedId",
-                ...(props.groupFromPriceField ? [props.groupFromPriceField] : []),
+                ...(props.groupFromPriceField
+                  ? [props.groupFromPriceField]
+                  : []),
                 ...(props.groupSortField &&
-                !["id", "room_category", "sharedId", props.groupFromPriceField].includes(
-                  props.groupSortField,
-                )
+                ![
+                  "id",
+                  "room_category",
+                  "sharedId",
+                  props.groupFromPriceField,
+                ].includes(props.groupSortField)
                   ? [props.groupSortField]
                   : []),
               ],
@@ -725,11 +756,16 @@ export default defineComponent({
                 "id",
                 "room_category",
                 "sharedId",
-                ...(props.groupFromPriceField ? [props.groupFromPriceField] : []),
+                ...(props.groupFromPriceField
+                  ? [props.groupFromPriceField]
+                  : []),
                 ...(props.groupSortField &&
-                !["id", "room_category", "sharedId", props.groupFromPriceField].includes(
-                  props.groupSortField,
-                )
+                ![
+                  "id",
+                  "room_category",
+                  "sharedId",
+                  props.groupFromPriceField,
+                ].includes(props.groupSortField)
                   ? [props.groupSortField]
                   : []),
               ],
@@ -1137,7 +1173,9 @@ export default defineComponent({
 
     const getGroupFromPrice = (key: string): boolean => {
       if (!props.groupFromPriceField) return false;
-      return !!lookupData.value.categories.get(key)?.[props.groupFromPriceField];
+      return !!lookupData.value.categories.get(key)?.[
+        props.groupFromPriceField
+      ];
     };
 
     const getRowFieldLabel = () => {
@@ -1599,10 +1637,21 @@ col.col-price {
   font-weight: 500;
   color: var(--theme--foreground-subdued);
 }
-.empty-state {
-  padding: 4rem 2rem;
+.empty-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
   text-align: center;
   color: var(--theme--foreground-subdued);
+  border: var(--theme--border-width) solid var(--theme--border-color);
+  border-radius: var(--theme--border-radius);
+  background: var(--theme--background-subdued);
+}
+.empty-icon {
+  color: var(--theme--foreground-subdued);
+  opacity: 0.5;
 }
 .empty-title {
   margin: 0.75rem 0 0.375rem;

@@ -163,6 +163,30 @@ export default defineInterface({
         schema: { default_value: "start_date" },
       },
       {
+        field: "emptyStateTitle",
+        name: "Empty State Title",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          note: "Heading shown when there are no prices to display. Supports $t: translation keys.",
+          options: { placeholder: "e.g. No prices configured yet" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "emptyStateHint",
+        name: "Empty State Hint",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          note: "Subtext shown below the empty state heading. Supports $t: translation keys.",
+          options: { placeholder: "e.g. Add price dates, categories, and occupancies to see them here." },
+        },
+        schema: { default_value: "" },
+      },
+      {
         field: "groupByField",
         name: "Group By Field",
         type: "string",
