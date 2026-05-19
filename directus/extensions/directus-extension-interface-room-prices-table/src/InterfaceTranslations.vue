@@ -66,23 +66,22 @@
                     />
                     <span class="group-title">
                       {{ getGroupLabel(groupKey) }}
-                      (<v-icon
-                        v-if="getGroupFromPrice(groupKey)"
+                      <span v-if="fromPriceSymbol && getGroupFromPrice(groupKey)" class="from-price-wrapper">(<v-icon
                         :name="fromPriceSymbol"
                         small
                         class="from-price-icon"
-                      />)
+                      />)</span>
                     </span>
                   </div>
                 </th>
                 <th v-for="col in columns" :key="col.id" class="column-header">
                   {{ col.name }}
-                  [{{ col.value }}] (<v-icon
-                    v-if="col.from_price"
+                  [{{ col.value }}]
+                  <span v-if="fromPriceSymbol && col.from_price" class="from-price-wrapper">(<v-icon
                     :name="fromPriceSymbol"
                     small
                     class="from-price-icon"
-                  />)
+                  />)</span>
                 </th>
               </tr>
             </thead>
@@ -104,13 +103,11 @@
                     </strong>
                     <small class="date-range">
                       {{ formatDateRange(row.start_date, row.end_date) }}
-                      (
-                      <v-icon
-                        v-if="row.from_price"
+                      <span v-if="fromPriceSymbol && row.from_price" class="from-price-wrapper">(<v-icon
                         :name="fromPriceSymbol"
                         small
                         class="from-price-icon"
-                      />)
+                      />)</span>
                     </small>
                   </div>
                 </td>
@@ -255,7 +252,7 @@ export default defineComponent({
     currencySymbolField: { type: String, default: "symbol" },
     defaultBuyCurrencySymbol: { type: String, default: "€" },
     defaultSellCurrencySymbol: { type: String, default: "$" },
-    fromPriceSymbol: { type: String, default: "*" },
+    fromPriceSymbol: { type: String, default: "" },
     occupancySortField: { type: String, default: "value" },
     rowSortField: { type: String, default: "start_date" },
     groupSortField: { type: String, default: "" },
@@ -1635,8 +1632,13 @@ col.col-price {
   opacity: 0;
   transform: translateY(-5px);
 }
+.from-price-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1em;
+  white-space: nowrap;
+}
 .from-price-icon {
-  margin-left: 0.25em;
   color: var(--theme--primary);
   vertical-align: middle;
   flex-shrink: 0;

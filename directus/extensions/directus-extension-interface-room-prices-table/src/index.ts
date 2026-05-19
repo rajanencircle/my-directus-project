@@ -88,7 +88,7 @@ export default defineInterface({
           interface: "select-icon",
           note: "Icon shown next to any item (occupancy, room category, price date) marked as a 'from price'. Pick any Material icon.",
         },
-        schema: { default_value: "star" },
+        schema: { default_value: "" },
       },
       {
         field: "groupSortField",
