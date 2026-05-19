@@ -12,18 +12,14 @@ export default defineInterface({
     const hideWhenDirect = [
       { name: "Direct mode", rule: { mode: { _eq: "direct" } }, hidden: true },
     ];
-    const hideWhenJunction = [
-      {
-        name: "Junction mode",
-        rule: { mode: { _eq: "junction" } },
-        hidden: true,
-      },
-    ];
+    // const hideWhenJunction = [
+    //   { name: "Junction mode", rule: { mode: { _eq: "junction" } }, hidden: true },
+    // ];
 
     const divider = (field: string, title: string, conditions?: any[]) => ({
       field,
       name: title,
-      type: "alias",
+      type: "alias" as const,
       meta: {
         width: "full",
         interface: "presentation-divider",
@@ -83,6 +79,53 @@ export default defineInterface({
 
       // ─── Table Layout ────────────────────────────────────────────────────────
       divider("divider_layout", "Table Layout"),
+      {
+        field: "fromPriceSymbol",
+        name: "From Price Icon",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "select-icon",
+          note: "Icon shown next to any item (occupancy, room category, price date) marked as a 'from price'. Pick any Material icon.",
+        },
+        schema: { default_value: "star" },
+      },
+      {
+        field: "groupSortField",
+        name: "Category (Group) Sort Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the group-by collection used to sort room categories in the table. e.g. 'sort' for a manual sort integer. Leave empty to use the parent record's category order array.",
+          options: { placeholder: "e.g. sort" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "occupancySortField",
+        name: "Occupancy (Column) Sort Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the occupancy record used to sort columns left-to-right. e.g. 'value' (number of guests) or 'sort' for a manual sort integer.",
+          options: { placeholder: "e.g. value" },
+        },
+        schema: { default_value: "value" },
+      },
+      {
+        field: "rowSortField",
+        name: "Date (Row) Sort Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the row collection used to sort rows top-to-bottom. e.g. 'start_date' for chronological order or 'sort' for a manual sort integer.",
+          options: { placeholder: "e.g. start_date" },
+        },
+        schema: { default_value: "start_date" },
+      },
       {
         field: "groupByField",
         name: "Group By Field",
@@ -587,7 +630,7 @@ export default defineInterface({
         },
         schema: { default_value: "symbol" },
       },
-    ];
+    ] as any;
   },
   types: ["alias"],
   localTypes: ["presentation"],

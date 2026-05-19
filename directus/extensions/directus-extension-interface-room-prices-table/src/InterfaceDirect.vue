@@ -63,80 +63,99 @@
                       class="accordion-icon"
                       :class="{ 'is-expanded': expandedGroups[groupKey] }"
                     />
-                    <span class="group-title">{{
-                      getGroupLabel(groupKey)
-                    }}</span>
+                    <span class="group-title">
+                      {{ getGroupLabel(groupKey) }}
+                      (<v-icon
+                        v-if="getGroupFromPrice(groupKey)"
+                        :name="fromPriceSymbol"
+                        small
+                        class="from-price-icon"
+                      />)
+                    </span>
                   </div>
                 </th>
                 <th v-for="col in columns" :key="col.id" class="column-header">
-                  {{ col.name }}{{ col.from_price ? " (From)" : "" }}
+                  {{ col.name }}
+                  [{{ col.value }}]
+                  <v-icon
+                    v-if="col.from_price"
+                    :name="fromPriceSymbol"
+                    class="from-price-icon"
+                  />
                 </th>
               </tr>
             </thead>
             <TransitionGroup tag="tbody" name="row-cascade">
-                <tr
-                  v-for="(row, rowIndex) in (expandedGroups[groupKey] ? group.rows : [])"
-                  :key="`${groupKey}|${row.id}`"
-                  class="data-row"
-                  :style="{ '--row-index': Math.min(Number(rowIndex), 8) }"
+              <tr
+                v-for="(row, rowIndex) in expandedGroups[groupKey]
+                  ? group.rows
+                  : []"
+                :key="`${groupKey}|${row.id}`"
+                class="data-row"
+                :style="{ '--row-index': Math.min(Number(rowIndex), 8) }"
+              >
+                <td class="row-label sticky-col">
+                  <div class="row-label-content">
+                    <strong
+                      v-if="row?.name && !isDateRangeName(row.name)"
+                      class="date-name"
+                      >{{ row.name }}
+                    </strong>
+                    <small class="date-range">
+                      {{ formatDateRange(row.start_date, row.end_date) }}
+                      (
+                      <v-icon
+                        v-if="row.from_price"
+                        :name="fromPriceSymbol"
+                        small
+                        class="from-price-icon"
+                      />)
+                    </small>
+                  </div>
+                </td>
+                <td class="label-col">
+                  <div class="price-labels">
+                    <label class="input-label buy-label">
+                      <v-icon name="shopping_cart" x-small />
+                      Buy ({{ defaultBuyCurrencySymbol }})
+                    </label>
+                    <label class="input-label sell-label">
+                      <v-icon name="sell" x-small />
+                      Sell ({{ defaultSellCurrencySymbol }})
+                    </label>
+                  </div>
+                </td>
+                <td
+                  v-for="col in columns"
+                  :key="`${groupKey}|${row.id}|${col.id}`"
+                  class="price-cell"
+                  :class="{
+                    'has-changes': isCellModified(groupKey, row.id, col.id),
+                  }"
                 >
-                  <td class="row-label sticky-col">
-                    <div class="row-label-content">
-                      <strong
-                        v-if="row?.name && !isDateRangeName(row.name)"
-                        class="date-name"
-                        >{{ row.name }}</strong
-                      >
-                      <small class="date-range">
-                        {{ formatDateRange(row.start_date, row.end_date) }}
-                      </small>
-                    </div>
-                  </td>
-                  <td class="label-col">
-                    <div class="price-labels">
-                      <label class="input-label buy-label">
-                        <v-icon name="shopping_cart" x-small />
-                        Buy ({{ defaultBuyCurrencySymbol }})
-                      </label>
-                      <label class="input-label sell-label">
-                        <v-icon name="sell" x-small />
-                        Sell ({{ defaultSellCurrencySymbol }})
-                      </label>
-                    </div>
-                  </td>
-                  <td
-                    v-for="col in columns"
-                    :key="`${groupKey}|${row.id}|${col.id}`"
-                    class="price-cell"
-                    :class="{
-                      'has-changes': isCellModified(groupKey, row.id, col.id),
-                    }"
-                  >
-                    <div class="price-inputs">
-                      <input
-                        :value="
-                          getCell(groupKey, row.id, col.id)[buyPriceField]
-                        "
-                        type="number"
-                        step="0.01"
-                        class="cell-input"
-                        placeholder="0.00"
-                        :disabled="disabled"
-                        @input="
-                          handleBuyPriceInput(groupKey, row.id, col.id, $event)
-                        "
-                        @focus="($event.target as HTMLInputElement).select()"
-                      />
-                      <span class="price-display">
-                        {{
-                          formatPrice(
-                            getCell(groupKey, row.id, col.id)[sellPriceField],
-                          )
-                        }}
-                      </span>
-                    </div>
-                  </td>
-                </tr>
+                  <div class="price-inputs">
+                    <input
+                      :value="getCell(groupKey, row.id, col.id)[buyPriceField]"
+                      type="number"
+                      step="0.01"
+                      class="cell-input"
+                      placeholder="0.00"
+                      :disabled="disabled"
+                      @input="
+                        handleBuyPriceInput(groupKey, row.id, col.id, $event)
+                      "
+                      @focus="($event.target as HTMLInputElement).select()"
+                    />
+                    <span class="price-display">
+                      {{
+                        formatPrice(
+                          getCell(groupKey, row.id, col.id)[sellPriceField],
+                        )
+                      }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
             </TransitionGroup>
           </table>
         </div>
@@ -217,6 +236,10 @@ export default defineComponent({
     // Currency (display only — no exchange rate lookup in direct mode)
     defaultBuyCurrencySymbol: { type: String, default: "€" },
     defaultSellCurrencySymbol: { type: String, default: "$" },
+    fromPriceSymbol: { type: String, default: "*" },
+    occupancySortField: { type: String, default: "value" },
+    rowSortField: { type: String, default: "start_date" },
+    groupSortField: { type: String, default: "" },
   },
 
   emits: ["input"],
@@ -320,6 +343,10 @@ export default defineComponent({
               `${relatedField}.name`,
               `${relatedField}.value`,
               `${relatedField}.from_price`,
+              ...(props.occupancySortField &&
+              props.occupancySortField !== "value"
+                ? [`${relatedField}.${props.occupancySortField}`]
+                : []),
             ],
             filter: {
               [parentField]: { _eq: parent_id.value },
@@ -340,7 +367,16 @@ export default defineComponent({
           `/items/${props.occupancyCollection}`,
           {
             params: {
-              fields: ["id", "name", "value", "from_price"],
+              fields: [
+                "id",
+                "name",
+                "value",
+                "from_price",
+                ...(props.occupancySortField &&
+                props.occupancySortField !== "value"
+                  ? [props.occupancySortField]
+                  : []),
+              ],
               filter: { id: { _in: [...new Set(originalIds)] } },
               limit: -1,
             },
@@ -433,7 +469,18 @@ export default defineComponent({
           api.get(`/items/${props.groupByCollection}`, {
             params: {
               filter: { hotel_id: { _eq: parent_id.value } },
-              fields: ["id", "name", "sharedId"],
+              fields: [
+                "id",
+                "name",
+                "sharedId",
+                "price_start",
+                ...(props.groupSortField &&
+                !["id", "name", "sharedId", "price_start"].includes(
+                  props.groupSortField,
+                )
+                  ? [props.groupSortField]
+                  : []),
+              ],
               limit: -1,
             },
           }),
@@ -455,7 +502,18 @@ export default defineComponent({
                 sharedId: { _in: parentCategoryIds },
                 id: { _nin: parentCategoryIds },
               },
-              fields: ["id", "name", "sharedId"],
+              fields: [
+                "id",
+                "name",
+                "sharedId",
+                "price_start",
+                ...(props.groupSortField &&
+                !["id", "name", "sharedId", "price_start"].includes(
+                  props.groupSortField,
+                )
+                  ? [props.groupSortField]
+                  : []),
+              ],
               limit: -1,
             },
           });
@@ -659,27 +717,45 @@ export default defineComponent({
     // ── Computed table data ──────────────────────────────────────────────────
 
     const columns = computed(() => {
+      const sf = props.occupancySortField || "value";
       return Array.from(lookupData.value.occupancies.entries())
         .map(([id, occ]) => (occ ? { ...occ, id } : null))
         .filter(Boolean)
         .sort((a, b) => {
-          if (a.value !== b.value) return (a.value || 0) - (b.value || 0);
+          const aVal = a[sf] ?? 0;
+          const bVal = b[sf] ?? 0;
+          const aNum = Number(aVal);
+          const bNum = Number(bVal);
+          if (!isNaN(aNum) && !isNaN(bNum) && aNum !== bNum) return aNum - bNum;
+          const cmp = String(aVal).localeCompare(String(bVal));
+          if (cmp !== 0) return cmp;
           return a.from_price ? -1 : 1;
         });
     });
-
+    console.log("InterfaceDirect", columns);
     const rows = computed(() => {
       const ids = new Set<string>();
       items.value.forEach((item) => {
         if (item[props.rowField]) ids.add(item[props.rowField]);
       });
+      const sf = props.rowSortField || "start_date";
       return Array.from(ids)
         .map((id) => lookupData.value.dates.get(id))
         .filter(Boolean)
-        .sort(
-          (a, b) =>
-            new Date(a.start_date).getTime() - new Date(b.start_date).getTime(),
-        );
+        .sort((a, b) => {
+          const aVal = a[sf];
+          const bVal = b[sf];
+          if (aVal == null && bVal == null) return 0;
+          if (aVal == null) return 1;
+          if (bVal == null) return -1;
+          const aNum = Number(aVal);
+          const bNum = Number(bVal);
+          if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+          const aDate = new Date(aVal).getTime();
+          const bDate = new Date(bVal).getTime();
+          if (!isNaN(aDate) && !isNaN(bDate)) return aDate - bDate;
+          return String(aVal).localeCompare(String(bVal));
+        });
     });
 
     const groupedData = computed(() => {
@@ -698,6 +774,23 @@ export default defineComponent({
 
     const orderedGroupedData = computed(() => {
       const groups = groupedData.value;
+      if (props.groupSortField) {
+        const sf = props.groupSortField;
+        const ordered: Record<string, any> = {};
+        Object.keys(groups)
+          .sort((a, b) => {
+            const aVal = lookupData.value.categories.get(a)?.[sf] ?? 0;
+            const bVal = lookupData.value.categories.get(b)?.[sf] ?? 0;
+            const aNum = Number(aVal);
+            const bNum = Number(bVal);
+            if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+            return String(aVal).localeCompare(String(bVal));
+          })
+          .forEach((key) => {
+            ordered[key] = groups[key];
+          });
+        return ordered;
+      }
       if (!props.groupByField || roomCategoryOrder.value.length === 0)
         return groups;
       const ordered: Record<string, any> = {};
@@ -720,6 +813,9 @@ export default defineComponent({
         key
       );
     };
+
+    const getGroupFromPrice = (key: string): boolean =>
+      !!lookupData.value.categories.get(key)?.price_start;
 
     const getRowFieldLabel = () =>
       props.rowField
@@ -921,6 +1017,7 @@ export default defineComponent({
       discardChanges,
       toggleGroup,
       isDateRangeName,
+      getGroupFromPrice,
       parent_id,
       buyPriceField: props.buyPriceField,
       sellPriceField: props.sellPriceField,
@@ -1140,19 +1237,29 @@ col.col-price {
   margin-top: 1rem;
 }
 .row-cascade-enter-active {
-  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1);
-  transition-delay: calc(var(--row-index) * 18ms);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  transition-delay: calc(var(--row-index) * 30ms);
 }
 .row-cascade-leave-active {
-  transition: opacity 0.12s ease, transform 0.12s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 .row-cascade-enter-from {
   opacity: 0;
-  transform: translateY(-8px);
+  transform: translateY(-10px);
 }
 .row-cascade-leave-to {
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+}
+.from-price-icon {
+  margin-left: 0.25em;
+  color: var(--theme--primary);
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 @media (max-width: 768px) {
   .sticky-col {
