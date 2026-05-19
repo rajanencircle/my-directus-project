@@ -91,6 +91,42 @@ export default defineInterface({
         schema: { default_value: "" },
       },
       {
+        field: "groupFromPriceField",
+        name: "Category From-Price Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the group-by collection that marks a room category as a 'from price' (e.g. price_start). Leave empty to disable the from-price indicator on category headers.",
+          options: { placeholder: "e.g. price_start" },
+        },
+        schema: { default_value: "price_start" },
+      },
+      {
+        field: "occupancyFromPriceField",
+        name: "Occupancy From-Price Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the occupancy record that marks it as a 'from price' column (e.g. from_price). Leave empty to disable the from-price indicator on column headers.",
+          options: { placeholder: "e.g. from_price" },
+        },
+        schema: { default_value: "from_price" },
+      },
+      {
+        field: "rowFromPriceField",
+        name: "Date (Row) From-Price Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the row collection that marks a price date as a 'from price' row (e.g. from_price). Leave empty to disable the from-price indicator on row labels.",
+          options: { placeholder: "e.g. from_price" },
+        },
+        schema: { default_value: "from_price" },
+      },
+      {
         field: "groupSortField",
         name: "Category (Group) Sort Field",
         type: "string",

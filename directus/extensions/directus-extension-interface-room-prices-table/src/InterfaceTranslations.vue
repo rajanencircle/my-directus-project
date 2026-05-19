@@ -103,7 +103,7 @@
                     </strong>
                     <small class="date-range">
                       {{ formatDateRange(row.start_date, row.end_date) }}
-                      <span v-if="fromPriceSymbol && row.from_price" class="from-price-wrapper">(<v-icon
+                      <span v-if="fromPriceSymbol && rowFromPriceField && row[rowFromPriceField]" class="from-price-wrapper">(<v-icon
                         :name="fromPriceSymbol"
                         small
                         class="from-price-icon"
@@ -253,6 +253,9 @@ export default defineComponent({
     defaultBuyCurrencySymbol: { type: String, default: "€" },
     defaultSellCurrencySymbol: { type: String, default: "$" },
     fromPriceSymbol: { type: String, default: "" },
+    groupFromPriceField: { type: String, default: "price_start" },
+    occupancyFromPriceField: { type: String, default: "from_price" },
+    rowFromPriceField: { type: String, default: "from_price" },
     occupancySortField: { type: String, default: "value" },
     rowSortField: { type: String, default: "start_date" },
     groupSortField: { type: String, default: "" },
@@ -308,12 +311,11 @@ export default defineComponent({
         name:
           relatedRecord.name ?? junctionRow?.name ?? String(junctionId ?? ""),
         value: relatedRecord.value ?? junctionRow?.value ?? null,
-        from_price:
-          relatedRecord.from_price ??
-          relatedRecord.fromPrice ??
-          junctionRow?.from_price ??
-          junctionRow?.fromPrice ??
-          false,
+        from_price: props.occupancyFromPriceField
+          ? (relatedRecord[props.occupancyFromPriceField] ??
+             junctionRow?.[props.occupancyFromPriceField] ??
+             false)
+          : false,
       };
     };
 
@@ -565,7 +567,7 @@ export default defineComponent({
               `${relatedField}.id`,
               `${relatedField}.name`,
               `${relatedField}.value`,
-              `${relatedField}.from_price`,
+              ...(props.occupancyFromPriceField ? [`${relatedField}.${props.occupancyFromPriceField}`] : []),
               ...(props.occupancySortField &&
               props.occupancySortField !== "value"
                 ? [`${relatedField}.${props.occupancySortField}`]
@@ -594,7 +596,7 @@ export default defineComponent({
                 "id",
                 "name",
                 "value",
-                "from_price",
+                ...(props.occupancyFromPriceField ? [props.occupancyFromPriceField] : []),
                 ...(props.occupancySortField &&
                 props.occupancySortField !== "value"
                   ? [props.occupancySortField]
@@ -689,9 +691,9 @@ export default defineComponent({
                 "id",
                 "room_category",
                 "sharedId",
-                "price_start",
+                ...(props.groupFromPriceField ? [props.groupFromPriceField] : []),
                 ...(props.groupSortField &&
-                !["id", "room_category", "sharedId", "price_start"].includes(
+                !["id", "room_category", "sharedId", props.groupFromPriceField].includes(
                   props.groupSortField,
                 )
                   ? [props.groupSortField]
@@ -723,9 +725,9 @@ export default defineComponent({
                 "id",
                 "room_category",
                 "sharedId",
-                "price_start",
+                ...(props.groupFromPriceField ? [props.groupFromPriceField] : []),
                 ...(props.groupSortField &&
-                !["id", "room_category", "sharedId", "price_start"].includes(
+                !["id", "room_category", "sharedId", props.groupFromPriceField].includes(
                   props.groupSortField,
                 )
                   ? [props.groupSortField]
@@ -1133,8 +1135,10 @@ export default defineComponent({
       );
     };
 
-    const getGroupFromPrice = (key: string): boolean =>
-      !!lookupData.value.categories.get(key)?.price_start;
+    const getGroupFromPrice = (key: string): boolean => {
+      if (!props.groupFromPriceField) return false;
+      return !!lookupData.value.categories.get(key)?.[props.groupFromPriceField];
+    };
 
     const getRowFieldLabel = () => {
       return props.rowField
