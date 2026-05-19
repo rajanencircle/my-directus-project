@@ -1077,7 +1077,6 @@ export default defineComponent({
           return a.from_price ? -1 : 1;
         });
     });
-    console.log("InterfaceTranslations", columns);
     const rows = computed(() => {
       const ids = new Set<string>();
       items.value.forEach((item) => {

@@ -2,7 +2,9 @@
   <div class="surcharge-prices-table">
     <div v-if="loading" class="loading">
       <v-progress-circular indeterminate />
-      <p class="loading-text">{{ loadingText || "Loading surcharge prices..." }}</p>
+      <p class="loading-text">
+        {{ loadingText || "Loading surcharge prices..." }}
+      </p>
     </div>
 
     <div v-else>
@@ -30,7 +32,9 @@
               <th class="header-cell header-name sticky-col" colspan="2">
                 {{ headerSurchargeLabel || "Surcharge" }}
               </th>
-              <th class="header-cell header-pricing">{{ headerPricingLabel || "Pricing" }}</th>
+              <th class="header-cell header-pricing">
+                {{ headerPricingLabel || "Pricing" }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -75,8 +79,15 @@
       <!-- Empty State -->
       <div v-else class="empty-state-card">
         <v-icon name="inbox" large class="empty-icon" />
-        <p class="empty-title">{{ emptyStateTitle || "No surcharges linked" }}</p>
-        <p class="empty-hint">{{ emptyStateHint || "Add surcharges to the hotel to manage pricing here." }}</p>
+        <p class="empty-title">
+          {{ emptyStateTitle || "No surcharges linked" }}
+        </p>
+        <p class="empty-hint">
+          {{
+            emptyStateHint ||
+            "Add surcharges to the hotel to manage pricing here."
+          }}
+        </p>
       </div>
 
       <!-- Save Bar Bottom -->
@@ -152,8 +163,6 @@ export default defineComponent({
       const hf = props.junctionHotelField;
       const lf = props.junctionLanguageField;
 
-      console.log("[SurchargePrices] resolveContext — collection:", props.collection, "primaryKey:", props.primaryKey, "values:", JSON.stringify(props.values));
-
       hotelId.value = props.values?.[hf]?.id ?? props.values?.[hf] ?? null;
       languageId.value = props.values?.[lf]?.id ?? props.values?.[lf] ?? null;
 
@@ -189,8 +198,6 @@ export default defineComponent({
         );
         if (uuidMatch) hotelId.value = uuidMatch[1];
       }
-
-      console.log("[SurchargePrices] resolved hotelId:", hotelId.value, "languageId:", languageId.value);
     };
 
     const fetchCurrencySymbols = async (rateKey: string) => {
@@ -218,7 +225,12 @@ export default defineComponent({
           {
             params: {
               filter: { [props.hotelField]: { _eq: hotelId.value } },
-              fields: ["id", "name", props.buyPriceField, ...(props.sortField ? [props.sortField] : [])],
+              fields: [
+                "id",
+                "name",
+                props.buyPriceField,
+                ...(props.sortField ? [props.sortField] : []),
+              ],
               sort: props.sortField ? [props.sortField] : undefined,
               limit: -1,
             },

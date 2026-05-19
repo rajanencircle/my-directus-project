@@ -188,7 +188,6 @@ function logDisplayValue() {
         "";
       values.push(value);
     });
-    console.log("[country-select] display-value(s) end:", values);
   });
 }
 
