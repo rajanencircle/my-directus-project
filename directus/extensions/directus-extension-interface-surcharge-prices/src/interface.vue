@@ -9,7 +9,7 @@
 
     <div v-else>
       <!-- Save Bar Top -->
-      <div class="save-bar" v-if="placement === 'top'">
+      <div class="save-bar button-top" v-if="placement === 'top'">
         <v-button
           @click="calculateAndSave"
           :loading="calculating"
@@ -411,6 +411,11 @@ export default defineComponent({
 }
 .button-bottom {
   margin-top: 1rem;
+  margin-bottom: 0;
+}
+.button-top {
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 .table-wrapper {
   overflow-x: auto;

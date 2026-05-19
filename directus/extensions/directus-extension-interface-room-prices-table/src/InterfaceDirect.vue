@@ -23,7 +23,7 @@
         </div>
       </div> -->
       <!-- Save Bar -->
-      <div class="save-bar" v-if="buttonPosition === 'top'">
+      <div class="save-bar button-top" v-if="buttonPosition === 'top'">
         <v-button
           @click="calculateSellPrices"
           :loading="calculatingSellPrices"
@@ -1279,6 +1279,11 @@ col.col-price {
 }
 .button-bottom {
   margin-top: 1rem;
+  margin-bottom: 0;
+}
+.button-top {
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 .row-cascade-enter-active {
   transition:
