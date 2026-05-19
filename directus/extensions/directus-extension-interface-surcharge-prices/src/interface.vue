@@ -105,6 +105,7 @@ export default defineComponent({
     field: { type: String, required: true },
     disabled: { type: Boolean, default: false },
     values: { type: Object, default: () => ({}) },
+    sortField: { type: String, default: "sort" },
     calculateFlowId: { type: String, default: "" },
     surchargesCollection: { type: String, default: "surcharges" },
     translationsCollection: {
@@ -151,6 +152,8 @@ export default defineComponent({
       const hf = props.junctionHotelField;
       const lf = props.junctionLanguageField;
 
+      console.log("[SurchargePrices] resolveContext — collection:", props.collection, "primaryKey:", props.primaryKey, "values:", JSON.stringify(props.values));
+
       hotelId.value = props.values?.[hf]?.id ?? props.values?.[hf] ?? null;
       languageId.value = props.values?.[lf]?.id ?? props.values?.[lf] ?? null;
 
@@ -171,6 +174,23 @@ export default defineComponent({
           console.error("[SurchargePrices] resolveContext error:", err);
         }
       }
+
+      // Fallback: when the interface is placed directly on the hotel collection,
+      // primaryKey IS the hotel ID and junctionHotelField won't resolve from values.
+      if (!hotelId.value && props.primaryKey && props.primaryKey !== "+") {
+        hotelId.value = String(props.primaryKey);
+      }
+
+      // Final fallback: for new junction records (pk="+"), extract the hotel UUID
+      // from the current page URL — works when rendered inside a hotel edit form.
+      if (!hotelId.value) {
+        const uuidMatch = window.location.pathname.match(
+          /\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i,
+        );
+        if (uuidMatch) hotelId.value = uuidMatch[1];
+      }
+
+      console.log("[SurchargePrices] resolved hotelId:", hotelId.value, "languageId:", languageId.value);
     };
 
     const fetchCurrencySymbols = async (rateKey: string) => {
@@ -198,7 +218,8 @@ export default defineComponent({
           {
             params: {
               filter: { [props.hotelField]: { _eq: hotelId.value } },
-              fields: ["id", "name", props.buyPriceField],
+              fields: ["id", "name", props.buyPriceField, ...(props.sortField ? [props.sortField] : [])],
+              sort: props.sortField ? [props.sortField] : undefined,
               limit: -1,
             },
           },

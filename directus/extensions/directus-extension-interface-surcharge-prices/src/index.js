@@ -12,6 +12,18 @@ export default {
   group: "other",
   options: [
     {
+      field: "sortField",
+      name: "Sort Field",
+      type: "string",
+      meta: {
+        width: "half",
+        interface: "input",
+        note: "Field on the surcharges collection used to sort rows. e.g. 'sort' for manual sort integer, 'name' for alphabetical.",
+        options: { placeholder: "e.g. sort" },
+      },
+      schema: { default_value: "sort" },
+    },
+    {
       field: "calculateFlowId",
       name: "Calculate Flow ID",
       type: "string",
