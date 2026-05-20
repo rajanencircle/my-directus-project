@@ -7,7 +7,7 @@
       :loading="isLoading"
       :secondary="classType !== 'primary'"
       :icon="!label"
-      :disabled="!isDirty || isSaving"
+      :disabled="alwaysEnabled ? isSaving : !isDirty || isSaving"
     >
       <v-icon v-if="icon" left :name="icon" />
       <span v-if="label">{{ label }}</span>
@@ -33,6 +33,8 @@ const props = defineProps({
   icon: { type: String, default: "save" },
   classType: { type: String, default: "primary" },
   flowId: { type: String, default: null },
+  flowPayload: { type: Object, default: null },
+  alwaysEnabled: { type: Boolean, default: false },
   primaryKey: { type: [String, Number], default: null },
   collection: { type: String, default: null },
 });
@@ -195,62 +197,71 @@ async function triggerNativeSave() {
 
 // ── Click handler ───────────────────────────────────────────
 async function handleClick() {
-  if (!isDirty.value || isLoading.value || isSaving.value) return;
+  if (isLoading.value || isSaving.value) return;
+  if (!props.alwaysEnabled && !isDirty.value) return;
 
-  isLoading.value = true;
-  isSaving.value = true;
+  const needsSave = isDirty.value;
 
-  try {
-    await triggerNativeSave();
+  if (needsSave) {
+    isLoading.value = true;
+    isSaving.value = true;
 
-    // Wait for Directus save to complete, then sync baseline
-    await new Promise((resolve) => {
-      let lastJson = JSON.stringify(deepToRaw(values));
-      let stableTicks = 0;
-      let minChecks = 5; // Minimum checks before considering stable
+    try {
+      await triggerNativeSave();
 
-      const checkSaveComplete = () => {
-        const currentJson = JSON.stringify(deepToRaw(values));
+      // Wait for Directus save to complete (values stabilise = save done)
+      await new Promise((resolve) => {
+        let lastJson = JSON.stringify(deepToRaw(values));
+        let stableTicks = 0;
+        let minChecks = 5;
 
-        if (currentJson === lastJson) {
-          stableTicks++;
-          if (stableTicks >= minChecks) {
-            // Values stable - save is done
-            syncCurrentSnapshot();
-            baselineJson.value = JSON.stringify(currentSnapshot.value);
-            resolve();
-            return;
+        const checkSaveComplete = () => {
+          const currentJson = JSON.stringify(deepToRaw(values));
+
+          if (currentJson === lastJson) {
+            stableTicks++;
+            if (stableTicks >= minChecks) {
+              syncCurrentSnapshot();
+              baselineJson.value = JSON.stringify(currentSnapshot.value);
+              resolve();
+              return;
+            }
+          } else {
+            stableTicks = 0;
+            lastJson = currentJson;
+            minChecks = 3;
           }
-        } else {
-          stableTicks = 0;
-          lastJson = currentJson;
-          minChecks = 3; // Fewer checks needed after change detected
-        }
 
-        setTimeout(checkSaveComplete, 100);
-      };
+          setTimeout(checkSaveComplete, 100);
+        };
 
-      setTimeout(checkSaveComplete, 200);
-      setTimeout(resolve, 5000); // Safety fallback
-    });
-  } catch (err) {
-    console.error("[save-and-stay-trigger-flow] Save error:", err);
+        setTimeout(checkSaveComplete, 200);
+        setTimeout(resolve, 5000); // Safety fallback
+      });
+    } catch (err) {
+      console.error("[save-and-stay-trigger-flow] Save error:", err);
+    }
+
+    isSaving.value = false;
+    isLoading.value = false;
   }
 
-  isSaving.value = false;
-  isLoading.value = false;
-
-  // Fire flow in background (non-blocking)
+  // Fire flow after save (or immediately when alwaysEnabled and nothing to save)
   if (props.flowId) {
     const urlParts = window.location.pathname.split("/");
     const itemId = props.primaryKey || urlParts[urlParts.length - 1];
     const collection = props.collection || urlParts[urlParts.length - 2];
 
+    const payload = {
+      collection,
+      keys: [itemId],
+      ...(props.flowPayload && typeof props.flowPayload === "object"
+        ? props.flowPayload
+        : {}),
+    };
+
     api
-      .post(`/flows/trigger/${props.flowId}`, {
-        collection,
-        keys: [itemId],
-      })
+      .post(`/flows/trigger/${props.flowId}`, payload)
       .catch((err) =>
         console.error("[save-and-stay-trigger-flow] Flow error:", err),
       );
@@ -258,31 +269,4 @@ async function handleClick() {
 }
 </script>
 
-<style>
-/*.save-and-stay-trigger-flow-class > .button:disabled {
-  background-color: var(
-    --v-button-background-color,
-    var(--theme--primary)
-  ) !important;
-  color: #6b7280 !important;
-  border: none !important;
-  opacity: 1 !important;
-  cursor: not-allowed !important;
-}
-
-.save-and-stay-trigger-flow-class > .button:not(:disabled) {
-  background-color: #07a4de !important;
-  color: #ffffff !important;
-  border: none !important;
-  opacity: 1 !important;
-  cursor: pointer !important;
-}
-
-.save-and-stay-trigger-flow-class > .button:not(:disabled):hover {
-  background-color: var(--theme--primary) !important;
-  color: #ffffff !important;
-  border: none !important;
-  opacity: 1 !important;
-  cursor: pointer !important;
-}*/
-</style>
+<style></style>
