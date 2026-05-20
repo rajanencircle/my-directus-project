@@ -33,6 +33,8 @@ const props = defineProps({
   icon: { type: String, default: "save" },
   classType: { type: String, default: "primary" },
   flowId: { type: String, default: null },
+  flowCollection: { type: String, default: null },
+  flowKey: { type: String, default: null },
   flowPayload: { type: Object, default: null },
   alwaysEnabled: { type: Boolean, default: false },
   primaryKey: { type: [String, Number], default: null },
@@ -116,14 +118,6 @@ const isDirty = computed(() => {
   return isDeeplyDifferent(currentSnapshot.value, baseline);
 });
 
-// Reset loading states when save completes and form is no longer dirty
-watch(isDirty, (dirty) => {
-  if (!dirty && isSaving.value) {
-    isSaving.value = false;
-    isLoading.value = false;
-  }
-});
-
 // Sync baseline when Directus updates initialValues
 watch(
   () => initialValues?.value,
@@ -195,6 +189,29 @@ async function triggerNativeSave() {
   );
 }
 
+// ── Dynamic payload template resolution ─────────────────────
+// Supports {{primaryKey}}, {{collection}}, {{fields.FIELD_NAME}} in string values
+function resolvePayload(obj, ctx) {
+  const resolveValue = (val) => {
+    if (typeof val === "string") {
+      return val.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
+        const k = key.trim();
+        if (k === "primaryKey") return ctx.primaryKey ?? match;
+        if (k === "collection") return ctx.collection ?? match;
+        if (k.startsWith("fields.")) return ctx.fields?.[k.slice(7)] ?? match;
+        return match;
+      });
+    }
+    if (Array.isArray(val)) return val.map(resolveValue);
+    if (val !== null && typeof val === "object")
+      return Object.fromEntries(
+        Object.entries(val).map(([k, v]) => [k, resolveValue(v)]),
+      );
+    return val;
+  };
+  return resolveValue(obj);
+}
+
 // ── Click handler ───────────────────────────────────────────
 async function handleClick() {
   if (isLoading.value || isSaving.value) return;
@@ -207,36 +224,42 @@ async function handleClick() {
     isSaving.value = true;
 
     try {
+      // Snapshot initialValues before triggering save so we can detect the change
+      const preInitialSnap = JSON.stringify(deepToRaw(initialValues?.value));
+
       await triggerNativeSave();
 
-      // Wait for Directus save to complete (values stabilise = save done)
+      // Wait for initialValues to change — Directus sets this after the save
+      // API call returns with fresh server data. That is the reliable "save done" signal.
       await new Promise((resolve) => {
-        let lastJson = JSON.stringify(deepToRaw(values));
-        let stableTicks = 0;
-        let minChecks = 5;
+        let done = false;
 
-        const checkSaveComplete = () => {
-          const currentJson = JSON.stringify(deepToRaw(values));
-
-          if (currentJson === lastJson) {
-            stableTicks++;
-            if (stableTicks >= minChecks) {
-              syncCurrentSnapshot();
-              baselineJson.value = JSON.stringify(currentSnapshot.value);
-              resolve();
-              return;
-            }
-          } else {
-            stableTicks = 0;
-            lastJson = currentJson;
-            minChecks = 3;
-          }
-
-          setTimeout(checkSaveComplete, 100);
+        const finish = (newInitial) => {
+          if (done) return;
+          done = true;
+          unwatch();
+          clearTimeout(fallback);
+          syncCurrentSnapshot();
+          baselineJson.value = JSON.stringify(
+            newInitial !== undefined
+              ? deepToRaw(newInitial)
+              : currentSnapshot.value,
+          );
+          resolve();
         };
 
-        setTimeout(checkSaveComplete, 200);
-        setTimeout(resolve, 5000); // Safety fallback
+        const unwatch = watch(
+          () => initialValues?.value,
+          (newInitial) => {
+            if (JSON.stringify(deepToRaw(newInitial)) !== preInitialSnap) {
+              finish(newInitial);
+            }
+          },
+          { deep: true },
+        );
+
+        // Safety fallback — if initialValues never changes (same data saved)
+        const fallback = setTimeout(() => finish(undefined), 6000);
       });
     } catch (err) {
       console.error("[save-and-stay-trigger-flow] Save error:", err);
@@ -249,15 +272,40 @@ async function handleClick() {
   // Fire flow after save (or immediately when alwaysEnabled and nothing to save)
   if (props.flowId) {
     const urlParts = window.location.pathname.split("/");
-    const itemId = props.primaryKey || urlParts[urlParts.length - 1];
-    const collection = props.collection || urlParts[urlParts.length - 2];
+    const autoItemId = props.primaryKey || urlParts[urlParts.length - 1];
+    const autoCollection = props.collection || urlParts[urlParts.length - 2];
+
+    const fields = deepToRaw(values) ?? {};
+    const templateContext = {
+      primaryKey: autoItemId,
+      collection: autoCollection,
+      fields,
+    };
+
+    const resolveStr = (str) =>
+      str
+        ? str.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
+            const k = key.trim();
+            if (k === "primaryKey") return templateContext.primaryKey ?? match;
+            if (k === "collection") return templateContext.collection ?? match;
+            if (k.startsWith("fields."))
+              return templateContext.fields?.[k.slice(7)] ?? match;
+            return match;
+          })
+        : str;
+
+    const finalCollection = resolveStr(props.flowCollection) || autoCollection;
+    const finalKey = resolveStr(props.flowKey) || autoItemId;
+
+    const resolvedPayload =
+      props.flowPayload && typeof props.flowPayload === "object"
+        ? resolvePayload(props.flowPayload, templateContext)
+        : {};
 
     const payload = {
-      collection,
-      keys: [itemId],
-      ...(props.flowPayload && typeof props.flowPayload === "object"
-        ? props.flowPayload
-        : {}),
+      collection: finalCollection,
+      keys: [finalKey],
+      ...resolvedPayload,
     };
 
     api
