@@ -1,8 +1,8 @@
 docsPath: "api-docs"
 useAuthentication: false
 info:
-  title: API Docs Playground
-  version: "0.1.0"
+  title: API Docs Playground 123
+  version: "2.1.0"
   description: Runtime playground that exercises both the YAML and Zod pipelines.
 tags:
   - {
