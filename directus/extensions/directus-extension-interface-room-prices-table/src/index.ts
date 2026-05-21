@@ -29,6 +29,8 @@ export default defineInterface({
     });
 
     return [
+      // ─── General ─────────────────────────────────────────────────────────────
+      divider("divider_general", "General"),
       {
         field: "label",
         type: "string",
@@ -163,30 +165,6 @@ export default defineInterface({
         schema: { default_value: "start_date" },
       },
       {
-        field: "emptyStateTitle",
-        name: "Empty State Title",
-        type: "string",
-        meta: {
-          width: "half",
-          interface: "system-input-translated-string",
-          note: "Heading shown when there are no prices to display. Supports $t: translation keys.",
-          options: { placeholder: "e.g. No prices configured yet" },
-        },
-        schema: { default_value: "" },
-      },
-      {
-        field: "emptyStateHint",
-        name: "Empty State Hint",
-        type: "string",
-        meta: {
-          width: "half",
-          interface: "system-input-translated-string",
-          note: "Subtext shown below the empty state heading. Supports $t: translation keys.",
-          options: { placeholder: "e.g. Add price dates, categories, and occupancies to see them here." },
-        },
-        schema: { default_value: "" },
-      },
-      {
         field: "groupByField",
         name: "Group By Field",
         type: "string",
@@ -244,6 +222,55 @@ export default defineInterface({
           note: "When enabled, users can add new price rows directly inside the table. Disable this if prices should only be created through imports or automated flows.",
         },
         schema: { default_value: false },
+      },
+
+      // ─── Labels ──────────────────────────────────────────────────────────────
+      divider("divider_labels", "Labels"),
+      {
+        field: "buyLabel",
+        name: "Buy Price Label",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          options: { placeholder: "e.g. Buy" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "sellLabel",
+        name: "Sell Price Label",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          options: { placeholder: "e.g. Sell" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "emptyStateTitle",
+        name: "Empty State Title",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          note: "Heading shown when there are no prices to display. Supports $t: translation keys.",
+          options: { placeholder: "e.g. No prices configured yet" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "emptyStateHint",
+        name: "Empty State Hint",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          note: "Subtext shown below the empty state heading. Supports $t: translation keys.",
+          options: { placeholder: "e.g. Add price dates, categories, and occupancies to see them here." },
+        },
+        schema: { default_value: "" },
       },
 
       // ─── Flow ────────────────────────────────────────────────────────────────

@@ -131,11 +131,11 @@
                   <div class="price-labels">
                     <label class="input-label buy-label">
                       <v-icon name="shopping_cart" x-small />
-                      Buy ({{ buyCurrencySymbol }})
+                      {{ buyLabel || "Buy" }} ({{ buyCurrencySymbol }})
                     </label>
                     <label class="input-label sell-label">
                       <v-icon name="sell" x-small />
-                      Sell ({{ sellCurrencySymbol }})
+                      {{ sellLabel || "Sell" }} ({{ sellCurrencySymbol }})
                     </label>
                   </div>
                 </td>
@@ -281,6 +281,8 @@ export default defineComponent({
     groupSortField: { type: String, default: "" },
     emptyStateTitle: { type: String, default: "" },
     emptyStateHint: { type: String, default: "" },
+    buyLabel: { type: String, default: "" },
+    sellLabel: { type: String, default: "" },
   },
 
   emits: ["input"],
