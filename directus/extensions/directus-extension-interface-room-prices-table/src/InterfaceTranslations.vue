@@ -717,16 +717,22 @@ export default defineComponent({
               filter: { hotel_id: { _eq: parent_id.value } },
               fields: [
                 "id",
-                "room_category",
+                "room_category.name",
+                "translations.translations_id",
+                "translations.room_category_additions",
                 "sharedId",
+                "days_repeater",
                 ...(props.groupFromPriceField
                   ? [props.groupFromPriceField]
                   : []),
                 ...(props.groupSortField &&
                 ![
                   "id",
-                  "room_category",
+                  "room_category.name",
+                  "translations.translations_id",
+                  "translations.room_category_additions",
                   "sharedId",
+                  "days_repeater",
                   props.groupFromPriceField,
                 ].includes(props.groupSortField)
                   ? [props.groupSortField]
@@ -756,7 +762,9 @@ export default defineComponent({
               },
               fields: [
                 "id",
-                "room_category",
+                "room_category.name",
+                "translations.translations_id",
+                "translations.room_category_additions",
                 "sharedId",
                 ...(props.groupFromPriceField
                   ? [props.groupFromPriceField]
@@ -764,7 +772,9 @@ export default defineComponent({
                 ...(props.groupSortField &&
                 ![
                   "id",
-                  "room_category",
+                  "room_category.name",
+                  "translations.translations_id",
+                  "translations.room_category_additions",
                   "sharedId",
                   props.groupFromPriceField,
                 ].includes(props.groupSortField)
@@ -1165,11 +1175,31 @@ export default defineComponent({
 
     const getGroupLabel = (key: string) => {
       if (key === "ungrouped") return "Ungrouped";
-      return (
-        lookupData.value.categories.get(key)?.room_category ||
-        lookupData.value.dates.get(key)?.name ||
-        key
-      );
+      const cat = lookupData.value.categories.get(key);
+
+      // Determine base name: M2O name → translations fallback → date name → key
+      let name: string;
+      if (cat?.room_category?.name) {
+        name = cat.room_category.name;
+      } else {
+        const translation = (cat?.translations || []).find(
+          (t: any) => t.translations_id === translations_id.value,
+        );
+        name = translation?.room_category_additions ||
+               lookupData.value.dates.get(key)?.name ||
+               key;
+      }
+
+      // Append days_label from parent's days_repeater when this is a child category
+      if (cat?.sharedId && cat.sharedId !== key) {
+        const parent = lookupData.value.categories.get(cat.sharedId);
+        const repeaterEntry = (parent?.days_repeater || []).find(
+          (entry: any) => entry.child_id === key,
+        );
+        if (repeaterEntry?.days_label) name = `${name} (${repeaterEntry.days_label})`;
+      }
+
+      return name;
     };
 
     const getGroupFromPrice = (key: string): boolean => {
