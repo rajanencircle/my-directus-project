@@ -1,0 +1,161 @@
+{
+  "info": {
+    "name": "BOTG API",
+    "description": "Custom REST API layer for BOTG — hotels, products, and more.\n\nSet the `baseUrl` variable to your environment (e.g. `http://localhost:8055` for local, `https://api.stage.example.com` for stage).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8055",
+      "type": "string",
+      "description": "Base URL of the Directus instance. Override per environment."
+    },
+    {
+      "key": "lang",
+      "value": "de",
+      "type": "string",
+      "description": "ISO 639-1 language code: de | en | nl"
+    },
+    {
+      "key": "hotelId",
+      "value": "",
+      "type": "string",
+      "description": "Hotel UUID, numeric object_id, or px_source_id"
+    }
+  ],
+  "item": [
+    {
+      "name": "Hotels",
+      "item": [
+        {
+          "name": "List Hotels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hotels?lang={{lang}}&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hotels"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "ISO 639-1 code (de | en | nl). If set, returns only that language in translations block."
+                },
+                {
+                  "key": "country",
+                  "value": "",
+                  "description": "Filter by country ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Full-text search on name and teaser (max 200 chars)",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "-date_updated",
+                  "description": "name | -name | date_updated | -date_updated",
+                  "disabled": true
+                },
+                {
+                  "key": "updated_after",
+                  "value": "2026-01-01T00:00:00Z",
+                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Max 100"
+                }
+              ]
+            },
+            "description": "Returns a paginated list of hotels. Use `updated_after` for delta sync."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Hotel Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hotels/{{hotelId}}?lang={{lang}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hotels", "{{hotelId}}"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{lang}}",
+                  "description": "ISO 639-1 code (de | en | nl). If set, returns only that language in translations block."
+                }
+              ]
+            },
+            "description": "Returns full hotel detail. The `id` path parameter accepts a UUID, numeric object_id, or px_source_id."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List Product Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"]
+            },
+            "description": "Returns a static catalogue of available product types (hotels, roundtrips, daytrips, campers, rentalcars, cruises, studytrips) with their API endpoints."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Docs",
+      "item": [
+        {
+          "name": "OpenAPI Spec (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/openapi.json",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "openapi.json"]
+            },
+            "description": "Returns the full OpenAPI 3.0 specification as JSON."
+          },
+          "response": []
+        },
+        {
+          "name": "ReDoc UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/docs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "docs"]
+            },
+            "description": "Interactive API documentation rendered with ReDoc."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
