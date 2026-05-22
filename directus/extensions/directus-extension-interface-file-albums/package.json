@@ -1,0 +1,23 @@
+{
+  "name": "directus-extension-interface-file-albums",
+  "version": "0.1.0",
+  "description": "Interface/panel to manage albums for a single directus_files item.",
+  "type": "module",
+  "keywords": ["directus", "directus-extension", "directus-extension-interface", "media", "albums"],
+  "directus:extension": {
+    "type": "interface",
+    "path": "dist/index.js",
+    "source": "src/index.ts",
+    "host": "^11.0.0"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w --no-minify"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "^17.0.0",
+    "typescript": "^5.0.0",
+    "vue": "^3.4.0"
+  }
+}
+
