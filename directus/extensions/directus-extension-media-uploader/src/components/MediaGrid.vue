@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ThumbnailCard from './ThumbnailCard.vue';
+import ThumbnailCard from "./ThumbnailCard.vue";
 
 interface JunctionRow {
   id: number | string;
@@ -11,11 +11,12 @@ const props = defineProps<{
   thumbnailSize: number;
   readonly: boolean;
   filesFkField: string;
+  downloadFormatPresets?: unknown;
 }>();
 
 const emit = defineEmits<{
-  (e: 'delete', row: JunctionRow): void;
-  (e: 'open', row: JunctionRow): void;
+  (e: "delete", row: JunctionRow): void;
+  (e: "open", row: JunctionRow): void;
 }>();
 </script>
 
@@ -36,6 +37,7 @@ const emit = defineEmits<{
         :thumbnail-size="thumbnailSize"
         :readonly="readonly"
         :files-fk-field="filesFkField"
+        :download-format-presets="downloadFormatPresets"
         @delete="emit('delete', row)"
         @open="emit('open', row)"
       />

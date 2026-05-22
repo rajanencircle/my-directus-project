@@ -3,6 +3,13 @@ import { computed, ref } from 'vue';
 import ExpiryInfoDialog from './ExpiryInfoDialog.vue';
 import ShareModal from './ShareModal.vue';
 import { isExpired } from '../utils/expiry';
+import {
+  buildAssetDownloadUrl,
+  parseDownloadFormatPresets,
+  triggerDownload,
+} from '../utils/downloadPresets';
+import { supportsMultiFormatDownload } from '../utils/fileType';
+import FileThumbPreview from './FileThumbPreview.vue';
 
 interface DirectusFile {
   id: string;
@@ -19,12 +26,16 @@ interface JunctionRow {
   [key: string]: any;
 }
 
-const props = defineProps<{
-  row: JunctionRow;
-  thumbnailSize: number;
-  readonly: boolean;
-  filesFkField: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    row: JunctionRow;
+    thumbnailSize: number;
+    readonly: boolean;
+    filesFkField: string;
+    downloadFormatPresets?: unknown;
+  }>(),
+  { downloadFormatPresets: undefined }
+);
 
 const emit = defineEmits<{
   (e: 'delete', row: JunctionRow): void;
@@ -32,41 +43,54 @@ const emit = defineEmits<{
 }>();
 
 const file = computed(() => props.row[props.filesFkField] as DirectusFile);
-const isImage = computed(() => file.value?.type?.startsWith('image/') ?? false);
-const expired = computed(() => isExpired(file.value?.expiry_date ?? null));
-
-const thumbnailUrl = computed(
-  () => `/assets/${file.value?.id}?width=${props.thumbnailSize}&height=${props.thumbnailSize}&fit=cover`
+const canMultiFormatDownload = computed(() =>
+  supportsMultiFormatDownload(file.value?.type, file.value?.filename_download)
 );
+const expired = computed(() => isExpired(file.value?.expiry_date ?? null));
 
 const displayName = computed(
   () => file.value?.title || file.value?.filename_download || 'Unnamed file'
 );
 
-const downloadFormats = [
-  { label: 'JPG', value: 'jpg' },
-  { label: 'PNG', value: 'png' },
-  { label: 'WebP', value: 'webp' },
-  { label: 'TIFF', value: 'tiff' },
-];
-
-function mimeToIcon(mimeType: string | null): string {
-  if (!mimeType) return 'insert_drive_file';
-  if (mimeType.startsWith('video/')) return 'videocam';
-  if (mimeType.startsWith('audio/')) return 'audiotrack';
-  if (mimeType === 'application/pdf') return 'picture_as_pdf';
-  if (mimeType.includes('zip') || mimeType.includes('compressed')) return 'folder_zip';
-  if (mimeType.includes('word') || mimeType.includes('document')) return 'description';
-  if (mimeType.includes('sheet') || mimeType.includes('excel')) return 'table_chart';
-  if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return 'slideshow';
-  return 'insert_drive_file';
-}
-
-const fileIcon = computed(() => mimeToIcon(file.value?.type ?? null));
+const downloadFormats = computed(() => parseDownloadFormatPresets(props.downloadFormatPresets));
 
 const expiryDialogOpen = ref(false);
 const actionsMenuOpen = ref(false);
 const shareModalOpen = ref(false);
+
+function closeActionsMenu() {
+  actionsMenuOpen.value = false;
+}
+
+function onEdit() {
+  closeActionsMenu();
+  openEditInNewTab();
+}
+
+function onPreview() {
+  closeActionsMenu();
+  openInNewTab();
+}
+
+function onDownloadAs(presetIndex: number) {
+  closeActionsMenu();
+  downloadAs(presetIndex);
+}
+
+function onDownloadDirect() {
+  closeActionsMenu();
+  downloadDirect();
+}
+
+function onShare() {
+  closeActionsMenu();
+  shareModalOpen.value = true;
+}
+
+function onRemove() {
+  closeActionsMenu();
+  emit('delete', props.row);
+}
 
 function openExpiryInfo() {
   expiryDialogOpen.value = true;
@@ -84,18 +108,21 @@ function openEditInNewTab() {
   window.open(`/admin/files/${id}`, '_blank', 'noopener,noreferrer');
 }
 
-function downloadAs(format: string) {
-  const link = document.createElement('a');
-  link.href = `/assets/${file.value?.id}?format=${format}&download`;
-  link.download = file.value?.filename_download ?? '';
-  link.click();
+function downloadAs(presetIndex: number) {
+  const id = file.value?.id;
+  if (!id) return;
+  const preset = downloadFormats.value[presetIndex];
+  if (!preset) return;
+  triggerDownload(
+    buildAssetDownloadUrl(id, preset, file.value?.type, file.value?.filename_download),
+    file.value?.filename_download ?? ''
+  );
 }
 
 function downloadDirect() {
-  const link = document.createElement('a');
-  link.href = `/assets/${file.value?.id}?download`;
-  link.download = file.value?.filename_download ?? '';
-  link.click();
+  const id = file.value?.id;
+  if (!id) return;
+  triggerDownload(`/assets/${id}?download`, file.value?.filename_download ?? '');
 }
 </script>
 
@@ -108,18 +135,14 @@ function downloadDirect() {
     @click="emit('open', row)"
   >
     <div class="thumb-wrap" :style="{ width: thumbnailSize + 'px', height: thumbnailSize + 'px' }">
-      <!-- Image preview -->
-      <img
-        v-if="isImage"
-        :src="thumbnailUrl"
+      <FileThumbPreview
+        v-if="file?.id"
+        :file-id="file.id"
+        :mime-type="file.type"
+        :filename="file.filename_download"
         :alt="displayName"
-        class="thumb-img"
-        loading="lazy"
+        :size="thumbnailSize"
       />
-      <!-- Non-image icon -->
-      <div v-else class="thumb-icon-wrap">
-        <v-icon :name="fileIcon" class="thumb-icon" />
-      </div>
 
       <!-- Kebab menu (Directus-like actions) -->
       <div class="top-actions">
@@ -149,37 +172,42 @@ function downloadDirect() {
           </template>
 
           <v-list>
-            <v-list-item clickable @click="openEditInNewTab">
+            <v-list-item clickable @click="onEdit">
               <v-list-item-icon><v-icon name="edit" /></v-list-item-icon>
               <v-list-item-content>Edit</v-list-item-content>
             </v-list-item>
 
-            <v-list-item clickable @click="openInNewTab">
+            <v-list-item clickable @click="onPreview">
               <v-list-item-icon><v-icon name="open_in_new" /></v-list-item-icon>
               <v-list-item-content>Preview</v-list-item-content>
             </v-list-item>
 
             <v-divider />
 
-            <template v-if="isImage">
-              <v-list-item v-for="fmt in downloadFormats" :key="fmt.value" clickable @click="downloadAs(fmt.value)">
+            <template v-if="canMultiFormatDownload">
+              <v-list-item
+                v-for="(fmt, idx) in downloadFormats"
+                :key="`${fmt.label}-${idx}`"
+                clickable
+                @click="onDownloadAs(idx)"
+              >
                 <v-list-item-icon><v-icon name="download" /></v-list-item-icon>
                 <v-list-item-content>Download {{ fmt.label }}</v-list-item-content>
               </v-list-item>
             </template>
-            <v-list-item v-else clickable @click="downloadDirect">
+            <v-list-item v-else clickable @click="onDownloadDirect">
               <v-list-item-icon><v-icon name="download" /></v-list-item-icon>
               <v-list-item-content>Download</v-list-item-content>
             </v-list-item>
 
             <v-divider />
-            <v-list-item clickable @click.stop="shareModalOpen = true">
+            <v-list-item clickable @click="onShare">
               <v-list-item-icon><v-icon name="share" /></v-list-item-icon>
               <v-list-item-content>Share</v-list-item-content>
             </v-list-item>
 
             <v-divider v-if="!readonly" />
-            <v-list-item v-if="!readonly" clickable class="danger-item" @click.stop="emit('delete', row)">
+            <v-list-item v-if="!readonly" clickable class="danger-item" @click.stop="onRemove">
               <v-list-item-icon><v-icon name="delete" /></v-list-item-icon>
               <v-list-item-content>Remove</v-list-item-content>
             </v-list-item>
@@ -232,26 +260,6 @@ function downloadDirect() {
   border-color: color-mix(in srgb, var(--theme--primary) 35%, var(--theme--border-color));
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
-}
-
-.thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.thumb-icon-wrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.thumb-icon {
-  font-size: 48px;
-  color: var(--theme--foreground-subdued);
 }
 
 .top-actions {

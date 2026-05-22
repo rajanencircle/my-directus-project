@@ -1,5 +1,6 @@
 import { defineInterface } from '@directus/extensions-sdk';
 import InterfaceComponent from './interface.vue';
+import { DEFAULT_DOWNLOAD_FORMAT_PRESETS_JSON } from './utils/downloadPresets';
 
 const DEFAULT_FILE_REVERSE_LINKS = JSON.stringify(
   [
@@ -194,6 +195,19 @@ export default defineInterface({
         width: 'full',
       },
       schema: { default_value: '[]' },
+    },
+    {
+      field: 'download_format_presets',
+      name: 'Download format presets',
+      type: 'json',
+      meta: {
+        interface: 'input-code',
+        options: { language: 'json', template: DEFAULT_DOWNLOAD_FORMAT_PRESETS_JSON },
+        note:
+          'JSON array of download options: { "label", "format"?, "width"?, "height"?, "fit"?, "quality"? }. Used in thumbnail menus, download-all, and file details. Leave empty to use JPG, PNG, WebP, TIFF (same as before).',
+        width: 'full',
+      },
+      schema: { default_value: DEFAULT_DOWNLOAD_FORMAT_PRESETS_JSON },
     },
     {
       field: 'geo_enabled',

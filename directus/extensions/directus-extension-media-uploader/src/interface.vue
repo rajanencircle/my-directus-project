@@ -5,6 +5,11 @@ import MediaGrid from './components/MediaGrid.vue';
 import UploadModal from './components/UploadModal.vue';
 import AddExistingModal from './components/AddExistingModal.vue';
 import FileDetailsDrawer from './components/FileDetailsDrawer.vue';
+import {
+  buildAssetDownloadUrl,
+  parseDownloadFormatPresets,
+  triggerDownload,
+} from './utils/downloadPresets';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -31,6 +36,7 @@ const props = withDefaults(
     upload_area_folder?: string | null;
     upload_extra_fields?: any;
     file_reverse_links?: any;
+    download_format_presets?: any;
     geo_enabled?: boolean;
     geo_levels?: any;
     geo_cascades?: any;
@@ -181,6 +187,57 @@ async function loadSettings() {
 
 // ─── Draft staging helpers ───────────────────────────────────────────────────
 
+async function hydrateDraftFromValue() {
+  const raw = props.value ?? [];
+  if (!Array.isArray(raw) || !raw.length) {
+    rowsDraft.value = [];
+    return;
+  }
+
+  const fk = filesFkField.value;
+  const hasNestedFiles = raw.some((item) => {
+    const file = item?.[fk];
+    return file && typeof file === 'object' && file.id;
+  });
+
+  if (hasNestedFiles) {
+    rowsDraft.value = raw.map((item) => {
+      const file = item[fk];
+      const fileId = typeof file === 'object' ? file.id : file;
+      const rowId = item?.id && !String(item.id).startsWith('tmp:') ? item.id : `tmp:${fileId}`;
+      return {
+        ...item,
+        id: rowId,
+        [fk]: typeof file === 'object' ? file : { id: file },
+      };
+    });
+    return;
+  }
+
+  const fileIds = raw
+    .map((item) => {
+      const file = item?.[fk];
+      return typeof file === 'object' ? file?.id : file;
+    })
+    .map(String)
+    .filter(Boolean);
+
+  if (!fileIds.length) {
+    rowsDraft.value = [];
+    return;
+  }
+
+  try {
+    const files = await fetchFilesByIds(fileIds);
+    rowsDraft.value = files.map((f: any) => ({
+      id: `tmp:${f.id}`,
+      [fk]: f,
+    }));
+  } catch (e) {
+    console.error('[media-uploader] Failed to hydrate draft from form value:', e);
+  }
+}
+
 async function fetchFilesByIds(fileIds: string[]) {
   const ids = (fileIds ?? []).map(String).filter(Boolean);
   if (!ids.length) return [];
@@ -307,26 +364,22 @@ function closeDetails() {
 
 // ─── Download All ─────────────────────────────────────────────────────────────
 
-const downloadFormats = [
-  { label: 'JPG', value: 'jpg' },
-  { label: 'PNG', value: 'png' },
-  { label: 'WebP', value: 'webp' },
-  { label: 'TIFF', value: 'tiff' },
-];
+const downloadFormats = computed(() => parseDownloadFormatPresets(props.download_format_presets));
 
-function downloadAll(format: string) {
+function downloadAll(presetIndex: number) {
+  const preset = downloadFormats.value[presetIndex];
+  if (!preset) return;
   rowsDraft.value.forEach((row, i) => {
     const file = row[filesFkField.value];
-    if (!file) return;
-    const isImage = file.type?.startsWith('image/') ?? false;
-    const url = isImage
-      ? `/assets/${file.id}?format=${format}&download`
-      : `/assets/${file.id}?download`;
+    if (!file?.id) return;
+    const url = buildAssetDownloadUrl(
+      String(file.id),
+      preset,
+      file.type,
+      file.filename_download
+    );
     setTimeout(() => {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = file.filename_download;
-      link.click();
+      triggerDownload(url, file.filename_download);
     }, i * 150);
   });
 }
@@ -359,7 +412,10 @@ onMounted(async () => {
   await loadSettings();
   const ready = initJunction();
   junctionReady.value = ready;
-  if (ready && !isNewRecord.value) {
+  if (!ready) return;
+  if (isNewRecord.value) {
+    await hydrateDraftFromValue();
+  } else {
     await loadFiles();
   }
 });
@@ -380,11 +436,13 @@ watch(
 watch(
   () => props.value,
   async () => {
-    if (isNewRecord.value) return;
-    // Ignore the immediate prop update that reflects our own emit.
     const nextSig = JSON.stringify(props.value ?? []);
     if (nextSig === lastEmittedValueSig.value) return;
-    await loadFiles();
+    if (isNewRecord.value) {
+      await hydrateDraftFromValue();
+    } else {
+      await loadFiles();
+    }
   },
   { deep: true }
 );
@@ -398,13 +456,11 @@ watch(
       {{ initError }}
     </div>
 
-    <!-- New-record hint -->
-    <div v-else-if="isNewRecord" class="notice notice-info">
-      <v-icon name="info" small />
-      Save this record first to manage files.
-    </div>
-
     <template v-else>
+      <div v-if="isNewRecord" class="notice notice-info">
+        <v-icon name="info" small />
+        Upload or link files now — they will be attached when you save this record.
+      </div>
       <!-- Header -->
       <div class="header">
         <span class="header-title">Media ({{ rowsDraft.length }})</span>
@@ -416,7 +472,12 @@ watch(
               </v-button>
             </template>
             <v-list>
-              <v-list-item v-for="fmt in downloadFormats" :key="fmt.value" clickable @click="downloadAll(fmt.value)">
+              <v-list-item
+                v-for="(fmt, idx) in downloadFormats"
+                :key="`${fmt.label}-${idx}`"
+                clickable
+                @click="downloadAll(idx)"
+              >
                 <v-list-item-content>{{ fmt.label }}</v-list-item-content>
               </v-list-item>
             </v-list>
@@ -459,6 +520,7 @@ watch(
         :thumbnail-size="thumbnail_size"
         :readonly="effectiveReadonly"
         :files-fk-field="filesFkField"
+        :download-format-presets="download_format_presets"
         @delete="requestDelete"
         @open="openDetails"
       />
@@ -470,7 +532,7 @@ watch(
       :junction-table="junctionTable"
       :collection-fk-field="collectionFkField"
       :files-fk-field="filesFkField"
-      :primary-key="primaryKey!"
+      :primary-key="primaryKey ?? ''"
       :allowed-types="allowed_types"
       :max-file-size="max_file_size"
       :default-folder="defaultFolder"
@@ -491,12 +553,13 @@ watch(
       :junction-table="junctionTable"
       :collection-fk-field="collectionFkField"
       :files-fk-field="filesFkField"
-      :primary-key="primaryKey!"
+      :primary-key="primaryKey ?? ''"
       :allowed-types="allowed_types ?? '*/*'"
       :thumbnail-size="thumbnail_size ?? 180"
       :default-folder="defaultFolder"
       :already-linked-file-ids="linkedFileIds"
       :file-reverse-links="file_reverse_links"
+      :download-format-presets="download_format_presets"
       @close="showAddExistingModal = false"
       @linked="(fileIds: string[]) => { showAddExistingModal = false; stageAddFileIds(fileIds); }"
     />
@@ -506,6 +569,8 @@ watch(
       :file-id="String(selectedRow[filesFkField].id)"
       :initial-file="selectedRow?.[filesFkField] ?? null"
       :file-reverse-links="file_reverse_links"
+      :download-format-presets="download_format_presets"
+      :readonly="effectiveReadonly"
       @close="closeDetails"
     />
 

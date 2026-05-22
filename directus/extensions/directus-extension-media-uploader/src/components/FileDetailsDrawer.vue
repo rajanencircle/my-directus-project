@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import { useApi, useStores } from '@directus/extensions-sdk';
-import {
-  type AnyRecord,
-  type ReverseLinkRule,
-  normalizeFieldsParam,
-  parseFileReverseLinks,
-  reverseTableCells,
-  reverseTableHeaders,
-} from '../utils/fileReverseLinks';
+import { type AnyRecord } from '../utils/fileReverseLinks';
+import FileMediaExtrasPanel from './FileMediaExtrasPanel.vue';
+import FileDetailPreview from './FileDetailPreview.vue';
+import { mimeToIcon } from '../utils/fileType';
 
 type ID = string;
 
@@ -99,27 +95,16 @@ const LABELS: Record<string, string> = {
   country: 'Country',
 };
 
-type ReverseSectionState = {
-  title: string;
-  collection: string;
-  loading: boolean;
-  error: string | null;
-  rows: AnyRecord[];
-  relatedItemField?: string;
-  nameField?: string;
-  fileField: string;
-  tableHeaders?: string[];
-  tablePaths?: string[];
-};
-
 const props = withDefaults(
   defineProps<{
     fileId: ID;
     initialFile?: AnyRecord | null;
     /** JSON array configured on the interface: junction lookups by file id */
     fileReverseLinks?: unknown;
+    downloadFormatPresets?: unknown;
+    readonly?: boolean;
   }>(),
-  { initialFile: null }
+  { initialFile: null, readonly: false }
 );
 
 const emit = defineEmits<{ (e: 'close'): void }>();
@@ -131,76 +116,11 @@ const loading = ref(false);
 const error = ref<string | null>(null);
 const fileItem = ref<AnyRecord | null>(null);
 
-const reverseSections = ref<ReverseSectionState[]>([]);
-
-const visibleReverseSections = computed(() =>
-  reverseSections.value.filter((sec) => sec.loading || !!sec.error || (sec.rows?.length ?? 0) > 0)
-);
-
-async function loadReverseLinks(fileId: string) {
-  const rules = parseFileReverseLinks(props.fileReverseLinks);
-  if (!rules.length) {
-    reverseSections.value = [];
-    return;
-  }
-
-  reverseSections.value = rules.map((r) => ({
-    title: r.section_title?.trim() || r.junction_collection,
-    collection: r.junction_collection,
-    loading: true,
-    error: null,
-    rows: [],
-    relatedItemField: r.related_item_field,
-    nameField: r.name_field,
-    fileField: r.file_field,
-    tableHeaders: r.table_headers,
-    tablePaths: r.table_paths,
-  }));
-
-  const updates = await Promise.all(
-    rules.map(async (rule) => {
-      try {
-        const limit = Math.min(Math.max(1, rule.limit ?? 50), 500);
-        const fields = normalizeFieldsParam(rule.fields);
-        const coll = encodeURIComponent(rule.junction_collection.trim());
-        const res = await api.get(`/items/${coll}`, {
-          params: {
-            filter: { [rule.file_field.trim()]: { _eq: String(fileId) } },
-            limit,
-            ...(fields ? { fields } : {}),
-          },
-        });
-        const rows = (res.data?.data ?? []) as AnyRecord[];
-        return { error: null as string | null, rows };
-      } catch (e: any) {
-        const msg = e?.response?.data?.errors?.[0]?.message ?? 'Failed to load.';
-        return { error: msg, rows: [] as AnyRecord[] };
-      }
-    })
-  );
-
-  reverseSections.value = rules.map((rule, idx) => ({
-    title: rule.section_title?.trim() || rule.junction_collection,
-    collection: rule.junction_collection,
-    loading: false,
-    error: updates[idx]?.error ?? null,
-    rows: updates[idx]?.rows ?? [],
-    relatedItemField: rule.related_item_field,
-    nameField: rule.name_field,
-    fileField: rule.file_field,
-    tableHeaders: rule.table_headers,
-    tablePaths: rule.table_paths,
-  }));
-}
-
 const title = computed(() => fileItem.value?.title || fileItem.value?.filename_download || 'File');
 
-const assetUrl = computed(() => {
-  const id = props.fileId;
-  const type = fileItem.value?.type ?? '';
-  if (type?.startsWith?.('image/')) return `/assets/${id}?width=1200&fit=contain`;
-  return `/assets/${id}`;
-});
+const titleIcon = computed(() =>
+  mimeToIcon(fileItem.value?.type ?? null, fileItem.value?.filename_download ?? null)
+);
 
 function labelFor(key: string): string {
   return LABELS[key] ?? key;
@@ -267,22 +187,12 @@ watch(
   () => props.fileId,
   async () => {
     await loadFile();
-    await loadReverseLinks(props.fileId);
   }
-);
-
-watch(
-  () => props.fileReverseLinks,
-  async () => {
-    await loadReverseLinks(props.fileId);
-  },
-  { deep: true }
 );
 
 onMounted(async () => {
   if (props.initialFile) fileItem.value = props.initialFile;
   await loadFile();
-  await loadReverseLinks(props.fileId);
 });
 </script>
 
@@ -296,7 +206,7 @@ onMounted(async () => {
   >
     <v-card class="details-card">
       <v-card-title class="card-title">
-        <v-icon name="image" class="title-icon" />
+        <v-icon :name="titleIcon" class="title-icon" />
         <span class="title-text" :title="title">{{ title }}</span>
         <div class="spacer" />
         <button class="close-btn" type="button" @click="emit('close')">
@@ -315,13 +225,11 @@ onMounted(async () => {
         </div>
 
         <template v-else>
-          <div class="preview">
-            <img v-if="fileItem?.type?.startsWith?.('image/')" :src="assetUrl" alt="" class="preview-img" />
-            <div v-else class="preview-nonimage">
-              <v-icon name="insert_drive_file" class="preview-icon" />
-              <p class="preview-name">{{ fileItem?.filename_download }}</p>
-            </div>
-          </div>
+          <FileDetailPreview
+            :file-id="String(fileId)"
+            :mime-type="fileItem?.type ?? null"
+            :filename="fileItem?.filename_download ?? null"
+          />
 
           <div class="section">
             <div class="section-title">Basic</div>
@@ -369,48 +277,14 @@ onMounted(async () => {
             </div>
           </div>
 
-          <template v-if="visibleReverseSections.length > 0">
-            <div v-for="(sec, rIdx) in visibleReverseSections" :key="`${sec.collection}-${rIdx}`" class="section">
-              <div class="section-title">{{ sec.title }}</div>
-              <div class="reverse-meta subdued">{{ sec.collection }}</div>
-
-              <div v-if="sec.loading" class="reverse-loading">
-                <v-progress-circular indeterminate x-small />
-                <span class="muted">Loading…</span>
-              </div>
-
-              <div v-else-if="sec.error" class="notice notice-error">
-                <v-icon name="error" small />
-                {{ sec.error }}
-              </div>
-
-              <div v-else class="reverse-table-wrap">
-                <div
-                  class="table reverse-table"
-                  :style="{ '--reverse-cols': String(reverseTableHeaders(sec).length) }"
-                >
-                  <div class="tr th">
-                  <div v-for="(h, hIdx) in reverseTableHeaders(sec)" :key="`${sec.collection}-h-${hIdx}`" class="td">
-                    {{ h }}
-                  </div>
-                </div>
-                <div
-                  v-for="(jrow, tIdx) in sec.rows"
-                  :key="`${sec.collection}-${String(jrow.id ?? 'row')}-${tIdx}`"
-                  class="tr"
-                >
-                  <div
-                    v-for="(cell, cIdx) in reverseTableCells(sec, jrow)"
-                    :key="`${sec.collection}-c-${tIdx}-${cIdx}`"
-                    class="td"
-                  >
-                    {{ cell ?? 'null' }}
-                  </div>
-                </div>
-                </div>
-              </div>
-            </div>
-          </template>
+          <FileMediaExtrasPanel
+            :file-id="String(fileId)"
+            :file-type="fileItem?.type ?? null"
+            :filename-download="fileItem?.filename_download ?? null"
+            :file-reverse-links="fileReverseLinks"
+            :download-format-presets="downloadFormatPresets"
+            :readonly="readonly"
+          />
 
           <div v-if="translations.length" class="section">
             <div class="section-title">IPTC Caption</div>

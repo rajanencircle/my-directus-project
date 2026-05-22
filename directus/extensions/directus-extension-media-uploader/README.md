@@ -28,6 +28,7 @@ So the junction table name is **dynamic** (example: `hotels_directus_files`, `cr
 The interface’s **options** include project-specific JSON defaults (safe to edit when moving projects):
 
 - `file_reverse_links` default JSON contains `hotels_directus_files` and other example junctions
+- `download_format_presets` controls which download options appear (thumbnail menus, download-all, file details drawer, linked-collections dialog)
 - Geography defaults (`geo_levels`, `geo_cascades`, `geo_filter_mappings`) reference collections like `places`, `states`, `destinations`, etc.
 
 Also note:
@@ -71,11 +72,16 @@ Build it with `directus-extension build`.
 
 ### What you may need to change manually (common)
 
-1) **Update option defaults** in:
-   - `src/index.ts`
-   - Especially `DEFAULT_FILE_REVERSE_LINKS` and geography config defaults, to match the target project’s collections/junctions
+1) **Update option defaults** in `src/index.ts` — especially `DEFAULT_FILE_REVERSE_LINKS` and geography config defaults, to match the target project's collections.
 
-2) If your target project doesn’t have those collections, either:
-   - update the defaults, or
-   - set the options in Directus UI per-field (overrides defaults)
+2) Configure `download_format_presets` in the Studio field options. Defaults to JPG, PNG, WebP, TIFF when empty.
+
+   ```json
+   [
+     { "label": "WebP 1200px", "format": "webp", "width": 1200, "fit": "contain" },
+     { "label": "JPG original", "format": "jpg" }
+   ]
+   ```
+
+3) For downloads + usage tables on the native **`directus_files`** detail page, install and configure `directus-extension-file-media-extras` (see that package's README).
 

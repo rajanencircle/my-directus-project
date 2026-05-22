@@ -6,6 +6,7 @@ import ExpiryInfoDialog from './ExpiryInfoDialog.vue';
 import { isExpired } from '../utils/expiry';
 import { extractJunctionFileId, parseFileReverseLinks, type AnyRecord } from '../utils/fileReverseLinks';
 import LinkedCollectionsDialog from './LinkedCollectionsDialog.vue';
+import FileThumbPreview from './FileThumbPreview.vue';
 
 type ID = string | number;
 
@@ -28,12 +29,14 @@ const props = withDefaults(
     defaultFolder: string | null;
     alreadyLinkedFileIds: string[];
     fileReverseLinks?: unknown;
+    downloadFormatPresets?: unknown;
   }>(),
   {
     thumbnailSize: 180,
     defaultFolder: null,
     alreadyLinkedFileIds: () => [],
     fileReverseLinks: undefined,
+    downloadFormatPresets: undefined,
   }
 );
 
@@ -88,7 +91,7 @@ async function loadAlbums() {
   albumsLoading.value = true;
   albumsError.value = null;
   try {
-    const res = await api.get('/items/albums', { params: { limit: -1, sort: ['name'], fields: ['id', 'name'] } });
+    const res = await api.get('/items/albums_directus', { params: { limit: -1, sort: ['name'], fields: ['id', 'name'] } });
     albums.value = (res.data?.data ?? []) as Album[];
     if (!selectedAlbumId.value && albums.value.length) selectedAlbumId.value = String(albums.value[0].id);
   } catch (e: any) {
@@ -110,7 +113,7 @@ async function createAlbum() {
   creatingAlbum.value = true;
   albumsError.value = null;
   try {
-    const res = await api.post('/items/albums', { name });
+    const res = await api.post('/items/albums_directus', { name });
     const created = res.data?.data as Album | undefined;
     await loadAlbums();
     if (created?.id != null) selectedAlbumId.value = String(created.id);
@@ -131,7 +134,7 @@ async function addSelectedToAlbum() {
   try {
     for (const fileId of ids) {
       try {
-        await api.post('/items/albums_directus_files', {
+        await api.post('/items/albums_directus', {
           albums_id: albumId,
           directus_files_id: String(fileId),
         });
@@ -184,11 +187,6 @@ function isLinkedAnywhere(fileId: string): boolean {
 
 function displayName(file: DirectusFile): string {
   return file.title || file.filename_download || 'Unnamed file';
-}
-
-function thumbnailUrl(id: string): string {
-  const size = props.thumbnailSize;
-  return `/assets/${id}?width=${size}&height=${size}&fit=cover`;
 }
 
 function toggleSelect(id: string) {
@@ -443,11 +441,13 @@ onMounted(() => {
               linked: alreadyLinkedFileIds.includes(file.id) || isLinkedAnywhere(file.id),
             }" :title="displayName(file)" @click="toggleSelect(file.id)">
               <div class="thumb">
-                <img v-if="file.type?.startsWith('image/')" class="thumb-img" :src="thumbnailUrl(file.id)" alt=""
-                  loading="lazy" />
-                <div v-else class="thumb-fallback">
-                  <v-icon name="insert_drive_file" />
-                </div>
+                <FileThumbPreview
+                  :file-id="file.id"
+                  :mime-type="file.type"
+                  :filename="file.filename_download"
+                  :alt="displayName(file)"
+                  :size="thumbnailSize"
+                />
                 <div class="badges-row">
                   <div class="badges-left">
                     <span
@@ -603,7 +603,10 @@ onMounted(() => {
     v-if="linkedDialogOpen && linkedDialogFile"
     :file-id="linkedDialogFile.id"
     :file-name="displayName(linkedDialogFile)"
+    :file-type="linkedDialogFile.type ?? null"
+    :filename-download="linkedDialogFile.filename_download ?? null"
     :file-reverse-links="props.fileReverseLinks"
+    :download-format-presets="props.downloadFormatPresets"
     @close="linkedDialogOpen = false"
   />
 </template>

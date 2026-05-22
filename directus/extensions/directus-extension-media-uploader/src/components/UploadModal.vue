@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useApi } from '@directus/extensions-sdk';
 import FolderDropdown from './FolderDropdown.vue';
 import GeographiesEditor from './GeographiesEditor.vue';
+import { mimeToIcon, resolveFileMediaKind } from '../utils/fileType';
+import { getMissingGeoLevels, parseGeoLevels } from '../utils/geoLevels';
 
 interface FileItem {
   file: File;
   previewUrl: string | null;
+  previewKind: 'image' | 'video' | null;
   status: 'idle' | 'uploading' | 'done' | 'error';
   progress: number;
   errorMessage: string | null;
@@ -53,6 +56,13 @@ const isUploading = ref(false);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const geoValue = ref<Record<string, StoredFieldValue | null>>({});
+const geoShowErrors = ref(false);
+
+const geoLevels = computed(() => parseGeoLevels(props.geoLevels));
+const missingGeoLevels = computed(() =>
+  props.geoEnabled ? getMissingGeoLevels(geoLevels.value, geoValue.value) : []
+);
+const geoIsValid = computed(() => missingGeoLevels.value.length === 0);
 
 type CheckboxOptionInput = string | { label?: string; value?: string };
 
@@ -139,9 +149,12 @@ const acceptAttr = computed(() => {
   return types;
 });
 
-const canUpload = computed(
-  () => fileItems.value.length > 0 && fileItems.value.some((f) => f.status === 'idle') && !isUploading.value && uploadAreaReady.value
-);
+const canUpload = computed(() => {
+  const hasPending =
+    fileItems.value.length > 0 && fileItems.value.some((f) => f.status === 'idle');
+  const geoOk = !props.geoEnabled || geoIsValid.value;
+  return hasPending && !isUploading.value && uploadAreaReady.value && geoOk;
+});
 
 const anySucceeded = computed(() => fileItems.value.some((f) => f.status === 'done'));
 const hasErrors = computed(() => fileItems.value.some((f) => f.status === 'error'));
@@ -169,14 +182,22 @@ function validateFile(file: File): string | null {
   return null;
 }
 
+function previewKindFor(file: File): 'image' | 'video' | null {
+  const kind = resolveFileMediaKind(file.type, file.name);
+  if (kind === 'image' || kind === 'video') return kind;
+  return null;
+}
+
 function addFiles(rawFiles: FileList | File[]) {
   const arr = Array.from(rawFiles);
   for (const file of arr) {
     const error = validateFile(file);
-    const previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : null;
+    const previewKind = previewKindFor(file);
+    const previewUrl = previewKind ? URL.createObjectURL(file) : null;
     fileItems.value.push({
       file,
       previewUrl,
+      previewKind,
       status: error ? 'error' : 'idle',
       progress: 0,
       errorMessage: error,
@@ -351,6 +372,10 @@ function uploadFileXhr(item: FileItem): Promise<string | null> {
 
 async function startUpload() {
   if (isUploading.value) return;
+  if (props.geoEnabled && !geoIsValid.value) {
+    geoShowErrors.value = true;
+    return;
+  }
   isUploading.value = true;
 
   const pendingItems = fileItems.value.filter((f) => f.status === 'idle');
@@ -379,17 +404,9 @@ function handleClose() {
   }
 }
 
-// Icon mapping for non-image files
-function mimeToIcon(mimeType: string | null): string {
-  if (!mimeType) return 'insert_drive_file';
-  if (mimeType.startsWith('video/')) return 'videocam';
-  if (mimeType.startsWith('audio/')) return 'audiotrack';
-  if (mimeType === 'application/pdf') return 'picture_as_pdf';
-  if (mimeType.includes('zip') || mimeType.includes('compressed')) return 'folder_zip';
-  if (mimeType.includes('word') || mimeType.includes('document')) return 'description';
-  if (mimeType.includes('sheet') || mimeType.includes('excel')) return 'table_chart';
-  return 'insert_drive_file';
-}
+watch(geoIsValid, (valid) => {
+  if (valid) geoShowErrors.value = false;
+});
 
 onMounted(() => {
   selectedFolder.value = props.defaultFolder;
@@ -421,18 +438,16 @@ onMounted(() => {
           />
         </div>
 
-        <!-- Folder picker -->
+        <!-- Folder picker (upload_area_folder hidden from options in Main Upload mode) -->
         <div v-if="!usingUploadArea" class="section">
           <label class="section-label">Upload to folder</label>
-          <FolderDropdown v-model="selectedFolder" />
+          <FolderDropdown v-model="selectedFolder" :exclude-id="props.uploadAreaFolder ?? null" />
         </div>
 
-        <div v-else class="archive-note" :class="{ warn: !uploadAreaReady }">
+        <!-- Upload Area: warn only when folder not configured; show nothing when it is -->
+        <div v-else-if="!uploadAreaReady" class="archive-note warn">
           <div class="archive-note-title">Upload Area</div>
-          <div v-if="uploadAreaReady">
-            Files uploaded in Upload Area will be stored in the configured interim folder.
-          </div>
-          <div v-else>
+          <div>
             Upload Area folder is not configured in the extension settings yet. Configure it before uploading in this mode.
           </div>
         </div>
@@ -457,6 +472,69 @@ onMounted(() => {
             class="hidden-input"
             @change="onFileInputChange"
           />
+        </div>
+
+        <!-- Selected preview grid -->
+        <div v-if="fileItems.length > 0" class="selected-wrap">
+          <div class="selected-header">
+            <span class="selected-label">Selected</span>
+            <span class="selected-sub">{{ pendingCount }} ready to upload</span>
+            <div class="spacer" />
+            <v-button x-small secondary :disabled="isUploading" @click="clearAll">Clear all</v-button>
+          </div>
+
+          <div class="selected-grid">
+            <div
+              v-for="(item, index) in fileItems"
+              :key="index"
+              class="tile"
+              :class="item.status"
+            >
+              <div class="tile-thumb">
+                <img
+                  v-if="item.previewUrl && item.previewKind === 'image'"
+                  :src="item.previewUrl"
+                  alt=""
+                  class="tile-img"
+                />
+                <video
+                  v-else-if="item.previewUrl && item.previewKind === 'video'"
+                  :src="item.previewUrl"
+                  class="tile-video"
+                  controls
+                  preload="metadata"
+                  playsinline
+                />
+                <div v-else class="tile-fallback">
+                  <v-icon :name="mimeToIcon(item.file.type, item.file.name)" class="tile-icon" />
+                </div>
+
+                <button
+                  v-if="item.status === 'idle' || item.status === 'error'"
+                  class="tile-remove"
+                  type="button"
+                  title="Remove"
+                  :disabled="isUploading"
+                  @click.stop="removeFileItem(index)"
+                >
+                  <v-icon name="close" x-small />
+                </button>
+
+                <div v-if="item.status === 'uploading' || item.status === 'done'" class="tile-progress">
+                  <div
+                    class="tile-progress-bar"
+                    :style="{ width: item.progress + '%' }"
+                    :class="{ done: item.status === 'done' }"
+                  />
+                </div>
+              </div>
+
+              <div class="tile-meta">
+                <p class="tile-name" :title="item.file.name">{{ item.file.name }}</p>
+                <p v-if="item.status === 'error'" class="tile-error">{{ item.errorMessage }}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div v-if="uploadExtraFields.length > 0" class="extra-fields">
@@ -489,9 +567,13 @@ onMounted(() => {
           </template>
         </div>
 
+        
+
         <GeographiesEditor
           v-if="props.geoEnabled"
           v-model="geoValue"
+          required
+          :show-errors="geoShowErrors"
           :disabled="isUploading"
           :levels="props.geoLevels"
           :cascades="props.geoCascades"
@@ -499,65 +581,16 @@ onMounted(() => {
           :language-code="props.geoLanguageCode"
           :label-field="props.geoLabelField"
         />
-        <p v-if="props.geoEnabled" class="geo-help">
-          Optional. Selected geography IDs will be saved directly on the uploaded file fields
+        <p v-if="props.geoEnabled && geoShowErrors && missingGeoLevels.length" class="geo-error">
+          <v-icon name="error" x-small />
+          Required: {{ missingGeoLevels.map((l) => l.label).join(', ') }}
+        </p>
+        <p v-else-if="props.geoEnabled" class="geo-help">
+          All geography fields are required before upload. Values are saved on each file as
           <strong>place, state, region, country, destination, destination_cluster</strong>.
         </p>
 
-        <!-- Selected preview grid -->
-        <div v-if="fileItems.length > 0" class="selected-wrap">
-          <div class="selected-header">
-            <span class="selected-label">Selected</span>
-            <span class="selected-sub">{{ pendingCount }} ready to upload</span>
-            <div class="spacer" />
-            <v-button x-small secondary :disabled="isUploading" @click="clearAll">Clear all</v-button>
-          </div>
-
-          <div class="selected-grid">
-            <div
-              v-for="(item, index) in fileItems"
-              :key="index"
-              class="tile"
-              :class="item.status"
-            >
-              <div class="tile-thumb">
-                <img
-                  v-if="item.previewUrl"
-                  :src="item.previewUrl"
-                  alt=""
-                  class="tile-img"
-                />
-                <div v-else class="tile-fallback">
-                  <v-icon :name="mimeToIcon(item.file.type)" class="tile-icon" />
-                </div>
-
-                <button
-                  v-if="item.status === 'idle' || item.status === 'error'"
-                  class="tile-remove"
-                  type="button"
-                  title="Remove"
-                  :disabled="isUploading"
-                  @click.stop="removeFileItem(index)"
-                >
-                  <v-icon name="close" x-small />
-                </button>
-
-                <div v-if="item.status === 'uploading' || item.status === 'done'" class="tile-progress">
-                  <div
-                    class="tile-progress-bar"
-                    :style="{ width: item.progress + '%' }"
-                    :class="{ done: item.status === 'done' }"
-                  />
-                </div>
-              </div>
-
-              <div class="tile-meta">
-                <p class="tile-name" :title="item.file.name">{{ item.file.name }}</p>
-                <p v-if="item.status === 'error'" class="tile-error">{{ item.errorMessage }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </v-card-text>
 
       <v-card-actions class="card-actions">
@@ -738,6 +771,15 @@ onMounted(() => {
   color: var(--theme--foreground-subdued);
 }
 
+.geo-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: -4px 0 0;
+  font-size: 12px;
+  color: var(--theme--danger, #dc3545);
+}
+
 .dropzone {
   border: 2px dashed var(--theme--border-color);
   border-radius: var(--theme--border-radius);
@@ -833,11 +875,16 @@ onMounted(() => {
   border-bottom: 1px solid var(--theme--border-color);
 }
 
-.tile-img {
+.tile-img,
+.tile-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.tile-video {
+  background: #000;
 }
 
 .tile-fallback {

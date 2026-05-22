@@ -13,6 +13,7 @@ type FolderNode = DirectusFolder & { children: FolderNode[] };
 
 const props = defineProps<{
   modelValue: string | null;
+  excludeId?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -45,7 +46,11 @@ function normalizeFolderRaw(item: Record<string, unknown>): DirectusFolder {
   };
 }
 
-const folderMap = computed(() => new Map(folders.value.map((f) => [String(f.id), f])));
+const visibleFolders = computed(() =>
+  props.excludeId ? folders.value.filter((f) => f.id !== props.excludeId) : folders.value
+);
+
+const folderMap = computed(() => new Map(visibleFolders.value.map((f) => [String(f.id), f])));
 
 function getSegments(id: string, visited = new Set<string>()): string[] {
   if (visited.has(id)) return [];
@@ -63,7 +68,7 @@ const selectedSegments = computed(() => {
 
 const folderTree = computed<FolderNode[]>(() => {
   const map = new Map<string, FolderNode>();
-  for (const f of folders.value) {
+  for (const f of visibleFolders.value) {
     map.set(String(f.id), {
       ...f,
       id: String(f.id),

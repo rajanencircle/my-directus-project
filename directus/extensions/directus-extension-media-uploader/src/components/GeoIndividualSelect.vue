@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import type { Ref } from 'vue';
 import { useApi } from '@directus/extensions-sdk';
 
 type AnyRecord = Record<string, any>;
@@ -7,6 +8,17 @@ type AnyRecord = Record<string, any>;
 export interface StoredRef {
   id: string;
   collection: string;
+}
+
+interface CascadeFromConfig {
+  fieldKey: string;
+  parentCollection: string;
+  fk: string;
+}
+
+interface FilterByConfig {
+  fieldKey: string;
+  fk: string;
 }
 
 interface DropdownItem {
@@ -24,17 +36,24 @@ const props = withDefaults(
     labelField?: string;
     languageCode?: string;
     searchLimit?: number;
-    // Optional upstream filters: [{ fk: 'country_id', id: '...' }, ...]
-    filter?: Array<{ fk: string; id: string }>;
+    values?: Record<string, unknown> | null;
+    cascadeFrom?: CascadeFromConfig[];
+    filterBy?: FilterByConfig[];
+    required?: boolean;
+    invalid?: boolean;
   }>(),
   {
     modelValue: null,
     disabled: false,
+    required: false,
+    invalid: false,
     icon: 'search',
     labelField: 'translations.name',
     languageCode: 'en-GB',
     searchLimit: 20,
-    filter: () => [],
+    values: null,
+    cascadeFrom: () => [],
+    filterBy: () => [],
   }
 );
 
@@ -44,17 +63,48 @@ const emit = defineEmits<{
 
 const api = useApi();
 
+// Prefer explicitly-passed geo values over the Directus form context inject.
+// Inside UploadModal we're inside Directus's component tree which injects the
+// main-form values — those don't contain our geo fields. When props.values is
+// provided (always from GeographiesEditor), use it; only fall back to inject
+// when props.values is null (e.g. component used standalone inside a native form).
+const injectedValues = inject<Ref<Record<string, unknown>> | null>('values', null);
+const currentValues = computed<Record<string, unknown> | null>(
+  () => props.values ?? (injectedValues?.value as Record<string, unknown> | null) ?? null
+);
+
 const searchText = ref('');
 const active = ref(false);
 const loading = ref(false);
 const items = ref<DropdownItem[]>([]);
+const selectedItem = ref<DropdownItem | null>(null);
+const drawerOpen = ref(false);
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+// ─── Value helpers ────────────────────────────────────────────────────────────
+
+function extractId(val: unknown): string | null {
+  if (!val) return null;
+  if (typeof val === 'string') return val;
+  if (typeof val === 'number') return String(val);
+  if (typeof val === 'object' && 'id' in (val as object)) {
+    const id = (val as StoredRef).id;
+    return id ? String(id) : null;
+  }
+  return null;
+}
+
+// ─── Label / fields helpers ───────────────────────────────────────────────────
 
 function buildFieldsParam(labelField: string): string[] {
   const base = ['id'];
   const parts = labelField.split('.');
-  if (parts[0] === 'translations') {
-    base.push('translations.name', 'translations.translations_id');
+  if (parts[0] === 'translations' && parts[1]) {
+    base.push(
+      `translations.${parts[1]}`,
+      'translations.translations_id',
+      'translations.translations_id.code',
+    );
   } else {
     base.push(labelField);
   }
@@ -69,8 +119,9 @@ function extractLabel(item: AnyRecord): string {
   if (parts[0] === 'translations' && parts[1]) {
     const translations = (item.translations as Array<Record<string, string>>) ?? [];
     const match =
-      translations.find((t) => t.translations_id === props.languageCode) ??
-      translations[0];
+      translations.find(
+        (t) => t.translations_id === props.languageCode || t.code === props.languageCode
+      ) ?? translations[0];
     return String(match?.[parts[1]] ?? `[${item.id}]`);
   }
 
@@ -79,10 +130,59 @@ function extractLabel(item: AnyRecord): string {
   return String(val ?? `[${item.id}]`);
 }
 
-async function fetchById(id: string) {
+// ─── Path traversal for drawer input ─────────────────────────────────────────
+
+function extractFromPath(obj: AnyRecord, path: string): string | null {
+  const parts = path.split('.');
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current == null) return null;
+    if (
+      !Array.isArray(current) &&
+      typeof current === 'object' &&
+      Array.isArray((current as AnyRecord).create)
+    ) {
+      current = (current as AnyRecord).create;
+    }
+    if (Array.isArray(current)) {
+      const arr = current as AnyRecord[];
+      const match =
+        arr.find(
+          (item) => item.code === props.languageCode || item.translations_id === props.languageCode
+        ) ?? arr[0];
+      current = match?.[part];
+    } else {
+      current = (current as AnyRecord)[part];
+    }
+  }
+  return current != null ? String(current) : null;
+}
+
+// ─── API helpers ──────────────────────────────────────────────────────────────
+
+async function fetchById(id: string): Promise<AnyRecord | null> {
   const fields = buildFieldsParam(props.labelField ?? 'translations.name');
-  const res = await api.get(`/items/${props.targetCollection}/${id}`, { params: { fields } });
-  return res.data?.data ?? null;
+  try {
+    const res = await api.get(`/items/${props.targetCollection}/${id}`, { params: { fields } });
+    return res.data?.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchParentRecord(
+  collection: string,
+  id: string,
+  fields: string[]
+): Promise<AnyRecord | null> {
+  try {
+    const res = await api.get(`/items/${collection}/${id}`, {
+      params: { fields: ['id', ...fields] },
+    });
+    return res.data?.data ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function search(term: string) {
@@ -100,7 +200,7 @@ async function search(term: string) {
     else clauses.push({ [labelField]: { _icontains: q } });
   }
 
-  for (const f of props.filter ?? []) clauses.push({ [f.fk]: { _eq: f.id } });
+  for (const f of getActiveFilters()) clauses.push({ [f.fk]: { _eq: f.id } });
 
   const params: AnyRecord = {
     fields,
@@ -124,6 +224,25 @@ async function search(term: string) {
   }
 }
 
+// ─── Filter helpers ───────────────────────────────────────────────────────────
+
+function getActiveFilters(): Array<{ fk: string; id: string; fieldKey: string }> {
+  const active: Array<{ fk: string; id: string; fieldKey: string }> = [];
+  for (const f of props.filterBy ?? []) {
+    const parentId = extractId(currentValues.value?.[f.fieldKey]);
+    if (parentId) active.push({ fk: f.fk, id: parentId, fieldKey: f.fieldKey });
+  }
+  return active;
+}
+
+const filterHint = computed<string>(() =>
+  getActiveFilters()
+    .map((f) => `Filtered by ${f.fieldKey}`)
+    .join('  ·  ')
+);
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+
 async function initFromValue() {
   const id = props.modelValue?.id;
   if (!id) {
@@ -132,15 +251,28 @@ async function initFromValue() {
   }
   try {
     const record = await fetchById(String(id));
-    searchText.value = record ? extractLabel(record) : String(id);
+    const label = record ? extractLabel(record) : String(id);
+    selectedItem.value = { id: String(id), label };
+    searchText.value = label;
   } catch {
     searchText.value = String(id);
   }
 }
 
+function clearSelf() {
+  if (selectedItem.value !== null || searchText.value !== '') {
+    selectedItem.value = null;
+    searchText.value = '';
+    items.value = [];
+    emit('update:modelValue', null);
+  }
+}
+
+// ─── Event handlers ───────────────────────────────────────────────────────────
+
 function onInput(val: string) {
   searchText.value = val;
-  emit('update:modelValue', null);
+  selectedItem.value = null;
   active.value = true;
 
   if (searchTimer) clearTimeout(searchTimer);
@@ -155,27 +287,162 @@ async function onFocus() {
 function onBlur() {
   setTimeout(() => {
     active.value = false;
-    // restore label if there is a selected value
     if (props.modelValue?.id) initFromValue();
   }, 180);
 }
 
 function onSelect(item: DropdownItem) {
   emit('update:modelValue', { id: item.id, collection: props.targetCollection });
+  selectedItem.value = item;
   searchText.value = item.label;
   active.value = false;
   items.value = [];
 }
 
 function clear() {
-  emit('update:modelValue', null);
-  searchText.value = '';
-  items.value = [];
+  clearSelf();
+}
+
+function openDrawer() {
+  drawerOpen.value = true;
+}
+
+function closeDrawer() {
+  drawerOpen.value = false;
+}
+
+async function onDrawerInput(val: AnyRecord) {
+  if (!val) return;
+  try {
+    let id: string;
+    let itemData: AnyRecord;
+
+    if (val.id) {
+      id = String(val.id);
+      itemData = val;
+    } else {
+      const response = await api.post(`/items/${props.targetCollection}`, val);
+      itemData = response.data?.data ?? {};
+      id = String(itemData.id);
+    }
+
+    if (!id) return;
+
+    const label =
+      extractFromPath(val, props.labelField ?? 'translations.name') ??
+      extractLabel(itemData) ??
+      id;
+
+    onSelect({ id, label });
+  } catch (e) {
+    console.error(`[media-uploader] Error creating item in ${props.targetCollection}:`, e);
+  }
+  drawerOpen.value = false;
 }
 
 function handleOutsideClick(e: MouseEvent) {
   if (!(e.target as HTMLElement).closest('.geo-individual-select')) active.value = false;
 }
+
+// ─── Cascade watcher ─────────────────────────────────────────────────────────
+
+watch(
+  () => {
+    const snapshot: Record<string, unknown> = {};
+    for (const c of props.cascadeFrom ?? []) {
+      snapshot[c.fieldKey] = currentValues.value?.[c.fieldKey] ?? null;
+    }
+    return snapshot;
+  },
+  async (newParents, oldParents) => {
+    for (const c of props.cascadeFrom ?? []) {
+      const newId = extractId(newParents[c.fieldKey]);
+      const oldId = extractId(oldParents?.[c.fieldKey]);
+      if (newId === oldId) continue;
+
+      // Skip auto-fill on initial load if this field already has a saved value
+      if (oldId === null && extractId(props.modelValue) !== null) continue;
+
+      if (!newId) {
+        clearSelf();
+        return;
+      }
+
+      const parentCollection = c.parentCollection || (newParents[c.fieldKey] as any)?.collection;
+      if (!parentCollection) continue;
+
+      const parentRecord = await fetchParentRecord(parentCollection, newId, [c.fk]);
+      const rawTarget = parentRecord?.[c.fk];
+      const targetId = rawTarget ? String(rawTarget) : null;
+
+      if (!targetId) {
+        clearSelf();
+        return;
+      }
+      if (selectedItem.value?.id === targetId) return;
+
+      // Already matches saved value — just sync display label without emitting
+      if (extractId(props.modelValue) === targetId) {
+        if (!selectedItem.value) {
+          const record = await fetchById(targetId);
+          if (record) {
+            const label = extractLabel(record);
+            selectedItem.value = { id: targetId, label };
+            searchText.value = label;
+          }
+        }
+        return;
+      }
+
+      const record = await fetchById(targetId);
+      if (record) {
+        const label = extractLabel(record);
+        selectedItem.value = { id: targetId, label };
+        searchText.value = label;
+        items.value = [];
+        emit('update:modelValue', { id: targetId, collection: props.targetCollection });
+      }
+      return;
+    }
+  },
+  { deep: true, immediate: false }
+);
+
+// ─── FilterBy watcher ─────────────────────────────────────────────────────────
+
+watch(
+  () => {
+    const snapshot: Record<string, unknown> = {};
+    for (const f of props.filterBy ?? []) {
+      snapshot[f.fieldKey] = currentValues.value?.[f.fieldKey] ?? null;
+    }
+    return snapshot;
+  },
+  (newFilters, oldFilters) => {
+    if (!oldFilters) return;
+    for (const f of props.filterBy ?? []) {
+      const oldVal = extractId(oldFilters[f.fieldKey]);
+      const newVal = extractId(newFilters[f.fieldKey]);
+      if (newVal !== oldVal) {
+        // null → value is initial form load, skip to avoid dirty state
+        if (oldVal === null) return;
+        if (selectedItem.value) clearSelf();
+        return;
+      }
+    }
+  },
+  { deep: true }
+);
+
+// ─── External value watcher ───────────────────────────────────────────────────
+
+watch(
+  () => props.modelValue,
+  () => initFromValue(),
+  { deep: true }
+);
+
+// ─── Lifecycle ────────────────────────────────────────────────────────────────
 
 onMounted(() => {
   initFromValue();
@@ -187,18 +454,15 @@ onBeforeUnmount(() => {
   if (searchTimer) clearTimeout(searchTimer);
 });
 
-watch(
-  () => props.modelValue,
-  () => initFromValue(),
-  { deep: true }
-);
-
 const canClear = computed(() => Boolean(props.modelValue?.id) && !props.disabled);
 </script>
 
 <template>
-  <div class="geo-individual-select">
-    <div class="label">{{ label }}</div>
+  <div class="geo-individual-select" :class="{ invalid: invalid }">
+    <div class="label">
+      {{ label }}
+      <span v-if="required" class="required-mark" aria-hidden="true">*</span>
+    </div>
     <div class="input-wrap">
       <v-input
         :model-value="searchText"
@@ -214,10 +478,24 @@ const canClear = computed(() => Boolean(props.modelValue?.id) && !props.disabled
         </template>
         <template #append>
           <v-icon v-if="canClear" name="close" small clickable @click.stop="clear" />
+          <v-icon v-else-if="!disabled" name="add" small clickable @click.stop="openDrawer" />
         </template>
       </v-input>
 
+      <drawer-item
+        v-if="drawerOpen"
+        :active="drawerOpen"
+        :collection="targetCollection"
+        primary-key="+"
+        @update:active="closeDrawer"
+        @input="onDrawerInput"
+      />
+
       <div v-if="active" class="dropdown">
+        <div v-if="filterHint" class="dropdown-filter-hint">
+          <v-icon name="filter_alt" x-small />
+          {{ filterHint }}
+        </div>
         <div v-if="loading" class="dropdown-item loading">
           <v-progress-circular x-small indeterminate />
           Loading…
@@ -248,6 +526,17 @@ const canClear = computed(() => Boolean(props.modelValue?.id) && !props.disabled
   color: var(--theme--foreground-subdued);
 }
 
+.required-mark {
+  color: var(--theme--danger, #dc3545);
+  margin-left: 2px;
+}
+
+.geo-individual-select.invalid :deep(.v-input) {
+  --v-input-border-color: var(--theme--danger, #dc3545);
+  --v-input-border-color-hover: var(--theme--danger, #dc3545);
+  --v-input-border-color-focus: var(--theme--danger, #dc3545);
+}
+
 .input-wrap {
   position: relative;
 }
@@ -264,6 +553,24 @@ const canClear = computed(() => Boolean(props.modelValue?.id) && !props.disabled
   z-index: 220;
   max-height: 220px;
   overflow-y: auto;
+}
+
+.dropdown-filter-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--theme--primary, #6644ff);
+  background: var(--theme--primary-background, #f0ecff);
+  border-bottom: 1px solid var(--theme--border-color, #d3dae4);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dropdown-item {
