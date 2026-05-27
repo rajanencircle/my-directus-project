@@ -318,16 +318,8 @@ import AddFolder from '../components/AddFolder.vue'
 import BatchEditDrawer from '../components/BatchEditDrawer.vue'
 import DropZone from '../components/upload/DropZone.vue'
 import UploadModal from '../components/upload/UploadModal.vue'
-import {
-  UPLOAD_AREA_FOLDER,
-  UPLOAD_EXTRA_FIELDS,
-  GEO_ENABLED,
-  GEO_LEVELS,
-  GEO_CASCADES,
-  GEO_FILTER_MAPPINGS,
-  GEO_LANGUAGE_CODE,
-  GEO_LABEL_FIELD,
-} from '../upload-config'
+import { UPLOAD_EXTRA_FIELDS } from '../upload-config'
+import { useMediaLibrarySettings } from '../composables/useMediaLibrarySettings'
 
 const router = useRouter()
 const api = useApi()
@@ -419,7 +411,7 @@ const pageTitle = computed(() =>
 
 // ── Lifecycle ──────────────────────────────────────────────────────
 onMounted(async () => {
-  await Promise.all([foldersStore.fetchFolders(), loadColumnPrefs()])
+  await Promise.all([foldersStore.fetchFolders(), loadColumnPrefs(), loadSettings()])
   filesStore.fetchFiles()
 })
 
@@ -604,17 +596,19 @@ function handleRowClick({ item }: { item: DirectusFile; event: PointerEvent }) {
   }
 }
 
-// ── Upload config (edit src/upload-config.ts to change these) ─────
-const uploadConfig = {
-  uploadAreaFolder: UPLOAD_AREA_FOLDER,
+// ── Upload config — loaded from media_library_settings collection ──
+const { settings, loadSettings } = useMediaLibrarySettings()
+
+const uploadConfig = computed(() => ({
+  uploadAreaFolder: settings.value.upload_area_folder,
   uploadExtraFields: UPLOAD_EXTRA_FIELDS,
-  geoEnabled: GEO_ENABLED,
-  geoLevels: GEO_LEVELS,
-  geoCascades: GEO_CASCADES,
-  geoFilterMappings: GEO_FILTER_MAPPINGS,
-  geoLanguageCode: GEO_LANGUAGE_CODE,
-  geoLabelField: GEO_LABEL_FIELD,
-}
+  geoEnabled: settings.value.geo_enabled,
+  geoLevels: settings.value.geo_levels,
+  geoCascades: settings.value.geo_cascades,
+  geoFilterMappings: settings.value.geo_filter_mappings,
+  geoLanguageCode: settings.value.geo_language_code,
+  geoLabelField: settings.value.geo_label_field,
+}))
 
 // ── Batch delete ───────────────────────────────────────────────────
 async function batchDeleteFiles() {
@@ -686,6 +680,7 @@ function formatFilesize(bytes: number): string {
   --v-button-background-color-hover: var(--theme--danger) !important;
   --v-button-color-hover: var(--white) !important;
 }
+
 
 .active {
   --v-button-background-color: var(--theme--primary-background);

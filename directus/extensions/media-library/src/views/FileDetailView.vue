@@ -1,13 +1,15 @@
 <template>
   <private-view
-    :title="isLoading ? 'Loading…' : (file?.title ?? file?.filename_disk ?? 'File Detail')"
+    :title="
+      isLoading
+        ? 'Loading…'
+        : (file?.title ?? file?.filename_disk ?? 'File Detail')
+    "
     show-back
     back-to="/media-library"
   >
-
     <!-- ── Actions ────────────────────────────────────────────────── -->
     <template #actions>
-
       <!-- Delete -->
       <v-dialog v-model="confirmDelete" @esc="confirmDelete = false">
         <template #activator="{ on }">
@@ -28,15 +30,27 @@
           <v-card-text>This action cannot be undone.</v-card-text>
           <v-card-actions>
             <v-button secondary @click="confirmDelete = false">Cancel</v-button>
-            <v-button kind="danger" :loading="isDeleting" @click="deleteFile">Delete</v-button>
+            <v-button kind="danger" :loading="isDeleting" @click="deleteFile"
+              >Delete</v-button
+            >
           </v-card-actions>
         </v-card>
       </v-dialog>
 
       <!-- Move to folder -->
-      <v-dialog v-if="file" v-model="moveToDialogActive" @esc="moveToDialogActive = false">
+      <v-dialog
+        v-if="file"
+        v-model="moveToDialogActive"
+        @esc="moveToDialogActive = false"
+      >
         <template #activator="{ on }">
-          <v-button v-tooltip.bottom="'Move to Folder'" icon rounded secondary @click="on">
+          <v-button
+            v-tooltip.bottom="'Move to Folder'"
+            icon
+            rounded
+            secondary
+            @click="on"
+          >
             <v-icon name="folder_move" />
           </v-button>
         </template>
@@ -46,7 +60,9 @@
             <FolderDropdown v-model="selectedFolder" />
           </v-card-text>
           <v-card-actions>
-            <v-button secondary @click="moveToDialogActive = false">Cancel</v-button>
+            <v-button secondary @click="moveToDialogActive = false"
+              >Cancel</v-button
+            >
             <v-button :loading="isMoving" @click="moveToFolder">Move</v-button>
           </v-card-actions>
         </v-card>
@@ -88,7 +104,6 @@
       >
         <v-icon name="check" />
       </v-button>
-
     </template>
 
     <!-- ── Left navigation sidebar ────────────────────────────────── -->
@@ -101,7 +116,11 @@
       <v-detail icon="info" label="File Info" :start-open="true">
         <div class="sidebar-info">
           <template v-if="file">
-            <div v-for="row in sidebarInfoRows" :key="row.label" class="sidebar-row">
+            <div
+              v-for="row in sidebarInfoRows"
+              :key="row.label"
+              class="sidebar-row"
+            >
               <span class="sidebar-label">{{ row.label }}</span>
               <span class="sidebar-value">{{ row.value }}</span>
             </div>
@@ -115,7 +134,10 @@
           <div v-if="isLoadingRevisions" class="sidebar-state">
             <v-progress-circular indeterminate x-small />
           </div>
-          <div v-else-if="revisions.length === 0" class="sidebar-state sidebar-empty">
+          <div
+            v-else-if="revisions.length === 0"
+            class="sidebar-state sidebar-empty"
+          >
             No revisions yet
           </div>
           <div v-else class="revision-list">
@@ -123,8 +145,12 @@
               <v-icon name="history" x-small class="revision-icon" />
               <div class="revision-body">
                 <span class="revision-user">{{ rev.user_name }}</span>
-                <span class="revision-date">{{ formatDate(rev.timestamp) }}</span>
-                <span v-if="rev.comment" class="revision-comment">{{ rev.comment }}</span>
+                <span class="revision-date">{{
+                  formatDate(rev.timestamp)
+                }}</span>
+                <span v-if="rev.comment" class="revision-comment">{{
+                  rev.comment
+                }}</span>
               </div>
             </div>
           </div>
@@ -134,7 +160,6 @@
 
     <!-- ── Center content ─────────────────────────────────────────── -->
     <div class="file-item">
-
       <div v-if="isLoading" class="state-center">
         <v-progress-circular indeterminate />
       </div>
@@ -146,7 +171,6 @@
       </div>
 
       <template v-else>
-
         <!-- File preview -->
         <div class="preview-wrapper">
           <img
@@ -171,294 +195,347 @@
           :validation-errors="validationErrors"
           class="file-form"
         />
-
       </template>
-
     </div>
 
     <!-- Unsaved changes dialog -->
     <v-dialog v-model="confirmLeave" @esc="confirmLeave = false">
       <v-card>
         <v-card-title>Unsaved Changes</v-card-title>
-        <v-card-text>You have unsaved changes. Leave without saving?</v-card-text>
+        <v-card-text
+          >You have unsaved changes. Leave without saving?</v-card-text
+        >
         <v-card-actions>
-          <v-button secondary @click="discardAndLeave">Discard Changes</v-button>
+          <v-button secondary @click="discardAndLeave"
+            >Discard Changes</v-button
+          >
           <v-button @click="confirmLeave = false">Keep Editing</v-button>
         </v-card-actions>
       </v-card>
     </v-dialog>
-
   </private-view>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import { useApi, useStores } from '@directus/extensions-sdk'
-import { useAssetUrl } from '../composables/useAssetUrl'
-import MediaSidebar from '../components/layout/MediaSidebar.vue'
-import FolderDropdown from '../components/upload/FolderDropdown.vue'
-import type { DirectusFile } from '../stores/files.store'
-import { validateItem, clearHiddenEdits } from '../utils/validate-item'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
+import { useRouter, onBeforeRouteLeave } from "vue-router";
+import { useApi, useStores } from "@directus/extensions-sdk";
+import { useAssetUrl } from "../composables/useAssetUrl";
+import MediaSidebar from "../components/layout/MediaSidebar.vue";
+import FolderDropdown from "../components/upload/FolderDropdown.vue";
+import type { DirectusFile } from "../stores/files.store";
+import { validateItem, clearHiddenEdits } from "../utils/validate-item";
 
-const props = defineProps<{ id: string }>()
+const props = defineProps<{ id: string }>();
 
-const router = useRouter()
-const api = useApi()
-const { getPreviewUrl, getAssetUrl } = useAssetUrl()
-const { useFieldsStore } = useStores()
-const fieldsStore = useFieldsStore()
+const router = useRouter();
+const api = useApi();
+const { getPreviewUrl, getAssetUrl } = useAssetUrl();
+const { useFieldsStore } = useStores();
+const fieldsStore = useFieldsStore();
 
 // ── State ──────────────────────────────────────────────────────────
-const file = ref<DirectusFile | null>(null)
-const edits = ref<Record<string, any>>({})
-const validationErrors = ref<any[]>([])
-const isLoading = ref(true)
-const isSaving = ref(false)
-const isDeleting = ref(false)
-const isMoving = ref(false)
-const confirmDelete = ref(false)
-const moveToDialogActive = ref(false)
-const selectedFolder = ref<string | null>(null)
-const confirmLeave = ref(false)
-const pendingLeave = ref<string | null>(null)
+const file = ref<DirectusFile | null>(null);
+const edits = ref<Record<string, any>>({});
+const validationErrors = ref<any[]>([]);
+const isLoading = ref(true);
+const isSaving = ref(false);
+const isDeleting = ref(false);
+const isMoving = ref(false);
+const confirmDelete = ref(false);
+const moveToDialogActive = ref(false);
+const selectedFolder = ref<string | null>(null);
+const confirmLeave = ref(false);
+const pendingLeave = ref<string | null>(null);
 
 // Revisions
-const revisions = ref<any[]>([])
-const isLoadingRevisions = ref(false)
+const revisions = ref<any[]>([]);
+const isLoadingRevisions = ref(false);
 
 // ── Computed ───────────────────────────────────────────────────────
-const hasEdits = computed(() => Object.keys(edits.value).length > 0)
+const hasEdits = computed(() => Object.keys(edits.value).length > 0);
 
 const FIELDS_DENY_LIST = [
-  'type', 'width', 'height', 'filesize', 'created_on', 'uploaded_by',
-  'uploaded_on', 'modified_by', 'modified_on', 'duration', 'folder',
-  'charset', 'embed', 'storage', 'filename_disk', 'filename_download',
-]
+  "type",
+  "width",
+  "height",
+  "filesize",
+  "created_on",
+  "uploaded_by",
+  "uploaded_on",
+  "modified_by",
+  "modified_on",
+  "duration",
+  "folder",
+  "charset",
+  "embed",
+  "storage",
+  "filename_disk",
+  "filename_download",
+];
 
 const editableFields = computed(() => {
   try {
-    return fieldsStore.getFieldsForCollection('directus_files')
-      .filter((f: any) => !FIELDS_DENY_LIST.includes(f.field))
+    return fieldsStore
+      .getFieldsForCollection("directus_files")
+      .filter((f: any) => !FIELDS_DENY_LIST.includes(f.field));
   } catch {
-    return []
+    return [];
   }
-})
+});
 
-const previewUrl = computed(() => file.value ? getPreviewUrl(file.value.id) : '')
-const downloadUrl = computed(() => file.value ? getAssetUrl(file.value.id) + '?download' : '')
+const previewUrl = computed(() =>
+  file.value ? getPreviewUrl(file.value.id) : "",
+);
+const downloadUrl = computed(() =>
+  file.value ? getAssetUrl(file.value.id) + "?download" : "",
+);
 
 const sidebarInfoRows = computed(() => {
-  if (!file.value) return []
-  const f = file.value
+  if (!file.value) return [];
+  const f = file.value;
   const rows: { label: string; value: string }[] = [
-    { label: 'Type', value: f.type ?? '—' },
-    { label: 'Size', value: formatFilesize(f.filesize) },
-  ]
-  if (f.width && f.height) rows.push({ label: 'Dimensions', value: `${f.width} × ${f.height}` })
+    { label: "Type", value: f.type ?? "—" },
+    { label: "Size", value: formatFilesize(f.filesize) },
+  ];
+  if (f.width && f.height)
+    rows.push({ label: "Dimensions", value: `${f.width} × ${f.height}` });
   rows.push(
-    { label: 'Uploaded', value: formatDate(f.uploaded_on) },
-    { label: 'Modified', value: formatDate((f as any).modified_on) },
-    { label: 'ID', value: f.id },
-  )
-  return rows
-})
+    { label: "Uploaded", value: formatDate(f.uploaded_on) },
+    { label: "Modified", value: formatDate((f as any).modified_on) },
+    { label: "ID", value: f.id },
+  );
+  return rows;
+});
 
 // ── Lifecycle ──────────────────────────────────────────────────────
 onMounted(async () => {
-  await loadFile()
-  loadRevisions()
-})
+  await loadFile();
+  loadRevisions();
+});
 
 const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
   if (hasEdits.value) {
-    e.preventDefault()
-    ;(e as any).returnValue = ''
+    e.preventDefault();
+    (e as any).returnValue = "";
   }
-}
+};
 
 const saveShortcutHandler = (e: KeyboardEvent) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-    e.preventDefault()
-    if (hasEdits.value) save()
+  if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+    e.preventDefault();
+    if (hasEdits.value) save();
   }
-}
+};
 
 onMounted(() => {
-  window.addEventListener('beforeunload', beforeUnloadHandler)
-  window.addEventListener('keydown', saveShortcutHandler)
-})
+  window.addEventListener("beforeunload", beforeUnloadHandler);
+  window.addEventListener("keydown", saveShortcutHandler);
+});
 onBeforeUnmount(() => {
-  window.removeEventListener('beforeunload', beforeUnloadHandler)
-  window.removeEventListener('keydown', saveShortcutHandler)
-})
+  window.removeEventListener("beforeunload", beforeUnloadHandler);
+  window.removeEventListener("keydown", saveShortcutHandler);
+});
 
 onBeforeRouteLeave((to) => {
   if (hasEdits.value) {
-    pendingLeave.value = to.fullPath
-    confirmLeave.value = true
-    return false
+    pendingLeave.value = to.fullPath;
+    confirmLeave.value = true;
+    return false;
   }
-})
+});
 
-watch(() => props.id, async () => {
-  edits.value = {}
-  await loadFile()
-  loadRevisions()
-})
+watch(
+  () => props.id,
+  async () => {
+    edits.value = {};
+    await loadFile();
+    loadRevisions();
+  },
+);
 
 // ── Data loading ───────────────────────────────────────────────────
 async function loadFile() {
-  isLoading.value = true
+  isLoading.value = true;
+  console.log("props", props);
   try {
-    const res = await api.get(`/files/${props.id}`, { params: { fields: ['*', 'uploaded_by.id', 'uploaded_by.first_name', 'uploaded_by.last_name'] } })
-    file.value = res.data?.data ?? null
-    selectedFolder.value = file.value?.folder ?? null
+    const res = await api.get(`/files/${props.id}`, {
+      params: {
+        fields: [
+          "*",
+          "uploaded_by.id",
+          "uploaded_by.first_name",
+          "uploaded_by.last_name",
+        ],
+      },
+    });
+    file.value = res.data?.data ?? null;
+    selectedFolder.value = file.value?.folder ?? null;
   } catch (err) {
-    console.warn('[media-library] Failed to fetch file:', err)
-    file.value = null
+    console.warn("[media-library] Failed to fetch file:", err);
+    file.value = null;
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
 async function loadRevisions() {
-  isLoadingRevisions.value = true
+  isLoadingRevisions.value = true;
   try {
-    const res = await api.get('/revisions', {
+    const res = await api.get("/revisions", {
       params: {
-        filter: { item: { _eq: props.id }, collection: { _eq: 'directus_files' } },
-        fields: ['id', 'timestamp', 'user.first_name', 'user.last_name', 'activity.comment'],
-        sort: ['-timestamp'],
+        filter: {
+          item: { _eq: props.id },
+          collection: { _eq: "directus_files" },
+        },
+        fields: [
+          "id",
+          "timestamp",
+          "user.first_name",
+          "user.last_name",
+          "activity.comment",
+        ],
+        sort: ["-timestamp"],
         limit: 25,
       },
-    })
+    });
     revisions.value = (res.data?.data ?? []).map((r: any) => ({
       id: r.id,
       timestamp: r.timestamp,
-      user_name: r.user ? [r.user.first_name, r.user.last_name].filter(Boolean).join(' ') : 'System',
+      user_name: r.user
+        ? [r.user.first_name, r.user.last_name].filter(Boolean).join(" ")
+        : "System",
       comment: r.activity?.comment ?? null,
-    }))
+    }));
   } catch {
-    revisions.value = []
+    revisions.value = [];
   } finally {
-    isLoadingRevisions.value = false
+    isLoadingRevisions.value = false;
   }
 }
 
 // ── Actions ────────────────────────────────────────────────────────
 async function save() {
-  if (!hasEdits.value || isSaving.value) return
+  if (!hasEdits.value || isSaving.value) return;
 
-  validationErrors.value = []
+  validationErrors.value = [];
 
   // Build merged item for condition evaluation
-  const allFields = editableFields.value
-  const merged = { ...(file.value ?? {}), ...edits.value }
+  const allFields = editableFields.value;
+  const merged = { ...(file.value ?? {}), ...edits.value };
 
   // Client-side validation: respects conditions, hidden flags, and custom validation rules
-  const clientErrors = validateItem(merged, allFields, false, true)
+  const clientErrors = validateItem(merged, allFields, false, true);
   if (clientErrors.length > 0) {
-    validationErrors.value = clientErrors
-    return
+    validationErrors.value = clientErrors;
+    return;
   }
 
   // Clear values for fields hidden by conditions (clear_hidden_value_on_save)
-  const payload = clearHiddenEdits(edits.value, allFields, file.value ?? {})
+  const payload = clearHiddenEdits(edits.value, allFields, file.value ?? {});
 
-  isSaving.value = true
+  isSaving.value = true;
   try {
-    const res = await api.patch(`/files/${props.id}`, payload)
-    file.value = res.data?.data ?? file.value
-    edits.value = {}
-    loadRevisions()
+    const res = await api.patch(`/files/${props.id}`, payload);
+    file.value = res.data?.data ?? file.value;
+    edits.value = {};
+    loadRevisions();
   } catch (err: any) {
-    const errors = err?.response?.data?.errors ?? []
+    const errors = err?.response?.data?.errors ?? [];
     validationErrors.value = errors
-      .filter((e: any) => ['FAILED_VALIDATION', 'RECORD_NOT_UNIQUE'].includes(e?.extensions?.code))
-      .map((e: any) => e.extensions)
+      .filter((e: any) =>
+        ["FAILED_VALIDATION", "RECORD_NOT_UNIQUE"].includes(
+          e?.extensions?.code,
+        ),
+      )
+      .map((e: any) => e.extensions);
     if (validationErrors.value.length === 0) {
-      console.error('[media-library] Save failed:', err)
+      console.error("[media-library] Save failed:", err);
     }
   } finally {
-    isSaving.value = false
+    isSaving.value = false;
   }
 }
 
 async function deleteFile() {
-  if (isDeleting.value) return
-  isDeleting.value = true
+  if (isDeleting.value) return;
+  isDeleting.value = true;
   try {
-    await api.delete(`/files/${props.id}`)
-    edits.value = {}
-    router.push('/media-library')
+    await api.delete(`/files/${props.id}`);
+    edits.value = {};
+    router.push("/media-library");
   } catch (err) {
-    console.error('[media-library] Delete failed:', err)
+    console.error("[media-library] Delete failed:", err);
   } finally {
-    isDeleting.value = false
-    confirmDelete.value = false
+    isDeleting.value = false;
+    confirmDelete.value = false;
   }
 }
 
 async function moveToFolder() {
-  if (isMoving.value) return
-  isMoving.value = true
+  if (isMoving.value) return;
+  isMoving.value = true;
   try {
-    const res = await api.patch(`/files/${props.id}`, { folder: selectedFolder.value })
-    file.value = res.data?.data ?? file.value
-    moveToDialogActive.value = false
+    const res = await api.patch(`/files/${props.id}`, {
+      folder: selectedFolder.value,
+    });
+    file.value = res.data?.data ?? file.value;
+    moveToDialogActive.value = false;
   } catch (err) {
-    console.error('[media-library] Move failed:', err)
+    console.error("[media-library] Move failed:", err);
   } finally {
-    isMoving.value = false
+    isMoving.value = false;
   }
 }
 
 function goBack() {
-  router.push('/media-library')
+  router.push("/media-library");
 }
 
 function discardAndLeave() {
-  edits.value = {}
-  confirmLeave.value = false
-  const dest = pendingLeave.value ?? '/media-library'
-  pendingLeave.value = null
-  router.push(dest)
+  edits.value = {};
+  confirmLeave.value = false;
+  const dest = pendingLeave.value ?? "/media-library";
+  pendingLeave.value = null;
+  router.push(dest);
 }
 
 async function copyAssetUrl() {
-  if (!file.value) return
-  await navigator.clipboard.writeText(getAssetUrl(file.value.id))
+  if (!file.value) return;
+  await navigator.clipboard.writeText(getAssetUrl(file.value.id));
 }
 
 // ── Helpers ────────────────────────────────────────────────────────
 function isImageType(mimeType: string): boolean {
-  return mimeType?.startsWith('image/') ?? false
+  return mimeType?.startsWith("image/") ?? false;
 }
 
 function getFileIcon(mimeType: string): string {
-  if (!mimeType) return 'insert_drive_file'
-  if (mimeType.startsWith('video/')) return 'movie'
-  if (mimeType.startsWith('audio/')) return 'audiotrack'
-  if (mimeType.includes('pdf')) return 'picture_as_pdf'
-  if (mimeType.includes('zip') || mimeType.includes('archive')) return 'folder_zip'
-  if (mimeType.includes('word') || mimeType.includes('document')) return 'description'
-  if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return 'table_chart'
-  return 'insert_drive_file'
+  if (!mimeType) return "insert_drive_file";
+  if (mimeType.startsWith("video/")) return "movie";
+  if (mimeType.startsWith("audio/")) return "audiotrack";
+  if (mimeType.includes("pdf")) return "picture_as_pdf";
+  if (mimeType.includes("zip") || mimeType.includes("archive"))
+    return "folder_zip";
+  if (mimeType.includes("word") || mimeType.includes("document"))
+    return "description";
+  if (mimeType.includes("spreadsheet") || mimeType.includes("excel"))
+    return "table_chart";
+  return "insert_drive_file";
 }
 
 function formatFilesize(bytes: number): string {
-  if (!bytes) return '—'
-  const kb = bytes / 1024
-  if (kb < 1024) return `${kb.toFixed(1)} KB`
-  const mb = kb / 1024
-  if (mb < 1024) return `${mb.toFixed(1)} MB`
-  return `${(mb / 1024).toFixed(1)} GB`
+  if (!bytes) return "—";
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  const mb = kb / 1024;
+  if (mb < 1024) return `${mb.toFixed(1)} MB`;
+  return `${(mb / 1024).toFixed(1)} GB`;
 }
 
 function formatDate(isoString: string): string {
-  if (!isoString) return '—'
-  return new Date(isoString).toLocaleString()
+  if (!isoString) return "—";
+  return new Date(isoString).toLocaleString();
 }
 </script>
 
