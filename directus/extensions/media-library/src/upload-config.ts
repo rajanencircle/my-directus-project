@@ -8,14 +8,12 @@ export const UPLOAD_AREA_FOLDER: string | null =
 
 export const UPLOAD_EXTRA_FIELDS = [
   {
-    type: "checkbox-group",
-    field: "flags",
-    label: "Flags",
-    options: [
-      { label: "Is Map?", value: "map" },
-      { label: "Tour32 Export?", value: "Tour32" },
-    ],
-    storeAs: "string-array",
+    type: "boolean",
+    field: "is_map",
+  },
+  {
+    type: "boolean",
+    field: "tour32_export",
   },
 ];
 
@@ -31,13 +29,13 @@ export const GEO_LEVELS = [
   { field: "state", collection: "states", label: "State", icon: "map" },
   {
     field: "region",
-    collection: "regions_geo",
+    collection: "regions",
     label: "Region",
     icon: "terrain",
   },
   {
     field: "country",
-    collection: "countries_geo",
+    collection: "countries",
     label: "Country",
     icon: "flag",
   },
@@ -75,7 +73,7 @@ export const GEO_FILTER_MAPPINGS = {
   ],
   state: [{ fk: "country_id", from: "country" }],
   region: [{ fk: "country_id", from: "country" }],
-  destination: [{ fk: "countries_geo_id", from: "country" }],
+  destination: [{ fk: "countries_id", from: "country" }],
   destination_cluster: [{ fk: "destinations_cluster_id", from: "destination" }],
 };
 

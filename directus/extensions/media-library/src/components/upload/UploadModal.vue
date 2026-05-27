@@ -61,6 +61,7 @@ const isUploading = ref(false);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const geoValue = ref<Record<string, StoredFieldValue | null>>({});
 const checkboxValues = ref<Record<string, string[]>>({});
+const booleanValues = ref<Record<string, boolean>>({});
 
 // Reset state when modal opens
 watch(
@@ -72,6 +73,7 @@ watch(
       isDragging.value = false;
       geoValue.value = {};
       checkboxValues.value = {};
+      booleanValues.value = {};
     }
   },
 );
@@ -170,6 +172,17 @@ function resolvedCheckboxOptions(
   return normalizedCheckboxOptions(field);
 }
 
+// Returns the translated field label from fieldsStore, falling back to a config
+// label or a humanised version of the field key.
+function labelForField(fieldName: string, fallback?: string): string {
+  try {
+    const name = (fieldsStore.getField("directus_files", fieldName) as any)?.name;
+    if (name) return name;
+  } catch { /* ignore */ }
+  if (fallback) return fallback;
+  return fieldName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 // ── File management ─────────────────────────────────────────────────
 
 const selectedCount = computed(() => fileItems.value.length);
@@ -254,19 +267,17 @@ function uploadFileXhr(item: FileItem): Promise<string | null> {
     formData.append("status", "draft");
     if (selectedFolder.value) formData.append("folder", selectedFolder.value);
 
-    // Extra checkbox fields
+    // Extra checkbox-group and boolean fields
     for (const field of uploadExtraFields.value) {
+      const f = String((field as any)?.field ?? "").trim();
+      if (!f) continue;
       if ((field as any)?.type === "checkbox-group") {
-        const f = String((field as any)?.field ?? "").trim();
-        if (!f) continue;
         const val = checkboxValues.value[f] ?? [];
         if (val.length > 0) {
-          try {
-            formData.append(f, JSON.stringify(val));
-          } catch {
-            /* ignore */
-          }
+          try { formData.append(f, JSON.stringify(val)); } catch { /* ignore */ }
         }
+      } else if ((field as any)?.type === "boolean") {
+        formData.append(f, booleanValues.value[f] ? "true" : "false");
       }
     }
 
@@ -500,26 +511,16 @@ function mimeToIcon(mimeType: string | null): string {
           </div>
         </div>
 
-        <!-- Extra fields (checkbox groups) -->
+        <!-- Extra fields (checkbox groups + booleans) -->
         <div v-if="uploadExtraFields.length > 0" class="extra-fields">
           <template
             v-for="field in uploadExtraFields"
-            :key="
-              String(
-                (field as any)?.field ??
-                  (field as any)?.label ??
-                  JSON.stringify(field),
-              )
-            "
+            :key="String((field as any)?.field ?? (field as any)?.label ?? JSON.stringify(field))"
           >
-            <div
-              v-if="(field as any)?.type === 'checkbox-group'"
-              class="extra-section"
-            >
+            <!-- Checkbox group (multi-select flags) -->
+            <div v-if="(field as any)?.type === 'checkbox-group'" class="extra-section">
               <div class="extra-title">
-                {{
-                  (field as any)?.label || (field as any)?.field || "Options"
-                }}
+                {{ labelForField(String((field as any)?.field ?? ''), (field as any)?.label) }}
               </div>
               <div class="flags-grid">
                 <label
@@ -532,23 +533,31 @@ function mimeToIcon(mimeType: string | null): string {
                     type="checkbox"
                     class="flag-check"
                     :disabled="isUploading"
-                    :checked="
-                      checkboxSelected(
-                        String((field as any)?.field ?? ''),
-                        opt.value,
-                      )
-                    "
-                    @change="
-                      toggleCheckbox(
-                        String((field as any)?.field ?? ''),
-                        opt.value,
-                      )
-                    "
+                    :checked="checkboxSelected(String((field as any)?.field ?? ''), opt.value)"
+                    @change="toggleCheckbox(String((field as any)?.field ?? ''), opt.value)"
                   />
                   <span class="flag-label">{{ opt.label }}</span>
                 </label>
               </div>
             </div>
+
+            <!-- Boolean (single toggle) -->
+            <label
+              v-else-if="(field as any)?.type === 'boolean'"
+              class="flag-item boolean-field"
+              :class="{ disabled: isUploading }"
+            >
+              <input
+                type="checkbox"
+                class="flag-check"
+                :disabled="isUploading"
+                :checked="booleanValues[(field as any)?.field] ?? false"
+                @change="booleanValues[(field as any)?.field] = ($event.target as HTMLInputElement).checked"
+              />
+              <span class="flag-label">
+                {{ labelForField(String((field as any)?.field ?? ''), (field as any)?.label) }}
+              </span>
+            </label>
           </template>
         </div>
 
@@ -913,6 +922,14 @@ function mimeToIcon(mimeType: string | null): string {
   font-size: 13px;
   font-weight: 600;
   color: var(--theme--foreground);
+}
+
+/* Boolean field sits flush — no wrapper section needed */
+.boolean-field {
+  border: 1px solid var(--theme--border-color);
+  border-radius: var(--theme--border-radius);
+  background: var(--theme--background-normal);
+  padding: 10px 12px;
 }
 
 /* Geo help text */
