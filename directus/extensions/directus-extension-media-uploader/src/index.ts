@@ -262,6 +262,30 @@ export default defineInterface({
       schema: { default_value: DEFAULT_GEO_FILTER_MAPPINGS },
     },
     {
+      field: 'upload_status_field',
+      name: 'Upload Status Field',
+      type: 'string',
+      meta: {
+        width: 'half',
+        interface: 'input',
+        note: 'Field name on directus_files to set on upload (e.g. directus_status). Leave empty to skip.',
+        options: { placeholder: 'directus_status' },
+      },
+      schema: { default_value: 'directus_status' },
+    },
+    {
+      field: 'upload_status_value',
+      name: 'Upload Status Value',
+      type: 'string',
+      meta: {
+        width: 'half',
+        interface: 'input',
+        note: 'Value written to the upload status field on each uploaded file. Default: draft.',
+        options: { placeholder: 'draft' },
+      },
+      schema: { default_value: 'draft' },
+    },
+    {
       field: 'geo_language_code',
       name: 'Geography Language Code',
       type: 'string',

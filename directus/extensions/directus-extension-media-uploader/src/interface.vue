@@ -43,6 +43,8 @@ const props = withDefaults(
     geo_filter_mappings?: any;
     geo_language_code?: string;
     geo_label_field?: string;
+    upload_status_field?: string | null;
+    upload_status_value?: string | null;
   }>(),
   {
     value: () => [],
@@ -544,6 +546,8 @@ watch(
       :geo-filter-mappings="geo_filter_mappings"
       :geo-language-code="geo_language_code"
       :geo-label-field="geo_label_field"
+      :upload-status-field="upload_status_field ?? 'directus_status'"
+      :upload-status-value="upload_status_value ?? 'draft'"
       @close="showUploadModal = false"
       @uploaded="(fileIds: string[]) => { showUploadModal = false; stageAddFileIds(fileIds); }"
     />

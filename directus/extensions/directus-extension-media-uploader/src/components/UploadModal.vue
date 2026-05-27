@@ -37,6 +37,8 @@ const props = defineProps<{
   geoFilterMappings?: any;
   geoLanguageCode?: string;
   geoLabelField?: string;
+  uploadStatusField?: string | null;
+  uploadStatusValue?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -279,6 +281,10 @@ function uploadFileXhr(item: FileItem): Promise<string | null> {
     formData.append('title', title);
     if (effectiveUploadFolder.value) {
       formData.append('folder', effectiveUploadFolder.value);
+    }
+
+    if (props.uploadStatusField && props.uploadStatusValue) {
+      formData.append(props.uploadStatusField, props.uploadStatusValue);
     }
 
     // Extra fields (optional) stored on directus_files

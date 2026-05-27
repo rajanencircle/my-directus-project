@@ -1,0 +1,129 @@
+/* NEW */
+
+/* Form width overrides */
+:root {
+  --form-column-min-width: 0rem !important;
+  --form-column-max-width: 48rem !important;
+}
+
+/* text-area */
+.v-form .field .v-textarea {
+  block-size: 90px;
+}
+/* Base card styling for both group types */
+.v-item-group.group-raw {
+  background-color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+}
+
+/* Accordion sections */
+
+.content-split .v-form .group-raw.first-visible-field,
+.content-split .v-form:not(.fields) > .group-raw.full,
+.v-item-group.group-accordion .v-form.grid .v-item-group {
+  background-color: #ffffff !important;
+  border-radius: 12px;
+  padding: 40px;
+  border: 1px solid #e5e7eb;
+}
+.v-item-group.group-accordion .v-form.grid .v-item-group {
+  padding: 30px 40px;
+  margin-top: 0px;
+}
+.content-split .v-form.fields .group-raw.first-visible-field {
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+.content-split .v-form.fields {
+  padding-bottom: 0;
+  grid-template-columns: [start]minmax(0, 1fr) [half]minmax(0, 1fr) [full] !important;
+}
+.content-split .v-form.grid {
+  grid-template-columns: [start]minmax(0, 1fr) [half]minmax(0, 1fr) [full] !important;
+}
+.v-item-group.group-accordion .v-item.accordion-section {
+  border-top: none;
+}
+.v-form .v-item-group.group-accordion {
+  border: none;
+}
+
+/* Accordion header */
+.v-item-group.group-accordion .label.type-title {
+  padding-block: 0;
+}
+/* Nested groups spacing */
+.v-item-group .v-item-group {
+  margin-top: 12px;
+}
+
+/* Extra spacing when multiple nested groups are stacked */
+.v-item-group .v-item-group + .v-item-group {
+  margin-top: 12px;
+}
+
+/* Ensure inner wrapper doesn't collapse */
+.v-list-item.link.block.clickable .preview {
+  height: 100% !important;
+}
+
+/* reposnive style */
+@media only screen and (max-width: 1024px) {
+  .content-split .v-form .group-raw.first-visible-field,
+  .content-split .v-form:not(.fields) > .group-raw.full,
+  .v-item-group.group-accordion .v-form.grid .v-item-group {
+    padding: 20px;
+  }
+}
+
+/* Tabs style */
+.group-tabs .tab-list {
+  background: #fff !important;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px !important;
+  padding: 8px 10px !important;
+}
+.group-tabs .tab-list .tab-trigger {
+  padding: 8px 14px;
+  border: none;
+}
+.group-tabs .tab-list .tab-trigger .field-name {
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 500;
+}
+.group-tabs .tab-list .tab-trigger[data-state="active"],
+.group-tabs .tab-list .tab-trigger:hover {
+  background: #f1f5f9 !important;
+  border-radius: 8px;
+}
+.group-tabs .tab-list .tab-trigger[data-state="active"] .field-name {
+  font-weight: 600;
+  color: #008cc0;
+}
+.group-tabs .tab-list .tab-trigger:hover .field-name {
+  color: #008cc0;
+}
+@media only screen and (max-width: 767px) {
+  .group-tabs .tab-list .tab-trigger {
+    padding: 6px 10px;
+  }
+  .group-tabs .tab-list .tab-trigger[data-state="active"] {
+    border-radius: 4px;
+  }
+  .group-tabs .tab-list {
+    column-gap: 4px !important;
+    row-gap: 6px !important;
+  }
+}
+
+/*Tab list sticky*/
+.tab-list {
+  position: sticky !important;
+  top: 22px !important;
+  z-index: 2 !important;
+}
