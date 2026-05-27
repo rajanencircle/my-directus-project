@@ -1,20 +1,24 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
-import { useApi } from '@directus/extensions-sdk';
+import { computed, onMounted, ref, watch } from "vue";
+import { useApi, useStores } from "@directus/extensions-sdk";
 import {
   type AnyRecord,
+  type ColumnDef,
   type ReverseSectionLike,
+  type TranslatableString,
   normalizeFieldsParam,
   parseFileReverseLinks,
-  reverseTableCells,
-  reverseTableHeaders,
-} from './utils/fileReverseLinks';
+  resolveTranslatable,
+  resolvedTableCells,
+  resolvedTableHeaders,
+} from "./utils/fileReverseLinks";
 import {
   buildAssetDownloadUrl,
   parseDownloadFormatPresets,
+  resolvePresetLabel,
   triggerDownload,
-} from './utils/downloadPresets';
-import { supportsMultiFormatDownload } from './utils/fileType';
+} from "./utils/downloadPresets";
+import { supportsMultiFormatDownload } from "./utils/fileType";
 
 type ReverseSectionState = ReverseSectionLike & {
   title: string;
@@ -23,6 +27,9 @@ type ReverseSectionState = ReverseSectionLike & {
   error: string | null;
   rows: AnyRecord[];
   fileField: string;
+  columns?: ColumnDef[];
+  tableHeaders?: Array<TranslatableString>;
+  tablePaths?: string[];
 };
 
 const props = withDefaults(
@@ -40,18 +47,31 @@ const props = withDefaults(
     disabled: false,
     file_reverse_links: undefined,
     download_format_presets: undefined,
-  }
+  },
 );
 
 const api = useApi();
 
-const fileId = computed(() =>
-  props.primaryKey == null || props.primaryKey === '+' || props.primaryKey === ''
-    ? ''
-    : String(props.primaryKey)
+// ── Current UI locale ────────────────────────────────────────────────────
+const { useUserStore } = useStores();
+const userStore = useUserStore();
+const currentLocale = computed<string>(
+  () =>
+    (userStore.currentUser as any)?.language ??
+    navigator.language.replace("_", "-") ??
+    "en-US",
 );
 
-// ── File metadata (type + filename needed for downloads) ──────────────────
+// ── File ID ──────────────────────────────────────────────────────────────
+const fileId = computed(() =>
+  props.primaryKey == null ||
+  props.primaryKey === "+" ||
+  props.primaryKey === ""
+    ? ""
+    : String(props.primaryKey),
+);
+
+// ── File metadata ────────────────────────────────────────────────────────
 const fileType = ref<string | null>(null);
 const filenameDownload = ref<string | null>(null);
 const fileMeta = ref<AnyRecord | null>(null);
@@ -61,7 +81,7 @@ async function loadFileMeta() {
   if (!id) return;
   try {
     const res = await api.get(`/files/${id}`, {
-      params: { fields: ['type', 'filename_download'] },
+      params: { fields: ["type", "filename_download"] },
     });
     const d = res.data?.data ?? null;
     fileMeta.value = d;
@@ -74,9 +94,11 @@ async function loadFileMeta() {
 
 // ── Download presets ─────────────────────────────────────────────────────
 const canMultiFormatDownload = computed(() =>
-  supportsMultiFormatDownload(fileType.value, filenameDownload.value)
+  supportsMultiFormatDownload(fileType.value, filenameDownload.value),
 );
-const downloadPresets = computed(() => parseDownloadFormatPresets(props.download_format_presets));
+const downloadPresets = computed(() =>
+  parseDownloadFormatPresets(props.download_format_presets),
+);
 
 function downloadPreset(idx: number) {
   const id = fileId.value;
@@ -85,7 +107,7 @@ function downloadPreset(idx: number) {
   if (!preset) return;
   triggerDownload(
     buildAssetDownloadUrl(id, preset, fileType.value, filenameDownload.value),
-    filenameDownload.value
+    filenameDownload.value,
   );
 }
 
@@ -97,19 +119,27 @@ function downloadOriginal() {
 
 // ── Reverse-link usage sections ──────────────────────────────────────────
 const reverseSections = ref<ReverseSectionState[]>([]);
-const hasReverseRules = computed(() => parseFileReverseLinks(props.file_reverse_links).length > 0);
+const hasReverseRules = computed(
+  () => parseFileReverseLinks(props.file_reverse_links).length > 0,
+);
 
 async function loadReverseLinks(id: string) {
   const rules = parseFileReverseLinks(props.file_reverse_links);
-  if (!rules.length) { reverseSections.value = []; return; }
+  if (!rules.length) {
+    reverseSections.value = [];
+    return;
+  }
+
+  const locale = currentLocale.value;
 
   reverseSections.value = rules.map((r) => ({
-    title: r.section_title?.trim() || r.junction_collection,
+    title: resolveTranslatable(r.section_title, locale, r.junction_collection),
     collection: r.junction_collection,
     loading: true,
     error: null,
     rows: [],
     fileField: r.file_field,
+    columns: r.columns,
     tableHeaders: r.table_headers,
     tablePaths: r.table_paths,
   }));
@@ -127,23 +157,32 @@ async function loadReverseLinks(id: string) {
             ...(fields ? { fields } : {}),
           },
         });
-        return { error: null as string | null, rows: (res.data?.data ?? []) as AnyRecord[] };
+        return {
+          error: null as string | null,
+          rows: (res.data?.data ?? []) as AnyRecord[],
+        };
       } catch (e: any) {
-        return { error: e?.response?.data?.errors?.[0]?.message ?? 'Failed to load.', rows: [] as AnyRecord[] };
+        return {
+          error: e?.response?.data?.errors?.[0]?.message ?? "Failed to load.",
+          rows: [] as AnyRecord[],
+        };
       }
-    })
+    }),
   );
 
-  reverseSections.value = rules.map((rule, idx) => ({
-    title: rule.section_title?.trim() || rule.junction_collection,
-    collection: rule.junction_collection,
-    loading: false,
-    error: updates[idx]?.error ?? null,
-    rows: updates[idx]?.rows ?? [],
-    fileField: rule.file_field,
-    tableHeaders: rule.table_headers,
-    tablePaths: rule.table_paths,
-  }));
+  reverseSections.value = rules.map((rule, idx) => {
+    return {
+      title: resolveTranslatable(rule.section_title, locale, rule.junction_collection),
+      collection: rule.junction_collection,
+      loading: false,
+      error: updates[idx]?.error ?? null,
+      rows: updates[idx]?.rows ?? [],
+      fileField: rule.file_field,
+      columns: rule.columns,
+      tableHeaders: rule.table_headers,
+      tablePaths: rule.table_paths,
+    };
+  });
 }
 
 watch(fileId, async (id) => {
@@ -151,9 +190,12 @@ watch(fileId, async (id) => {
   await Promise.all([loadFileMeta(), loadReverseLinks(id)]);
 });
 
-watch(() => props.file_reverse_links, async () => {
-  if (fileId.value) await loadReverseLinks(fileId.value);
-}, { deep: true });
+watch(
+  () => JSON.stringify(props.file_reverse_links),
+  async () => {
+    if (fileId.value) await loadReverseLinks(fileId.value);
+  },
+);
 
 onMounted(async () => {
   if (fileId.value) {
@@ -175,17 +217,23 @@ onMounted(async () => {
         <template v-if="canMultiFormatDownload">
           <v-button
             v-for="(preset, idx) in downloadPresets"
-            :key="`${preset.label}-${idx}`"
+            :key="`${resolvePresetLabel(preset, currentLocale)}-${idx}`"
             secondary
             small
             :disabled="disabled"
             @click="downloadPreset(idx)"
           >
             <v-icon name="download" small />
-            {{ preset.label }}
+            {{ resolvePresetLabel(preset, currentLocale) }}
           </v-button>
         </template>
-        <v-button v-else secondary small :disabled="disabled" @click="downloadOriginal">
+        <v-button
+          v-else
+          secondary
+          small
+          :disabled="disabled"
+          @click="downloadOriginal"
+        >
           <v-icon name="download" small />
           Download original
         </v-button>
@@ -212,19 +260,27 @@ onMounted(async () => {
           {{ sec.error }}
         </div>
 
-        <p v-else-if="!sec.rows.length" class="reverse-empty">No assignments found.</p>
+        <p v-else-if="!sec.rows.length" class="reverse-empty">
+          No assignments found.
+        </p>
 
         <div v-else class="reverse-table-wrap">
           <div
             class="table reverse-table"
-            :style="{ '--reverse-cols': String(reverseTableHeaders(sec).length) }"
+            :style="{
+              '--reverse-cols': String(
+                resolvedTableHeaders(sec, currentLocale).length,
+              ),
+            }"
           >
             <div class="tr th">
               <div
-                v-for="(h, hIdx) in reverseTableHeaders(sec)"
+                v-for="(h, hIdx) in resolvedTableHeaders(sec, currentLocale)"
                 :key="`${sec.collection}-h-${hIdx}`"
                 class="td"
-              >{{ h }}</div>
+              >
+                {{ h }}
+              </div>
             </div>
             <div
               v-for="(jrow, tIdx) in sec.rows"
@@ -232,10 +288,12 @@ onMounted(async () => {
               class="tr"
             >
               <div
-                v-for="(cell, cIdx) in reverseTableCells(sec, jrow)"
+                v-for="(cell, cIdx) in resolvedTableCells(sec, jrow)"
                 :key="`${sec.collection}-c-${tIdx}-${cIdx}`"
                 class="td"
-              >{{ cell ?? '—' }}</div>
+              >
+                {{ cell ?? "—" }}
+              </div>
             </div>
           </div>
         </div>
@@ -289,9 +347,14 @@ onMounted(async () => {
 }
 
 .notice-error {
-  background: color-mix(in srgb, var(--theme--danger, #dc3545) 10%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--theme--danger, #dc3545) 10%,
+    transparent
+  );
   color: var(--theme--danger, #dc3545);
-  border: 1px solid color-mix(in srgb, var(--theme--danger, #dc3545) 30%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--theme--danger, #dc3545) 30%, transparent);
 }
 
 .table {
@@ -346,7 +409,9 @@ onMounted(async () => {
 .reverse-meta {
   font-size: 11px;
   font-weight: 600;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   margin: -4px 0 0;
 }
 

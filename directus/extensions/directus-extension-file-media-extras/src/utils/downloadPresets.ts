@@ -1,7 +1,9 @@
+import { type TranslatableString, resolveTranslatable } from './translations';
 import { supportsMultiFormatDownload } from './fileType';
 
 export type DownloadFormatPreset = {
-  label: string;
+  /** Button label — plain string or locale map: {"en-US":"JPG","fr-FR":"JPG"} */
+  label: TranslatableString;
   format?: string;
   width?: number;
   height?: number;
@@ -19,7 +21,7 @@ export const DEFAULT_DOWNLOAD_FORMAT_PRESETS: DownloadFormatPreset[] = [
 export const DEFAULT_DOWNLOAD_FORMAT_PRESETS_JSON = JSON.stringify(
   DEFAULT_DOWNLOAD_FORMAT_PRESETS,
   null,
-  2
+  2,
 );
 
 export function parseDownloadFormatPresets(input: unknown): DownloadFormatPreset[] {
@@ -35,8 +37,17 @@ export function parseDownloadFormatPresets(input: unknown): DownloadFormatPreset
   const out: DownloadFormatPreset[] = [];
   for (const item of raw) {
     if (!item || typeof item !== 'object') continue;
-    const label = String((item as any).label ?? '').trim();
+
+    // label may be a string or a translation object
+    const rawLabel = (item as any).label;
+    let label: TranslatableString | undefined;
+    if (typeof rawLabel === 'string' && rawLabel.trim()) {
+      label = rawLabel.trim();
+    } else if (rawLabel && typeof rawLabel === 'object' && !Array.isArray(rawLabel)) {
+      label = rawLabel as Record<string, string>;
+    }
     if (!label) continue;
+
     const preset: DownloadFormatPreset = { label };
     const format = (item as any).format;
     if (format != null && String(format).trim()) preset.format = String(format).trim();
@@ -53,11 +64,16 @@ export function parseDownloadFormatPresets(input: unknown): DownloadFormatPreset
   return out.length ? out : [...DEFAULT_DOWNLOAD_FORMAT_PRESETS];
 }
 
+/** Resolve the button label for a preset to the given locale. */
+export function resolvePresetLabel(preset: DownloadFormatPreset, locale: string): string {
+  return resolveTranslatable(preset.label, locale, '');
+}
+
 export function buildAssetDownloadUrl(
   fileId: string,
   preset: DownloadFormatPreset,
   mimeType?: string | null,
-  filename?: string | null
+  filename?: string | null,
 ): string {
   const base = `/assets/${fileId}`;
   if (!supportsMultiFormatDownload(mimeType, filename)) return `${base}?download`;
