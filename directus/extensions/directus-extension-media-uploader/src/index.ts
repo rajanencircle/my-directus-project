@@ -1,6 +1,6 @@
 import { defineInterface } from "@directus/extensions-sdk";
 import InterfaceComponent from "./interface.vue";
-import { DEFAULT_DOWNLOAD_FORMAT_PRESETS_JSON } from "./utils/downloadPresets";
+import { DEFAULT_DOWNLOAD_FORMAT_PRESETS_JSON } from "./utils/downloadPresets.ts";
 
 const DEFAULT_FILE_REVERSE_LINKS = JSON.stringify(
   [

@@ -30,15 +30,18 @@ function pickFromMap(translationsMap, lang) {
   return translationsMap[firstKey] ?? null;
 }
 
-function shapeGeo(geo) {
+function shapeGeo(geo, lang) {
   if (!geo) return null;
   const transMap = buildTranslationsMap(geo.translations, t => ({ name: t.name ?? null }));
+  const filteredTransMap = lang
+    ? (transMap[lang] ? { [lang]: transMap[lang] } : {})
+    : transMap;
   return {
     id: geo.id,
     ...(geo.ISO !== undefined && { iso: geo.ISO }),
     ...(geo.id_primarix !== undefined && { id_primarix: geo.id_primarix }),
     ...(geo.location_tour32 !== undefined && { location_tour32: geo.location_tour32 }),
-    translations: transMap,
+    translations: filteredTransMap,
   };
 }
 
@@ -94,6 +97,10 @@ export function shapeHotelListItem(hotel, lang) {
     }),
   );
 
+  const filteredTranslations = lang
+    ? (descTranslationsMap[lang] ? { [lang]: descTranslationsMap[lang] } : {})
+    : descTranslationsMap;
+
   const shaped = {
     type: 'hotel',
     id: hotel.id,
@@ -102,12 +109,12 @@ export function shapeHotelListItem(hotel, lang) {
     status: hotel.status_primarix ?? null,
     date_created: ensureUtcSuffix(hotel.date_created),
     date_updated: ensureUtcSuffix(hotel.date_updated),
-    translations: descTranslationsMap,
+    translations: filteredTranslations,
     description: pickFromMap(descTranslationsMap, lang),
-    country: shapeGeo(hotel.country),
-    state: shapeGeo(hotel.state),
-    region: shapeGeo(hotel.region),
-    place: shapeGeo(hotel.place),
+    country: shapeGeo(hotel.country, lang),
+    state: shapeGeo(hotel.state, lang),
+    region: shapeGeo(hotel.region, lang),
+    place: shapeGeo(hotel.place, lang),
     hotel_classification: hotel.hotel_classification
       ? { id: hotel.hotel_classification.id, label: hotel.hotel_classification.label }
       : null,
@@ -140,10 +147,13 @@ export function shapeHotelDetail(hotel, lang) {
   }));
 
   const allLangs = new Set([...Object.keys(descMap), ...Object.keys(infoMap)]);
-  const translations = {};
+  const allTranslations = {};
   for (const iso of allLangs) {
-    translations[iso] = { ...(descMap[iso] ?? {}), ...(infoMap[iso] ?? {}) };
+    allTranslations[iso] = { ...(descMap[iso] ?? {}), ...(infoMap[iso] ?? {}) };
   }
+  const translations = lang
+    ? (allTranslations[lang] ? { [lang]: allTranslations[lang] } : {})
+    : allTranslations;
 
   // Per-language price settings (margin, buy entity)
   const priceSettingsMap = buildPriceSettingsMap(hotel.hotel_prices);
@@ -156,6 +166,15 @@ export function shapeHotelDetail(hotel, lang) {
     teaser: t.image_badge_teaser ?? null,
     detail: t.image_badge_details ?? null,
   }));
+
+  // Filter hotels_specials JSON entries by publication status and date range
+  const today = new Date().toISOString().slice(0, 10);
+  const specials = (hotel.hotels_specials ?? []).filter(s => {
+    if (s.status === 'unpublished') return false;
+    if (s.publish_start && s.publish_start > today) return false;
+    if (s.publish_end && s.publish_end < today) return false;
+    return true;
+  });
 
   // Rooms with new shape
   const roomCategories = hotel.room_categories ?? [];
@@ -227,6 +246,7 @@ export function shapeHotelDetail(hotel, lang) {
     },
     translations,
     rooms,
+    specials,
     price_options,
     image_badge: {
       status: hotel.image_badge_status ?? null,

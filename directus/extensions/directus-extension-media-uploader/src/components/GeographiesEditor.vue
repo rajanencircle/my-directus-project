@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import GeoIndividualSelect, { type StoredRef } from './GeoIndividualSelect.vue';
-import { DEFAULT_GEO_LEVELS, parseGeoLevels, type GeoLevelConfig } from '../utils/geoLevels';
+import { computed } from "vue";
+import GeoIndividualSelect, { type StoredRef } from "./GeoIndividualSelect.vue";
+import {
+  DEFAULT_GEO_LEVELS,
+  parseGeoLevels,
+  type GeoLevelConfig,
+} from "../utils/geoLevels.ts";
 
 type GeoValue = Record<string, StoredRef | null>;
 
@@ -19,26 +23,26 @@ interface CascadeMapping {
 
 const DEFAULT_FILTER_MAPPINGS: Record<string, FilterMapping[]> = {
   place: [
-    { fk: 'country_id', from: 'country' },
-    { fk: 'state_id', from: 'state' },
-    { fk: 'region_id', from: 'region' },
+    { fk: "country_id", from: "country" },
+    { fk: "state_id", from: "state" },
+    { fk: "region_id", from: "region" },
   ],
-  state: [{ fk: 'country_id', from: 'country' }],
-  region: [{ fk: 'country_id', from: 'country' }],
-  destination: [{ fk: 'countries_geo_id', from: 'country' }],
-  destination_cluster: [{ fk: 'destinations_cluster_id', from: 'destination' }],
+  state: [{ fk: "country_id", from: "country" }],
+  region: [{ fk: "country_id", from: "country" }],
+  destination: [{ fk: "countries_geo_id", from: "country" }],
+  destination_cluster: [{ fk: "destinations_cluster_id", from: "destination" }],
 };
 
 const DEFAULT_CASCADES: Record<string, CascadeMapping[]> = {
   place: [
-    { fk: 'state_id', to: 'state' },
-    { fk: 'region_id', to: 'region' },
-    { fk: 'country_id', to: 'country' },
+    { fk: "state_id", to: "state" },
+    { fk: "region_id", to: "region" },
+    { fk: "country_id", to: "country" },
   ],
-  state: [{ fk: 'country_id', to: 'country' }],
-  region: [{ fk: 'country_id', to: 'country' }],
-  country: [{ fk: 'destination_id', to: 'destination' }],
-  destination: [{ fk: 'destinations_cluster_id', to: 'destination_cluster' }],
+  state: [{ fk: "country_id", to: "country" }],
+  region: [{ fk: "country_id", to: "country" }],
+  country: [{ fk: "destination_id", to: "destination" }],
+  destination: [{ fk: "destinations_cluster_id", to: "destination_cluster" }],
 };
 
 const props = withDefaults(
@@ -56,37 +60,43 @@ const props = withDefaults(
   {
     modelValue: null,
     disabled: false,
-    languageCode: 'en-GB',
-    labelField: 'translations.name',
+    languageCode: "en-GB",
+    labelField: "translations.name",
     levels: null,
     cascades: null,
     filterMappings: null,
     required: false,
     showErrors: false,
-  }
+  },
 );
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: GeoValue): void;
+  (e: "update:modelValue", value: GeoValue): void;
 }>();
 
 function parseRecord<T>(
   input: Record<string, T> | string | null | undefined,
-  fallback: Record<string, T>
+  fallback: Record<string, T>,
 ): Record<string, T> {
   if (!input) return fallback;
-  if (typeof input === 'object') return input;
+  if (typeof input === "object") return input;
   try {
     const parsed = JSON.parse(input);
-    return parsed && typeof parsed === 'object' ? (parsed as Record<string, T>) : fallback;
+    return parsed && typeof parsed === "object"
+      ? (parsed as Record<string, T>)
+      : fallback;
   } catch {
     return fallback;
   }
 }
 
-const levels = computed(() => parseGeoLevels(props.levels ?? DEFAULT_GEO_LEVELS));
+const levels = computed(() =>
+  parseGeoLevels(props.levels ?? DEFAULT_GEO_LEVELS),
+);
 const cascades = computed(() => parseRecord(props.cascades, DEFAULT_CASCADES));
-const filterMappings = computed(() => parseRecord(props.filterMappings, DEFAULT_FILTER_MAPPINGS));
+const filterMappings = computed(() =>
+  parseRecord(props.filterMappings, DEFAULT_FILTER_MAPPINGS),
+);
 
 const levelByField = computed(() => {
   const map = new Map<string, LevelConfig>();
@@ -96,7 +106,10 @@ const levelByField = computed(() => {
 
 // Convert source-perspective cascades → per-field cascadeFrom arrays for GeoIndividualSelect
 const cascadeFromByField = computed(() => {
-  const result: Record<string, { fieldKey: string; parentCollection: string; fk: string }[]> = {};
+  const result: Record<
+    string,
+    { fieldKey: string; parentCollection: string; fk: string }[]
+  > = {};
   for (const level of levels.value) result[level.field] = [];
   for (const [sourceField, mappings] of Object.entries(cascades.value)) {
     const sourceLevel = levelByField.value.get(sourceField);
@@ -126,17 +139,20 @@ function current(): GeoValue {
 }
 
 function setField(field: string, val: StoredRef | null) {
-  emit('update:modelValue', { ...current(), [field]: val });
+  emit("update:modelValue", { ...current(), [field]: val });
 }
 
 function isFieldInvalid(field: string): boolean {
   if (!props.required || !props.showErrors) return false;
-  return !(current()[field]?.id);
+  return !current()[field]?.id;
 }
 </script>
 
 <template>
-  <div class="geographies-editor" :class="{ 'has-errors': required && showErrors }">
+  <div
+    class="geographies-editor"
+    :class="{ 'has-errors': required && showErrors }"
+  >
     <div class="section-title">
       Geography
       <span v-if="required" class="required-mark" aria-hidden="true">*</span>
@@ -189,7 +205,11 @@ function isFieldInvalid(field: string): boolean {
 }
 
 .geographies-editor.has-errors {
-  border-color: color-mix(in srgb, var(--theme--danger, #dc3545) 40%, var(--theme--border-color));
+  border-color: color-mix(
+    in srgb,
+    var(--theme--danger, #dc3545) 40%,
+    var(--theme--border-color)
+  );
 }
 
 .grid {

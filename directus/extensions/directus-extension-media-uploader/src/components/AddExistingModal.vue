@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
-import { useApi } from '@directus/extensions-sdk';
-import FolderDropdown from './FolderDropdown.vue';
-import ExpiryInfoDialog from './ExpiryInfoDialog.vue';
-import { isExpired } from '../utils/expiry';
-import { extractJunctionFileId, parseFileReverseLinks, type AnyRecord } from '../utils/fileReverseLinks';
-import LinkedCollectionsDialog from './LinkedCollectionsDialog.vue';
-import FileThumbPreview from './FileThumbPreview.vue';
+import { computed, onMounted, ref, watch } from "vue";
+import { useApi } from "@directus/extensions-sdk";
+import FolderDropdown from "./FolderDropdown.vue";
+import ExpiryInfoDialog from "./ExpiryInfoDialog.vue";
+import { isExpired } from "../utils/expiry.js";
+import {
+  extractJunctionFileId,
+  parseFileReverseLinks,
+  type AnyRecord,
+} from "../utils/fileReverseLinks.js";
+import LinkedCollectionsDialog from "./LinkedCollectionsDialog.vue";
+import FileThumbPreview from "./FileThumbPreview.vue";
 
 type ID = string | number;
 
@@ -37,12 +41,12 @@ const props = withDefaults(
     alreadyLinkedFileIds: () => [],
     fileReverseLinks: undefined,
     downloadFormatPresets: undefined,
-  }
+  },
 );
 
 const emit = defineEmits<{
-  (e: 'close'): void;
-  (e: 'linked', fileIds: string[]): void;
+  (e: "close"): void;
+  (e: "linked", fileIds: string[]): void;
 }>();
 
 const api = useApi();
@@ -51,7 +55,7 @@ const loading = ref(false);
 const linking = ref(false);
 const loadError = ref<string | null>(null);
 
-const search = ref('');
+const search = ref("");
 const selectedFolder = ref<string | null>(props.defaultFolder);
 
 const perPage = ref<number>(25);
@@ -72,9 +76,9 @@ const albumDialogOpen = ref(false);
 const albumsLoading = ref(false);
 const albumsError = ref<string | null>(null);
 const albums = ref<Album[]>([]);
-const selectedAlbumId = ref<string>('');
+const selectedAlbumId = ref<string>("");
 const creatingAlbum = ref(false);
-const newAlbumName = ref('');
+const newAlbumName = ref("");
 const albumLinking = ref(false);
 
 function openExpiryInfo(file: DirectusFile) {
@@ -91,11 +95,15 @@ async function loadAlbums() {
   albumsLoading.value = true;
   albumsError.value = null;
   try {
-    const res = await api.get('/items/albums_directus', { params: { limit: -1, sort: ['name'], fields: ['id', 'name'] } });
+    const res = await api.get("/items/albums_directus", {
+      params: { limit: -1, sort: ["name"], fields: ["id", "name"] },
+    });
     albums.value = (res.data?.data ?? []) as Album[];
-    if (!selectedAlbumId.value && albums.value.length) selectedAlbumId.value = String(albums.value[0].id);
+    if (!selectedAlbumId.value && albums.value.length)
+      selectedAlbumId.value = String(albums.value[0].id);
   } catch (e: any) {
-    albumsError.value = e?.response?.data?.errors?.[0]?.message ?? 'Failed to load albums.';
+    albumsError.value =
+      e?.response?.data?.errors?.[0]?.message ?? "Failed to load albums.";
     albums.value = [];
   } finally {
     albumsLoading.value = false;
@@ -113,13 +121,14 @@ async function createAlbum() {
   creatingAlbum.value = true;
   albumsError.value = null;
   try {
-    const res = await api.post('/items/albums_directus', { name });
+    const res = await api.post("/items/albums_directus", { name });
     const created = res.data?.data as Album | undefined;
     await loadAlbums();
     if (created?.id != null) selectedAlbumId.value = String(created.id);
-    newAlbumName.value = '';
+    newAlbumName.value = "";
   } catch (e: any) {
-    albumsError.value = e?.response?.data?.errors?.[0]?.message ?? 'Failed to create album.';
+    albumsError.value =
+      e?.response?.data?.errors?.[0]?.message ?? "Failed to create album.";
   } finally {
     creatingAlbum.value = false;
   }
@@ -134,7 +143,7 @@ async function addSelectedToAlbum() {
   try {
     for (const fileId of ids) {
       try {
-        await api.post('/items/albums_directus', {
+        await api.post("/items/albums_directus", {
           albums_id: albumId,
           directus_files_id: String(fileId),
         });
@@ -144,7 +153,9 @@ async function addSelectedToAlbum() {
     }
     albumDialogOpen.value = false;
   } catch (e: any) {
-    albumsError.value = e?.response?.data?.errors?.[0]?.message ?? 'Failed to add files to album.';
+    albumsError.value =
+      e?.response?.data?.errors?.[0]?.message ??
+      "Failed to add files to album.";
   } finally {
     albumLinking.value = false;
   }
@@ -152,20 +163,20 @@ async function addSelectedToAlbum() {
 
 const acceptTypes = computed(() => {
   const types = props.allowedTypes;
-  if (!types || types === '*/*') return [];
+  if (!types || types === "*/*") return [];
   return types
-    .split(',')
+    .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
 });
 
 function matchesAllowedTypes(file: DirectusFile): boolean {
   if (!acceptTypes.value.length) return true;
-  const mime = file.type ?? '';
+  const mime = file.type ?? "";
   return acceptTypes.value.some((pattern) => {
-    if (pattern === '*/*') return true;
-    if (pattern.endsWith('/*')) {
-      const group = pattern.split('/')[0];
+    if (pattern === "*/*") return true;
+    if (pattern.endsWith("/*")) {
+      const group = pattern.split("/")[0];
       return mime.startsWith(`${group}/`);
     }
     return mime === pattern;
@@ -179,14 +190,16 @@ const selectedCount = computed(() => selectedIds.value.size);
 const linkedAnywhereMap = ref<Record<string, boolean>>({});
 const linkedLoading = ref(false);
 
-const reverseLinkRules = computed(() => parseFileReverseLinks(props.fileReverseLinks));
+const reverseLinkRules = computed(() =>
+  parseFileReverseLinks(props.fileReverseLinks),
+);
 
 function isLinkedAnywhere(fileId: string): boolean {
   return linkedAnywhereMap.value[String(fileId)] === true;
 }
 
 function displayName(file: DirectusFile): string {
-  return file.title || file.filename_download || 'Unnamed file';
+  return file.title || file.filename_download || "Unnamed file";
 }
 
 function toggleSelect(id: string) {
@@ -210,9 +223,9 @@ const pageCount = computed(() => {
 });
 
 const perPageItems = [
-  { text: '25', value: 25 },
-  { text: '50', value: 50 },
-  { text: '100', value: 100 },
+  { text: "25", value: 25 },
+  { text: "50", value: 50 },
+  { text: "100", value: 100 },
 ];
 
 const pageButtons = computed(() => {
@@ -260,16 +273,16 @@ async function fetchPage() {
     else if (filterClauses.length > 1) filter = { _and: filterClauses };
 
     const params: Record<string, unknown> = {
-      fields: ['id', 'title', 'filename_download', 'type', 'expiry_date'],
-      sort: ['-uploaded_on'],
+      fields: ["id", "title", "filename_download", "type", "expiry_date"],
+      sort: ["-uploaded_on"],
       limit: perPage.value,
       offset: offset.value,
-      meta: 'filter_count',
+      meta: "filter_count",
     };
 
     if (filter) params.filter = filter;
 
-    const res = await api.get('/files', { params });
+    const res = await api.get("/files", { params });
     const batch: DirectusFile[] = res.data?.data ?? [];
 
     files.value = batch;
@@ -278,25 +291,26 @@ async function fetchPage() {
     void loadLinkedStatusForFiles(batch.map((f) => String(f.id)));
 
     const metaCount = res.data?.meta?.filter_count;
-    if (typeof metaCount === 'number') {
+    if (typeof metaCount === "number") {
       total.value = metaCount;
     } else {
       // Fallback: aggregate count
       try {
-        const countRes = await api.get('/files', {
+        const countRes = await api.get("/files", {
           params: {
-            aggregate: { count: '*' },
+            aggregate: { count: "*" },
             filter,
           },
         });
         const cnt = countRes.data?.data?.[0]?.count;
-        total.value = typeof cnt === 'number' ? cnt : Number(cnt ?? 0);
+        total.value = typeof cnt === "number" ? cnt : Number(cnt ?? 0);
       } catch {
         total.value = null;
       }
     }
   } catch (e: any) {
-    loadError.value = e?.response?.data?.errors?.[0]?.message ?? 'Failed to load files.';
+    loadError.value =
+      e?.response?.data?.errors?.[0]?.message ?? "Failed to load files.";
     files.value = [];
     total.value = null;
   } finally {
@@ -321,7 +335,7 @@ async function loadLinkedStatusForFiles(fileIds: string[]) {
           const res = await api.get(`/items/${coll}`, {
             params: {
               filter: { [fileField]: { _in: ids } },
-              fields: ['id', fileField],
+              fields: ["id", fileField],
               limit: -1,
             },
           });
@@ -329,12 +343,12 @@ async function loadLinkedStatusForFiles(fileIds: string[]) {
         } catch {
           return { rule, rows: [] as AnyRecord[] };
         }
-      })
+      }),
     );
 
     const next: Record<string, boolean> = {};
     for (const { rule, rows } of perRule) {
-      const fileField = rule.file_field?.trim?.() ?? '';
+      const fileField = rule.file_field?.trim?.() ?? "";
       if (!fileField) continue;
       for (const row of rows) {
         const id = extractJunctionFileId((row as any)[fileField]);
@@ -357,17 +371,17 @@ async function linkSelected() {
     // Stage only. Persist will happen when the parent record is saved.
     const already = new Set(props.alreadyLinkedFileIds.map(String));
     const toStage = ids.map(String).filter((id) => !already.has(id));
-    emit('linked', toStage);
+    emit("linked", toStage);
   } catch (e) {
     // Keep modal open so user can retry
-    console.error('[media-uploader] Add existing link error:', e);
+    console.error("[media-uploader] Add existing link error:", e);
   } finally {
     linking.value = false;
   }
 }
 
 function handleClose() {
-  emit('close');
+  emit("close");
 }
 
 watch(
@@ -375,7 +389,7 @@ watch(
   () => {
     resetResults();
     fetchPage();
-  }
+  },
 );
 
 watch(
@@ -383,14 +397,14 @@ watch(
   () => {
     page.value = 1;
     fetchPage();
-  }
+  },
 );
 
 watch(
   () => page.value,
   () => {
     fetchPage();
-  }
+  },
 );
 
 onMounted(() => {
@@ -400,27 +414,48 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-dialog :model-value="true" @update:model-value="(v: boolean) => !v && handleClose()" persistent>
+  <v-dialog
+    :model-value="true"
+    @update:model-value="(v: boolean) => !v && handleClose()"
+    persistent
+  >
     <v-card class="add-existing-card">
       <v-card-title class="card-title">
         <v-icon name="collections" class="title-icon" />
         Add Existing
-        <span class="title-count" v-if="selectedCount > 0">{{ selectedCount }} selected</span>
+        <span class="title-count" v-if="selectedCount > 0"
+          >{{ selectedCount }} selected</span
+        >
         <div class="spacer" />
-        <button class="close-btn" type="button" @click="handleClose" :disabled="linking">
+        <button
+          class="close-btn"
+          type="button"
+          @click="handleClose"
+          :disabled="linking"
+        >
           <v-icon name="close" small />
         </button>
       </v-card-title>
 
       <v-card-text class="card-body">
         <div class="toolbar">
-          <v-input class="search" :model-value="search" placeholder="Search media…"
-            @update:model-value="(v: unknown) => (search = String(v ?? ''))">
+          <v-input
+            class="search"
+            :model-value="search"
+            placeholder="Search media…"
+            @update:model-value="(v: unknown) => (search = String(v ?? ''))"
+          >
             <template #prepend>
               <v-icon name="search" small />
             </template>
             <template #append>
-              <v-icon v-if="search" name="close" small clickable @click.stop="search = ''" />
+              <v-icon
+                v-if="search"
+                name="close"
+                small
+                clickable
+                @click.stop="search = ''"
+              />
             </template>
           </v-input>
 
@@ -436,10 +471,20 @@ onMounted(() => {
 
         <div class="grid-wrap">
           <div class="grid">
-            <button v-for="file in visibleFiles" :key="file.id" type="button" class="tile" :class="{
-              selected: selectedIds.has(file.id),
-              linked: alreadyLinkedFileIds.includes(file.id) || isLinkedAnywhere(file.id),
-            }" :title="displayName(file)" @click="toggleSelect(file.id)">
+            <button
+              v-for="file in visibleFiles"
+              :key="file.id"
+              type="button"
+              class="tile"
+              :class="{
+                selected: selectedIds.has(file.id),
+                linked:
+                  alreadyLinkedFileIds.includes(file.id) ||
+                  isLinkedAnywhere(file.id),
+              }"
+              :title="displayName(file)"
+              @click="toggleSelect(file.id)"
+            >
               <div class="thumb">
                 <FileThumbPreview
                   :file-id="file.id"
@@ -451,7 +496,10 @@ onMounted(() => {
                 <div class="badges-row">
                   <div class="badges-left">
                     <span
-                      v-if="alreadyLinkedFileIds.includes(file.id) && !isLinkedAnywhere(file.id)"
+                      v-if="
+                        alreadyLinkedFileIds.includes(file.id) &&
+                        !isLinkedAnywhere(file.id)
+                      "
                       class="badge badge-linked"
                     >
                       Linked
@@ -461,7 +509,9 @@ onMounted(() => {
                       class="badge badge-linked badge-linked-clickable"
                       role="button"
                       tabindex="0"
-                      :title="linkedLoading ? 'Checking…' : 'View linked collections'"
+                      :title="
+                        linkedLoading ? 'Checking…' : 'View linked collections'
+                      "
                       @click.stop="openLinkedCollections(file)"
                       @keydown.enter.stop="openLinkedCollections(file)"
                       @keydown.space.prevent.stop="openLinkedCollections(file)"
@@ -506,21 +556,41 @@ onMounted(() => {
 
       <v-card-actions class="card-actions">
         <div class="pagination">
-          <button class="page-btn" type="button" :disabled="page <= 1" @click="goToPage(page - 1)">
+          <button
+            class="page-btn"
+            type="button"
+            :disabled="page <= 1"
+            @click="goToPage(page - 1)"
+          >
             ‹
           </button>
-          <button v-for="p in pageButtons" :key="p" class="page-btn" type="button" :class="{ active: p === page }"
-            @click="goToPage(p)">
+          <button
+            v-for="p in pageButtons"
+            :key="p"
+            class="page-btn"
+            type="button"
+            :class="{ active: p === page }"
+            @click="goToPage(p)"
+          >
             {{ p }}
           </button>
-          <button class="page-btn" type="button" :disabled="page >= pageCount" @click="goToPage(page + 1)">
+          <button
+            class="page-btn"
+            type="button"
+            :disabled="page >= pageCount"
+            @click="goToPage(page + 1)"
+          >
             ›
           </button>
         </div>
 
         <div class="per-page">
           <div class="per-page-label">Per page</div>
-          <v-select v-model="perPage" :items="perPageItems" :disabled="loading" />
+          <v-select
+            v-model="perPage"
+            :items="perPageItems"
+            :disabled="loading"
+          />
         </div>
 
         <div class="spacer" />
@@ -532,21 +602,36 @@ onMounted(() => {
         >
           Add to album
         </v-button>
-        <v-button secondary :disabled="linking" @click="handleClose">Cancel</v-button>
-        <v-button :disabled="selectedCount === 0" :loading="linking" @click="linkSelected">
-          Add {{ selectedCount || '' }}
+        <v-button secondary :disabled="linking" @click="handleClose"
+          >Cancel</v-button
+        >
+        <v-button
+          :disabled="selectedCount === 0"
+          :loading="linking"
+          @click="linkSelected"
+        >
+          Add {{ selectedCount || "" }}
         </v-button>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
-  <v-dialog :model-value="albumDialogOpen" @update:model-value="(v: boolean) => (albumDialogOpen = v)" persistent>
+  <v-dialog
+    :model-value="albumDialogOpen"
+    @update:model-value="(v: boolean) => (albumDialogOpen = v)"
+    persistent
+  >
     <v-card class="album-card">
       <v-card-title class="album-title">
         <v-icon name="collections" />
         Add to album
         <div class="spacer" />
-        <button class="close-btn" type="button" @click="albumDialogOpen = false" :disabled="albumLinking || creatingAlbum">
+        <button
+          class="close-btn"
+          type="button"
+          @click="albumDialogOpen = false"
+          :disabled="albumLinking || creatingAlbum"
+        >
           <v-icon name="close" small />
         </button>
       </v-card-title>
@@ -565,7 +650,9 @@ onMounted(() => {
             <div class="album-label">Album</div>
             <v-select
               v-model="selectedAlbumId"
-              :items="albums.map((a) => ({ text: a.name, value: String(a.id) }))"
+              :items="
+                albums.map((a) => ({ text: a.name, value: String(a.id) }))
+              "
               :disabled="albumLinking || creatingAlbum"
             />
           </div>
@@ -576,9 +663,15 @@ onMounted(() => {
               <v-input
                 :model-value="newAlbumName"
                 placeholder="New album name…"
-                @update:model-value="(v: unknown) => (newAlbumName = String(v ?? ''))"
+                @update:model-value="
+                  (v: unknown) => (newAlbumName = String(v ?? ''))
+                "
               />
-              <v-button :loading="creatingAlbum" :disabled="!newAlbumName.trim() || albumLinking" @click="createAlbum">
+              <v-button
+                :loading="creatingAlbum"
+                :disabled="!newAlbumName.trim() || albumLinking"
+                @click="createAlbum"
+              >
                 Create
               </v-button>
             </div>
@@ -588,16 +681,29 @@ onMounted(() => {
       <v-card-actions class="album-actions">
         <div class="muted">{{ selectedCount }} selected</div>
         <div class="spacer" />
-        <v-button secondary :disabled="albumLinking || creatingAlbum" @click="albumDialogOpen = false">Cancel</v-button>
-        <v-button :loading="albumLinking" :disabled="!selectedAlbumId || selectedCount === 0" @click="addSelectedToAlbum">
+        <v-button
+          secondary
+          :disabled="albumLinking || creatingAlbum"
+          @click="albumDialogOpen = false"
+          >Cancel</v-button
+        >
+        <v-button
+          :loading="albumLinking"
+          :disabled="!selectedAlbumId || selectedCount === 0"
+          @click="addSelectedToAlbum"
+        >
           Add to album
         </v-button>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
-  <ExpiryInfoDialog v-model="expiryDialogOpen" :expiry-date="expiryDialogFile?.expiry_date ?? null"
-    :title="expiryDialogFile?.title ?? null" :filename="expiryDialogFile?.filename_download ?? null" />
+  <ExpiryInfoDialog
+    v-model="expiryDialogOpen"
+    :expiry-date="expiryDialogFile?.expiry_date ?? null"
+    :title="expiryDialogFile?.title ?? null"
+    :filename="expiryDialogFile?.filename_download ?? null"
+  />
 
   <LinkedCollectionsDialog
     v-if="linkedDialogOpen && linkedDialogFile"
@@ -700,7 +806,9 @@ onMounted(() => {
   text-align: left;
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.15s, transform 0.08s;
+  transition:
+    border-color 0.15s,
+    transform 0.08s;
 }
 
 .tile:hover {
@@ -710,7 +818,8 @@ onMounted(() => {
 
 .tile.selected {
   border-color: var(--theme--primary);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme--primary) 20%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--theme--primary) 20%, transparent);
 }
 
 .tile.linked {
@@ -805,7 +914,11 @@ onMounted(() => {
 
 .badge-expired {
   gap: 8px;
-  background: color-mix(in srgb, var(--theme--warning, #fd7e14) 30%, rgba(0, 0, 0, 0.45));
+  background: color-mix(
+    in srgb,
+    var(--theme--warning, #fd7e14) 30%,
+    rgba(0, 0, 0, 0.45)
+  );
   border-color: rgba(255, 255, 255, 0.25);
   white-space: nowrap;
   cursor: pointer;
@@ -846,9 +959,14 @@ onMounted(() => {
 }
 
 .notice-error {
-  background: color-mix(in srgb, var(--theme--danger, #dc3545) 10%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--theme--danger, #dc3545) 10%,
+    transparent
+  );
   color: var(--theme--danger, #dc3545);
-  border: 1px solid color-mix(in srgb, var(--theme--danger, #dc3545) 30%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--theme--danger, #dc3545) 30%, transparent);
 }
 
 .album-card {
@@ -914,7 +1032,6 @@ onMounted(() => {
   gap: 6px;
 }
 
-
 .page-btn {
   width: 30px;
   height: 30px;
@@ -929,7 +1046,11 @@ onMounted(() => {
 }
 
 .page-btn:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--theme--primary) 45%, var(--theme--border-color));
+  border-color: color-mix(
+    in srgb,
+    var(--theme--primary) 45%,
+    var(--theme--border-color)
+  );
 }
 
 .page-btn:disabled {
@@ -939,7 +1060,8 @@ onMounted(() => {
 
 .page-btn.active {
   border-color: var(--theme--primary);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme--primary) 18%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--theme--primary) 18%, transparent);
 }
 
 .per-page {

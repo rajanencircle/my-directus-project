@@ -60,53 +60,9 @@ export default {
       meta: {
         width: "full",
         interface: "input",
-        note: "UUID of a Directus Flow with a Webhook or Manual trigger. The flow always receives { collection, keys } plus any extra payload fields. Leave empty to only Save & Stay.",
+        note: "UUID of a Directus Flow with a Webhook or Manual trigger. The flow receives { collection, keys [id] in the body. Leave empty to only Save & Stay.",
         options: { placeholder: "e.g. a1b2c3d4-..." },
       },
-    },
-    {
-      field: "flowCollection",
-      name: "Flow Collection (optional)",
-      type: "string",
-      meta: {
-        width: "half",
-        interface: "input",
-        note: "Collection name sent as 'collection' in the flow payload. Overrides the auto-detected collection. Supports {{fields.FIELD_NAME}}.",
-        options: { placeholder: "e.g. hotels or {{fields.hotels_id}}" },
-      },
-    },
-    {
-      field: "flowKey",
-      name: "Flow Item Key (optional)",
-      type: "string",
-      meta: {
-        width: "half",
-        interface: "input",
-        note: "Item ID sent as 'keys[0]' in the flow payload. Overrides the auto-detected primary key. Supports {{primaryKey}} and {{fields.FIELD_NAME}}.",
-        options: { placeholder: "e.g. {{fields.hotels_id}} or {{primaryKey}}" },
-      },
-    },
-    {
-      field: "flowPayload",
-      name: "Extra Flow Payload (optional)",
-      type: "json",
-      meta: {
-        width: "full",
-        interface: "input-code",
-        note: "Additional JSON merged into the flow body. Supports {{primaryKey}}, {{collection}}, {{fields.FIELD_NAME}}. E.g. { \"source\": \"my-button\", \"notify\": true }",
-        options: { language: "json", placeholder: '{ "key": "value" }' },
-      },
-    },
-    {
-      field: "alwaysEnabled",
-      name: "Always Enabled",
-      type: "boolean",
-      meta: {
-        width: "half",
-        interface: "boolean",
-        note: "When on, the button is never disabled by unsaved changes. If there are no changes, save is skipped and only the flow is triggered.",
-      },
-      schema: { default_value: false },
     },
   ],
 };

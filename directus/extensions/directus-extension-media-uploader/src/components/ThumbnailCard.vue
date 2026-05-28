@@ -134,7 +134,10 @@ function downloadDirect() {
     :title="displayName"
     @click="emit('open', row)"
   >
-    <div class="thumb-wrap" :style="{ width: thumbnailSize + 'px', height: thumbnailSize + 'px' }">
+    <div
+      class="thumb-wrap"
+      :style="{ width: thumbnailSize + 'px', height: thumbnailSize + 'px' }"
+    >
       <FileThumbPreview
         v-if="file?.id"
         :file-id="file.id"
@@ -158,7 +161,12 @@ function downloadDirect() {
         >
           Don’t use
         </div>
-        <v-menu v-model="actionsMenuOpen" placement="bottom-end" show-arrow close-on-content-click>
+        <v-menu
+          v-model="actionsMenuOpen"
+          placement="bottom-end"
+          show-arrow
+          close-on-content-click
+        >
           <template #activator="{ toggle, active }">
             <button
               class="kebab-btn"
@@ -192,7 +200,9 @@ function downloadDirect() {
                 @click="onDownloadAs(idx)"
               >
                 <v-list-item-icon><v-icon name="download" /></v-list-item-icon>
-                <v-list-item-content>Download {{ fmt.label }}</v-list-item-content>
+                <v-list-item-content
+                  >Download {{ fmt.label }}</v-list-item-content
+                >
               </v-list-item>
             </template>
             <v-list-item v-else clickable @click="onDownloadDirect">
@@ -207,7 +217,12 @@ function downloadDirect() {
             </v-list-item>
 
             <v-divider v-if="!readonly" />
-            <v-list-item v-if="!readonly" clickable class="danger-item" @click.stop="onRemove">
+            <v-list-item
+              v-if="!readonly"
+              clickable
+              class="danger-item"
+              @click.stop="onRemove"
+            >
               <v-list-item-icon><v-icon name="delete" /></v-list-item-icon>
               <v-list-item-content>Remove</v-list-item-content>
             </v-list-item>
@@ -253,11 +268,18 @@ function downloadDirect() {
   background: var(--theme--background-normal);
   border: 1px solid var(--theme--border-color);
   flex-shrink: 0;
-  transition: box-shadow 0.15s, border-color 0.15s, transform 0.08s;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s,
+    transform 0.08s;
 }
 
 .thumbnail-card:hover .thumb-wrap {
-  border-color: color-mix(in srgb, var(--theme--primary) 35%, var(--theme--border-color));
+  border-color: color-mix(
+    in srgb,
+    var(--theme--primary) 35%,
+    var(--theme--border-color)
+  );
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
 }
@@ -282,7 +304,11 @@ function downloadDirect() {
   font-weight: 800;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  background: color-mix(in srgb, var(--theme--warning, #fd7e14) 30%, rgba(0, 0, 0, 0.45));
+  background: color-mix(
+    in srgb,
+    var(--theme--warning, #fd7e14) 30%,
+    rgba(0, 0, 0, 0.45)
+  );
   backdrop-filter: blur(6px);
   cursor: pointer;
   user-select: none;
@@ -295,11 +321,20 @@ function downloadDirect() {
   width: 30px;
   height: 30px;
   border-radius: var(--theme--border-radius);
-  border: 1px solid color-mix(in srgb, var(--theme--border-color) 70%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--theme--border-color) 70%, transparent);
   color: var(--theme--foreground);
-  background: color-mix(in srgb, var(--theme--background-normal) 85%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--theme--background-normal) 85%,
+    transparent
+  );
   cursor: pointer;
-  transition: background 0.12s, opacity 0.15s, border-color 0.12s, box-shadow 0.12s;
+  transition:
+    background 0.12s,
+    opacity 0.15s,
+    border-color 0.12s,
+    box-shadow 0.12s;
   opacity: 0.75;
   outline: none;
 }
@@ -312,8 +347,13 @@ function downloadDirect() {
 .kebab-btn.active {
   opacity: 1;
   background: var(--theme--background-subdued);
-  border-color: color-mix(in srgb, var(--theme--primary) 35%, var(--theme--border-color));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme--primary) 18%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--theme--primary) 35%,
+    var(--theme--border-color)
+  );
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--theme--primary) 18%, transparent);
 }
 
 .kebab-btn:hover {

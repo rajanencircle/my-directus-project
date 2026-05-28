@@ -5,7 +5,9 @@ const SORT_ALLOWLIST = new Set(['name', '-name', 'date_updated', '-date_updated'
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function buildListFilter({ search, country }) {
-  const filter = {};
+  const filter = {
+    status_primarix: { _eq: 'published' },
+  };
 
   if (search) {
     filter._or = [
@@ -18,7 +20,19 @@ export function buildListFilter({ search, country }) {
     filter.country = { id: { _eq: parseInt(country, 10) } };
   }
 
-  return Object.keys(filter).length ? filter : null;
+  return filter;
+}
+
+export function buildPublicationDeepFilter() {
+  const today = new Date().toISOString().slice(0, 10);
+  const dateRangeFilter = [
+    { _or: [{ publish_start: { _null: true } }, { publish_start: { _lte: today } }] },
+    { _or: [{ publish_end: { _null: true } }, { publish_end: { _gte: today } }] },
+  ];
+  return {
+    room_categories: { _filter: { _and: [{ status: { _eq: 'published' } }, ...dateRangeFilter] } },
+    price_dates: { _filter: { _and: [{ status: { _eq: 'published' } }, ...dateRangeFilter] } },
+  };
 }
 
 export function buildSort(sortParam) {

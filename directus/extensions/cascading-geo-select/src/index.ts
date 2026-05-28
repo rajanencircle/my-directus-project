@@ -1,59 +1,110 @@
 import InterfaceComponent from "./interface.vue";
 
-const EXAMPLE_CASCADE_FROM = JSON.stringify(
+const DEFAULT_LEVELS = JSON.stringify(
   [
     {
-      fieldKey: "place",
-      parentCollection: "places",
-      fk: "country_id",
+      field: "place",
+      collection: "places",
+      label: "Place (City)",
+      icon: "location_city",
+    },
+    {
+      field: "state",
+      collection: "states",
+      label: "State",
+      icon: "map",
+    },
+    {
+      field: "region",
+      collection: "regions_geo",
+      label: "Region",
+      icon: "terrain",
+    },
+    {
+      field: "country",
+      collection: "countries_geo",
+      label: "Country",
+      icon: "flag",
+    },
+    {
+      field: "destination",
+      collection: "destinations",
+      label: "Destination",
+      icon: "explore",
+    },
+    {
+      field: "destination_cluster",
+      collection: "destinations_cluster",
+      label: "Destination Cluster",
+      icon: "public",
     },
   ],
   null,
   2,
 );
 
-const EXAMPLE_FILTER_BY = JSON.stringify(
-  [
-    {
-      fieldKey: "country",
-      fk: "country_id",
-    },
-  ],
+const DEFAULT_CASCADES = JSON.stringify(
+  {
+    place: [
+      { fk: "state_id", to: "state" },
+      { fk: "region_id", to: "region" },
+      { fk: "country_id", to: "country" },
+    ],
+    state: [{ fk: "country_id", to: "country" }],
+    region: [{ fk: "country_id", to: "country_id" }],
+    country: [{ fk: "destination_id", to: "destination" }],
+    destination: [{ fk: "destinations_cluster_id", to: "destination_cluster" }],
+  },
   null,
   2,
 );
 
 export default {
   id: "cascading-geo-select",
-  name: "Geo Cascade Select",
+  name: "Cascading Hierarchy Select",
   icon: "account_tree",
   description:
-    "Single-field autocomplete with cascade auto-fill and parent-scoped filtering. Add one instance per M2O field; wire fields together via cascadeFrom and filterBy.",
+    "Dynamic cascading autocomplete dropdowns for any hierarchical M2O relation chain. Reusable for geographies, categories, or any nested lookup.",
   component: InterfaceComponent,
-  types: ["string", "uuid", "json", "integer"],
+  // 'alias' + localTypes:'group' → GROUP mode (spreads values into child M2O fields)
+  // 'json'                       → JSON mode (stores full selection as JSON blob)
+  types: ["json"],
+  // localTypes: ["m2o", "o2m", "m2m", "m2a"],
   relational: true,
-  localTypes: ["m2o"],
-  useValues: true,
   options: [
     {
-      field: "target_collection",
-      name: "Target Collection",
+      field: "levels",
+      name: "Levels Configuration",
+      type: "json",
+      meta: {
+        interface: "input-code",
+        options: { language: "json", template: DEFAULT_LEVELS },
+        note: "JSON array: hierarchy levels from most specific (top/index 0) to least specific (bottom). Each: {field, collection, label, icon}",
+        width: "full",
+      },
+      schema: { default_value: DEFAULT_LEVELS },
+    },
+    {
+      field: "cascades",
+      name: "Cascade Mappings",
+      type: "json",
+      meta: {
+        interface: "input-code",
+        options: { language: "json", template: DEFAULT_CASCADES },
+        note: 'JSON object: when field X is selected, follow these FK fields to auto-populate other levels. Key = fieldName, value = array of {fk: "fk_field_in_that_collection", to: "target_field_name"}',
+        width: "full",
+      },
+      schema: { default_value: DEFAULT_CASCADES },
+    },
+    {
+      field: "languageCode",
+      name: "Language Code",
       type: "string",
+      schema: { default_value: "en-GB" },
       meta: {
         interface: "input",
         width: "half",
-        note: "Collection this field selects from (e.g. places, countries_geo)",
-        required: true,
-      },
-    },
-    {
-      field: "icon",
-      name: "Icon",
-      type: "string",
-      schema: { default_value: "search" },
-      meta: {
-        interface: "select-icon",
-        width: "half",
+        note: "Language code for translated label fields (e.g. en-GB, de-DE)",
       },
     },
     {
@@ -64,18 +115,23 @@ export default {
       meta: {
         interface: "input",
         width: "half",
-        note: 'Dot-path to display label. E.g. "translations.name" or "name"',
+        note: 'Dot-path to the display label. For translated: "translations.name". For simple: "name"',
       },
     },
     {
-      field: "languageCode",
-      name: "Language Code",
+      field: "displayMode",
+      name: "Display Mode",
       type: "string",
-      schema: { default_value: "en-GB" },
+      schema: { default_value: "grid" },
       meta: {
-        interface: "input",
+        interface: "select-dropdown",
+        options: {
+          choices: [
+            { text: "Grid (2 columns)", value: "grid" },
+            { text: "Stack (full width)", value: "stack" },
+          ],
+        },
         width: "half",
-        note: "Language code for translated labels (e.g. en-GB, de-DE)",
       },
     },
     {
@@ -84,41 +140,6 @@ export default {
       type: "integer",
       schema: { default_value: 20 },
       meta: { interface: "input", width: "half" },
-    },
-    {
-      field: "storeWithCollection",
-      name: "Store with Collection",
-      type: "boolean",
-      schema: { default_value: false },
-      meta: {
-        interface: "boolean",
-        width: "half",
-        note: "Emit {id, collection} instead of bare UUID (useful for API consumers needing collection context)",
-      },
-    },
-    {
-      field: "cascadeFrom",
-      name: "Cascade From (auto-fill from parent field)",
-      type: "json",
-      meta: {
-        interface: "input-code",
-        options: { language: "json", template: EXAMPLE_CASCADE_FROM },
-        note: "Auto-fill this field when a parent field changes. [{fieldKey, parentCollection, fk}] — fk is the FK column on the parent record pointing to this field's collection.",
-        width: "full",
-      },
-      schema: { default_value: "[]" },
-    },
-    {
-      field: "filterBy",
-      name: "Filter By (scope dropdown to parent value)",
-      type: "json",
-      meta: {
-        interface: "input-code",
-        options: { language: "json", template: EXAMPLE_FILTER_BY },
-        note: "When a parent field has a value, restrict this dropdown by FK. [{fieldKey, fk}] — fk is the FK column on THIS collection referencing the parent.",
-        width: "full",
-      },
-      schema: { default_value: "[]" },
     },
   ],
 };

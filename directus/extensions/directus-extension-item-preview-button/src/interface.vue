@@ -101,10 +101,20 @@ export default defineComponent({
       for (const sel of SIDEBAR_NAV_SELECTORS) {
         const el = document.querySelector(sel);
         if (el) {
+          console.log("[ip-preview] sidebar found via selector:", sel, el);
           return el;
         }
       }
-
+      // Debug: log all aside/nav elements to help identify correct selector
+      console.warn("[ip-preview] No sidebar selector matched. Found in DOM:");
+      document.querySelectorAll("aside, nav").forEach((el) => {
+        console.log(
+          "  ",
+          el.tagName,
+          (el as HTMLElement).className || "(no class)",
+          el.id || "",
+        );
+      });
       return null;
     }
 

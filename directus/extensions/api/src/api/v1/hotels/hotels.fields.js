@@ -72,12 +72,14 @@ export const DETAIL_FIELDS = [
   // Room categories with translations
   'room_categories.id', 'room_categories.room_category',
   'room_categories.room_category_calc_type', 'room_categories.price_start',
+  'room_categories.status', 'room_categories.publish_start', 'room_categories.publish_end',
   'room_categories.translations.translations_id.code',
   'room_categories.translations.room_category_additions',
   'room_categories.translations.room_category_description',
   // Price date windows
   'price_dates.id', 'price_dates.name',
   'price_dates.start_date', 'price_dates.end_date', 'price_dates.from_price',
+  'price_dates.status', 'price_dates.publish_start', 'price_dates.publish_end',
   // Room prices with sell prices per language
   'room_prices.id', 'room_prices.room_category_id',
   'room_prices.price_date_id', 'room_prices.room_occupancy_id', 'room_prices.buy_price',
@@ -94,12 +96,23 @@ export const DETAIL_FIELDS = [
   'image_badge_translations.translations_id.code',
   'image_badge_translations.image_badge_teaser',
   'image_badge_translations.image_badge_details',
+  // Offers / specials (JSON repeater — filtered in transformer)
+  'hotels_specials',
   // Surcharges — fetched separately to avoid Directus nested-translation resolution issues
   'surcharges.id',
 ];
 
+export const CHILD_RC_FIELDS = [
+  'id', 'sharedId', 'room_category', 'room_category_calc_type', 'price_start',
+  'status', 'publish_start', 'publish_end',
+  'translations.translations_id.code',
+  'translations.room_category_additions',
+  'translations.room_category_description',
+];
+
 export const SURCHARGE_FIELDS = [
   'id', 'name', 'px_source_id', 'buy_price',
+  'status', 'publish_start', 'publish_end',
   'translations.translations_id.code',
   'translations.surcharge_description',
 ];
