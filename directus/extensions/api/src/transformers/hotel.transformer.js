@@ -95,6 +95,18 @@ function buildPriceSettingsMap(hotelPricesRows) {
     const locale = getLocaleCode(row.translations_id);
     const iso = LOCALE_TO_ISO[locale] ?? locale;
     if (!iso) continue;
+
+    // Resolve from_price sell value: M2O to room_prices → room_prices_translations per language
+    let fromPrice = null;
+    for (const t of row.from_price?.room_prices_translations ?? []) {
+      const tLocale = getLocaleCode(t.translations_id);
+      const tIso = LOCALE_TO_ISO[tLocale] ?? tLocale;
+      if (tIso === iso) {
+        fromPrice = t.sell_price ?? null;
+        break;
+      }
+    }
+
     map[iso] = {
       marginPct: row.margin_percentage ?? null,
       unit:
@@ -103,6 +115,7 @@ function buildPriceSettingsMap(hotelPricesRows) {
           : row.buy_price_type === "per_unit"
             ? "unit"
             : null,
+      fromPrice,
     };
   }
   return map;
@@ -334,6 +347,7 @@ export function shapeHotelDetail(hotel, lang) {
       booking_email: hotel.booking_email ?? null,
       booking_info: hotel.booking_info ?? null,
     },
+    from_price: activeSettings.fromPrice ?? null,
     accommodation_type:
       hotel.accommodation_type?.[0]?.accommodation_types_id?.label ?? null,
     classification: hotel.hotel_classification?.label ?? null,

@@ -99,10 +99,12 @@ export const DETAIL_FIELDS = [
   "price_info_translations.important_information",
   "price_info_translations.mobility_advice_text",
   "price_info_translations.price_infos_supplementary",
-  // Hotel price settings per language — margin, buy entity (hotels_translations_1)
+  // Hotel price settings per language — margin, buy entity, from_price (hotels_translations_1)
   "hotel_prices.translations_id.code",
   "hotel_prices.margin_percentage",
   "hotel_prices.buy_price_type",
+  "hotel_prices.from_price.room_prices_translations.translations_id.code",
+  "hotel_prices.from_price.room_prices_translations.sell_price",
   // Country
   "country.id",
   "country.ISO",
