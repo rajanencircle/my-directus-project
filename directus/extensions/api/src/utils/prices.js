@@ -49,9 +49,14 @@ export function groupPrices(roomCategories, priceDates, roomPrices, occupancies,
         ? (sellByLang[lang] ?? Object.values(sellByLang)[0] ?? null)
         : (Object.values(sellByLang)[0] ?? null);
 
+      const sellTranslations = lang
+        ? (sellByLang[lang] !== undefined ? { [lang]: sellByLang[lang] } : {})
+        : sellByLang;
+
       dateMap[dateKey].occupancies[occKey] = {
         buy: rp.buy_price ?? null,
         sell,
+        translations: sellTranslations,
         margin: marginPct ?? null,
         unit: unit ?? null,
       };

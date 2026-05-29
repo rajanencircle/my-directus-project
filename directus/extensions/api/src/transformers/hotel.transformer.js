@@ -210,16 +210,13 @@ export function shapeHotelDetail(hotel, lang) {
     price_infos_supplementary: t.price_infos_supplementary ?? null,
   }));
 
-  const allLangs = new Set([...Object.keys(descMap), ...Object.keys(infoMap)]);
-  const allTranslations = {};
-  for (const iso of allLangs) {
-    allTranslations[iso] = { ...(descMap[iso] ?? {}), ...(infoMap[iso] ?? {}) };
-  }
   const translations = lang
-    ? allTranslations[lang]
-      ? { [lang]: allTranslations[lang] }
-      : {}
-    : allTranslations;
+    ? (descMap[lang] ? { [lang]: descMap[lang] } : {})
+    : descMap;
+
+  const price_info_translations = lang
+    ? (infoMap[lang] ? { [lang]: infoMap[lang] } : {})
+    : infoMap;
 
   // Per-language price settings (margin, buy entity)
   const priceSettingsMap = buildPriceSettingsMap(hotel.hotel_prices);
@@ -295,6 +292,9 @@ export function shapeHotelDetail(hotel, lang) {
         type: active.type ?? null,
         catering: active.catering ?? null,
         calc_type: active.calc_type ?? null,
+        translations: lang
+          ? (translationsMap[lang] ? { [lang]: translationsMap[lang] } : {})
+          : translationsMap,
       };
     });
 
@@ -366,6 +366,7 @@ export function shapeHotelDetail(hotel, lang) {
       .filter(Boolean)
       .map((a) => ({ id: a.id, label: a.label })),
     translations,
+    price_info_translations,
     rooms,
     price_options,
     specials,
