@@ -67,8 +67,8 @@ function stripFields(obj, fields) {
 }
 
 const SUPPLIER_TYPE_MAP = {
-  direct_booking: "Independent",
-  partner_booking: "Partner",
+  Yes: "Independent",
+  No: "Partner",
 };
 
 /**
@@ -244,18 +244,15 @@ export function shapeHotelDetail(hotel, lang) {
       s.translations,
       (t) => t.surcharge_description ?? null,
     );
-    const buy = s.buy_price ?? null;
+    const buy = s.buy_price ? parseFloat(s.buy_price) : null;
     const marginPct = activeSettings.marginPct;
-    const sell =
-      buy !== null && marginPct !== null
-        ? Math.round(buy * (1 - marginPct / 100))
-        : null;
+    const sell = s.sell_price ?? null;
     return {
       id: s.id,
-      surcharge_description: pickFromMap(descMap, lang),
-      buy_price: buy,
-      sell_price: sell,
-      margin_percentage: marginPct ?? null,
+      description: pickFromMap(descMap, lang),
+      buy,
+      sell,
+      margin: marginPct ?? null,
     };
   });
 
@@ -265,9 +262,13 @@ export function shapeHotelDetail(hotel, lang) {
     name: hotel.name,
     season: hotel.season ?? null,
     object_id: hotel.object_id ?? null,
+    object_info: hotel.object_info ?? null,
     status_primarix: hotel.status_primarix ?? null,
     date_created: ensureUtcSuffix(hotel.date_created),
     date_updated: ensureUtcSuffix(hotel.date_updated),
+    user_created: hotel.user_created ?? null,
+    user_updated: hotel.user_updated ?? null,
+    partner_type: hotel.partner_type ?? null,
     hotel_group: hotel.hotel_group
       ? { id: hotel.hotel_group.id, label: hotel.hotel_group.label }
       : null,
@@ -277,16 +278,14 @@ export function shapeHotelDetail(hotel, lang) {
       zip_code: hotel.zip_code ?? null,
       town: getGeoName(hotel.place, lang),
       state: getGeoName(hotel.state, lang),
-      state_code: hotel.state?.ISO ?? null,
       region: getGeoName(hotel.region, lang),
       country: getGeoName(hotel.country, lang),
-      country_code: hotel.country?.ISO ?? null,
-      geo: null,
+      location_tour32: hotel.place?.location_tour32 ?? null,
     },
     contact: {
-      phone: hotel.phone_general ?? null,
-      phone_emergency: hotel.phone_ah ?? null,
-      email: hotel.email_general ?? null,
+      phone_general: hotel.phone_general ?? null,
+      phone_ah: hotel.phone_ah ?? null,
+      email_general: hotel.email_general ?? null,
       website: hotel.website ?? null,
     },
     partner_filter_ids: (hotel.partner ?? [])
@@ -300,6 +299,8 @@ export function shapeHotelDetail(hotel, lang) {
       id_tour_user: hotel.id_tour_user ?? null,
       haupt_id_tour_user: hotel.haupt_id_tour_user ?? null,
       booking_partner: hotel.booking?.booking_partner ?? null,
+      booking_email: hotel.booking_email ?? null,
+      booking_info: hotel.booking_info ?? null,
     },
     accommodation_type:
       hotel.accommodation_type?.[0]?.accommodation_types_id?.label ?? null,

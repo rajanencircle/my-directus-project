@@ -18,7 +18,9 @@ export function buildImageUrls(mediaJunctionRows) {
         url: `${base}/assets/${file.id}`,
         thumbnail_url: `${base}/assets/${file.id}?width=400&height=300&fit=cover`,
         copyright: file.copyright ?? null,
-        workspace: file.folder?.name ?? null,
+        folder: file.folder
+          ? { id: file.folder.id ?? null, name: file.folder.name ?? null }
+          : null,
         expiry_date: file.expiry_date ?? null,
         alt_text: file.alt_text ?? null,
         sort: index + 1,
