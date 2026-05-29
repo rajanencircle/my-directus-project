@@ -38,12 +38,13 @@ export const LIST_FIELDS = [
 ];
 
 export const DETAIL_FIELDS = [
-  // Base (px_source_id excluded — strip field; internal_remarks excluded — strip field)
+  // Base (px_source_id excluded — strip field)
   "id",
   "name",
   "season",
   "object_id",
   "object_info",
+  "internal_remarks",
   "street",
   "street_number",
   "zip_code",
@@ -54,8 +55,12 @@ export const DETAIL_FIELDS = [
   "status_primarix",
   "date_created",
   "date_updated",
-  "user_created",
-  "user_updated",
+  "user_created.id",
+  "user_created.first_name",
+  "user_created.last_name",
+  "user_updated.id",
+  "user_updated.first_name",
+  "user_updated.last_name",
   "id_tour_user",
   "haupt_id_tour_user",
   "booking_partner",
@@ -111,7 +116,8 @@ export const DETAIL_FIELDS = [
   "region.translations.translations_id.code",
   // Place
   "place.id",
-  "place.location_tour32",
+  "place.location_tour32.translations.translations_id.code",
+  "place.location_tour32.translations.name",
   "place.translations.name",
   "place.translations.translations_id.code",
   // M2O relations

@@ -263,11 +263,16 @@ export function shapeHotelDetail(hotel, lang) {
     season: hotel.season ?? null,
     object_id: hotel.object_id ?? null,
     object_info: hotel.object_info ?? null,
+    internal_remarks: hotel.internal_remarks ?? null,
     status_primarix: hotel.status_primarix ?? null,
     date_created: ensureUtcSuffix(hotel.date_created),
     date_updated: ensureUtcSuffix(hotel.date_updated),
-    user_created: hotel.user_created ?? null,
-    user_updated: hotel.user_updated ?? null,
+    user_created: hotel.user_created
+      ? { id: hotel.user_created.id ?? null, first_name: hotel.user_created.first_name ?? null, last_name: hotel.user_created.last_name ?? null }
+      : null,
+    user_updated: hotel.user_updated
+      ? { id: hotel.user_updated.id ?? null, first_name: hotel.user_updated.first_name ?? null, last_name: hotel.user_updated.last_name ?? null }
+      : null,
     partner_type: hotel.partner_type ?? null,
     hotel_group: hotel.hotel_group
       ? { id: hotel.hotel_group.id, label: hotel.hotel_group.label }
@@ -280,7 +285,12 @@ export function shapeHotelDetail(hotel, lang) {
       state: getGeoName(hotel.state, lang),
       region: getGeoName(hotel.region, lang),
       country: getGeoName(hotel.country, lang),
-      location_tour32: hotel.place?.location_tour32 ?? null,
+      location_tour32: (() => {
+        const loc = hotel.place?.location_tour32;
+        if (!loc) return null;
+        const map = buildTranslationsMap(loc.translations, (t) => t.name ?? null);
+        return pickFromMap(map, lang);
+      })(),
     },
     contact: {
       phone_general: hotel.phone_general ?? null,
