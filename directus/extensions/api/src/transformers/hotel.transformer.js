@@ -260,7 +260,7 @@ export function shapeHotelDetail(hotel, lang) {
     type: "hotel",
     id: hotel.id,
     name: hotel.name,
-    season: hotel.season ?? null,
+    season: hotel.season?.season ?? null,
     object_id: hotel.object_id ?? null,
     object_info: hotel.object_info ?? null,
     internal_remarks: hotel.internal_remarks ?? null,
@@ -332,6 +332,6 @@ export function shapeHotelDetail(hotel, lang) {
       end_date: hotel.image_badge_end_date ?? null,
       translations: badgeTranslations,
     },
-    pictures: buildImageUrls(hotel.media),
+    pictures: buildImageUrls(hotel.media, lang),
   };
 }
