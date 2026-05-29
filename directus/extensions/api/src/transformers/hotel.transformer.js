@@ -66,6 +66,21 @@ function stripFields(obj, fields) {
   }
 }
 
+// Publication filter rules:
+// - unpublished → exclude
+// - start set, end not set → include (open-ended)
+// - start set, end set → include only if today is within [start, end]
+// - start not set, end set → exclude (invalid range)
+// - neither set → include (no date restriction)
+function isPublicationActive(item, today) {
+  if (item.status === "unpublished") return false;
+  const start = item.publish_start ?? null;
+  const end = item.publish_end ?? null;
+  if (!start && end) return false;
+  if (start && end) return today >= start && today <= end;
+  return true;
+}
+
 const SUPPLIER_TYPE_MAP = {
   Yes: "Independent",
   No: "Partner",
@@ -209,18 +224,20 @@ export function shapeHotelDetail(hotel, lang) {
     }),
   );
 
-  // Filter hotels_specials JSON entries by publication status and date range
   const today = new Date().toISOString().slice(0, 10);
-  const specials = (hotel.hotels_specials ?? []).filter((s) => {
-    if (s.status === "unpublished") return false;
-    if (s.publish_start && s.publish_start > today) return false;
-    if (s.publish_end && s.publish_end < today) return false;
-    return true;
-  });
 
-  // Rooms with new shape
-  const roomCategories = hotel.room_categories ?? [];
-  const priceDates = hotel.price_dates ?? [];
+  // Specials — filter by publication status and date range
+  const specials = (hotel.hotels_specials ?? []).filter((s) =>
+    isPublicationActive(s, today),
+  );
+
+  // Rooms with new shape — filter room_categories and price_dates by publication
+  const roomCategories = (hotel.room_categories ?? []).filter((rc) =>
+    isPublicationActive(rc, today),
+  );
+  const priceDates = (hotel.price_dates ?? []).filter((pd) =>
+    isPublicationActive(pd, today),
+  );
   const roomPrices = hotel.room_prices ?? [];
   const occupancies = (hotel.room_occupancies ?? [])
     .map((r) => r.occupancies_id)
@@ -238,23 +255,25 @@ export function shapeHotelDetail(hotel, lang) {
     },
   );
 
-  // Surcharges → price_options
-  const price_options = (hotel.surcharges ?? []).map((s) => {
-    const descMap = buildTranslationsMap(
-      s.translations,
-      (t) => t.surcharge_description ?? null,
-    );
-    const buy = s.buy_price ? parseFloat(s.buy_price) : null;
-    const marginPct = activeSettings.marginPct;
-    const sell = s.sell_price ?? null;
-    return {
-      id: s.id,
-      description: pickFromMap(descMap, lang),
-      buy,
-      sell,
-      margin: marginPct ?? null,
-    };
-  });
+  // Surcharges → price_options — filter by publication status and date range
+  const price_options = (hotel.surcharges ?? [])
+    .filter((s) => isPublicationActive(s, today))
+    .map((s) => {
+      const descMap = buildTranslationsMap(
+        s.translations,
+        (t) => t.surcharge_description ?? null,
+      );
+      const buy = s.buy_price ? parseFloat(s.buy_price) : null;
+      const marginPct = activeSettings.marginPct;
+      const sell = s.sell_price ?? null;
+      return {
+        id: s.id,
+        description: pickFromMap(descMap, lang),
+        buy,
+        sell,
+        margin: marginPct ?? null,
+      };
+    });
 
   return {
     type: "hotel",
