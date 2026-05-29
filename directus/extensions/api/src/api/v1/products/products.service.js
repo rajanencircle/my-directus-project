@@ -1,5 +1,5 @@
-import { LIST_FIELDS } from '../hotels/hotels.fields.js';
-import { buildListFilter, buildSort, buildUpdatedAfterFilter } from '../hotels/hotels.filters.js';
+import { DETAIL_FIELDS } from '../hotels/hotels.fields.js';
+import { buildListFilter, buildSort, buildUpdatedAfterFilter, buildPublicationDeepFilter } from '../hotels/hotels.filters.js';
 
 const HOTELS_COLLECTION = 'hotels';
 
@@ -28,10 +28,11 @@ export async function listProducts(
 
   const [hotels, hotelCount] = await Promise.all([
     hotelsService.readByQuery({
-      fields: LIST_FIELDS,
+      fields: DETAIL_FIELDS,
       sort: sortClause,
       limit,
       offset,
+      deep: buildPublicationDeepFilter(),
       ...(filter && { filter }),
     }),
     hotelsService.readByQuery({

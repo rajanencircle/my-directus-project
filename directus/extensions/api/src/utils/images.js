@@ -6,7 +6,7 @@
  * @returns {object[]}
  */
 export function buildImageUrls(mediaJunctionRows) {
-  const base = (process.env.DIRECTUS_PUBLIC_URL ?? '').replace(/\/$/, '');
+  const base = (process.env.DIRECTUS_PUBLIC_URL ?? "").replace(/\/$/, "");
 
   return (mediaJunctionRows ?? [])
     .map((row, index) => {
@@ -20,7 +20,7 @@ export function buildImageUrls(mediaJunctionRows) {
         copyright: file.copyright ?? null,
         workspace: file.folder?.name ?? null,
         expiry_date: file.expiry_date ?? null,
-        alt_text: file.alt ?? null,
+        alt_text: file.alt_text ?? null,
         sort: index + 1,
       };
     })

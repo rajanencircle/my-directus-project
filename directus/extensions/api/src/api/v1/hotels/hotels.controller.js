@@ -1,7 +1,7 @@
-import { sendSuccess, sendPaginated } from '../../shared/apiResponse.js';
-import { parsePagination } from '../../shared/pagination.js';
-import { listHotels, getHotelDetails } from './hotels.service.js';
-import { shapeHotelListItem, shapeHotelDetail } from '../../../transformers/hotel.transformer.js';
+import { sendSuccess, sendPaginated } from "../../shared/apiResponse.js";
+import { parsePagination } from "../../shared/pagination.js";
+import { listHotels, getHotelDetails } from "./hotels.service.js";
+import { shapeHotelDetail } from "../../../transformers/hotel.transformer.js";
 
 export function createHotelsController(context) {
   return {
@@ -10,8 +10,11 @@ export function createHotelsController(context) {
       const { search, country, sort, updated_after } = req.query;
       const lang = req.query.lang ?? req.query.language ?? null;
 
-      const result = await listHotels({ page, limit, offset, search, country, sort, updated_after }, context);
-      const data = result.data.map(item => shapeHotelListItem(item, lang));
+      const result = await listHotels(
+        { page, limit, offset, search, country, sort, updated_after },
+        context,
+      );
+      const data = result.data.map((item) => shapeHotelDetail(item, lang));
       return sendPaginated(res, { ...result, data });
     },
 

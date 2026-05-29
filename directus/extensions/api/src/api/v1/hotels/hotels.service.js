@@ -1,4 +1,4 @@
-import { LIST_FIELDS, DETAIL_FIELDS, SURCHARGE_FIELDS, CHILD_RC_FIELDS } from './hotels.fields.js';
+import { DETAIL_FIELDS, SURCHARGE_FIELDS, CHILD_RC_FIELDS } from './hotels.fields.js';
 import { buildListFilter, buildSort, buildIdFilter, buildUpdatedAfterFilter, buildPublicationDeepFilter } from './hotels.filters.js';
 import { AppError } from '../../shared/AppError.js';
 import { HTTP_STATUS } from '../../shared/constants.js';
@@ -19,11 +19,12 @@ export async function listHotels({ page, limit, offset, search, country, sort, u
 
   const [items, countResult] = await Promise.all([
     hotelsService.readByQuery({
-      fields: LIST_FIELDS,
+      fields: DETAIL_FIELDS,
       sort: buildSort(sort),
       limit,
       offset,
       filter,
+      deep: buildPublicationDeepFilter(),
     }),
     hotelsService.readByQuery({
       aggregate: { count: ['*'] },

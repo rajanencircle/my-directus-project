@@ -1,0 +1,13 @@
+{
+  "name": "media-share-validate",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build --watch"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "latest",
+    "typescript": "latest",
+    "vue": "^3.4.0"
+  }
+}
