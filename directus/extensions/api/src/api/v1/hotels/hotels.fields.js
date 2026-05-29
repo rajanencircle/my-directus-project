@@ -30,6 +30,10 @@ export const LIST_FIELDS = [
   "place.location_tour32",
   "place.translations.name",
   "place.translations.translations_id.code",
+  //location_tour32
+  "location_tour32.id",
+  "location_tour32.translations.name",
+  "location_tour32.translations.translations_id.code",
   // Key relations
   "hotel_classification.id",
   "hotel_classification.label",
@@ -120,6 +124,12 @@ export const DETAIL_FIELDS = [
   "place.location_tour32.translations.name",
   "place.translations.name",
   "place.translations.translations_id.code",
+  // location_tour32
+  "location_tour32.id",
+  "location_tour32.location_tour32.translations.translations_id.code",
+  "location_tour32.location_tour32.translations.name",
+  "location_tour32.translations.name",
+  "location_tour32.translations.translations_id.code",
   // M2O relations
   "hotel_group.id",
   "hotel_group.label",
