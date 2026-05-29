@@ -374,7 +374,9 @@ export function shapeHotelDetail(hotel, lang) {
       status: hotel.image_badge_status ?? null,
       start_date: hotel.image_badge_start_date ?? null,
       end_date: hotel.image_badge_end_date ?? null,
-      translations: badgeTranslations,
+      translations: lang
+        ? (badgeTranslations[lang] ? { [lang]: badgeTranslations[lang] } : {})
+        : badgeTranslations,
     },
     pictures: buildImageUrls(hotel.media, lang),
   };

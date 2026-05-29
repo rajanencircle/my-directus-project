@@ -1,3 +1,5 @@
+import { LOCALE_TO_ISO } from "../maps/language-code.map.js";
+
 /**
  * Builds picture objects for hotel media files.
  * Uses DIRECTUS_PUBLIC_URL env var as the base URL for asset links.
@@ -21,7 +23,8 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
           typeof t.translations_id === "object"
             ? t.translations_id?.code
             : t.translations_id;
-        if (code) captionMap[code] = t.caption_i18n ?? null;
+        const iso = LOCALE_TO_ISO[code] ?? code;
+        if (iso) captionMap[iso] = t.caption_i18n ?? null;
       }
       const caption_i18n =
         Object.keys(captionMap).length === 0
