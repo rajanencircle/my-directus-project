@@ -1,8 +1,340 @@
+// Real example data captured from GET /api/v1/hotels?limit=2 and GET /api/v1/hotels/{id}?lang=de
+const REAL_HOTEL = {
+  type: "hotel",
+  id: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca",
+  name: "Stay at Alice Springs",
+  season: "2026",
+  object_id: 9,
+  object_info: "26_NT, Alice Springs, Stay at Alice Springs",
+  internal_remarks: "sa64d65as465d4sa64as65d46",
+  status_primarix: "published",
+  date_created: "2026-05-09T11:48:36.379Z",
+  date_updated: "2026-05-29T10:16:30.057Z",
+  user_created: {
+    id: "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    first_name: "Migration",
+    last_name: "User",
+  },
+  user_updated: {
+    id: "9cb74080-c36b-402b-8ecc-bcd2f3d68b3a",
+    first_name: "creator",
+    last_name: "dev",
+  },
+  partner_type: "selected",
+  hotel_group: {
+    id: "780b958e-27c1-4a46-ae8f-174fee04643f",
+    label: "Independent_unabhangig",
+  },
+  address: {
+    street: "Leichhardt Terrace",
+    street_number: "11",
+    zip_code: "NT 0870",
+    town: "Alice Springs",
+    state: "Northern Territory",
+    region: "Rotes Zentrum",
+    country: "Australien",
+    location_tour32: "Alice Springs",
+  },
+  contact: {
+    phone_general: "+61 8 8950 6666",
+    phone_ah: "",
+    email_general: "info@alicespringsaurora.com.au",
+    website: "www.auroraresorts.com.au",
+  },
+  partner_filter_ids: [4739, 4740, 4742, 82185, 4743],
+  supplier: {
+    type: "Independent",
+    id_tour_user: "3030",
+    haupt_id_tour_user: "Main Service Provider (Tour32 only)",
+    booking_partner: "Across Australia (Goway Travel)",
+    booking_email: "bookings@example.com",
+    booking_info: "Contact via email preferred",
+  },
+  from_price: "677.00",
+  accommodation_type: "Hotel",
+  classification: "3.0",
+  activities: [
+    { id: "eb07e2b8-f666-4b22-b089-a66d64826f46", label: "Flitterwochen" },
+    { id: "d4588b4d-8e2c-4e79-84e7-3bc3820ebada", label: "Reiten" },
+    { id: "ccf63bf1-0de7-42f1-a6a9-f832a8f386b1", label: "Baden" },
+    { id: "e1da83c1-b83d-41f8-932a-9b962197bc47", label: "Golf" },
+    { id: "04520670-cdf6-4448-9c52-f1a825bc7a46", label: "Wellness" },
+  ],
+  price_info_translations: {
+    "de-CH": {
+      services_included: "Übernachtung",
+      services_not_included: "",
+      service_highlights: "",
+      minimum_stay: null,
+      minimum_stay_additions: "",
+      deviating_cancelation_terms: "",
+      children_policy: "keine Ermäßigung.",
+      children_free_age: null,
+      children_free_number: null,
+      important_information: "",
+      mobility_advice_text:
+        "Wir sind verpflichtet darauf hinzuweisen, dass diese Unterkunft im Allgemeinen für Personen mit eingeschränkter Mobilität nicht geeignet ist.",
+      price_infos_supplementary: null,
+    },
+    de: {
+      services_included: "Übernachtung",
+      services_not_included: "",
+      service_highlights: "",
+      minimum_stay: null,
+      minimum_stay_additions: "",
+      deviating_cancelation_terms: "",
+      children_policy: "keine Ermäßigung.",
+      children_free_age: null,
+      children_free_number: null,
+      important_information: "",
+      mobility_advice_text:
+        "Wir sind verpflichtet darauf hinzuweisen, dass diese Unterkunft im Allgemeinen für Personen mit eingeschränkter Mobilität nicht geeignet ist.",
+      price_infos_supplementary: null,
+    },
+    nl: {
+      services_included: "Overnachting",
+      services_not_included: "",
+      service_highlights: "",
+      minimum_stay: null,
+      minimum_stay_additions: "",
+      deviating_cancelation_terms: "",
+      children_policy: "geen korting.",
+      children_free_age: null,
+      children_free_number: null,
+      important_information: "",
+      mobility_advice_text: null,
+      price_infos_supplementary: null,
+    },
+  },
+  rooms: [
+    {
+      category: "TEST",
+      booking_code: null,
+      tour32_name: null,
+      catering: null,
+      days_repeater: [],
+      prices: [],
+    },
+  ],
+  specials: [
+    {
+      name: "123123",
+      special_description: "qwesaddasd",
+      status: "published",
+      publish_start: "2026-05-20",
+      publish_end: "2026-06-25",
+    },
+    {
+      name: "555",
+      special_description: "22222",
+      status: "published",
+      publish_start: "2026-05-15",
+      publish_end: "2026-05-30",
+    },
+  ],
+  image_badge: {
+    status: "published_period",
+    start_date: "2026-05-12",
+    end_date: "2026-05-28",
+    translations: {
+      de: {
+        image_badge_teaser: "Text Overview Pages",
+        image_badge_details: "Text Detail Page",
+      },
+    },
+  },
+  pictures: [
+    {
+      id: "0df9e839-5747-4af4-a9cc-72cda5b8bd8d",
+      filename: "claudio-schwarz-Axx5fWxrcFA-unsplash_optimized_2000",
+      url: "/assets/0df9e839-5747-4af4-a9cc-72cda5b8bd8d",
+      thumbnail_url:
+        "/assets/0df9e839-5747-4af4-a9cc-72cda5b8bd8d?width=400&height=300&fit=cover",
+      copyright: "©none",
+      alt_text: null,
+      caption_i18n: null,
+      is_map: false,
+      tour32_export: false,
+      dimensions_px: null,
+      keyword_ids: null,
+      folder: {
+        id: "118314af-9e4f-4109-9777-582bce3c6cc5",
+        name: "Icons",
+      },
+      expiry_date: null,
+      sort: 1,
+    },
+    {
+      id: "39855816-999d-4154-be81-11503499c443",
+      filename: "claudio-schwarz-Axx5fWxrcFA-unsplash_optimized_2000",
+      url: "/assets/39855816-999d-4154-be81-11503499c443",
+      thumbnail_url:
+        "/assets/39855816-999d-4154-be81-11503499c443?width=400&height=300&fit=cover",
+      copyright: "©none",
+      alt_text: "Narrow European street with church tower",
+      caption_i18n: null,
+      is_map: false,
+      tour32_export: false,
+      dimensions_px: null,
+      keyword_ids: null,
+      folder: null,
+      expiry_date: "2026-05-21",
+      sort: 2,
+    },
+  ],
+};
+
+// Multi-lang version (no lang param) — translations keyed by de-CH, de, nl
+const REAL_HOTEL_MULTILANG = {
+  ...REAL_HOTEL,
+  translations: {
+    "de-CH": {
+      subline_location: "Alice Springs",
+      teaser:
+        "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
+      description_short:
+        "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool und WLAN.",
+      description_surrounding:
+        "Sehr zentral im Stadtzentrum, mit Zugang zur Fußgängerzone.",
+      description_rooms:
+        "109 Zimmer mit Klimaanlage, Kühlschrank und TV. Deluxe-Zimmer sind geräumiger (ca. 26 m²).",
+      total_number_of_rooms: 109,
+      remarks_arrival: null,
+      description_supplementary: null,
+    },
+    de: {
+      subline_location: "Alice Springs",
+      teaser:
+        "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
+      description_short:
+        "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
+      description_surrounding:
+        "Sehr zentral im Stadtzentrum, mit Zugang zur Fußgängerzone.",
+      description_rooms:
+        "109 Zimmer, u.a. ausgestattet mit einem Doppel- und einem Einzelbett, Dusche/WC, Fön, Klimaanlage, Kühlschrank, Tee-/Kaffeezubereiter und TV.",
+      total_number_of_rooms: 109,
+      remarks_arrival: "test",
+      description_supplementary: [
+        { headline: "123123", text: "12312" },
+        { headline: "1", text: "2" },
+      ],
+    },
+    nl: {
+      subline_location: "Alice Springs",
+      teaser: "Populair vanwege de centrale ligging direct aan de Todd Mall.",
+      description_short:
+        "Stay at Alice biedt een 24-uursreceptie, zwembad, wasserette met munten, gratis overdekte parking en wifi.",
+      description_surrounding:
+        "Zeer centraal in het stadscentrum, direct aan de voetgangerszone.",
+      description_rooms:
+        "109 kamers met een tweepersoonsbed en een eenpersoonsbed, douche/wc, haardroger, airco, koelkast, koffie-/theefaciliteiten en tv.",
+      total_number_of_rooms: 109,
+      remarks_arrival: "",
+      description_supplementary: null,
+    },
+  },
+  price_options: [
+    {
+      id: "3ea533f0-26c3-4ea1-81da-53b382e94358",
+      description: null,
+      booking_name: null,
+      buy: null,
+      sell: null,
+      margin: 230,
+      type: null,
+      catering: null,
+      calc_type: null,
+      translations: {},
+    },
+  ],
+};
+
+// Lang=de filtered version (for GET /api/v1/hotels/{id}?lang=de)
+const REAL_HOTEL_LANG_DE = {
+  ...REAL_HOTEL,
+  translations: {
+    de: {
+      subline_location: "Alice Springs",
+      teaser:
+        "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
+      description_short:
+        "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
+      description_surrounding:
+        "Sehr zentral im Stadtzentrum, mit Zugang zur Fußgängerzone.",
+      description_rooms:
+        "109 Zimmer, u.a. ausgestattet mit einem Doppel- und einem Einzelbett, Dusche/WC, Fön, Klimaanlage, Kühlschrank, Tee-/Kaffeezubereiter und TV.",
+      total_number_of_rooms: 109,
+      remarks_arrival: "test",
+      description_supplementary: [
+        { headline: "123123", text: "12312" },
+        { headline: "1", text: "2" },
+      ],
+    },
+  },
+  price_info_translations: {
+    de: {
+      services_included: "Übernachtung",
+      services_not_included: "",
+      service_highlights: "",
+      minimum_stay: null,
+      minimum_stay_additions: "",
+      deviating_cancelation_terms: "",
+      children_policy: "keine Ermäßigung.",
+      children_free_age: null,
+      children_free_number: null,
+      important_information: "",
+      mobility_advice_text:
+        "Wir sind verpflichtet darauf hinzuweisen, dass diese Unterkunft im Allgemeinen für Personen mit eingeschränkter Mobilität nicht geeignet ist. Falls Sie sich unsicher sind, sprechen Sie uns bitte vor einer Buchung an.",
+      price_infos_supplementary: null,
+    },
+  },
+  price_options: [
+    {
+      id: "3ea533f0-26c3-4ea1-81da-53b382e94358",
+      description: "Frühstück pro Person/Nacht",
+      booking_name: "Full Breakfast",
+      buy: 500,
+      sell: null,
+      margin: 230,
+      type: "optional",
+      catering: {
+        id: "6c8ba1d2-e38e-4698-bca9-a7a289999b97",
+        designation: "Frühstück",
+      },
+      calc_type: "pro Person und Nacht",
+      translations: {
+        de: {
+          description: "Frühstück pro Person/Nacht",
+          booking_name: "Full Breakfast",
+          sell_price: null,
+          type: "optional",
+          catering: {
+            id: "6c8ba1d2-e38e-4698-bca9-a7a289999b97",
+            designation: "Frühstück",
+          },
+          calc_type: "pro Person und Nacht",
+        },
+      },
+    },
+  ],
+  image_badge: {
+    status: "published_period",
+    start_date: "2026-05-12",
+    end_date: "2026-05-28",
+    translations: {
+      de: {
+        image_badge_teaser: "Text Overview Pages",
+        image_badge_details: "Text Detail Page",
+      },
+    },
+  },
+};
+
 export const openapiSpec = {
   openapi: "3.0.3",
   info: {
     title: "BOTG API",
-    version: "1.0.0",
+    version: "1.1.0",
     description: "Custom REST API layer for BOTG — hotels, products, and more.",
   },
   tags: [
@@ -20,9 +352,9 @@ export const openapiSpec = {
           {
             in: "query",
             name: "lang",
-            schema: { type: "string", enum: ["de", "en", "nl"] },
+            schema: { type: "string", enum: ["de", "en", "nl", "de-CH"] },
             description:
-              "If set, only that language is returned in the translations block. Omit to get all languages.",
+              "ISO 639-1 language code. If set, each translations block returns only that language key. Omit to get all available languages.",
           },
           {
             in: "query",
@@ -80,146 +412,18 @@ export const openapiSpec = {
                 example: {
                   success: true,
                   message: "OK",
-                  data: [
-                    {
-                      type: "hotel",
-                      id: "ed5dce60-a0a1-4775-9084-6112940442a1",
-                      name: "Stay at Alice Springs",
-                      object_id: 9,
-                      status: "draft",
-                      date_created: "2026-05-20T14:13:16.963Z",
-                      date_updated: "2026-05-25T06:28:10.588Z",
-                      translations: {
-                        "de-CH": {
-                          teaser:
-                            "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
-                          description_short:
-                            "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
-                        },
-                        de: {
-                          teaser:
-                            "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
-                          description_short:
-                            "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
-                        },
-                        nl: {
-                          teaser:
-                            "Populair vanwege de centrale ligging direct aan de Todd Mall.",
-                          description_short:
-                            "Stay at Alice biedt een 24-uursreceptie, zwembad, wasserette met munten, gratis overdekte parking en wifi.",
-                        },
-                      },
-                      description: {
-                        teaser:
-                          "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
-                        description_short:
-                          "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
-                      },
-                      country: {
-                        id: 13,
-                        iso: "AU",
-                        id_primarix: 294,
-                        translations: {
-                          de: { name: "Australien" },
-                          "de-CH": { name: "Australien" },
-                          nl: { name: "Australië" },
-                        },
-                      },
-                      state: {
-                        id: 3,
-                        translations: {
-                          de: { name: "Northern Territory" },
-                          "de-CH": { name: "Northern Territory" },
-                          nl: { name: "Northern Territory" },
-                        },
-                      },
-                      region: {
-                        id: 16,
-                        id_primarix: 3128,
-                        translations: {
-                          de: { name: "Rotes Zentrum" },
-                          "de-CH": { name: "Rotes Zentrum" },
-                          nl: { name: "Rode Centrum" },
-                        },
-                      },
-                      place: {
-                        id: 18,
-                        location_tour32: 44,
-                        translations: {
-                          de: { name: "Alice Springs" },
-                          "de-CH": { name: "Alice Springs" },
-                          nl: { name: "Alice Springs" },
-                        },
-                      },
-                      hotel_classification: {
-                        id: "641f5633-2451-46df-ab20-cd3b2a7631f2",
-                        label: "3.0",
-                      },
-                      hotel_group: {
-                        id: "35599dcc-b5c9-4d0a-8cc7-ce99455091c7",
-                        label: "Independent_unabhangig",
-                      },
-                    },
-                    {
-                      type: "hotel",
-                      id: "1da8add8-3814-4724-9315-6a2a208e7f09",
-                      name: "Cape Cadogan Boutique Hotel",
-                      object_id: 29,
-                      status: "draft",
-                      date_created: "2026-05-20T14:13:44.114Z",
-                      date_updated: "2026-05-20T14:13:44.161Z",
-                      translations: {},
-                      description: null,
-                      country: {
-                        id: 197,
-                        iso: "ZA",
-                        id_primarix: 518,
-                        translations: {
-                          de: { name: "Südafrika" },
-                          "de-CH": { name: "Südafrika" },
-                          nl: { name: "Zuid-Afrika" },
-                        },
-                      },
-                      state: null,
-                      region: {
-                        id: 120,
-                        id_primarix: 121856,
-                        translations: {
-                          de: { name: "Kaphalbinsel" },
-                          "de-CH": { name: "Kaphalbinsel" },
-                          nl: { name: "Kaapschiereiland" },
-                        },
-                      },
-                      place: {
-                        id: 525,
-                        location_tour32: 1033,
-                        translations: {
-                          de: { name: "Kapstadt" },
-                          "de-CH": { name: "Kapstadt" },
-                          nl: { name: "Kaapstad" },
-                        },
-                      },
-                      hotel_classification: {
-                        id: "2a08a0a3-a813-4278-b38f-10fe2059fa63",
-                        label: "4.0",
-                      },
-                      hotel_group: {
-                        id: "6dc04c3a-e18d-4b76-b27f-792d81da6358",
-                        label: "(AFR) More Hotels",
-                      },
-                    },
-                  ],
+                  data: [REAL_HOTEL_MULTILANG],
                   meta: {
-                    requestId: "d0867c06-edaf-4ffa-a7bf-d85d7fe17381",
-                    timestamp: "2026-05-25T06:29:11.491Z",
+                    requestId: "5f3cc439-2af7-43f2-867c-4e583251b475",
+                    timestamp: "2026-05-29T13:24:13.346Z",
                     pagination: {
-                      total: 4,
+                      total: 1,
                       page: 1,
-                      limit: 2,
-                      totalPages: 2,
-                      hasNext: true,
+                      limit: 20,
+                      totalPages: 1,
+                      hasNext: false,
                       hasPrev: false,
-                      updated_at_max: "2026-05-25T06:28:10.588Z",
+                      updated_at_max: "2026-05-29T10:16:30.057Z",
                     },
                   },
                 },
@@ -247,9 +451,9 @@ export const openapiSpec = {
           {
             in: "query",
             name: "lang",
-            schema: { type: "string", enum: ["de", "en", "nl"] },
+            schema: { type: "string", enum: ["de", "en", "nl", "de-CH"] },
             description:
-              "If set, only that language is returned in the translations block.",
+              "ISO 639-1 language code. If set, every translations block (translations, price_info_translations, rooms[].prices[].occupancies[].translations, price_options[].translations, image_badge.translations, pictures[].caption_i18n) returns only that language key. Omit to get all available languages.",
           },
         ],
         responses: {
@@ -269,240 +473,10 @@ export const openapiSpec = {
                 example: {
                   success: true,
                   message: "OK",
-                  data: {
-                    id: "ed5dce60-a0a1-4775-9084-6112940442a1",
-                    object_id: 9,
-                    type: "hotel",
-                    status: "draft",
-                    date_created: "2026-05-20T14:13:16.963Z",
-                    date_updated: "2026-05-25T06:28:10.588Z",
-                    name: "Stay at Alice Springs",
-                    classification: "3.0",
-                    accommodation_type: "Hotel",
-                    supplier: {
-                      type: null,
-                      id_tour_user: "3030",
-                      haupt_id_tour_user: null,
-                      booking_partner: "Across Australia (Goway Travel)",
-                    },
-                    partner_filter_ids: [],
-                    address: {
-                      street: "Leichhardt Terrace",
-                      street_number: "11",
-                      zip_code: "NT 0870",
-                      town: "Alice Springs",
-                      state: "Northern Territory",
-                      state_code: "NT",
-                      region: "Rotes Zentrum",
-                      country: "Australien",
-                      country_code: "AU",
-                      geo: null,
-                    },
-                    contact: {
-                      phone: "+61 8 8950 6666",
-                      phone_emergency: "",
-                      email: "info@alicespringsaurora.com.au",
-                      website: "www.auroraresorts.com.au",
-                    },
-                    translations: {
-                      "de-CH": {
-                        introduction:
-                          "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
-                        description_main:
-                          "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
-                        description_location: "Alice Springs",
-                        description_rooms:
-                          "109 Zimmer, u.a. ausgestattet mit einem Doppel- und einem Einzelbett, Dusche/WC, Föhn, Klimaanlage, Kühlschrank, Tee-/Kaffeezubereiter und TV.",
-                        services_included: null,
-                        not_included: null,
-                        mobility_advice: null,
-                      },
-                      de: {
-                        introduction:
-                          "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
-                        description_main:
-                          "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
-                        description_location: "Alice Springs",
-                        description_rooms:
-                          "109 Zimmer, u.a. ausgestattet mit einem Doppel- und einem Einzelbett, Dusche/WC, Föhn, Klimaanlage, Kühlschrank, Tee-/Kaffeezubereiter und TV.",
-                        services_included: "test",
-                        not_included: "test",
-                        mobility_advice: null,
-                      },
-                      nl: {
-                        introduction:
-                          "Populair vanwege de centrale ligging direct aan de Todd Mall.",
-                        description_main:
-                          "Stay at Alice biedt een 24-uursreceptie, zwembad, wasserette met munten, gratis overdekte parking en wifi.",
-                        description_location: "Alice Springs",
-                        description_rooms:
-                          "109 kamers met een tweepersoonsbed en een eenpersoonsbed, douche/wc, haardroger, airco, koelkast, koffie-/theefaciliteiten en tv.",
-                        services_included: null,
-                        not_included: null,
-                        mobility_advice: null,
-                      },
-                    },
-                    rooms: [
-                      {
-                        category: null,
-                        prices: [
-                          {
-                            start_date: "2026-03-31",
-                            end_date: "2026-04-01",
-                            occupancies: {
-                              368: {
-                                buy: "183.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                              369: {
-                                buy: "183.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                              370: {
-                                buy: "216.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                            },
-                          },
-                          {
-                            start_date: "2026-10-31",
-                            end_date: "2027-02-27",
-                            occupancies: {
-                              368: {
-                                buy: "149.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                              369: {
-                                buy: "149.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                              370: {
-                                buy: "183.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                            },
-                          },
-                        ],
-                      },
-                      {
-                        category: null,
-                        prices: [
-                          {
-                            start_date: "2026-03-31",
-                            end_date: "2026-04-01",
-                            occupancies: {
-                              368: {
-                                buy: "191.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                              369: {
-                                buy: "191.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                              370: {
-                                buy: "0.00",
-                                sell: "0.00",
-                                margin: 23,
-                                unit: "person",
-                              },
-                            },
-                          },
-                          {
-                            start_date: "2026-10-31",
-                            end_date: "2027-02-27",
-                            occupancies: {
-                              368: {
-                                buy: "158.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                              369: {
-                                buy: "158.00",
-                                sell: null,
-                                margin: 23,
-                                unit: "person",
-                              },
-                              370: {
-                                buy: "0.00",
-                                sell: "0.00",
-                                margin: 23,
-                                unit: "person",
-                              },
-                            },
-                          },
-                        ],
-                      },
-                    ],
-                    price_options: [
-                      {
-                        id: "37a37bfa-320c-4376-a384-d5872f8952b9",
-                        description: "Frühstück pro Person/Nacht",
-                        buy: "323.00",
-                        sell: 249,
-                        margin: 23,
-                      },
-                    ],
-                    image_badge: {
-                      status: "published_period",
-                      start_date: "2026-05-15",
-                      end_date: "2026-05-28",
-                      translations: {
-                        de: { teaser: "test", detail: "test" },
-                      },
-                    },
-                    activities: [
-                      {
-                        id: "4a1975d6-dec8-4f33-8218-1f4e28e07aec",
-                        label: "test",
-                      },
-                    ],
-                    pictures: [
-                      {
-                        id: "f9db3573-79d4-440a-b58d-e0b62ea7cce4",
-                        filename: "claudio-schwarz-Axx5fWxrcFA-unsplash.jpg",
-                        url: "/assets/f9db3573-79d4-440a-b58d-e0b62ea7cce4",
-                        thumbnail_url:
-                          "/assets/f9db3573-79d4-440a-b58d-e0b62ea7cce4?width=400&height=300&fit=cover",
-                        copyright: "©",
-                        workspace: null,
-                        expiry_date: null,
-                        alt_text: null,
-                        sort: 1,
-                      },
-                      {
-                        id: "1fe70c81-cfb4-4e3c-8736-abb65f719db8",
-                        filename: "Screenshot 2026-05-21 at 1.55.30 PM.png",
-                        url: "/assets/1fe70c81-cfb4-4e3c-8736-abb65f719db8",
-                        thumbnail_url:
-                          "/assets/1fe70c81-cfb4-4e3c-8736-abb65f719db8?width=400&height=300&fit=cover",
-                        copyright: "©",
-                        workspace: null,
-                        expiry_date: null,
-                        alt_text: null,
-                        sort: 2,
-                      },
-                    ],
-                  },
+                  data: REAL_HOTEL_LANG_DE,
                   meta: {
-                    requestId: "8db0270b-1622-4a13-aba2-2ae841ec24e0",
-                    timestamp: "2026-05-25T06:28:41.958Z",
+                    requestId: "90e32bdd-e1ee-4500-b691-736803c40b4f",
+                    timestamp: "2026-05-29T13:24:11.071Z",
                   },
                 },
               },
@@ -524,7 +498,7 @@ export const openapiSpec = {
           {
             in: "query",
             name: "lang",
-            schema: { type: "string", enum: ["de", "en", "nl"] },
+            schema: { type: "string", enum: ["de", "en", "nl", "de-CH"] },
             description:
               "If set, only that language is returned in the translations block.",
           },
@@ -578,7 +552,7 @@ export const openapiSpec = {
                     message: { type: "string", example: "OK" },
                     data: {
                       type: "array",
-                      items: { $ref: "#/components/schemas/HotelListItem" },
+                      items: { $ref: "#/components/schemas/HotelDetail" },
                     },
                     meta: {
                       allOf: [
@@ -598,70 +572,18 @@ export const openapiSpec = {
                 example: {
                   success: true,
                   message: "OK",
-                  data: [
-                    {
-                      type: "hotel",
-                      id: "ed5dce60-a0a1-4775-9084-6112940442a1",
-                      name: "Stay at Alice Springs",
-                      object_id: 9,
-                      status: "draft",
-                      date_created: "2026-05-20T14:13:16.963Z",
-                      date_updated: "2026-05-25T06:28:10.588Z",
-                      translations: {
-                        de: {
-                          teaser:
-                            "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
-                          description_short:
-                            "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
-                        },
-                      },
-                      description: {
-                        teaser:
-                          "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
-                        description_short:
-                          "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool, einen Münzwaschsalon, kostenfreie überdachte Parkplätze und WLAN.",
-                      },
-                      country: {
-                        id: 13,
-                        iso: "AU",
-                        id_primarix: 294,
-                        translations: { de: { name: "Australien" } },
-                      },
-                      state: {
-                        id: 3,
-                        translations: { de: { name: "Northern Territory" } },
-                      },
-                      region: {
-                        id: 16,
-                        id_primarix: 3128,
-                        translations: { de: { name: "Rotes Zentrum" } },
-                      },
-                      place: {
-                        id: 18,
-                        location_tour32: 44,
-                        translations: { de: { name: "Alice Springs" } },
-                      },
-                      hotel_classification: {
-                        id: "641f5633-2451-46df-ab20-cd3b2a7631f2",
-                        label: "3.0",
-                      },
-                      hotel_group: {
-                        id: "35599dcc-b5c9-4d0a-8cc7-ce99455091c7",
-                        label: "Independent_unabhangig",
-                      },
-                    },
-                  ],
+                  data: [REAL_HOTEL_MULTILANG],
                   meta: {
-                    requestId: "9792ff85-bd80-4524-804b-c6ddbf2580be",
-                    timestamp: "2026-05-25T06:24:25.491Z",
+                    requestId: "9c23ed47-8b3c-44f3-97f6-44b2f726b959",
+                    timestamp: "2026-05-29T13:23:48.346Z",
                     pagination: {
-                      total: 4,
+                      total: 1,
                       page: 1,
                       limit: 20,
                       totalPages: 1,
                       hasNext: false,
                       hasPrev: false,
-                      updated_at_max: "2026-05-25T06:28:10.588Z",
+                      updated_at_max: "2026-05-29T10:16:30.057Z",
                     },
                   },
                 },
@@ -712,27 +634,23 @@ export const openapiSpec = {
           requestId: {
             type: "string",
             nullable: true,
-            example: "d0867c06-edaf-4ffa-a7bf-d85d7fe17381",
+            example: "44ac6b28-f31e-4943-acdb-5bb8c472eba7",
           },
           timestamp: {
             type: "string",
             format: "date-time",
-            example: "2026-05-25T06:29:11.491Z",
+            example: "2026-05-29T13:23:46.161Z",
           },
         },
       },
       PaginationMeta: {
         type: "object",
         properties: {
-          total: {
-            type: "integer",
-            description: "Total number of matching records",
-            example: 4,
-          },
+          total: { type: "integer", example: 1 },
           page: { type: "integer", example: 1 },
           limit: { type: "integer", example: 20 },
-          totalPages: { type: "integer", example: 2 },
-          hasNext: { type: "boolean", example: true },
+          totalPages: { type: "integer", example: 1 },
+          hasNext: { type: "boolean", example: false },
           hasPrev: { type: "boolean", example: false },
           updated_at_max: {
             type: "string",
@@ -740,7 +658,7 @@ export const openapiSpec = {
             nullable: true,
             description:
               "Latest date_updated among returned records — use as cursor for delta sync.",
-            example: "2026-05-25T06:28:10.588Z",
+            example: "2026-05-29T10:16:30.057Z",
           },
         },
       },
@@ -751,7 +669,7 @@ export const openapiSpec = {
           message: { type: "string", example: "OK" },
           data: {
             type: "array",
-            items: { $ref: "#/components/schemas/HotelListItem" },
+            items: { $ref: "#/components/schemas/HotelDetail" },
           },
           meta: {
             allOf: [
@@ -769,6 +687,8 @@ export const openapiSpec = {
       GeoObject: {
         type: "object",
         nullable: true,
+        description:
+          "Geographic reference (country, state, region, place, or location_tour32).",
         properties: {
           id: { type: "integer", example: 13 },
           iso: { type: "string", nullable: true, example: "AU" },
@@ -776,163 +696,155 @@ export const openapiSpec = {
           location_tour32: { type: "integer", nullable: true, example: 44 },
           translations: {
             type: "object",
+            description:
+              "Keyed by ISO 639-1 code. Filtered to the requested lang when lang param is set.",
             additionalProperties: {
               type: "object",
               properties: { name: { type: "string", nullable: true } },
             },
-            example: {
-              de: { name: "Australien" },
-              "de-CH": { name: "Australien" },
-              nl: { name: "Australië" },
-            },
+            example: { de: { name: "Australien" }, nl: { name: "Australië" } },
           },
         },
       },
-      HotelListItem: {
+      OccupancyPrices: {
         type: "object",
+        description:
+          "Buy/sell prices for one occupancy type within a price date window.",
         properties: {
-          type: { type: "string", example: "hotel" },
-          id: {
+          buy: {
             type: "string",
-            format: "uuid",
-            example: "ed5dce60-a0a1-4775-9084-6112940442a1",
-          },
-          name: { type: "string", example: "Stay at Alice Springs" },
-          object_id: { type: "integer", nullable: true, example: 9 },
-          status: {
-            type: "string",
-            enum: ["published", "draft"],
             nullable: true,
-            example: "draft",
+            description: "Buy price (decimal string).",
+            example: "183.00",
           },
-          date_created: {
-            type: "string",
-            format: "date-time",
-            example: "2026-05-20T14:13:16.963Z",
-          },
-          date_updated: {
-            type: "string",
-            format: "date-time",
-            example: "2026-05-25T06:28:10.588Z",
+          sell: {
+            type: "number",
+            nullable: true,
+            description:
+              "Sell price for the active lang (or first available when no lang param).",
+            example: 225.0,
           },
           translations: {
             type: "object",
             description:
-              'Keyed by locale code (e.g. "de", "de-CH", "nl"). Contains only the requested lang if the lang param is set.',
-            additionalProperties: {
-              type: "object",
-              properties: {
-                teaser: { type: "string", nullable: true },
-                description_short: { type: "string", nullable: true },
-              },
+              "Sell price keyed by ISO 639-1 code. Filtered to the requested lang when lang param is set.",
+            additionalProperties: { type: "number", nullable: true },
+            example: { de: 225.0, nl: 210.0 },
+          },
+          margin: {
+            type: "number",
+            nullable: true,
+            description: "Margin percentage from hotel_prices.",
+            example: 230,
+          },
+          unit: {
+            type: "string",
+            enum: ["person", "unit"],
+            nullable: true,
+            example: "person",
+          },
+        },
+      },
+      SurchargeTranslation: {
+        type: "object",
+        description: "Per-language surcharge fields.",
+        properties: {
+          description: { type: "string", nullable: true },
+          booking_name: { type: "string", nullable: true },
+          sell_price: { type: "number", nullable: true },
+          type: {
+            type: "string",
+            nullable: true,
+            description: "Surcharge type designation (from mandatory collection).",
+          },
+          catering: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: { type: "string", format: "uuid", nullable: true },
+              designation: { type: "string", nullable: true },
             },
           },
-          description: {
-            type: "object",
+          calc_type: {
+            type: "string",
             nullable: true,
             description:
-              "Single-language shortcut — mirrors translations[lang]. Only present when lang param is set.",
-            properties: {
-              teaser: { type: "string", nullable: true },
-              description_short: { type: "string", nullable: true },
-            },
-          },
-          country: { $ref: "#/components/schemas/GeoObject" },
-          state: { $ref: "#/components/schemas/GeoObject" },
-          region: { $ref: "#/components/schemas/GeoObject" },
-          place: { $ref: "#/components/schemas/GeoObject" },
-          hotel_classification: {
-            type: "object",
-            nullable: true,
-            properties: {
-              id: {
-                type: "string",
-                format: "uuid",
-                example: "641f5633-2451-46df-ab20-cd3b2a7631f2",
-              },
-              label: { type: "string", example: "3.0" },
-            },
-          },
-          hotel_group: {
-            type: "object",
-            nullable: true,
-            properties: {
-              id: {
-                type: "string",
-                format: "uuid",
-                example: "35599dcc-b5c9-4d0a-8cc7-ce99455091c7",
-              },
-              label: { type: "string", example: "Independent_unabhangig" },
-            },
+              "Calculation method designation (from calculation_method collection).",
           },
         },
       },
       HotelDetail: {
         type: "object",
         properties: {
+          type: { type: "string", example: "hotel" },
           id: {
             type: "string",
             format: "uuid",
-            example: "ed5dce60-a0a1-4775-9084-6112940442a1",
+            example: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca",
+          },
+          name: { type: "string", example: "Stay at Alice Springs" },
+          season: {
+            type: "string",
+            nullable: true,
+            description: "Season label from the linked season record.",
+            example: "2026",
           },
           object_id: { type: "integer", nullable: true, example: 9 },
-          type: { type: "string", example: "hotel" },
-          status: {
+          object_info: {
             type: "string",
-            enum: ["published", "draft"],
             nullable: true,
-            example: "draft",
+            example: "26_NT, Alice Springs, Stay at Alice Springs",
+          },
+          internal_remarks: {
+            type: "string",
+            nullable: true,
+            example: null,
+          },
+          status_primarix: {
+            type: "string",
+            nullable: true,
+            example: "published",
           },
           date_created: {
             type: "string",
             format: "date-time",
-            example: "2026-05-20T14:13:16.963Z",
+            example: "2026-05-09T11:48:36.379Z",
           },
           date_updated: {
             type: "string",
             format: "date-time",
-            example: "2026-05-25T06:28:10.588Z",
+            example: "2026-05-29T10:16:30.057Z",
           },
-          name: { type: "string", example: "Stay at Alice Springs" },
-          classification: {
-            type: "string",
-            nullable: true,
-            example: "3.0",
-            description: "Label from hotel_classifications.",
-          },
-          accommodation_type: {
-            type: "string",
-            nullable: true,
-            example: "Hotel",
-            description: "Label of the first accommodation type.",
-          },
-          supplier: {
+          user_created: {
             type: "object",
+            nullable: true,
             properties: {
-              type: {
-                type: "string",
-                enum: ["Independent", "Partner"],
-                nullable: true,
-                example: null,
-              },
-              id_tour_user: { type: "string", nullable: true, example: "3030" },
-              haupt_id_tour_user: {
-                type: "string",
-                nullable: true,
-                example: null,
-              },
-              booking_partner: {
-                type: "string",
-                nullable: true,
-                example: "Across Australia (Goway Travel)",
-              },
+              id: { type: "string", format: "uuid" },
+              first_name: { type: "string", nullable: true },
+              last_name: { type: "string", nullable: true },
             },
           },
-          partner_filter_ids: {
-            type: "array",
-            items: { type: "integer" },
-            description: "Primarix IDs of assigned partners.",
-            example: [],
+          user_updated: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: { type: "string", format: "uuid" },
+              first_name: { type: "string", nullable: true },
+              last_name: { type: "string", nullable: true },
+            },
+          },
+          partner_type: {
+            type: "string",
+            nullable: true,
+            example: "selected",
+          },
+          hotel_group: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: { type: "string", format: "uuid" },
+              label: { type: "string", nullable: true },
+            },
           },
           address: {
             type: "object",
@@ -947,38 +859,51 @@ export const openapiSpec = {
               town: {
                 type: "string",
                 nullable: true,
+                description: "Translated place name for the active lang.",
                 example: "Alice Springs",
               },
               state: {
                 type: "string",
                 nullable: true,
+                description: "Translated state name for the active lang.",
                 example: "Northern Territory",
               },
-              state_code: { type: "string", nullable: true, example: "NT" },
               region: {
                 type: "string",
                 nullable: true,
+                description: "Translated region name for the active lang.",
                 example: "Rotes Zentrum",
               },
               country: {
                 type: "string",
                 nullable: true,
+                description: "Translated country name for the active lang.",
                 example: "Australien",
               },
-              country_code: { type: "string", nullable: true, example: "AU" },
-              geo: { type: "object", nullable: true, example: null },
+              location_tour32: {
+                type: "string",
+                nullable: true,
+                description:
+                  "Translated Tour32 location name for the active lang.",
+                example: "Alice Springs",
+              },
             },
           },
           contact: {
             type: "object",
             properties: {
-              phone: {
+              phone_general: {
                 type: "string",
                 nullable: true,
                 example: "+61 8 8950 6666",
               },
-              phone_emergency: { type: "string", nullable: true, example: "" },
-              email: {
+              phone_ah: {
+                type: "string",
+                nullable: true,
+                description: "After-hours phone number.",
+                example: "",
+              },
+              email_general: {
                 type: "string",
                 nullable: true,
                 example: "info@alicespringsaurora.com.au",
@@ -990,36 +915,225 @@ export const openapiSpec = {
               },
             },
           },
+          partner_filter_ids: {
+            type: "array",
+            items: { type: "integer" },
+            description: "Primarix IDs of assigned partner organisations.",
+            example: [4739, 4740, 4742],
+          },
+          supplier: {
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                enum: ["Independent", "Partner"],
+                nullable: true,
+                example: "Independent",
+              },
+              id_tour_user: {
+                type: "string",
+                nullable: true,
+                example: "3030",
+              },
+              haupt_id_tour_user: {
+                type: "string",
+                nullable: true,
+                example: "Main Service Provider (Tour32 only)",
+              },
+              booking_partner: {
+                type: "string",
+                nullable: true,
+                example: "Across Australia (Goway Travel)",
+              },
+              booking_email: {
+                type: "string",
+                nullable: true,
+                example: null,
+              },
+              booking_info: {
+                type: "string",
+                nullable: true,
+                example: null,
+              },
+            },
+          },
+          from_price: {
+            type: "string",
+            nullable: true,
+            description:
+              "Lowest sell price for the active lang as a decimal string, resolved from the linked room_prices record in hotel_prices.",
+            example: "677.00",
+          },
+          accommodation_type: {
+            type: "string",
+            nullable: true,
+            description: "Label of the first linked accommodation type.",
+            example: "Hotel",
+          },
+          classification: {
+            type: "string",
+            nullable: true,
+            description: "Label from hotel_classifications.",
+            example: "3.0",
+          },
+          activities: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "string", format: "uuid" },
+                label: { type: "string", nullable: true },
+              },
+            },
+          },
           translations: {
             type: "object",
             description:
-              'Keyed by locale code (e.g. "de", "de-CH", "nl"). Contains only the requested lang if the lang param is set.',
+              "Hotel description fields keyed by ISO 639-1 code (e.g. \"de\", \"de-CH\", \"nl\"). Filtered to the requested lang when lang param is set. Source: hotel_descriptions_translations junction.",
             additionalProperties: {
               type: "object",
               properties: {
-                introduction: { type: "string", nullable: true },
-                description_main: { type: "string", nullable: true },
-                description_location: { type: "string", nullable: true },
+                subline_location: { type: "string", nullable: true },
+                teaser: { type: "string", nullable: true },
+                description_short: { type: "string", nullable: true },
+                description_surrounding: { type: "string", nullable: true },
                 description_rooms: { type: "string", nullable: true },
+                total_number_of_rooms: {
+                  type: "integer",
+                  nullable: true,
+                  description: "Total room count as integer.",
+                  example: 109,
+                },
+                remarks_arrival: { type: "string", nullable: true },
+                description_supplementary: {
+                  type: "array",
+                  nullable: true,
+                  description:
+                    "JSON repeater — array of {headline, text} blocks. Null when empty.",
+                  items: {
+                    type: "object",
+                    properties: {
+                      headline: { type: "string" },
+                      text: { type: "string" },
+                    },
+                  },
+                },
+              },
+            },
+            example: {
+              de: {
+                subline_location: "Alice Springs",
+                teaser:
+                  "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
+                description_short:
+                  "Das Stay at Alice bietet u.a. eine 24-Stunden-Rezeption, einen Swimmingpool und WLAN.",
+                description_surrounding:
+                  "Sehr zentral im Stadtzentrum, mit Zugang zur Fußgängerzone.",
+                description_rooms:
+                  "109 Zimmer mit Klimaanlage, Kühlschrank und TV.",
+                total_number_of_rooms: 109,
+                remarks_arrival: "test",
+                description_supplementary: [
+                  { headline: "123123", text: "12312" },
+                ],
+              },
+            },
+          },
+          price_info_translations: {
+            type: "object",
+            description:
+              "Price and service information keyed by ISO 639-1 code. Filtered to the requested lang when lang param is set. Source: price_info_translations junction.",
+            additionalProperties: {
+              type: "object",
+              properties: {
                 services_included: { type: "string", nullable: true },
-                not_included: { type: "string", nullable: true },
-                mobility_advice: { type: "string", nullable: true },
+                services_not_included: { type: "string", nullable: true },
+                service_highlights: { type: "string", nullable: true },
+                minimum_stay: {
+                  type: "string",
+                  nullable: true,
+                  description: "e.g. \"2 Nights\", \"3 Nights\"",
+                },
+                minimum_stay_additions: { type: "string", nullable: true },
+                deviating_cancelation_terms: {
+                  type: "string",
+                  nullable: true,
+                },
+                children_policy: { type: "string", nullable: true },
+                children_free_age: { type: "integer", nullable: true },
+                children_free_number: { type: "integer", nullable: true },
+                important_information: { type: "string", nullable: true },
+                mobility_advice_text: { type: "string", nullable: true },
+                price_infos_supplementary: {
+                  type: "array",
+                  nullable: true,
+                  description: "JSON repeater: [{headline, text}]",
+                  items: {
+                    type: "object",
+                    properties: {
+                      headline: { type: "string" },
+                      text: { type: "string" },
+                    },
+                  },
+                },
+              },
+            },
+            example: {
+              de: {
+                services_included: "Übernachtung",
+                services_not_included: "",
+                service_highlights: "",
+                minimum_stay: null,
+                minimum_stay_additions: "",
+                deviating_cancelation_terms: "",
+                children_policy: "keine Ermäßigung.",
+                children_free_age: null,
+                children_free_number: null,
+                important_information: "",
+                mobility_advice_text:
+                  "Wir sind verpflichtet darauf hinzuweisen, dass diese Unterkunft im Allgemeinen für Personen mit eingeschränkter Mobilität nicht geeignet ist.",
+                price_infos_supplementary: null,
               },
             },
           },
           rooms: {
             type: "array",
+            description:
+              "Room categories with pricing. Only room_categories and price_dates whose publication status is active are included.",
             items: {
               type: "object",
               properties: {
                 category: {
                   type: "string",
                   nullable: true,
-                  description: "Room category name.",
+                  example: "TEST",
+                },
+                booking_code: {
+                  type: "string",
+                  nullable: true,
                   example: null,
+                },
+                tour32_name: {
+                  type: "string",
+                  nullable: true,
+                  example: null,
+                },
+                catering: {
+                  type: "object",
+                  nullable: true,
+                  properties: {
+                    id: { type: "string", format: "uuid", nullable: true },
+                    designation: { type: "string", nullable: true },
+                  },
+                },
+                days_repeater: {
+                  nullable: true,
+                  description:
+                    "JSON repeater for day-specific pricing variations.",
                 },
                 prices: {
                   type: "array",
+                  description: "Price date windows for this room category.",
                   items: {
                     type: "object",
                     properties: {
@@ -1036,32 +1150,9 @@ export const openapiSpec = {
                       occupancies: {
                         type: "object",
                         description:
-                          "Keyed by occupancy ID. The key is a numeric string (occupancy value ID).",
+                          "Keyed by occupancy name (e.g. \"DZ\", \"EZ\").",
                         additionalProperties: {
-                          type: "object",
-                          properties: {
-                            buy: {
-                              type: "string",
-                              nullable: true,
-                              example: "183.00",
-                            },
-                            sell: {
-                              type: "string",
-                              nullable: true,
-                              example: null,
-                            },
-                            margin: {
-                              type: "number",
-                              nullable: true,
-                              example: 23,
-                            },
-                            unit: {
-                              type: "string",
-                              enum: ["person", "unit"],
-                              nullable: true,
-                              example: "person",
-                            },
-                          },
+                          $ref: "#/components/schemas/OccupancyPrices",
                         },
                       },
                     },
@@ -1072,23 +1163,102 @@ export const openapiSpec = {
           },
           price_options: {
             type: "array",
-            description: "Surcharges / optional add-ons.",
+            description:
+              "Surcharges / optional add-ons. Only surcharges whose publication status is active are included.",
             items: {
               type: "object",
               properties: {
                 id: {
                   type: "string",
                   format: "uuid",
-                  example: "37a37bfa-320c-4376-a384-d5872f8952b9",
+                  example: "3ea533f0-26c3-4ea1-81da-53b382e94358",
                 },
                 description: {
                   type: "string",
                   nullable: true,
+                  description: "Description for the active lang.",
                   example: "Frühstück pro Person/Nacht",
                 },
-                buy: { type: "string", nullable: true, example: "323.00" },
-                sell: { type: "number", nullable: true, example: 249 },
-                margin: { type: "number", nullable: true, example: 23 },
+                booking_name: {
+                  type: "string",
+                  nullable: true,
+                  example: "Full Breakfast",
+                },
+                buy: {
+                  type: "number",
+                  nullable: true,
+                  example: 500,
+                },
+                sell: { type: "number", nullable: true, example: null },
+                margin: { type: "number", nullable: true, example: 230 },
+                type: { type: "string", nullable: true, example: "optional" },
+                catering: {
+                  type: "object",
+                  nullable: true,
+                  properties: {
+                    id: { type: "string", format: "uuid", nullable: true },
+                    designation: { type: "string", nullable: true },
+                  },
+                },
+                calc_type: {
+                  type: "string",
+                  nullable: true,
+                  example: "pro Person und Nacht",
+                },
+                translations: {
+                  type: "object",
+                  description:
+                    "All translatable surcharge fields keyed by ISO 639-1 code. Filtered to the requested lang when lang param is set.",
+                  additionalProperties: {
+                    $ref: "#/components/schemas/SurchargeTranslation",
+                  },
+                  example: {
+                    de: {
+                      description: "Frühstück pro Person/Nacht",
+                      booking_name: "Full Breakfast",
+                      sell_price: null,
+                      type: "optional",
+                      catering: {
+                        id: "6c8ba1d2-e38e-4698-bca9-a7a289999b97",
+                        designation: "Frühstück",
+                      },
+                      calc_type: "pro Person und Nacht",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          specials: {
+            type: "array",
+            description:
+              "Active special offers (JSON repeater). Only specials whose publication status is active are included.",
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string", nullable: true, example: "123123" },
+                special_description: {
+                  type: "string",
+                  nullable: true,
+                  example: "qwesaddasd",
+                },
+                status: {
+                  type: "string",
+                  nullable: true,
+                  example: "published",
+                },
+                publish_start: {
+                  type: "string",
+                  format: "date",
+                  nullable: true,
+                  example: "2026-05-20",
+                },
+                publish_end: {
+                  type: "string",
+                  format: "date",
+                  nullable: true,
+                  example: "2026-06-25",
+                },
               },
             },
           },
@@ -1104,7 +1274,7 @@ export const openapiSpec = {
                 type: "string",
                 format: "date",
                 nullable: true,
-                example: "2026-05-15",
+                example: "2026-05-12",
               },
               end_date: {
                 type: "string",
@@ -1114,63 +1284,110 @@ export const openapiSpec = {
               },
               translations: {
                 type: "object",
+                description:
+                  "Badge text keyed by ISO 639-1 code. Filtered to the requested lang when lang param is set.",
                 additionalProperties: {
                   type: "object",
                   properties: {
-                    teaser: { type: "string", nullable: true },
-                    detail: { type: "string", nullable: true },
+                    image_badge_teaser: {
+                      type: "string",
+                      nullable: true,
+                      example: "Text Overview Pages",
+                    },
+                    image_badge_details: {
+                      type: "string",
+                      nullable: true,
+                      example: "Text Detail Page",
+                    },
                   },
                 },
                 example: {
-                  de: { teaser: "Sonderangebot", detail: "Nur bis Ende Mai!" },
+                  de: {
+                    image_badge_teaser: "Text Overview Pages",
+                    image_badge_details: "Text Detail Page",
+                  },
                 },
-              },
-            },
-          },
-          activities: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                id: {
-                  type: "string",
-                  format: "uuid",
-                  example: "4a1975d6-dec8-4f33-8218-1f4e28e07aec",
-                },
-                label: { type: "string", nullable: true, example: "Swimming" },
               },
             },
           },
           pictures: {
             type: "array",
+            description: "Hotel media files with asset URLs and metadata.",
             items: {
               type: "object",
               properties: {
                 id: {
                   type: "string",
                   format: "uuid",
-                  example: "f9db3573-79d4-440a-b58d-e0b62ea7cce4",
+                  example: "0df9e839-5747-4af4-a9cc-72cda5b8bd8d",
                 },
                 filename: {
                   type: "string",
                   nullable: true,
-                  example: "hotel-exterior.jpg",
+                  example: "claudio-schwarz-Axx5fWxrcFA-unsplash_optimized_2000",
                 },
                 url: {
                   type: "string",
-                  example: "/assets/f9db3573-79d4-440a-b58d-e0b62ea7cce4",
+                  example: "/assets/0df9e839-5747-4af4-a9cc-72cda5b8bd8d",
                 },
                 thumbnail_url: {
                   type: "string",
                   example:
-                    "/assets/f9db3573-79d4-440a-b58d-e0b62ea7cce4?width=400&height=300&fit=cover",
+                    "/assets/0df9e839-5747-4af4-a9cc-72cda5b8bd8d?width=400&height=300&fit=cover",
                 },
-                copyright: { type: "string", nullable: true, example: "©" },
-                workspace: {
+                copyright: {
                   type: "string",
                   nullable: true,
-                  description: "Folder name in Directus Files.",
+                  example: "©none",
+                },
+                alt_text: { type: "string", nullable: true, example: null },
+                caption_i18n: {
+                  description:
+                    "When lang is set: the caption string for that language (or null). When no lang: an object keyed by ISO 639-1 code. Null when no captions exist.",
+                  oneOf: [
+                    { type: "string", nullable: true },
+                    {
+                      type: "object",
+                      additionalProperties: {
+                        type: "string",
+                        nullable: true,
+                      },
+                    },
+                  ],
                   example: null,
+                },
+                is_map: {
+                  type: "boolean",
+                  nullable: true,
+                  example: false,
+                },
+                tour32_export: {
+                  type: "boolean",
+                  nullable: true,
+                  example: false,
+                },
+                dimensions_px: {
+                  type: "string",
+                  nullable: true,
+                  example: null,
+                },
+                keyword_ids: {
+                  type: "array",
+                  nullable: true,
+                  items: { type: "string" },
+                  example: null,
+                },
+                folder: {
+                  type: "object",
+                  nullable: true,
+                  properties: {
+                    id: { type: "string", format: "uuid", nullable: true },
+                    name: { type: "string", nullable: true },
+                  },
+                  example: {
+                    id: "118314af-9e4f-4109-9777-582bce3c6cc5",
+                    name: "Icons",
+                  },
                 },
                 expiry_date: {
                   type: "string",
@@ -1178,8 +1395,12 @@ export const openapiSpec = {
                   nullable: true,
                   example: null,
                 },
-                alt_text: { type: "string", nullable: true, example: null },
-                sort: { type: "integer", example: 1 },
+                sort: {
+                  type: "integer",
+                  description:
+                    "1-based sort position within the hotel's media list.",
+                  example: 1,
+                },
               },
             },
           },
@@ -1219,7 +1440,7 @@ export const openapiSpec = {
                 "Missing or malformed Authorization header. Expected: Bearer <token>",
               meta: {
                 requestId: "5bc339bd-d3c5-4a86-9a4c-c4cfd9bc79f0",
-                timestamp: "2026-05-25T06:24:39.933Z",
+                timestamp: "2026-05-29T13:24:39.933Z",
               },
             },
           },
@@ -1238,7 +1459,7 @@ export const openapiSpec = {
               ],
               meta: {
                 requestId: "330d2ca7-a418-42e2-a1f0-c03ded46e922",
-                timestamp: "2026-05-25T06:24:40.027Z",
+                timestamp: "2026-05-29T13:24:40.027Z",
               },
             },
           },
@@ -1254,7 +1475,7 @@ export const openapiSpec = {
               message: "Hotel not found: non-existent-id-00000",
               meta: {
                 requestId: "76082571-e6de-4847-b252-e13cb31d07ea",
-                timestamp: "2026-05-25T06:24:40.000Z",
+                timestamp: "2026-05-29T13:24:40.000Z",
               },
             },
           },
@@ -1270,7 +1491,7 @@ export const openapiSpec = {
               message: "Internal server error",
               meta: {
                 requestId: "e4690af3-6004-4e38-8c4d-737d9cf4fa22",
-                timestamp: "2026-05-25T06:24:27.954Z",
+                timestamp: "2026-05-29T13:24:27.954Z",
               },
             },
           },
