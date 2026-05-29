@@ -272,19 +272,29 @@ export function shapeHotelDetail(hotel, lang) {
   const price_options = (hotel.surcharges ?? [])
     .filter((s) => isPublicationActive(s, today))
     .map((s) => {
-      const descMap = buildTranslationsMap(
-        s.translations,
-        (t) => t.surcharge_description ?? null,
-      );
+      const translationsMap = buildTranslationsMap(s.translations, (t) => ({
+        description: t.surcharge_description ?? null,
+        booking_name: t.surcharge_booking_name ?? null,
+        sell_price: t.sell_price ?? null,
+        type: t.surcharge_type?.designation ?? null,
+        catering: t.surcharge_catering
+          ? { id: t.surcharge_catering.id, designation: t.surcharge_catering.designation }
+          : null,
+        calc_type: t.surcharge_calc_type?.designation ?? null,
+      }));
+      const active = pickFromMap(translationsMap, lang) ?? {};
       const buy = s.buy_price ? parseFloat(s.buy_price) : null;
       const marginPct = activeSettings.marginPct;
-      const sell = s.sell_price ?? null;
       return {
         id: s.id,
-        description: pickFromMap(descMap, lang),
+        description: active.description ?? null,
+        booking_name: active.booking_name ?? null,
         buy,
-        sell,
+        sell: active.sell_price ?? null,
         margin: marginPct ?? null,
+        type: active.type ?? null,
+        catering: active.catering ?? null,
+        calc_type: active.calc_type ?? null,
       };
     });
 

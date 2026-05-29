@@ -59,6 +59,12 @@ export function groupPrices(roomCategories, priceDates, roomPrices, occupancies,
 
     return {
       category: cat.room_category,
+      booking_code: cat.room_category_booking_code ?? null,
+      tour32_name: cat.room_category_tour32_name ?? null,
+      catering: cat.room_category_catering
+        ? { id: cat.room_category_catering.id, designation: cat.room_category_catering.designation }
+        : null,
+      days_repeater: cat.days_repeater ?? null,
       prices: Object.values(dateMap),
     };
   });
