@@ -334,7 +334,7 @@ export const openapiSpec = {
   openapi: "3.0.3",
   info: {
     title: "BOTG API",
-    version: "1.1.0",
+    version: "1.2.0",
     description: "Custom REST API layer for BOTG — hotels, products, and more.",
   },
   tags: [
@@ -347,15 +347,10 @@ export const openapiSpec = {
     "/api/v1/hotels": {
       get: {
         tags: ["Hotels"],
-        summary: "List hotels",
+        summary: "List hotels (lightweight)",
+        description:
+          "Returns a minimal paginated list of hotels containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/hotels/{id}` for full detail.",
         parameters: [
-          {
-            in: "query",
-            name: "lang",
-            schema: { type: "string", enum: ["de", "en", "nl", "de-CH"] },
-            description:
-              "ISO 639-1 language code. If set, each translations block returns only that language key. Omit to get all available languages.",
-          },
           {
             in: "query",
             name: "country",
@@ -366,7 +361,7 @@ export const openapiSpec = {
             in: "query",
             name: "search",
             schema: { type: "string", maxLength: 200 },
-            description: "Full-text search on hotel name and teaser.",
+            description: "Full-text search on hotel name.",
           },
           {
             in: "query",
@@ -386,12 +381,6 @@ export const openapiSpec = {
           },
           {
             in: "query",
-            name: "fields",
-            schema: { type: "string" },
-            description: "Comma-separated list of fields to return.",
-          },
-          {
-            in: "query",
             name: "page",
             schema: { type: "integer", minimum: 1, default: 1 },
           },
@@ -403,16 +392,21 @@ export const openapiSpec = {
         ],
         responses: {
           200: {
-            description: "Paginated hotel list",
+            description: "Paginated lightweight hotel list",
             content: {
               "application/json": {
-                schema: {
-                  $ref: "#/components/schemas/PaginatedHotelListResponse",
-                },
+                schema: { $ref: "#/components/schemas/PaginatedHotelListResponse" },
                 example: {
                   success: true,
                   message: "OK",
-                  data: [REAL_HOTEL_MULTILANG],
+                  data: [
+                    {
+                      id: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca",
+                      object_id: 9,
+                      name: "Stay at Alice Springs",
+                      date_updated: "2026-05-29T10:16:30.057Z",
+                    },
+                  ],
                   meta: {
                     requestId: "5f3cc439-2af7-43f2-867c-4e583251b475",
                     timestamp: "2026-05-29T13:24:13.346Z",
@@ -491,16 +485,69 @@ export const openapiSpec = {
     "/api/v1/products": {
       get: {
         tags: ["Products"],
-        summary: "List product types",
+        summary: "Product catalog",
         description:
-          "Returns a static catalogue of available product types and their API endpoints.",
+          "Returns a live catalog of all product types with real item counts and their list/detail route URLs. No query parameters required.",
+        responses: {
+          200: {
+            description: "Product catalog",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    message: { type: "string", example: "OK" },
+                    data: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/ProductCatalogItem" },
+                    },
+                    meta: { $ref: "#/components/schemas/ResponseMeta" },
+                  },
+                },
+                example: {
+                  success: true,
+                  message: "OK",
+                  data: [
+                    {
+                      type: "hotel",
+                      total: 42,
+                      list_url: "/api/v1/hotels",
+                      detail_url: "/api/v1/hotels/{id}",
+                    },
+                    {
+                      type: "cruise",
+                      total: 0,
+                      list_url: "/api/v1/cruises",
+                      detail_url: "/api/v1/cruises/{id}",
+                    },
+                  ],
+                  meta: {
+                    requestId: "9c23ed47-8b3c-44f3-97f6-44b2f726b959",
+                    timestamp: "2026-05-29T13:23:48.346Z",
+                  },
+                },
+              },
+            },
+          },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/products/details": {
+      get: {
+        tags: ["Products"],
+        summary: "List products (full detail)",
+        description:
+          "Returns full product detail for all product types in a single paginated list. Currently includes hotels only.",
         parameters: [
           {
             in: "query",
             name: "lang",
             schema: { type: "string", enum: ["de", "en", "nl", "de-CH"] },
             description:
-              "If set, only that language is returned in the translations block.",
+              "If set, only that language is returned in all translations blocks.",
           },
           {
             in: "query",
@@ -527,7 +574,7 @@ export const openapiSpec = {
             in: "query",
             name: "updated_after",
             schema: { type: "string", format: "date-time" },
-            description: "Delta sync filter.",
+            description: "Delta sync — return only records updated after this timestamp.",
           },
           {
             in: "query",
@@ -542,7 +589,7 @@ export const openapiSpec = {
         ],
         responses: {
           200: {
-            description: "Paginated product list",
+            description: "Paginated full-detail product list",
             content: {
               "application/json": {
                 schema: {
@@ -560,9 +607,7 @@ export const openapiSpec = {
                         {
                           type: "object",
                           properties: {
-                            pagination: {
-                              $ref: "#/components/schemas/PaginationMeta",
-                            },
+                            pagination: { $ref: "#/components/schemas/PaginationMeta" },
                           },
                         },
                       ],
@@ -582,6 +627,115 @@ export const openapiSpec = {
                       limit: 20,
                       totalPages: 1,
                       hasNext: false,
+                      hasPrev: false,
+                      updated_at_max: "2026-05-29T10:16:30.057Z",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/products/limited-list": {
+      get: {
+        tags: ["Products"],
+        summary: "List products (lightweight)",
+        description:
+          "Returns a lightweight list of all products across all types with only the essential fields for indexing, search, selection, and synchronisation.",
+        parameters: [
+          {
+            in: "query",
+            name: "country",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by country ID.",
+          },
+          {
+            in: "query",
+            name: "search",
+            schema: { type: "string", maxLength: 200 },
+            description: "Full-text search.",
+          },
+          {
+            in: "query",
+            name: "sort",
+            schema: {
+              type: "string",
+              enum: ["name", "-name", "date_updated", "-date_updated"],
+            },
+            description: "Default: -date_updated",
+          },
+          {
+            in: "query",
+            name: "updated_after",
+            schema: { type: "string", format: "date-time" },
+            description: "Delta sync — return only records updated after this timestamp.",
+          },
+          {
+            in: "query",
+            name: "page",
+            schema: { type: "integer", minimum: 1, default: 1 },
+          },
+          {
+            in: "query",
+            name: "limit",
+            schema: { type: "integer", minimum: 1, maximum: 100, default: 20 },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Paginated lightweight product list",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    message: { type: "string", example: "OK" },
+                    data: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/ProductLimitedItem" },
+                    },
+                    meta: {
+                      allOf: [
+                        { $ref: "#/components/schemas/ResponseMeta" },
+                        {
+                          type: "object",
+                          properties: {
+                            pagination: { $ref: "#/components/schemas/PaginationMeta" },
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+                example: {
+                  success: true,
+                  message: "OK",
+                  data: [
+                    {
+                      type: "hotel",
+                      id: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca",
+                      object_id: 9,
+                      name: "Stay at Alice Springs",
+                      status: "published",
+                      date_created: "2026-05-09T11:48:36.379Z",
+                      date_updated: "2026-05-29T10:16:30.057Z",
+                    },
+                  ],
+                  meta: {
+                    requestId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                    timestamp: "2026-05-29T13:23:48.346Z",
+                    pagination: {
+                      total: 42,
+                      page: 1,
+                      limit: 20,
+                      totalPages: 3,
+                      hasNext: true,
                       hasPrev: false,
                       updated_at_max: "2026-05-29T10:16:30.057Z",
                     },
@@ -662,6 +816,39 @@ export const openapiSpec = {
           },
         },
       },
+      HotelListItem: {
+        type: "object",
+        description: "Lightweight hotel record returned by GET /api/v1/hotels.",
+        properties: {
+          id: { type: "string", format: "uuid", example: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca" },
+          object_id: { type: "integer", nullable: true, example: 9 },
+          name: { type: "string", example: "Stay at Alice Springs" },
+          date_updated: { type: "string", format: "date-time", example: "2026-05-29T10:16:30.057Z" },
+        },
+      },
+      ProductCatalogItem: {
+        type: "object",
+        description: "One entry in the product catalog returned by GET /api/v1/products.",
+        properties: {
+          type: { type: "string", example: "hotel", description: "Product type identifier." },
+          total: { type: "integer", example: 42, description: "Live count of published items of this type." },
+          list_url: { type: "string", example: "/api/v1/hotels", description: "Endpoint to list all items of this type." },
+          detail_url: { type: "string", example: "/api/v1/hotels/{id}", description: "Endpoint template for a single item detail." },
+        },
+      },
+      ProductLimitedItem: {
+        type: "object",
+        description: "Lightweight product record returned by GET /api/v1/products/limited-list.",
+        properties: {
+          type: { type: "string", example: "hotel" },
+          id: { type: "string", format: "uuid", example: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca" },
+          object_id: { type: "integer", nullable: true, example: 9 },
+          name: { type: "string", example: "Stay at Alice Springs" },
+          status: { type: "string", nullable: true, example: "published" },
+          date_created: { type: "string", format: "date-time", example: "2026-05-09T11:48:36.379Z" },
+          date_updated: { type: "string", format: "date-time", example: "2026-05-29T10:16:30.057Z" },
+        },
+      },
       PaginatedHotelListResponse: {
         type: "object",
         properties: {
@@ -669,7 +856,7 @@ export const openapiSpec = {
           message: { type: "string", example: "OK" },
           data: {
             type: "array",
-            items: { $ref: "#/components/schemas/HotelDetail" },
+            items: { $ref: "#/components/schemas/HotelListItem" },
           },
           meta: {
             allOf: [

@@ -62,7 +62,7 @@ const REDOC_HTML = `<!DOCTYPE html>
 <body>
   <div id="api-banner">
     <span class="api-title">BOTG API</span>
-    <span class="api-version">v1.1.0</span>
+    <span class="api-version">v1.2.0</span>
     <span style="color:#a0b4cc; font-size:13px;">Hotels · Products · Cruises</span>
     <a class="api-json-link" href="/api/v1/openapi.json" target="_blank">OpenAPI JSON ↗</a>
   </div>
