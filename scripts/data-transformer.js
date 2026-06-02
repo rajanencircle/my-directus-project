@@ -2,10 +2,22 @@
 // CONFIGURATION
 // ------------------------------------------
 
-// // local
+// local
 // const env = {
 //   DIRECTUS_URL: "http://localhost:8055",
-//   DIRECTUS_TOKEN: "2cpd1MiSahgbSQqyu_pUfz0MK8BJOjqV",
+//   DIRECTUS_TOKEN: "872dSIw4Y6v7XRqLlUYgxwglqO190igH",
+// };
+
+/*
+dev: https://directus-dev-botg.func.team
+staging: https://directus-staging-botg.func.team
+main: https://directus-prod-botg.func.team
+*/
+
+// // PROD (main)
+// const env = {
+//   DIRECTUS_URL: "https://directus-prod-botg.func.team",
+//   DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
 // };
 
 // // staging
@@ -14,16 +26,29 @@
 //     "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
 //   DIRECTUS_TOKEN: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
 // };
-const env = {
-  DIRECTUS_URL: "https://directus.staging.functional.team",
-  DIRECTUS_TOKEN: "S2MuaWxtPP5GVmhSykH6Z1RVh_LWoDmC",
-};
 
-// // dev
+// const env = {
+//   DIRECTUS_URL: "https://directus-staging-botg.func.team",
+//   DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
+// };
+
+// // // dev
 // const env = {
 //   DIRECTUS_URL: "https://directus-dev-botg.func.team",
-//   DIRECTUS_TOKEN: "QARPY7qs65GsrPUs35LEgN7ApexarinS",
+//   DIRECTUS_TOKEN: "QtF-MmL0PxJUPd1udylLm_lGOGtW2WES",
 // };
+
+const env = {
+  // // PROD (main)
+  // DIRECTUS_URL: "https://directus-prod-botg.func.team",
+  // DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
+  // // staging
+  // DIRECTUS_URL: "https://directus-staging-botg.func.team",
+  // DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
+  // dev
+  DIRECTUS_URL: "https://directus-dev-botg.func.team",
+  DIRECTUS_TOKEN: "QtF-MmL0PxJUPd1udylLm_lGOGtW2WES",
+};
 
 // Initialize Directus client URL
 const DIRECTUS_URL = env.DIRECTUS_URL;
@@ -76,6 +101,16 @@ async function transformCollectionData(
 ) {
   try {
     console.log(`Fetching items from ${collectionName}...`);
+    console.log(
+      "startId",
+      startId,
+      "endId",
+      endId,
+      "fieldName",
+      fieldName,
+      "updateFieldName",
+      updateFieldName,
+    );
 
     // Fetch items. Using limit: -1 to get all, but for very large
     // collections you might need to implement pagination here.
@@ -89,18 +124,21 @@ async function transformCollectionData(
     }
 
     const response = await directusRequest("GET", path);
+
+    console.log("response", response);
     const items = response.data || [];
+    console.log("items", items);
 
     console.log(`Found ${items.length} items. Starting transformation...`);
 
     let updatedCount = 0;
 
     for (const item of items) {
-      const originalValue = item["translations"];
+      const originalValue = item[fieldName];
 
       // Await the transformation function since it's async
       const transformedValue = await transformFn(originalValue);
-
+      // console.log("transformedValue", transformedValue);
       // Only trigger an API update if we got a valid transformed value and it differs from original
       // (Comparing an array/object originalValue with a string transformedValue will always be true)
       if (transformedValue) {
@@ -133,6 +171,8 @@ async function transformCollectionData(
 // Define your custom transformation function.
 // For your specific case: removes '#' symbols and capitalizes words.
 const myTransformFunction = async (value) => {
+  // console.log("value", value);
+  return parseInt(value);
   // console.log("value", value);
   // if (typeof value !== "string") return value;
 
@@ -209,7 +249,7 @@ const myTransformFunction = async (value) => {
   //   }
   //   return code;
 
-  return;
+  // return;
 };
 
 // Parse command line arguments for optional range
@@ -218,9 +258,9 @@ const endIdArg = process.argv[3] ? parseInt(process.argv[3]) : null;
 
 // Run the script
 transformCollectionData(
-  "posts", // Collection Name
-  "translations.*", // Field to read from
-  "content", // Field to update (can be the same or different)
+  "hotels", // Collection Name
+  "season_2", // Field to read from
+  "season", // Field to update (can be the same or different)
   myTransformFunction, // Your transformation function
   // startIdArg, // Optional Start ID
   // startIdArg, // Optional End ID

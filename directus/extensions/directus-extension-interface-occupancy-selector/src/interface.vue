@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { ref, computed, onMounted, watch, getCurrentInstance } from 'vue';
 import { useApi, useStores } from '@directus/extensions-sdk';
 
 type ItemId = string | number;
@@ -29,7 +28,9 @@ interface SelectedGroupState {
   fromPriceTrue: boolean;
 }
 
-const { t } = useI18n();
+const instance = getCurrentInstance();
+const t = (key: string): string =>
+  instance?.appContext.config.globalProperties.$t?.(key) ?? key;
 
 const props = withDefaults(
   defineProps<{
@@ -43,6 +44,12 @@ const props = withDefaults(
     rightPaneLabel?: string;
     searchPlaceholder?: string;
     noSelectionMessage?: string;
+    noResultsMessage?: string;
+    allSelectedMessage?: string;
+    clickToSelectLabel?: string;
+    removeLabel?: string;
+    fromPriceTrueLabel?: string;
+    fromPriceFalseLabel?: string;
   }>(),
   {
     displayTemplate: '{{name}}',
@@ -51,6 +58,12 @@ const props = withDefaults(
     rightPaneLabel: 'Selected',
     searchPlaceholder: 'Search…',
     noSelectionMessage: 'No items selected yet',
+    noResultsMessage: 'No results match your search',
+    allSelectedMessage: 'All items are selected',
+    clickToSelectLabel: 'Click to select',
+    removeLabel: 'Remove',
+    fromPriceTrueLabel: 'From price: On',
+    fromPriceFalseLabel: 'From price: Off',
   }
 );
 
@@ -63,10 +76,16 @@ function resolveLabel(value: string): string {
   return value;
 }
 
-const resolvedLeftLabel = computed(() => resolveLabel(props.leftPaneLabel ?? 'Available'));
-const resolvedRightLabel = computed(() => resolveLabel(props.rightPaneLabel ?? 'Selected'));
-const resolvedSearchPlaceholder = computed(() => resolveLabel(props.searchPlaceholder ?? 'Search…'));
-const resolvedNoSelectionMessage = computed(() => resolveLabel(props.noSelectionMessage ?? 'No items selected yet'));
+const resolvedLeftLabel = computed(() => resolveLabel(props.leftPaneLabel || 'Available'));
+const resolvedRightLabel = computed(() => resolveLabel(props.rightPaneLabel || 'Selected'));
+const resolvedSearchPlaceholder = computed(() => resolveLabel(props.searchPlaceholder || 'Search…'));
+const resolvedNoSelectionMessage = computed(() => resolveLabel(props.noSelectionMessage || 'No items selected yet'));
+const resolvedNoResultsMessage = computed(() => resolveLabel(props.noResultsMessage || 'No results match your search'));
+const resolvedAllSelectedMessage = computed(() => resolveLabel(props.allSelectedMessage || 'All items are selected'));
+const resolvedClickToSelectLabel = computed(() => resolveLabel(props.clickToSelectLabel || 'Click to select'));
+const resolvedRemoveLabel = computed(() => resolveLabel(props.removeLabel || 'Remove'));
+const resolvedFromPriceTrueLabel = computed(() => resolveLabel(props.fromPriceTrueLabel || 'From price: On'));
+const resolvedFromPriceFalseLabel = computed(() => resolveLabel(props.fromPriceFalseLabel || 'From price: Off'));
 
 const emit = defineEmits(['input']);
 const api = useApi();
@@ -419,7 +438,7 @@ watch(
             v-for="entry in availableEntries"
             :key="entry.key"
             class="list-item"
-            title="Click to select"
+            :title="resolvedClickToSelectLabel"
             @click="selectEntry(entry)"
           >
             <span class="item-label">
@@ -433,7 +452,7 @@ watch(
           </div>
 
           <div v-if="availableEntries.length === 0" class="empty-state">
-            {{ searchQuery ? 'No results match your search' : 'All items are selected' }}
+            {{ searchQuery ? resolvedNoResultsMessage : resolvedAllSelectedMessage }}
           </div>
         </div>
       </div>
@@ -463,14 +482,14 @@ watch(
                 small
                 class="item-icon toggle-icon"
                 :class="{ 'toggle-disabled': !state.entry.trueItem || !state.entry.falseItem }"
-                :title="state.fromPriceTrue ? 'Use from_price true' : 'Use from_price false'"
+                :title="state.fromPriceTrue ? resolvedFromPriceTrueLabel : resolvedFromPriceFalseLabel"
                 @click.stop="toggleFromPrice(state.entry.key)"
               />
               <v-icon
                 name="remove_circle_outline"
                 small
                 class="item-icon icon-remove"
-                title="Remove"
+                :title="resolvedRemoveLabel"
                 @click.stop="deselectEntry(state.entry.key)"
               />
             </div>
