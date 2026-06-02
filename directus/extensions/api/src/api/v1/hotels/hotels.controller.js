@@ -8,13 +8,12 @@ export function createHotelsController(context) {
     async index(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
       const { search, country, sort, updated_after } = req.query;
-      const lang = req.query.lang ?? req.query.language ?? null;
 
       const result = await listHotels(
         { page, limit, offset, search, country, sort, updated_after },
         context,
       );
-      const data = result.data.map((item) => shapeHotelDetail(item, lang));
+      const data = result.data.map(({ id, object_id, name, date_updated }) => ({ id, object_id, name, date_updated }));
       return sendPaginated(res, { ...result, data });
     },
 
