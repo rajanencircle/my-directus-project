@@ -100,3 +100,31 @@ export async function listProductsLimited(
 
   return { data: taggedHotels, total, page, limit, updatedAtMax };
 }
+
+export async function getProductCatalog({ services, database, getSchema }) {
+  const schema = await getSchema();
+  const { ItemsService } = services;
+  const hotelsService = new ItemsService(HOTELS_COLLECTION, { knex: database, schema });
+
+  const [hotelCount] = await Promise.all([
+    hotelsService.readByQuery({
+      aggregate: { count: ['*'] },
+      filter: { status_primarix: { _eq: 'published' } },
+    }),
+  ]);
+
+  return [
+    {
+      type: 'hotel',
+      total: parseInt(hotelCount[0]?.count ?? '0', 10),
+      list_url: '/api/v1/hotels',
+      detail_url: '/api/v1/hotels/{id}',
+    },
+    {
+      type: 'cruise',
+      total: 0,
+      list_url: '/api/v1/cruises',
+      detail_url: '/api/v1/cruises/{id}',
+    },
+  ];
+}

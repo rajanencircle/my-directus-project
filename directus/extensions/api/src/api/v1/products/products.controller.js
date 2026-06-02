@@ -1,6 +1,6 @@
-import { sendPaginated } from '../../shared/apiResponse.js';
+import { sendPaginated, sendSuccess } from '../../shared/apiResponse.js';
 import { parsePagination } from '../../shared/pagination.js';
-import { listProducts, listProductsLimited } from './products.service.js';
+import { listProducts, listProductsLimited, getProductCatalog } from './products.service.js';
 import { shapeProduct } from '../../../transformers/product.transformer.js';
 import { ensureUtcSuffix } from '../../../utils/timestamps.js';
 
@@ -18,6 +18,11 @@ function shapeLimitedProduct(item) {
 
 export function createProductsController(context) {
   return {
+    async catalog(req, res) {
+      const data = await getProductCatalog(context);
+      return sendSuccess(res, data);
+    },
+
     async details(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
       const { search, country, sort, lang, updated_after } = req.query;
