@@ -1,0 +1,32 @@
+{
+  "name": "api",
+  "description": "Custom REST API layer mounted at /api/v1",
+  "icon": "extension",
+  "version": "1.0.1",
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "directus-extension-endpoint"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "directus:extension": {
+    "type": "endpoint",
+    "path": "dist/index.js",
+    "source": "src/hook/index.js",
+    "host": "^10.10.0"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w --no-minify"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "17.0.9"
+  },
+  "dependencies": {
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1"
+  }
+}
