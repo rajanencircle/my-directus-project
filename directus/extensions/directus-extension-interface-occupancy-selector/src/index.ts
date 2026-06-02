@@ -20,10 +20,36 @@ export default defineInterface({
       meta: {
         width: 'full',
         interface: 'input',
-        note: 'Template for how each item label is rendered. Use {{field_name}} placeholders. e.g. {{name}} – {{value}} persons',
+        note: 'Template for item labels. Use {{field_name}} placeholders. Fields from matched translations are merged in, so e.g. {{occupancy}} works alongside {{name}} and {{value}}.',
         options: { placeholder: '{{name}}' },
       },
       schema: { default_value: '{{name}}' },
+    },
+
+    // ─── Translations ─────────────────────────────────────────────────────────
+    {
+      field: 'translationsField',
+      name: 'Translations Relation Field',
+      type: 'string',
+      meta: {
+        width: 'half',
+        interface: 'input',
+        note: 'Relation field on the item that holds translations (e.g. translations). Leave empty to disable.',
+        options: { placeholder: 'e.g. translations' },
+      },
+      schema: { default_value: '' },
+    },
+    {
+      field: 'translationLocaleCodePath',
+      name: 'Locale Code Path',
+      type: 'string',
+      meta: {
+        width: 'half',
+        interface: 'input',
+        note: 'Dot-path within each translation row to the locale code. Path is relative to a single translation object — e.g. translations_id.code (not translations.translations_id.code). Matched against the current user language.',
+        options: { placeholder: 'e.g. translations_id.code' },
+      },
+      schema: { default_value: 'translations_id.code' },
     },
 
     // ─── Exclusion Logic ──────────────────────────────────────────────────────

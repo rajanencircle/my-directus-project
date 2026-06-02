@@ -39,15 +39,15 @@ main: https://directus-prod-botg.func.team
 // };
 
 const env = {
-  // // PROD (main)
-  // DIRECTUS_URL: "https://directus-prod-botg.func.team",
-  // DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
+  // PROD (main)
+  DIRECTUS_URL: "https://directus-prod-botg.func.team",
+  DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
   // // staging
   // DIRECTUS_URL: "https://directus-staging-botg.func.team",
   // DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
-  // dev
-  DIRECTUS_URL: "https://directus-dev-botg.func.team",
-  DIRECTUS_TOKEN: "QtF-MmL0PxJUPd1udylLm_lGOGtW2WES",
+  // // dev
+  // DIRECTUS_URL: "https://directus-dev-botg.func.team",
+  // DIRECTUS_TOKEN: "QtF-MmL0PxJUPd1udylLm_lGOGtW2WES",
 };
 
 // Initialize Directus client URL

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, getCurrentInstance } from 'vue';
-import { useApi, useStores } from '@directus/extensions-sdk';
+import { ref, computed, onMounted, watch, getCurrentInstance } from "vue";
+import { useApi, useStores } from "@directus/extensions-sdk";
 
 type ItemId = string | number;
 
@@ -40,6 +40,8 @@ const props = withDefaults(
     collection: string;
     displayTemplate?: string;
     groupFields?: string;
+    translationsField?: string;
+    translationLocaleCodePath?: string;
     leftPaneLabel?: string;
     rightPaneLabel?: string;
     searchPlaceholder?: string;
@@ -52,23 +54,25 @@ const props = withDefaults(
     fromPriceFalseLabel?: string;
   }>(),
   {
-    displayTemplate: '{{name}}',
-    groupFields: '',
-    leftPaneLabel: 'Available',
-    rightPaneLabel: 'Selected',
-    searchPlaceholder: 'Search…',
-    noSelectionMessage: 'No items selected yet',
-    noResultsMessage: 'No results match your search',
-    allSelectedMessage: 'All items are selected',
-    clickToSelectLabel: 'Click to select',
-    removeLabel: 'Remove',
-    fromPriceTrueLabel: 'From price: On',
-    fromPriceFalseLabel: 'From price: Off',
-  }
+    displayTemplate: "{{name}}",
+    groupFields: "",
+    translationsField: "",
+    translationLocaleCodePath: "translations_id.code",
+    leftPaneLabel: "Available",
+    rightPaneLabel: "Selected",
+    searchPlaceholder: "Search…",
+    noSelectionMessage: "No items selected yet",
+    noResultsMessage: "No results match your search",
+    allSelectedMessage: "All items are selected",
+    clickToSelectLabel: "Click to select",
+    removeLabel: "Remove",
+    fromPriceTrueLabel: "From price: On",
+    fromPriceFalseLabel: "From price: Off",
+  },
 );
 
 function resolveLabel(value: string): string {
-  if (value.startsWith('$t:')) {
+  if (value.startsWith("$t:")) {
     const key = value.slice(3).trim();
     const resolved = t(key);
     return resolved !== key ? resolved : key;
@@ -76,50 +80,127 @@ function resolveLabel(value: string): string {
   return value;
 }
 
-const resolvedLeftLabel = computed(() => resolveLabel(props.leftPaneLabel || 'Available'));
-const resolvedRightLabel = computed(() => resolveLabel(props.rightPaneLabel || 'Selected'));
-const resolvedSearchPlaceholder = computed(() => resolveLabel(props.searchPlaceholder || 'Search…'));
-const resolvedNoSelectionMessage = computed(() => resolveLabel(props.noSelectionMessage || 'No items selected yet'));
-const resolvedNoResultsMessage = computed(() => resolveLabel(props.noResultsMessage || 'No results match your search'));
-const resolvedAllSelectedMessage = computed(() => resolveLabel(props.allSelectedMessage || 'All items are selected'));
-const resolvedClickToSelectLabel = computed(() => resolveLabel(props.clickToSelectLabel || 'Click to select'));
-const resolvedRemoveLabel = computed(() => resolveLabel(props.removeLabel || 'Remove'));
-const resolvedFromPriceTrueLabel = computed(() => resolveLabel(props.fromPriceTrueLabel || 'From price: On'));
-const resolvedFromPriceFalseLabel = computed(() => resolveLabel(props.fromPriceFalseLabel || 'From price: Off'));
+const resolvedLeftLabel = computed(() =>
+  resolveLabel(props.leftPaneLabel || "Available"),
+);
+const resolvedRightLabel = computed(() =>
+  resolveLabel(props.rightPaneLabel || "Selected"),
+);
+const resolvedSearchPlaceholder = computed(() =>
+  resolveLabel(props.searchPlaceholder || "Search…"),
+);
+const resolvedNoSelectionMessage = computed(() =>
+  resolveLabel(props.noSelectionMessage || "No items selected yet"),
+);
+const resolvedNoResultsMessage = computed(() =>
+  resolveLabel(props.noResultsMessage || "No results match your search"),
+);
+const resolvedAllSelectedMessage = computed(() =>
+  resolveLabel(props.allSelectedMessage || "All items are selected"),
+);
+const resolvedClickToSelectLabel = computed(() =>
+  resolveLabel(props.clickToSelectLabel || "Click to select"),
+);
+const resolvedRemoveLabel = computed(() =>
+  resolveLabel(props.removeLabel || "Remove"),
+);
+const resolvedFromPriceTrueLabel = computed(() =>
+  resolveLabel(props.fromPriceTrueLabel || "From price: On"),
+);
+const resolvedFromPriceFalseLabel = computed(() =>
+  resolveLabel(props.fromPriceFalseLabel || "From price: Off"),
+);
 
-const emit = defineEmits(['input']);
+const emit = defineEmits(["input"]);
 const api = useApi();
 
 const allItems = ref<RelatedItem[]>([]);
 const savedJunctionRows = ref<JunctionRow[]>([]);
 const loading = ref(false);
 const errorMsg = ref<string | null>(null);
-const searchQuery = ref('');
+const searchQuery = ref("");
 const selectedGroupMap = ref<Map<string, SelectedGroupState>>(new Map());
 
-const junctionCollection = ref<string>('');
-const parentKeyField = ref<string>('');
-const resolvedRelatedKey = ref<string>('');
-const resolvedRelatedCollection = ref<string>('');
+const junctionCollection = ref<string>("");
+const parentKeyField = ref<string>("");
+const resolvedRelatedKey = ref<string>("");
+const resolvedRelatedCollection = ref<string>("");
 
 const parsedGroupFields = computed<string[]>(() =>
   props.groupFields
-    ? props.groupFields.split(',').map((f) => f.trim()).filter(Boolean)
-    : []
+    ? props.groupFields
+        .split(",")
+        .map((f) => f.trim())
+        .filter(Boolean)
+    : [],
 );
 
+function getUserLanguage(): string {
+  try {
+    const { useUserStore, useSettingsStore } = useStores();
+    const userLang = (useUserStore().currentUser as any)?.language as
+      | string
+      | undefined;
+    if (userLang) return userLang;
+    const projectLang = (useSettingsStore().settings as any)
+      ?.default_language as string | undefined;
+    return projectLang ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function getNestedValue(obj: any, path: string): any {
+  return path.split(".").reduce((acc, key) => acc?.[key], obj);
+}
+
+function resolveLocalePath(): string {
+  const raw = props.translationLocaleCodePath || "translations_id.code";
+  // strip accidental leading "{translationsField}." prefix (e.g. "translations.translations_id.code" → "translations_id.code")
+  const prefix = (props.translationsField || "") + ".";
+  return props.translationsField && raw.startsWith(prefix)
+    ? raw.slice(prefix.length)
+    : raw;
+}
+
+function enrichWithTranslation(item: RelatedItem): RelatedItem {
+  if (!props.translationsField) return item;
+  const translations = item[props.translationsField];
+  if (!Array.isArray(translations) || translations.length === 0) return item;
+
+  const userLang = getUserLanguage();
+  const localePath = resolveLocalePath();
+
+  let matched = userLang
+    ? translations.find((t) => getNestedValue(t, localePath) === userLang)
+    : null;
+
+  if (!matched) matched = translations[0];
+  if (!matched) return item;
+
+  const flat: Record<string, any> = {};
+  for (const [k, v] of Object.entries(matched)) {
+    if (k !== "id" && typeof v !== "object") flat[k] = v;
+  }
+  return { ...item, ...flat };
+}
+
 function renderLabel(item: RelatedItem): string {
-  if (!props.displayTemplate) return String(item.id);
+  const enriched = enrichWithTranslation(item);
+  if (!props.displayTemplate) return String(enriched.id);
   return props.displayTemplate.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-    const val = item[key];
-    if (val === null || val === undefined) return '';
+    const val = enriched[key];
+    if (val === null || val === undefined) return "";
     return String(val);
   });
 }
 
-function renderParts(item: RelatedItem): Array<{ text: string } | { bool: boolean }> {
+function renderParts(
+  item: RelatedItem,
+): Array<{ text: string } | { bool: boolean }> {
+  const enriched = enrichWithTranslation(item);
   const result: Array<{ text: string } | { bool: boolean }> = [];
-  const template = props.displayTemplate || String(item.id);
+  const template = props.displayTemplate || String(enriched.id);
   let cursor = 0;
   const regex = /\{\{(\w+)\}\}/g;
   let match: RegExpExecArray | null;
@@ -128,10 +209,10 @@ function renderParts(item: RelatedItem): Array<{ text: string } | { bool: boolea
     if (match.index > cursor) {
       result.push({ text: template.slice(cursor, match.index) });
     }
-    const val = item[match[1]];
+    const val = enriched[match[1]];
     if (val === null || val === undefined) {
       // skip
-    } else if (typeof val === 'boolean') {
+    } else if (typeof val === "boolean") {
       result.push({ bool: val });
     } else {
       result.push({ text: String(val) });
@@ -145,7 +226,7 @@ function renderParts(item: RelatedItem): Array<{ text: string } | { bool: boolea
 
 function getGroupKey(item: RelatedItem): string | null {
   if (!parsedGroupFields.value.length) return null;
-  return parsedGroupFields.value.map((f) => `${f}=${item[f]}`).join('&');
+  return parsedGroupFields.value.map((f) => `${f}=${item[f]}`).join("&");
 }
 
 function normalizeGroupKey(item: RelatedItem): string {
@@ -155,9 +236,9 @@ function normalizeGroupKey(item: RelatedItem): string {
 
 function getFromPriceFlag(item: RelatedItem): boolean {
   const value = item.from_price ?? item.fromPrice;
-  if (typeof value === 'boolean') return value;
-  if (typeof value === 'string') return value === 'true';
-  if (typeof value === 'number') return value === 1;
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return value === "true";
+  if (typeof value === "number") return value === 1;
   return false;
 }
 
@@ -185,10 +266,12 @@ const groupedEntryMap = computed<Map<string, GroupEntry>>(() => {
   return map;
 });
 
-const groupedEntries = computed(() => Array.from(groupedEntryMap.value.values()));
+const groupedEntries = computed(() =>
+  Array.from(groupedEntryMap.value.values()),
+);
 
 const availableEntries = computed(() => {
-  const query = searchQuery.value?.toLowerCase() ?? '';
+  const query = searchQuery.value?.toLowerCase() ?? "";
   return groupedEntries.value.filter((entry) => {
     if (selectedGroupMap.value.has(entry.key)) return false;
     if (!query) return true;
@@ -196,18 +279,27 @@ const availableEntries = computed(() => {
   });
 });
 
-const selectedGroupStates = computed(() => Array.from(selectedGroupMap.value.values()));
+const selectedGroupStates = computed(() =>
+  Array.from(selectedGroupMap.value.values()),
+);
 const selectedCount = computed(() => selectedGroupStates.value.length);
 
 function resolveJunctionInfo() {
   const { useRelationsStore } = useStores();
   const relationsStore = useRelationsStore();
 
-  const relations: any[] = relationsStore.getRelationsForField(props.collection, props.field);
+  const relations: any[] = relationsStore.getRelationsForField(
+    props.collection,
+    props.field,
+  );
   const junctionRel = relations.find((r) => r.meta?.one_field === props.field);
 
   if (!junctionRel) {
-    console.error('[occupancy-selector] Could not resolve junction relation for', props.collection, props.field);
+    console.error(
+      "[occupancy-selector] Could not resolve junction relation for",
+      props.collection,
+      props.field,
+    );
     return;
   }
 
@@ -217,27 +309,45 @@ function resolveJunctionInfo() {
 
   const relatedRelations: any[] = relationsStore.getRelationsForField(
     junctionRel.collection,
-    junctionRel.meta.junction_field
+    junctionRel.meta.junction_field,
   );
-  const relatedRel = relatedRelations.find((r) => r.field === junctionRel.meta.junction_field);
+  const relatedRel = relatedRelations.find(
+    (r) => r.field === junctionRel.meta.junction_field,
+  );
 
   if (relatedRel?.related_collection) {
     resolvedRelatedCollection.value = relatedRel.related_collection;
   } else {
-    console.error('[occupancy-selector] Could not resolve related collection from junction', junctionRel.collection);
+    console.error(
+      "[occupancy-selector] Could not resolve related collection from junction",
+      junctionRel.collection,
+    );
   }
+}
+
+function buildItemFields(): string {
+  if (!props.translationsField) return "*";
+  const localePath = resolveLocalePath();
+  const localeRelation = localePath.includes(".")
+    ? localePath.split(".")[0]
+    : null;
+  const parts = [`*`, `${props.translationsField}.*`];
+  if (localeRelation) {
+    parts.push(`${props.translationsField}.${localeRelation}.*`);
+  }
+  return parts.join(",");
 }
 
 async function fetchAllItems() {
   if (!resolvedRelatedCollection.value) {
-    errorMsg.value = 'Could not resolve related collection from schema.';
+    errorMsg.value = "Could not resolve related collection from schema.";
     return;
   }
   loading.value = true;
   errorMsg.value = null;
   try {
     const res = await api.get(`/items/${resolvedRelatedCollection.value}`, {
-      params: { limit: -1 },
+      params: { limit: -1, fields: buildItemFields() },
     });
     allItems.value = res.data.data ?? [];
   } catch (e: any) {
@@ -248,13 +358,20 @@ async function fetchAllItems() {
 }
 
 async function fetchSavedSelection() {
-  if (!props.primaryKey || props.primaryKey === '+') return;
-  if (!resolvedRelatedKey.value || !junctionCollection.value || !parentKeyField.value) {
-    console.warn('[occupancy-selector] fetchSavedSelection skipped — junction not resolved yet:', {
-      resolvedRelatedKey: resolvedRelatedKey.value,
-      junctionCollection: junctionCollection.value,
-      parentKeyField: parentKeyField.value,
-    });
+  if (!props.primaryKey || props.primaryKey === "+") return;
+  if (
+    !resolvedRelatedKey.value ||
+    !junctionCollection.value ||
+    !parentKeyField.value
+  ) {
+    console.warn(
+      "[occupancy-selector] fetchSavedSelection skipped — junction not resolved yet:",
+      {
+        resolvedRelatedKey: resolvedRelatedKey.value,
+        junctionCollection: junctionCollection.value,
+        parentKeyField: parentKeyField.value,
+      },
+    );
     return;
   }
 
@@ -262,7 +379,7 @@ async function fetchSavedSelection() {
     const res = await api.get(`/items/${junctionCollection.value}`, {
       params: {
         filter: { [parentKeyField.value]: { _eq: props.primaryKey } },
-        fields: ['id', resolvedRelatedKey.value],
+        fields: ["id", resolvedRelatedKey.value],
         limit: -1,
       },
     });
@@ -272,7 +389,10 @@ async function fetchSavedSelection() {
     const ids = rows.map((row) => row[resolvedRelatedKey.value]);
     initSelectedFromIds(ids);
   } catch (e: any) {
-    console.error('[occupancy-selector] fetchSavedSelection failed:', e?.message ?? e);
+    console.error(
+      "[occupancy-selector] fetchSavedSelection failed:",
+      e?.message ?? e,
+    );
   }
 }
 
@@ -307,8 +427,10 @@ function emitDiffFromMap(map = selectedGroupMap.value) {
   const originalIds = new Set(
     savedJunctionRows.value.map((row) => {
       const related = row[rk];
-      return typeof related === 'object' && related !== null ? related.id : related;
-    })
+      return typeof related === "object" && related !== null
+        ? related.id
+        : related;
+    }),
   );
 
   const create = [...newIds]
@@ -318,12 +440,13 @@ function emitDiffFromMap(map = selectedGroupMap.value) {
   const del = savedJunctionRows.value
     .filter((row) => {
       const related = row[rk];
-      const id = typeof related === 'object' && related !== null ? related.id : related;
+      const id =
+        typeof related === "object" && related !== null ? related.id : related;
       return !newIds.has(id);
     })
     .map((row) => row.id);
 
-  emit('input', { create, update: [], delete: del });
+  emit("input", { create, update: [], delete: del });
 }
 
 function selectEntry(entry: GroupEntry) {
@@ -367,7 +490,7 @@ function toggleFromPrice(key: string) {
 }
 
 function applyStagedValue(staged: any) {
-  if (!staged || typeof staged !== 'object') return;
+  if (!staged || typeof staged !== "object") return;
   const rk = resolvedRelatedKey.value;
   const next = new Map(selectedGroupMap.value);
 
@@ -376,7 +499,10 @@ function applyStagedValue(staged: any) {
       const row = savedJunctionRows.value.find((r) => r.id === junctionId);
       if (row) {
         const related = row[rk];
-        const id = typeof related === 'object' && related !== null ? related.id : related;
+        const id =
+          typeof related === "object" && related !== null
+            ? related.id
+            : related;
         const state = createStateFromId(id);
         if (state) next.delete(state.entry.key);
       }
@@ -406,12 +532,12 @@ onMounted(async () => {
 watch(
   () => props.primaryKey,
   async (key) => {
-    if (key && key !== '+') {
+    if (key && key !== "+") {
       savedJunctionRows.value = [];
       selectedGroupMap.value = new Map();
       await fetchSavedSelection();
     }
-  }
+  },
 );
 </script>
 
@@ -426,7 +552,10 @@ watch(
         </div>
 
         <div class="pane-search">
-          <v-input v-model="searchQuery" :placeholder="resolvedSearchPlaceholder" />
+          <v-input
+            v-model="searchQuery"
+            :placeholder="resolvedSearchPlaceholder"
+          />
         </div>
 
         <div v-if="loading" class="loading-state">
@@ -442,9 +571,11 @@ watch(
             @click="selectEntry(entry)"
           >
             <span class="item-label">
-              <template v-for="(part, i) in renderParts(entry.labelItem)" :key="i">
-                <span v-if="'bool' in part" class="label-text">
-                </span>
+              <template
+                v-for="(part, i) in renderParts(entry.labelItem)"
+                :key="i"
+              >
+                <span v-if="'bool' in part" class="label-text"> </span>
                 <span v-else class="label-text">{{ part.text }}</span>
               </template>
             </span>
@@ -452,7 +583,11 @@ watch(
           </div>
 
           <div v-if="availableEntries.length === 0" class="empty-state">
-            {{ searchQuery ? resolvedNoResultsMessage : resolvedAllSelectedMessage }}
+            {{
+              searchQuery
+                ? resolvedNoResultsMessage
+                : resolvedAllSelectedMessage
+            }}
           </div>
         </div>
       </div>
@@ -460,7 +595,9 @@ watch(
       <div class="pane pane-right">
         <div class="pane-header">
           <span class="pane-title">{{ resolvedRightLabel }}</span>
-          <span class="pane-count pane-count-selected">{{ selectedCount }}</span>
+          <span class="pane-count pane-count-selected">{{
+            selectedCount
+          }}</span>
         </div>
 
         <div class="pane-list">
@@ -470,19 +607,30 @@ watch(
             class="list-item list-item-selected"
           >
             <span class="item-label">
-              <template v-for="(part, i) in renderParts(state.selectedItem)" :key="i">
-                <span v-if="'bool' in part" class="label-text">
-                </span>
+              <template
+                v-for="(part, i) in renderParts(state.selectedItem)"
+                :key="i"
+              >
+                <span v-if="'bool' in part" class="label-text"> </span>
                 <span v-else class="label-text">{{ part.text }}</span>
               </template>
             </span>
             <div class="item-actions">
               <v-icon
-                :name="state.fromPriceTrue ? 'check_box' : 'check_box_outline_blank'"
+                :name="
+                  state.fromPriceTrue ? 'check_box' : 'check_box_outline_blank'
+                "
                 small
                 class="item-icon toggle-icon"
-                :class="{ 'toggle-disabled': !state.entry.trueItem || !state.entry.falseItem }"
-                :title="state.fromPriceTrue ? resolvedFromPriceTrueLabel : resolvedFromPriceFalseLabel"
+                :class="{
+                  'toggle-disabled':
+                    !state.entry.trueItem || !state.entry.falseItem,
+                }"
+                :title="
+                  state.fromPriceTrue
+                    ? resolvedFromPriceTrueLabel
+                    : resolvedFromPriceFalseLabel
+                "
                 @click.stop="toggleFromPrice(state.entry.key)"
               />
               <v-icon
@@ -506,7 +654,8 @@ watch(
 
 <style scoped>
 .occupancy-selector {
-  border: var(--theme--border-width) solid var(--theme--form--field--input--border-color);
+  border: var(--theme--border-width) solid
+    var(--theme--form--field--input--border-color);
   border-radius: var(--theme--border-radius);
   background: var(--theme--form--field--input--background);
   overflow: hidden;
@@ -525,7 +674,8 @@ watch(
 }
 
 .pane-left {
-  border-right: var(--theme--border-width) solid var(--theme--border-color-subdued);
+  border-right: var(--theme--border-width) solid
+    var(--theme--border-color-subdued);
 }
 
 .pane-header {
@@ -534,7 +684,8 @@ watch(
   justify-content: space-between;
   padding: 8px 12px;
   background: var(--theme--background-subdued);
-  border-bottom: var(--theme--border-width) solid var(--theme--border-color-subdued);
+  border-bottom: var(--theme--border-width) solid
+    var(--theme--border-color-subdued);
   gap: 8px;
 }
 
@@ -563,7 +714,8 @@ watch(
 
 .pane-search {
   padding: 8px;
-  border-bottom: var(--theme--border-width) solid var(--theme--border-color-subdued);
+  border-bottom: var(--theme--border-width) solid
+    var(--theme--border-color-subdued);
 }
 
 .pane-list {
@@ -579,7 +731,8 @@ watch(
   padding: 9px 12px;
   cursor: pointer;
   transition: background 0.12s ease;
-  border-bottom: var(--theme--border-width) solid var(--theme--border-color-subdued);
+  border-bottom: var(--theme--border-width) solid
+    var(--theme--border-color-subdued);
   gap: 8px;
 }
 
