@@ -1,7 +1,12 @@
 import { query, param } from 'express-validator';
 
 const VALID_LANG_CODES = ['de', 'de-CH', 'en', 'nl'];
-const VALID_SORT_VALUES = ['name', '-name', 'date_updated', '-date_updated'];
+const VALID_SORT_VALUES = [
+  'name', '-name',
+  'date_updated', '-date_updated',
+  'object_id', '-object_id',
+  'season', '-season',
+];
 
 export const listHotelsSchema = [
   query('page')
@@ -26,6 +31,38 @@ export const listHotelsSchema = [
     .isInt({ min: 1 })
     .withMessage('country must be a positive integer ID'),
 
+  query('hotel_group')
+    .optional()
+    .isUUID()
+    .withMessage('hotel_group must be a valid UUID'),
+
+  query('hotel_classification')
+    .optional()
+    .isUUID()
+    .withMessage('hotel_classification must be a valid UUID'),
+
+  query('region')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('region must be a positive integer ID'),
+
+  query('state')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('state must be a positive integer ID'),
+
+  query('activity')
+    .optional()
+    .isUUID()
+    .withMessage('activity must be a valid UUID'),
+
+  query('season')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage('season must be a string (max 50 chars)'),
+
   query('lang')
     .optional()
     .isIn(VALID_LANG_CODES)
@@ -45,12 +82,6 @@ export const listHotelsSchema = [
     .optional()
     .isISO8601()
     .withMessage('updated_after must be a valid ISO 8601 date-time'),
-
-  query('fields')
-    .optional()
-    .isString()
-    .trim()
-    .withMessage('fields must be a comma-separated string'),
 ];
 
 export const getHotelDetailSchema = [

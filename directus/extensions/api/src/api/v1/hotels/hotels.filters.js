@@ -1,10 +1,15 @@
 import { AppError } from '../../shared/AppError.js';
 import { HTTP_STATUS } from '../../shared/constants.js';
 
-const SORT_ALLOWLIST = new Set(['name', '-name', 'date_updated', '-date_updated']);
+const SORT_ALLOWLIST = new Set([
+  'name', '-name',
+  'date_updated', '-date_updated',
+  'object_id', '-object_id',
+  'season', '-season',
+]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function buildListFilter({ search, country }) {
+export function buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season }) {
   const filter = {
     status_primarix: { _eq: 'published' },
   };
@@ -18,6 +23,30 @@ export function buildListFilter({ search, country }) {
 
   if (country) {
     filter.country = { id: { _eq: parseInt(country, 10) } };
+  }
+
+  if (hotel_group) {
+    filter.hotel_group = { id: { _eq: hotel_group } };
+  }
+
+  if (hotel_classification) {
+    filter.hotel_classification = { id: { _eq: hotel_classification } };
+  }
+
+  if (region) {
+    filter.region = { id: { _eq: parseInt(region, 10) } };
+  }
+
+  if (state) {
+    filter.state = { id: { _eq: parseInt(state, 10) } };
+  }
+
+  if (activity) {
+    filter.hotel_activities = { activities_id: { id: { _eq: activity } } };
+  }
+
+  if (season) {
+    filter.season = { _eq: season };
   }
 
   return filter;

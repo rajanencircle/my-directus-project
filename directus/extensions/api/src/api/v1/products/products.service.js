@@ -15,14 +15,14 @@ const LIMITED_FIELDS = [
  * so the product transformer can route to the correct per-type shaper.
  */
 export async function listProducts(
-  { page, limit, offset, search, country, sort, updated_after },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
   const { ItemsService } = services;
   const hotelsService = new ItemsService(HOTELS_COLLECTION, { knex: database, schema });
 
-  const listFilter = buildListFilter({ search, country });
+  const listFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season });
   const deltaFilter = buildUpdatedAfterFilter(updated_after);
   const filter = listFilter && deltaFilter
     ? { _and: [listFilter, deltaFilter] }
@@ -59,14 +59,14 @@ export async function listProducts(
 }
 
 export async function listProductsLimited(
-  { page, limit, offset, search, country, sort, updated_after },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
   const { ItemsService } = services;
   const hotelsService = new ItemsService(HOTELS_COLLECTION, { knex: database, schema });
 
-  const listFilter = buildListFilter({ search, country });
+  const listFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season });
   const deltaFilter = buildUpdatedAfterFilter(updated_after);
   const filter = listFilter && deltaFilter
     ? { _and: [listFilter, deltaFilter] }

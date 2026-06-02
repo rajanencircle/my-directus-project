@@ -67,7 +67,7 @@
                 {
                   "key": "search",
                   "value": "",
-                  "description": "Full-text search on hotel name (max 200 chars)",
+                  "description": "Case-insensitive search across hotel name and teaser (max 200 chars)",
                   "disabled": true
                 },
                 {
@@ -77,9 +77,45 @@
                   "disabled": true
                 },
                 {
+                  "key": "region",
+                  "value": "",
+                  "description": "Filter by region ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "state",
+                  "value": "",
+                  "description": "Filter by state ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "hotel_group",
+                  "value": "",
+                  "description": "Filter by hotel group UUID",
+                  "disabled": true
+                },
+                {
+                  "key": "hotel_classification",
+                  "value": "",
+                  "description": "Filter by hotel classification UUID",
+                  "disabled": true
+                },
+                {
+                  "key": "activity",
+                  "value": "",
+                  "description": "Filter by activity UUID — returns hotels with this activity linked",
+                  "disabled": true
+                },
+                {
+                  "key": "season",
+                  "value": "",
+                  "description": "Filter by season string (e.g. 2026)",
+                  "disabled": true
+                },
+                {
                   "key": "sort",
                   "value": "-date_updated",
-                  "description": "name | -name | date_updated | -date_updated",
+                  "description": "name | -name | date_updated | -date_updated | object_id | -object_id | season | -season",
                   "disabled": true
                 },
                 {
@@ -90,7 +126,7 @@
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of hotels — only `id`, `object_id`, `name`, and `date_updated`. Use for listing pages and sync operations. No `lang` param needed (no translations in response)."
+            "description": "Returns a minimal paginated list of hotels — only `id`, `object_id`, `name`, and `date_updated`. No `lang` param needed (no translations in response).\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": [
             {
@@ -146,7 +182,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "products"]
             },
-            "description": "Returns a live catalog of all product types with real published item counts and route URLs. No query parameters."
+            "description": "Returns a live catalog of all product types with real published item counts and route URLs. No query parameters required."
           },
           "response": [
             {
@@ -185,30 +221,66 @@
                 {
                   "key": "search",
                   "value": "",
-                  "description": "Full-text search",
+                  "description": "Case-insensitive search across name and teaser (max 200 chars)",
                   "disabled": true
                 },
                 {
                   "key": "country",
                   "value": "",
-                  "description": "Filter by country ID",
+                  "description": "Filter by country ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "region",
+                  "value": "",
+                  "description": "Filter by region ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "state",
+                  "value": "",
+                  "description": "Filter by state ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "hotel_group",
+                  "value": "",
+                  "description": "Filter by hotel group UUID",
+                  "disabled": true
+                },
+                {
+                  "key": "hotel_classification",
+                  "value": "",
+                  "description": "Filter by hotel classification UUID",
+                  "disabled": true
+                },
+                {
+                  "key": "activity",
+                  "value": "",
+                  "description": "Filter by activity UUID",
+                  "disabled": true
+                },
+                {
+                  "key": "season",
+                  "value": "",
+                  "description": "Filter by season string (e.g. 2026)",
                   "disabled": true
                 },
                 {
                   "key": "sort",
                   "value": "-date_updated",
-                  "description": "name | -name | date_updated | -date_updated",
+                  "description": "name | -name | date_updated | -date_updated | object_id | -object_id | season | -season",
                   "disabled": true
                 },
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync filter",
+                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
                   "disabled": true
                 }
               ]
             },
-            "description": "Returns full product detail (all fields) for all product types in a single paginated list. Currently includes hotels only. Equivalent to the previous `/api/v1/products` endpoint."
+            "description": "Returns full product detail (all fields) for all product types in a single paginated list. Currently includes hotels only.\n\n**Filters:** lang, search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": []
         },
@@ -234,30 +306,66 @@
                 {
                   "key": "search",
                   "value": "",
-                  "description": "Full-text search",
+                  "description": "Case-insensitive search across name and teaser (max 200 chars)",
                   "disabled": true
                 },
                 {
                   "key": "country",
                   "value": "",
-                  "description": "Filter by country ID",
+                  "description": "Filter by country ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "region",
+                  "value": "",
+                  "description": "Filter by region ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "state",
+                  "value": "",
+                  "description": "Filter by state ID (integer)",
+                  "disabled": true
+                },
+                {
+                  "key": "hotel_group",
+                  "value": "",
+                  "description": "Filter by hotel group UUID",
+                  "disabled": true
+                },
+                {
+                  "key": "hotel_classification",
+                  "value": "",
+                  "description": "Filter by hotel classification UUID",
+                  "disabled": true
+                },
+                {
+                  "key": "activity",
+                  "value": "",
+                  "description": "Filter by activity UUID",
+                  "disabled": true
+                },
+                {
+                  "key": "season",
+                  "value": "",
+                  "description": "Filter by season string (e.g. 2026)",
                   "disabled": true
                 },
                 {
                   "key": "sort",
                   "value": "-date_updated",
-                  "description": "name | -name | date_updated | -date_updated",
+                  "description": "name | -name | date_updated | -date_updated | object_id | -object_id | season | -season",
                   "disabled": true
                 },
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync filter",
+                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
                   "disabled": true
                 }
               ]
             },
-            "description": "Lightweight product list across all types — only `type`, `id`, `object_id`, `name`, `status`, `date_created`, `date_updated`. No `lang` param (no translations). Use for indexing, search, selection, and sync."
+            "description": "Lightweight product list — only `type`, `id`, `object_id`, `name`, `status`, `date_created`, `date_updated`. No `lang` param.\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": [
             {

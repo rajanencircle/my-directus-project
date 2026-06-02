@@ -353,31 +353,66 @@ export const openapiSpec = {
         parameters: [
           {
             in: "query",
+            name: "search",
+            schema: { type: "string", maxLength: 200 },
+            description: "Case-insensitive search across hotel name and teaser description.",
+          },
+          {
+            in: "query",
             name: "country",
             schema: { type: "integer", minimum: 1 },
             description: "Filter by country ID.",
           },
           {
             in: "query",
-            name: "search",
-            schema: { type: "string", maxLength: 200 },
-            description: "Full-text search on hotel name.",
+            name: "region",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by region ID.",
+          },
+          {
+            in: "query",
+            name: "state",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by state ID.",
+          },
+          {
+            in: "query",
+            name: "hotel_group",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by hotel group UUID.",
+          },
+          {
+            in: "query",
+            name: "hotel_classification",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by hotel classification UUID.",
+          },
+          {
+            in: "query",
+            name: "activity",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by activity UUID — returns hotels that have this activity linked.",
+          },
+          {
+            in: "query",
+            name: "season",
+            schema: { type: "string", maxLength: 50 },
+            description: "Filter by season string (e.g. `2026`).",
           },
           {
             in: "query",
             name: "sort",
             schema: {
               type: "string",
-              enum: ["name", "-name", "date_updated", "-date_updated"],
+              enum: ["name", "-name", "date_updated", "-date_updated", "object_id", "-object_id", "season", "-season"],
             },
-            description: "Default: -date_updated",
+            description: "Default: `-date_updated`",
           },
           {
             in: "query",
             name: "updated_after",
             schema: { type: "string", format: "date-time" },
-            description:
-              "Delta sync — return only records updated after this timestamp.",
+            description: "Delta sync — return only records updated after this timestamp.",
           },
           {
             in: "query",
@@ -546,8 +581,13 @@ export const openapiSpec = {
             in: "query",
             name: "lang",
             schema: { type: "string", enum: ["de", "en", "nl", "de-CH"] },
-            description:
-              "If set, only that language is returned in all translations blocks.",
+            description: "If set, only that language is returned in all translations blocks.",
+          },
+          {
+            in: "query",
+            name: "search",
+            schema: { type: "string", maxLength: 200 },
+            description: "Case-insensitive search across name and teaser description.",
           },
           {
             in: "query",
@@ -557,18 +597,48 @@ export const openapiSpec = {
           },
           {
             in: "query",
-            name: "search",
-            schema: { type: "string", maxLength: 200 },
-            description: "Full-text search.",
+            name: "region",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by region ID.",
+          },
+          {
+            in: "query",
+            name: "state",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by state ID.",
+          },
+          {
+            in: "query",
+            name: "hotel_group",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by hotel group UUID.",
+          },
+          {
+            in: "query",
+            name: "hotel_classification",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by hotel classification UUID.",
+          },
+          {
+            in: "query",
+            name: "activity",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by activity UUID.",
+          },
+          {
+            in: "query",
+            name: "season",
+            schema: { type: "string", maxLength: 50 },
+            description: "Filter by season string (e.g. `2026`).",
           },
           {
             in: "query",
             name: "sort",
             schema: {
               type: "string",
-              enum: ["name", "-name", "date_updated", "-date_updated"],
+              enum: ["name", "-name", "date_updated", "-date_updated", "object_id", "-object_id", "season", "-season"],
             },
-            description: "Default: -date_updated",
+            description: "Default: `-date_updated`",
           },
           {
             in: "query",
@@ -650,24 +720,60 @@ export const openapiSpec = {
         parameters: [
           {
             in: "query",
+            name: "search",
+            schema: { type: "string", maxLength: 200 },
+            description: "Case-insensitive search across name and teaser description.",
+          },
+          {
+            in: "query",
             name: "country",
             schema: { type: "integer", minimum: 1 },
             description: "Filter by country ID.",
           },
           {
             in: "query",
-            name: "search",
-            schema: { type: "string", maxLength: 200 },
-            description: "Full-text search.",
+            name: "region",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by region ID.",
+          },
+          {
+            in: "query",
+            name: "state",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by state ID.",
+          },
+          {
+            in: "query",
+            name: "hotel_group",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by hotel group UUID.",
+          },
+          {
+            in: "query",
+            name: "hotel_classification",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by hotel classification UUID.",
+          },
+          {
+            in: "query",
+            name: "activity",
+            schema: { type: "string", format: "uuid" },
+            description: "Filter by activity UUID.",
+          },
+          {
+            in: "query",
+            name: "season",
+            schema: { type: "string", maxLength: 50 },
+            description: "Filter by season string (e.g. `2026`).",
           },
           {
             in: "query",
             name: "sort",
             schema: {
               type: "string",
-              enum: ["name", "-name", "date_updated", "-date_updated"],
+              enum: ["name", "-name", "date_updated", "-date_updated", "object_id", "-object_id", "season", "-season"],
             },
-            description: "Default: -date_updated",
+            description: "Default: `-date_updated`",
           },
           {
             in: "query",

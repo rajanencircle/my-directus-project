@@ -17,7 +17,7 @@ const COLLECTION = "hotels";
 const SURCHARGES_COLLECTION = "surcharges";
 
 export async function listHotels(
-  { page, limit, offset, search, country, sort, updated_after },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
@@ -27,7 +27,7 @@ export async function listHotels(
     schema,
   });
 
-  const listFilter = buildListFilter({ search, country });
+  const listFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season });
   const deltaFilter = buildUpdatedAfterFilter(updated_after);
   const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
 

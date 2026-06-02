@@ -7,10 +7,10 @@ export function createHotelsController(context) {
   return {
     async index(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, sort, updated_after } = req.query;
+      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after } = req.query;
 
       const result = await listHotels(
-        { page, limit, offset, search, country, sort, updated_after },
+        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
         context,
       );
       const data = result.data.map(({ id, object_id, name, date_updated }) => ({ id, object_id, name, date_updated }));

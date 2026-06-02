@@ -25,10 +25,10 @@ export function createProductsController(context) {
 
     async details(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, sort, lang, updated_after } = req.query;
+      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, lang, updated_after } = req.query;
 
       const result = await listProducts(
-        { page, limit, offset, search, country, sort, updated_after },
+        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
         context,
       );
 
@@ -43,10 +43,10 @@ export function createProductsController(context) {
 
     async limitedList(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, sort, updated_after } = req.query;
+      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after } = req.query;
 
       const result = await listProductsLimited(
-        { page, limit, offset, search, country, sort, updated_after },
+        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
         context,
       );
 
