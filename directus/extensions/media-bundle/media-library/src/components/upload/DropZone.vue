@@ -22,16 +22,16 @@
     <transition name="slide-up">
       <div v-if="uploads.length > 0" class="upload-progress-panel">
         <div class="panel-header">
-          <span>Uploading {{ uploads.length }} file{{ uploads.length !== 1 ? 's' : '' }}</span>
+          <span
+            >Uploading {{ uploads.length }} file{{
+              uploads.length !== 1 ? "s" : ""
+            }}</span
+          >
           <v-button x-small icon @click="clearCompleted">
             <v-icon name="close" x-small />
           </v-button>
         </div>
-        <div
-          v-for="upload in uploads"
-          :key="upload.name"
-          class="upload-item"
-        >
+        <div v-for="upload in uploads" :key="upload.name" class="upload-item">
           <span class="upload-name">{{ upload.name }}</span>
           <span class="upload-percent">{{ upload.progress }}%</span>
           <div class="progress-bar-track">
@@ -48,124 +48,132 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useApi } from '@directus/extensions-sdk'
-import { useFilesStore } from '../../stores/files.store'
+import { ref } from "vue";
+import { useApi } from "@directus/extensions-sdk";
+import { useFilesStore } from "../../stores/files.store";
 
 export interface UploadAdapter {
-  upload(file: File, folder: string | null, onProgress: (pct: number) => void): Promise<void>
+  upload(
+    file: File,
+    folder: string | null,
+    onProgress: (pct: number) => void,
+  ): Promise<void>;
 }
 
-type ApiInstance = ReturnType<typeof useApi>
+type ApiInstance = ReturnType<typeof useApi>;
 
 class DirectusUploadAdapter implements UploadAdapter {
-  private api: ApiInstance
+  private api: ApiInstance;
 
   constructor(api: ApiInstance) {
-    this.api = api
+    this.api = api;
   }
 
-  async upload(file: File, folder: string | null, onProgress: (pct: number) => void): Promise<void> {
-    const form = new FormData()
-    form.append('file', file)
-    if (folder) form.append('folder', folder)
+  async upload(
+    file: File,
+    folder: string | null,
+    onProgress: (pct: number) => void,
+  ): Promise<void> {
+    const form = new FormData();
+    form.append("file", file);
+    if (folder) form.append("folder", folder);
 
-    await this.api.post('/files', form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    await this.api.post("/files", form, {
+      headers: { "Content-Type": "multipart/form-data" },
       onUploadProgress: (evt) => {
         if (evt.total) {
-          onProgress(Math.round((evt.loaded / evt.total) * 100))
+          onProgress(Math.round((evt.loaded / evt.total) * 100));
         }
       },
-    })
+    });
   }
 }
 
 const props = withDefaults(
   defineProps<{
-    folderId?: string | null
-    adapter?: UploadAdapter
+    folderId?: string | null;
+    adapter?: UploadAdapter;
   }>(),
   {
     folderId: null,
     adapter: undefined,
-  }
-)
+  },
+);
 
 const emit = defineEmits<{
-  'upload-progress': [name: string, percent: number]
-  'upload-complete': []
-}>()
+  "upload-progress": [name: string, percent: number];
+  "upload-complete": [];
+}>();
 
-const filesStore = useFilesStore()
+const filesStore = useFilesStore();
 
-const _defaultAdapter: UploadAdapter = new DirectusUploadAdapter(useApi())
+const _defaultAdapter: UploadAdapter = new DirectusUploadAdapter(useApi());
 
 function getAdapter(): UploadAdapter {
-  return props.adapter ?? _defaultAdapter
+  return props.adapter ?? _defaultAdapter;
 }
 
 interface UploadItem {
-  name: string
-  progress: number
-  error: boolean
+  name: string;
+  progress: number;
+  error: boolean;
 }
 
-const isDragging = ref(false)
-const uploads = ref<UploadItem[]>([])
-let dragCounter = 0
+const isDragging = ref(false);
+const uploads = ref<UploadItem[]>([]);
+let dragCounter = 0;
 
 function onDragEnter() {
-  dragCounter++
-  isDragging.value = true
+  dragCounter++;
+  isDragging.value = true;
 }
 
 function onDragLeave() {
-  dragCounter--
+  dragCounter--;
   if (dragCounter <= 0) {
-    dragCounter = 0
-    isDragging.value = false
+    dragCounter = 0;
+    isDragging.value = false;
   }
 }
 
 async function onDrop(evt: DragEvent) {
-  isDragging.value = false
-  dragCounter = 0
+  isDragging.value = false;
+  dragCounter = 0;
 
-  const files = Array.from(evt.dataTransfer?.files ?? [])
-  if (files.length === 0) return
+  const files = Array.from(evt.dataTransfer?.files ?? []);
+  if (files.length === 0) return;
 
-  const adapter = getAdapter()
+  const adapter = getAdapter();
 
   const items: UploadItem[] = files.map((f) => ({
     name: f.name,
     progress: 0,
     error: false,
-  }))
-  uploads.value.push(...items)
+  }));
+  uploads.value.push(...items);
 
   await Promise.all(
     files.map(async (file, idx) => {
-      const item = items[idx]
+      const item = items[idx];
       try {
         await adapter.upload(file, props.folderId ?? null, (pct) => {
-          item.progress = pct
-          emit('upload-progress', file.name, pct)
-        })
-        item.progress = 100
+          item.progress = pct;
+          emit("upload-progress", file.name, pct);
+        });
+        item.progress = 100;
       } catch (err) {
-        item.error = true
-        console.warn('[media-library] Upload failed:', file.name, err)
+        item.error = true;
+        console.warn("[media-library] Upload failed:", file.name, err);
       }
-    })
-  )
+    }),
+  );
 
-  emit('upload-complete')
-  await filesStore.fetchFiles()
+  emit("upload-complete");
+  await filesStore.fetchFiles();
 }
 
 function clearCompleted() {
-  uploads.value = uploads.value.filter((u) => u.progress < 100 && !u.error)
+  uploads.value = uploads.value.filter((u) => u.progress < 100 && !u.error);
 }
 </script>
 
@@ -175,6 +183,7 @@ function clearCompleted() {
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 0 !important;
 }
 
 .drop-overlay {
@@ -281,7 +290,9 @@ function clearCompleted() {
 
 .slide-up-enter-active,
 .slide-up-leave-active {
-  transition: transform 0.2s, opacity 0.2s;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
 }
 .slide-up-enter-from,
 .slide-up-leave-to {
