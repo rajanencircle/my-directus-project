@@ -2,7 +2,7 @@
   "name": "media-share-validate",
   "version": "1.0.0",
   "scripts": {
-    "build": "directus-extension build",
+    "build:standalone": "directus-extension build",
     "dev": "directus-extension build --watch"
   },
   "devDependencies": {

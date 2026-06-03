@@ -5,7 +5,7 @@
   "type": "module",
   "keywords": ["directus", "directus-extension", "directus-extension-interface", "media", "albums"],
   "scripts": {
-    "build": "directus-extension build",
+    "build:standalone": "directus-extension build",
     "dev": "directus-extension build -w --no-minify"
   },
   "devDependencies": {
