@@ -97,10 +97,78 @@ const routeConfig: RouteConfig[] = [
       hideLabels: {
         fields: [
           "partner_type",
-          "booking_partners",
           "booking_partner",
           "partner",
           "item_preview_button",
+          "image_badge_translations",
+          "hotel_descriptions_translations",
+          "price_info_translations",
+          "save_and_stay_price",
+          "save_and_stay_surcharge",
+        ],
+      },
+      addClasses: [],
+      tabGroupRawStyles: [
+        {
+          tabIds: ["master_data_group"],
+          styles: {
+            "background-color": "transparent",
+            padding: "0px",
+            border: "0px solid #E5E7EB",
+          },
+        },
+      ],
+    },
+  },
+  {
+    path: "/content/cruises",
+    children: true,
+    actions: {
+      hideLabels: {
+        fields: [
+          "partner_type",
+          "booking_partner",
+          "partner",
+          "item_preview_button",
+          "translations",
+          "price_infos_translations",
+          "travel_program_translations",
+          "image_badge_translations",
+          "save_and_stay_price",
+          "save_and_stay_surcharge",
+        ],
+      },
+      addClasses: [],
+      tabGroupRawStyles: [
+        {
+          tabIds: ["master_data_group"],
+          styles: {
+            "background-color": "transparent",
+            padding: "0px",
+            border: "0px solid #E5E7EB",
+          },
+        },
+      ],
+    },
+  },
+  {
+    path: "/content/tours",
+    children: true,
+    actions: {
+      hideLabels: {
+        fields: [
+          "partner_type",
+          "booking_partner",
+          "partner",
+          "item_preview_button",
+          "image_badge_translations",
+          "save_and_stay_surcharge",
+          "tours_description_translations",
+          "tours_dates_translations",
+          "price_info",
+          "tour_prices",
+          "tours_specials",
+          "image_badge_translations",
         ],
       },
       addClasses: [],
@@ -137,6 +205,7 @@ const routeConfig: RouteConfig[] = [
       ],
     },
   },
+
   // {
   //   // Demo 3: Add a visual indicator class to a specific field
   //   path: '/content/bookings',
