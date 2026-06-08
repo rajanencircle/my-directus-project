@@ -66,6 +66,20 @@ export default defineInterface({
       schema: { default_value: '' },
     },
 
+    // ─── From-Price Field ─────────────────────────────────────────────────────
+    {
+      field: 'fromPriceField',
+      name: 'From-Price Field Name',
+      type: 'string',
+      meta: {
+        width: 'full',
+        interface: 'input',
+        note: 'Field on the related item that acts as the "from price" boolean toggle. Defaults to from_price. Set to price_category_start for Tours price categories.',
+        options: { placeholder: 'from_price' },
+      },
+      schema: { default_value: 'from_price' },
+    },
+
     // ─── Search ───────────────────────────────────────────────────────────────
     {
       field: 'searchPlaceholder',

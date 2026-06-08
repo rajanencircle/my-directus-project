@@ -2,7 +2,7 @@
   "name": "media-share-viewer",
   "version": "1.0.0",
   "scripts": {
-    "build:standalone": "directus-extension build",
+    "build": "directus-extension build",
     "dev": "directus-extension build --watch"
   },
   "devDependencies": {

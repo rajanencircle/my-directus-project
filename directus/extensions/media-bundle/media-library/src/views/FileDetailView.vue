@@ -52,6 +52,18 @@
         </v-card>
       </v-dialog>
 
+      <!-- Share -->
+      <v-button
+        v-if="file"
+        v-tooltip.bottom="lbl('share', 'Share')"
+        icon
+        rounded
+        secondary
+        @click="shareDialogActive = true"
+      >
+        <v-icon name="share" />
+      </v-button>
+
       <!-- Copy URL -->
       <v-button
         v-if="file"
@@ -163,6 +175,103 @@
 
     </div>
 
+    <!-- Share dialog -->
+    <v-dialog v-model="shareDialogActive" @esc="shareDialogActive = false" :persistent="shareCreating">
+      <v-card>
+        <v-card-title>
+          <v-icon name="share" left />
+          {{ lbl('shareTitle', 'Share File') }}
+        </v-card-title>
+
+        <template v-if="!shareUrl">
+          <v-card-text>
+            <v-notice type="info" class="share-hint">
+              {{ lbl('shareHint', 'A link will be generated. Optionally protect it with a password or set an expiry date.') }}
+            </v-notice>
+
+            <div class="share-fields">
+              <div class="share-field">
+                <div class="label type-label">
+                  {{ lbl('sharePasswordLabel', 'Password') }}
+                  <span class="share-optional">— {{ t('optional') }}</span>
+                </div>
+                <v-input
+                  v-model="sharePassword"
+                  type="password"
+                  :placeholder="lbl('sharePasswordPlaceholder', 'Leave blank for no password')"
+                  :disabled="shareCreating"
+                  autocomplete="off"
+                />
+              </div>
+
+              <div class="share-field">
+                <div class="label type-label">
+                  {{ lbl('shareExpiryLabel', 'Expiry Date') }}
+                  <span class="share-optional">— {{ t('optional') }}</span>
+                </div>
+                <v-input
+                  v-model="shareExpiryDate"
+                  type="datetime-local"
+                  :disabled="shareCreating"
+                />
+              </div>
+
+              <div class="share-field">
+                <div class="label type-label">
+                  {{ lbl('shareEmailLabel', 'Share via Email') }}
+                  <span class="share-optional">— {{ t('optional') }}</span>
+                </div>
+                <v-input
+                  v-model="shareEmailsRaw"
+                  :placeholder="lbl('shareEmailPlaceholder', 'email@example.com, another@example.com')"
+                  :disabled="shareCreating"
+                />
+                <p class="share-note">{{ lbl('shareEmailHint', 'Separate multiple addresses with commas') }}</p>
+              </div>
+            </div>
+
+            <v-notice v-if="shareError" type="danger" class="share-error">{{ shareError }}</v-notice>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-button secondary :disabled="shareCreating" @click="closeShareDialog">{{ t('cancel') }}</v-button>
+            <v-button :loading="shareCreating" @click="createShareLink">
+              <v-icon name="link" left />
+              {{ lbl('shareCreateBtn', 'Create Link') }}
+            </v-button>
+          </v-card-actions>
+        </template>
+
+        <template v-else>
+          <v-card-text>
+            <v-notice type="success" class="share-hint">
+              {{ lbl('shareSuccess', 'Share link created successfully!') }}
+            </v-notice>
+
+            <div class="share-fields">
+              <div class="share-field">
+                <div class="label type-label">{{ lbl('shareUrlLabel', 'Share URL') }}</div>
+                <v-input :model-value="shareUrl" readonly>
+                  <template #append>
+                    <v-icon
+                      :name="shareCopied ? 'check' : 'content_copy'"
+                      clickable
+                      :title="lbl('shareCopyUrl', 'Copy URL')"
+                      @click="copyShareUrl"
+                    />
+                  </template>
+                </v-input>
+              </div>
+            </div>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-button @click="closeShareDialog">{{ t('done') }}</v-button>
+          </v-card-actions>
+        </template>
+      </v-card>
+    </v-dialog>
+
     <!-- Unsaved changes dialog -->
     <v-dialog v-model="confirmLeave" @esc="confirmLeave = false">
       <v-card>
@@ -218,6 +327,16 @@ const moveToDialogActive = ref(false)
 const selectedFolder = ref<string | null>(null)
 const confirmLeave = ref(false)
 const pendingLeave = ref<string | null>(null)
+
+// ── Share state ────────────────────────────────────────────────────
+const shareDialogActive = ref(false)
+const sharePassword = ref('')
+const shareExpiryDate = ref('')
+const shareEmailsRaw = ref('')
+const shareCreating = ref(false)
+const shareError = ref('')
+const shareUrl = ref('')
+const shareCopied = ref(false)
 
 
 // ── Computed ───────────────────────────────────────────────────────
@@ -439,6 +558,75 @@ async function copyAssetUrl() {
   await navigator.clipboard.writeText(getAssetUrl(file.value.id))
 }
 
+// ── Share actions ──────────────────────────────────────────────────
+function closeShareDialog() {
+  shareDialogActive.value = false
+  sharePassword.value = ''
+  shareExpiryDate.value = ''
+  shareEmailsRaw.value = ''
+  shareError.value = ''
+  shareUrl.value = ''
+  shareCopied.value = false
+}
+
+function parseShareEmails(raw: string): string[] {
+  return raw
+    .split(/[\s,;]+/)
+    .map(e => e.trim())
+    .filter(e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
+}
+
+async function createShareLink() {
+  if (!file.value) return
+  shareCreating.value = true
+  shareError.value = ''
+
+  try {
+    const payload: Record<string, any> = {
+      status: 'published',
+      file: file.value.id,
+    }
+    if (sharePassword.value) payload.password = sharePassword.value
+    if (shareExpiryDate.value) payload.expired_date = shareExpiryDate.value
+
+    const { data } = await api.post('/items/media_share_link', payload)
+    const shareId = data.data.id
+    const url = `${window.location.origin}/media-share-validate/view/${shareId}/`
+
+    try {
+      await api.patch(`/items/media_share_link/${shareId}`, { link: url })
+    } catch (patchErr: any) {
+      console.error('[FileDetailView] PATCH share link failed', patchErr?.response?.data ?? patchErr)
+    }
+
+    shareUrl.value = url
+
+    const emails = parseShareEmails(shareEmailsRaw.value)
+    if (emails.length > 0) {
+      try {
+        await api.post('/media-share-validate/notify', { shareUrl: url, emails })
+      } catch (mailErr: any) {
+        console.error('[FileDetailView] notify failed', mailErr?.response?.data ?? mailErr)
+      }
+    }
+  } catch (err: any) {
+    console.error('[FileDetailView] create share link failed', err?.response?.data ?? err)
+    shareError.value = err?.response?.data?.errors?.[0]?.message ?? 'Failed to create share link.'
+  } finally {
+    shareCreating.value = false
+  }
+}
+
+async function copyShareUrl() {
+  try {
+    await navigator.clipboard.writeText(shareUrl.value)
+    shareCopied.value = true
+    setTimeout(() => { shareCopied.value = false }, 2000)
+  } catch {
+    /* no-op */
+  }
+}
+
 // ── Helpers ────────────────────────────────────────────────────────
 function isImageType(mimeType: string): boolean {
   return mimeType?.startsWith('image/') ?? false
@@ -580,6 +768,38 @@ function formatDate(isoString: string): string {
 
 .download-preset-btn {
   width: 100%;
+}
+
+/* ── Share dialog ─────────────────────────────────────────────────── */
+.share-hint {
+  margin-bottom: var(--theme--form--row-gap);
+}
+
+.share-error {
+  margin-top: var(--theme--form--row-gap);
+}
+
+.share-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--theme--form--row-gap);
+}
+
+.share-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.share-optional {
+  font-weight: 400;
+  color: var(--theme--foreground-subdued);
+}
+
+.share-note {
+  font-size: 12px;
+  color: var(--theme--foreground-subdued);
+  margin: 0;
 }
 
 </style>

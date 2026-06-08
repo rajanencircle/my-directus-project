@@ -6,11 +6,9 @@ import { resolveTranslatable } from './utils/translations';
 import MediaGrid from './components/MediaGrid.vue';
 import UploadModal from './components/UploadModal.vue';
 import AddExistingModal from './components/AddExistingModal.vue';
-import FileDetailsDrawer from './components/FileDetailsDrawer.vue';
 import {
-  buildAssetDownloadUrl,
   parseDownloadFormatPresets,
-  triggerDownload,
+  downloadFileViaApi,
 } from './utils/downloadPresets';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -240,7 +238,7 @@ const deleteLoading = ref(false);
 
 const defaultFolder = ref<string | null>(null);
 
-const selectedRow = ref<JunctionRow | null>(null);
+const selectedFileId = ref<string | null>(null);
 
 // Draft rows for form state (staged until parent record Save).
 // This is what drives the UI, and what we emit back to Directus.
@@ -499,27 +497,14 @@ function cancelDelete() {
 
 // ─── Drawer ───────────────────────────────────────────────────────────────────
 
-async function openDetails(row: JunctionRow) {
-  // If this is a staged (unsaved) row, it might not have a junction id yet.
-  // In that case, just open with the local row data.
-  if (!row?.id || String(row.id).startsWith('tmp:')) {
-    selectedRow.value = row;
-    return;
-  }
-
-  // Otherwise refresh the selected junction row with expanded file.
-  try {
-    const res = await api.get(`/items/${junctionTable.value}/${row.id}`, {
-      params: { fields: ['*', `${filesFkField.value}.*`] },
-    });
-    selectedRow.value = res.data?.data ?? row;
-  } catch {
-    selectedRow.value = row;
-  }
+function openDetails(row: JunctionRow) {
+  const file = row[filesFkField.value];
+  const id = file?.id;
+  if (id) selectedFileId.value = String(id);
 }
 
 function closeDetails() {
-  selectedRow.value = null;
+  selectedFileId.value = null;
 }
 
 // ─── Download All ─────────────────────────────────────────────────────────────
@@ -532,15 +517,9 @@ function downloadAll(presetIndex: number) {
   rowsDraft.value.forEach((row, i) => {
     const file = row[filesFkField.value];
     if (!file?.id) return;
-    const url = buildAssetDownloadUrl(
-      String(file.id),
-      preset,
-      file.type,
-      file.filename_download
-    );
     setTimeout(() => {
-      triggerDownload(url, file.filename_download);
-    }, i * 150);
+      downloadFileViaApi(api, String(file.id), preset, file.type, file.filename_download);
+    }, i * 300);
   });
 }
 
@@ -726,14 +705,13 @@ watch(
       @linked="(fileIds: string[]) => { showAddExistingModal = false; stageAddFileIds(fileIds); }"
     />
 
-    <FileDetailsDrawer
-      v-if="selectedRow?.[filesFkField]?.id"
-      :file-id="String(selectedRow[filesFkField].id)"
-      :initial-file="selectedRow?.[filesFkField] ?? null"
-      :file-reverse-links="file_reverse_links"
-      :download-format-presets="download_format_presets"
-      :readonly="effectiveReadonly"
-      @close="closeDetails"
+    <drawer-item
+      v-if="selectedFileId"
+      :active="true"
+      collection="directus_files"
+      :primary-key="selectedFileId"
+      :edits="{}"
+      @update:active="closeDetails"
     />
 
     <!-- Delete confirmation dialog -->
@@ -784,6 +762,8 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .header-title {
@@ -792,11 +772,13 @@ watch(
   color: var(--theme--foreground-subdued);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
 }
 

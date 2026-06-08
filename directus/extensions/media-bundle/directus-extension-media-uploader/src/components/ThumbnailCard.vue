@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useApi } from '@directus/extensions-sdk';
 import { useT } from '../composables/useT';
 import ExpiryInfoDialog from './ExpiryInfoDialog.vue';
 import ShareModal from './ShareModal.vue';
 import { isExpired } from '../utils/expiry';
 import {
-  buildAssetDownloadUrl,
   parseDownloadFormatPresets,
-  triggerDownload,
+  downloadFileViaApi,
 } from '../utils/downloadPresets';
 import { supportsMultiFormatDownload } from '../utils/fileType';
 import FileThumbPreview from './FileThumbPreview.vue';
@@ -56,6 +56,7 @@ const displayName = computed(
 
 const downloadFormats = computed(() => parseDownloadFormatPresets(props.downloadFormatPresets));
 
+const api = useApi();
 const { t } = useT();
 
 const expiryDialogOpen = ref(false);
@@ -109,24 +110,21 @@ function openInNewTab() {
 function openEditInNewTab() {
   const id = file.value?.id;
   if (!id) return;
-  window.open(`/admin/files/${id}`, '_blank', 'noopener,noreferrer');
+  window.open(`/admin/media-library/${id}`, '_blank', 'noopener,noreferrer');
 }
 
-function downloadAs(presetIndex: number) {
+async function downloadAs(presetIndex: number) {
   const id = file.value?.id;
   if (!id) return;
   const preset = downloadFormats.value[presetIndex];
   if (!preset) return;
-  triggerDownload(
-    buildAssetDownloadUrl(id, preset, file.value?.type, file.value?.filename_download),
-    file.value?.filename_download ?? ''
-  );
+  await downloadFileViaApi(api, id, preset, file.value?.type, file.value?.filename_download);
 }
 
-function downloadDirect() {
+async function downloadDirect() {
   const id = file.value?.id;
   if (!id) return;
-  triggerDownload(`/assets/${id}?download`, file.value?.filename_download ?? '');
+  await downloadFileViaApi(api, id, {}, file.value?.type, file.value?.filename_download);
 }
 </script>
 

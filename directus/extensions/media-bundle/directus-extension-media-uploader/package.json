@@ -8,7 +8,7 @@
     "directus-custom-interface"
   ],
   "scripts": {
-    "build:standalone": "directus-extension build",
+    "build": "directus-extension build",
     "dev": "directus-extension build -w --no-minify"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, getCurrentInstance } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+import { useI18n } from 'vue-i18n';
 import { useApi, useStores } from "@directus/extensions-sdk";
 
 type ItemId = string | number;
@@ -28,9 +29,7 @@ interface SelectedGroupState {
   fromPriceTrue: boolean;
 }
 
-const instance = getCurrentInstance();
-const t = (key: string): string =>
-  instance?.appContext.config.globalProperties.$t?.(key) ?? key;
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -40,6 +39,7 @@ const props = withDefaults(
     collection: string;
     displayTemplate?: string;
     groupFields?: string;
+    fromPriceField?: string;
     translationsField?: string;
     translationLocaleCodePath?: string;
     leftPaneLabel?: string;
@@ -56,6 +56,7 @@ const props = withDefaults(
   {
     displayTemplate: "{{name}}",
     groupFields: "",
+    fromPriceField: "from_price",
     translationsField: "",
     translationLocaleCodePath: "translations_id.code",
     leftPaneLabel: "Available",
@@ -156,7 +157,6 @@ function getNestedValue(obj: any, path: string): any {
 
 function resolveLocalePath(): string {
   const raw = props.translationLocaleCodePath || "translations_id.code";
-  // strip accidental leading "{translationsField}." prefix (e.g. "translations.translations_id.code" → "translations_id.code")
   const prefix = (props.translationsField || "") + ".";
   return props.translationsField && raw.startsWith(prefix)
     ? raw.slice(prefix.length)
@@ -235,7 +235,8 @@ function normalizeGroupKey(item: RelatedItem): string {
 }
 
 function getFromPriceFlag(item: RelatedItem): boolean {
-  const value = item.from_price ?? item.fromPrice;
+  const fieldName = props.fromPriceField ?? 'from_price';
+  const value = item[fieldName];
   if (typeof value === "boolean") return value;
   if (typeof value === "string") return value === "true";
   if (typeof value === "number") return value === 1;

@@ -14,9 +14,8 @@ import {
   reverseTableHeaders,
 } from '../utils/fileReverseLinks';
 import {
-  buildAssetDownloadUrl,
   parseDownloadFormatPresets,
-  triggerDownload,
+  downloadFileViaApi,
 } from '../utils/downloadPresets';
 import { supportsMultiFormatDownload } from '../utils/fileType';
 
@@ -120,19 +119,16 @@ async function loadReverseLinks(fileId: string) {
   }));
 }
 
-function downloadPreset(idx: number) {
+async function downloadPreset(idx: number) {
   if (props.readonly) return;
   const preset = downloadPresets.value[idx];
   if (!preset) return;
-  triggerDownload(
-    buildAssetDownloadUrl(props.fileId, preset, props.fileType, props.filenameDownload),
-    props.filenameDownload ?? undefined
-  );
+  await downloadFileViaApi(api, props.fileId, preset, props.fileType, props.filenameDownload);
 }
 
-function downloadOriginal() {
+async function downloadOriginal() {
   if (props.readonly) return;
-  triggerDownload(`/assets/${props.fileId}?download`, props.filenameDownload ?? undefined);
+  await downloadFileViaApi(api, props.fileId, {}, props.fileType, props.filenameDownload);
 }
 
 watch(

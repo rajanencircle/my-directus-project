@@ -249,10 +249,10 @@ export default defineInterface({
         meta: {
           width: "half",
           interface: "input",
-          note: "Field on the Row Collection used as the start date for sorting and display. e.g. 'departure_date' for cruises, 'start_date' for hotels.",
-          options: { placeholder: "e.g. departure_date" },
+          note: "Field on the Row Collection used as the start date for sorting and display. e.g. 'date_departure' for cruises, 'start_date' for hotels.",
+          options: { placeholder: "e.g. date_departure" },
         },
-        schema: { default_value: "departure_date" },
+        schema: { default_value: "date_departure" },
       },
       {
         field: "rowEndDateField",
@@ -261,10 +261,10 @@ export default defineInterface({
         meta: {
           width: "half",
           interface: "input",
-          note: "Field on the Row Collection used as the end date for display. e.g. 'arrival_date' for cruises, 'end_date' for hotels.",
-          options: { placeholder: "e.g. arrival_date" },
+          note: "Field on the Row Collection used as the end date for display. e.g. 'date_arrival' for cruises, 'end_date' for hotels.",
+          options: { placeholder: "e.g. date_arrival" },
         },
-        schema: { default_value: "arrival_date" },
+        schema: { default_value: "date_arrival" },
       },
       {
         field: "occupanciesField",

@@ -88,9 +88,13 @@ export function buildAssetDownloadUrl(
   return qs ? `${base}?${qs}` : `${base}?download`;
 }
 
-export function triggerDownload(url: string, filename?: string | null) {
+export function triggerDownload(url: string, filename?: string | null, format?: string) {
   const link = document.createElement('a');
   link.href = url;
-  if (filename) link.download = filename;
+  if (filename) {
+    link.download = format
+      ? filename.replace(/\.[^.]+$/, `.${format}`)
+      : filename;
+  }
   link.click();
 }

@@ -48,19 +48,9 @@
       }
     ]
   },
-  "workspaces": [
-    "media-library",
-    "directus-extension-media-uploader",
-    "media-share-viewer",
-    "media-share-validate",
-    "directus-extension-interface-file-albums",
-    "directus-extension-file-media-extras"
-  ],
   "scripts": {
     "build": "directus-extension build",
-    "dev": "directus-extension build --watch",
-    "build:sub": "npm run build --workspaces --if-present",
-    "build:all": "npm run build:sub && npm run build"
+    "dev": "directus-extension build --watch"
   },
   "devDependencies": {
     "@directus/extensions-sdk": "^17.0.0",

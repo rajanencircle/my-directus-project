@@ -2,59 +2,44 @@
   <div class="media-share-interface">
 
     <!-- Loading -->
-    <div v-if="loading" class="share-loading">
+    <div v-if="loading" class="state-loading">
       <v-progress-circular indeterminate small />
     </div>
 
     <!-- Error -->
     <v-notice v-else-if="loadError" type="danger">{{ loadError }}</v-notice>
 
-    <!-- Shares table -->
+    <!-- Shares list -->
     <template v-else>
-      <div v-if="shares.length > 0" class="share-table">
-        <div class="share-table-header">
-          <span class="col-link">Share Link</span>
-          <span class="col-pwd">Password</span>
-          <span class="col-expiry">Expires</span>
-          <span class="col-actions"></span>
-        </div>
-
+      <div v-if="shares.length > 0" class="share-list">
         <div
           v-for="share in shares"
           :key="share.id"
-          class="share-table-row"
+          class="share-row"
         >
-          <span class="col-link share-url-cell">
-            <span class="share-url-text" :title="buildShareUrl(share.id)">
-              {{ buildShareUrl(share.id) }}
-            </span>
-          </span>
-
-          <span class="col-pwd">
+          <div class="share-row-main">
+            <code class="share-url">{{ buildShareUrl(share.id) }}</code>
+            <div class="share-meta">
+              <span v-if="share[passwordField]" class="meta-badge">
+                <v-icon name="lock" x-small />
+                Password
+              </span>
+              <span
+                v-if="share[expiryField]"
+                class="meta-badge"
+                :class="{ expired: isExpired(share[expiryField]) }"
+              >
+                <v-icon name="schedule" x-small />
+                {{ formatDate(share[expiryField]) }}
+              </span>
+            </div>
+          </div>
+          <div class="share-row-actions">
             <v-icon
-              v-if="share[passwordField]"
-              name="lock"
-              small
-              class="icon-lock"
-              v-tooltip="'Password protected'"
-            />
-            <span v-else class="no-value">—</span>
-          </span>
-
-          <span class="col-expiry">
-            <span v-if="share[expiryField]" :class="{ expired: isExpired(share[expiryField]) }">
-              {{ formatDate(share[expiryField]) }}
-            </span>
-            <span v-else class="no-value">Never</span>
-          </span>
-
-          <span class="col-actions">
-            <v-icon
-              name="content_copy"
+              :name="copiedId === share.id ? 'check_circle' : 'content_copy'"
               small
               clickable
-              class="action-icon"
-              :class="{ 'icon-copied': copiedId === share.id }"
+              :style="copiedId === share.id ? 'color: var(--theme--success)' : ''"
               v-tooltip="copiedId === share.id ? 'Copied!' : 'Copy link'"
               @click="copyLink(share.id)"
             />
@@ -62,19 +47,17 @@
               name="delete"
               small
               clickable
-              class="action-icon icon-revoke"
-              v-tooltip="'Revoke share'"
+              class="icon-delete"
+              v-tooltip="'Revoke'"
               @click="confirmRevoke(share)"
             />
-          </span>
+          </div>
         </div>
       </div>
 
-      <div v-else class="share-empty">
-        No share links yet.
-      </div>
+      <p v-else class="empty-state">No share links yet.</p>
 
-      <div class="share-footer">
+      <div class="footer">
         <v-button small secondary @click="dialogOpen = true">
           <v-icon name="add" left small />
           Create Share Link
@@ -83,69 +66,77 @@
     </template>
 
     <!-- Create share dialog -->
-    <v-dialog v-model="dialogOpen" @esc="closeDialog">
-      <v-card>
-        <v-card-title>Create Share Link</v-card-title>
+    <v-dialog v-model="dialogOpen" @esc="closeDialog" :persistent="creating">
+      <v-card style="max-width: 460px; width: 100%">
+        <v-card-title>
+          <v-icon name="share" left />
+          Create Share Link
+        </v-card-title>
 
         <v-card-text>
-          <div class="form-field">
-            <div class="form-label">Password <span class="optional">(optional)</span></div>
-            <v-input
-              v-model="newPassword"
-              type="password"
-              placeholder="Leave blank for no password"
-              :disabled="creating"
-            />
-          </div>
-
-          <div class="form-field">
-            <div class="form-label">Expires <span class="optional">(optional)</span></div>
-            <v-input
-              v-model="newExpiry"
-              type="datetime-local"
-              :disabled="creating"
-            />
-          </div>
-
-          <div class="form-field">
-            <div class="form-label">Share via Email <span class="optional">(optional)</span></div>
-            <div class="chip-input-wrap" :class="{ disabled: creating }" @click="emailInputEl?.focus()">
-              <span v-for="(email, i) in newEmails" :key="email" class="chip">
-                {{ email }}
-                <button class="chip-remove" @click.stop="removeChip(i)" :disabled="creating">×</button>
-              </span>
-              <input
-                ref="emailInputEl"
-                v-model="emailInput"
-                class="chip-text-input"
-                placeholder="Type email and press Enter"
+          <div class="fields">
+            <div class="field">
+              <div class="type-label label">
+                Password
+                <span class="subdued"> — optional</span>
+              </div>
+              <v-input
+                v-model="newPassword"
+                type="password"
+                placeholder="Leave blank for no password"
                 :disabled="creating"
-                @keydown="onEmailKeydown"
-                @blur="onEmailBlur"
+                autocomplete="off"
+                autofocus
               />
+            </div>
+
+            <div class="field">
+              <div class="type-label label">
+                Expires
+                <span class="subdued"> — optional</span>
+              </div>
+              <v-input
+                v-model="newExpiry"
+                type="datetime-local"
+                :disabled="creating"
+              />
+            </div>
+
+            <div class="field">
+              <div class="type-label label">
+                Notify via Email
+                <span class="subdued"> — optional</span>
+              </div>
+              <v-input
+                v-model="newEmailsRaw"
+                placeholder="user@example.com, other@example.com"
+                :disabled="creating"
+              />
+              <span class="type-hint subdued">Comma-separated for multiple recipients</span>
             </div>
           </div>
 
-          <v-notice v-if="createError" type="danger">{{ createError }}</v-notice>
+          <v-notice v-if="createError" type="danger" class="notice">{{ createError }}</v-notice>
         </v-card-text>
 
         <v-card-actions>
-          <v-button secondary @click="closeDialog" :disabled="creating">Cancel</v-button>
-          <v-button @click="createShare" :loading="creating">Create</v-button>
+          <v-button secondary :disabled="creating" @click="closeDialog">Cancel</v-button>
+          <v-button :loading="creating" @click="createShare">
+            <v-icon name="link" left />
+            Generate Link
+          </v-button>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <!-- Revoke confirm dialog -->
-    <v-dialog v-model="revokeDialogOpen" @esc="revokeDialogOpen = false" small>
+    <v-dialog v-model="revokeDialogOpen" @esc="revokeDialogOpen = false">
       <v-card>
         <v-card-title>Revoke Share Link?</v-card-title>
-        <v-card-text>
-          This will permanently delete the share link. Anyone with the link will lose access.
-        </v-card-text>
+        <v-card-text>This will permanently delete the share link. Anyone with the link will lose access.</v-card-text>
         <v-card-actions>
-          <v-button secondary @click="revokeDialogOpen = false" :disabled="revoking">Cancel</v-button>
-          <v-button danger @click="revokeShare" :loading="revoking">Revoke</v-button>
+          <v-button secondary :disabled="revoking" @click="revokeDialogOpen = false">Cancel</v-button>
+          <v-button kind="danger" :loading="revoking" @click="revokeShare">Revoke</v-button>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -157,14 +148,6 @@
 import { ref, watch } from 'vue';
 import { useApi } from '@directus/extensions-sdk';
 
-// Email chip helpers (module scope, no reactivity needed)
-function isValidEmail(v: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-}
-
-// value, primaryKey, collection, field — injected by Directus, not user-configurable
-// targetCollection, fileField, passwordField, expiryField — come from interface options (index.ts)
-// withDefaults ensures the component works even if an option wasn't saved yet
 const props = withDefaults(
   defineProps<{
     value?: string | null;
@@ -204,49 +187,18 @@ const loadError = ref('');
 const dialogOpen = ref(false);
 const newPassword = ref('');
 const newExpiry = ref('');
+const newEmailsRaw = ref('');
 const creating = ref(false);
 const createError = ref('');
-
-// Email chips
-const newEmails = ref<string[]>([]);
-const emailInput = ref('');
-const emailInputEl = ref<HTMLInputElement | null>(null);
-
-function addEmailChip() {
-  const val = emailInput.value.trim().replace(/[,;]$/, '');
-  if (val && isValidEmail(val) && !newEmails.value.includes(val)) {
-    newEmails.value.push(val);
-  }
-  emailInput.value = '';
-}
-
-function removeChip(index: number) {
-  newEmails.value.splice(index, 1);
-}
-
-function onEmailKeydown(e: KeyboardEvent) {
-  if (['Enter', ',', ';', 'Tab'].includes(e.key)) {
-    e.preventDefault();
-    addEmailChip();
-  } else if (e.key === 'Backspace' && !emailInput.value) {
-    newEmails.value.pop();
-  }
-}
-
-function onEmailBlur() {
-  if (emailInput.value.trim()) addEmailChip();
-}
 
 const revokeDialogOpen = ref(false);
 const revokeTarget = ref<ShareRecord | null>(null);
 const revoking = ref(false);
-
 const copiedId = ref<string | null>(null);
 
 watch(
   () => [props.primaryKey, props.targetCollection, props.fileField] as const,
   ([key, col, field]) => {
-    console.log('[MediaShare] watch fired', { key, col, field });
     if (key && key !== '+' && col && field) loadShares();
   },
   { immediate: true }
@@ -254,45 +206,32 @@ watch(
 
 async function loadShares() {
   const pk = props.primaryKey;
-  console.log('[MediaShare] loadShares called', {
-    pk,
-    targetCollection: props.targetCollection,
-    fileField: props.fileField,
-  });
-
-  if (!pk || pk === '+') {
-    console.log('[MediaShare] aborted — no valid pk');
-    return;
-  }
-
+  if (!pk || pk === '+') return;
   loading.value = true;
   loadError.value = '';
-
   try {
     const fields = ['id', props.passwordField, props.expiryField].filter(Boolean).join(',');
-    console.log('[MediaShare] GET', `/items/${props.targetCollection}`, { filter: { [props.fileField!]: { _eq: pk } }, fields });
     const { data } = await api.get(`/items/${props.targetCollection}`, {
-      params: {
-        filter: { [props.fileField!]: { _eq: pk } },
-        fields,
-        limit: -1,
-      },
+      params: { filter: { [props.fileField!]: { _eq: pk } }, fields, limit: -1 },
     });
-    console.log('[MediaShare] response', data);
     shares.value = data.data ?? [];
   } catch (err: any) {
-    const msg = err?.response?.data?.errors?.[0]?.message ?? 'Failed to load share links.';
-    console.error('[MediaShare] error', msg, err);
-    loadError.value = msg;
+    loadError.value = err?.response?.data?.errors?.[0]?.message ?? 'Failed to load share links.';
   } finally {
     loading.value = false;
   }
 }
 
+function parseEmails(raw: string): string[] {
+  return raw
+    .split(/[\s,;]+/)
+    .map(e => e.trim())
+    .filter(e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+}
+
 async function createShare() {
   creating.value = true;
   createError.value = '';
-
   try {
     const payload: Record<string, unknown> = {
       [props.fileField!]: props.primaryKey,
@@ -307,22 +246,22 @@ async function createShare() {
 
     try {
       await api.patch(`/items/${props.targetCollection}/${shareId}`, { [props.linkField!]: url });
-    } catch (patchErr: any) {
-      console.error('[MediaShare] PATCH link failed', patchErr?.response?.data ?? patchErr);
+    } catch (e: any) {
+      console.error('[MediaShare] PATCH link failed', e?.response?.data ?? e);
     }
 
-    if (newEmails.value.length > 0) {
+    const emails = parseEmails(newEmailsRaw.value);
+    if (emails.length > 0) {
       try {
-        await api.post('/media-share-validate/notify', { shareUrl: url, emails: newEmails.value });
-      } catch (mailErr: any) {
-        console.error('[MediaShare] notify failed', mailErr?.response?.data ?? mailErr);
+        await api.post('/media-share-validate/notify', { shareUrl: url, emails });
+      } catch (e: any) {
+        console.error('[MediaShare] notify failed', e?.response?.data ?? e);
       }
     }
 
     closeDialog();
     await loadShares();
   } catch (err: any) {
-    console.error('[MediaShare] POST failed', err?.response?.data ?? err);
     createError.value = err?.response?.data?.errors?.[0]?.message ?? 'Failed to create share link.';
   } finally {
     creating.value = false;
@@ -337,26 +276,22 @@ function confirmRevoke(share: ShareRecord) {
 async function revokeShare() {
   if (!revokeTarget.value) return;
   revoking.value = true;
-
   try {
     await api.delete(`/items/${props.targetCollection}/${revokeTarget.value.id}`);
+  } catch {
+    /* no-op */
+  } finally {
     revokeDialogOpen.value = false;
     revokeTarget.value = null;
-    await loadShares();
-  } catch {
-    revokeDialogOpen.value = false;
-    await loadShares();
-  } finally {
     revoking.value = false;
+    await loadShares();
   }
 }
 
 function copyLink(shareId: string) {
-  const url = buildShareUrl(shareId);
-  console.log('[MediaShare] copying URL', url);
-  navigator.clipboard.writeText(url).then(() => {
+  navigator.clipboard.writeText(buildShareUrl(shareId)).then(() => {
     copiedId.value = shareId;
-    setTimeout(() => (copiedId.value = null), 2000);
+    setTimeout(() => { copiedId.value = null; }, 2000);
   });
 }
 
@@ -364,9 +299,8 @@ function closeDialog() {
   dialogOpen.value = false;
   newPassword.value = '';
   newExpiry.value = '';
+  newEmailsRaw.value = '';
   createError.value = '';
-  newEmails.value = [];
-  emailInput.value = '';
 }
 
 function buildShareUrl(shareId: string): string {
@@ -395,197 +329,126 @@ function isExpired(iso: unknown): boolean {
   gap: 12px;
 }
 
-.share-loading {
+.state-loading {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--theme--foreground-subdued);
-  font-size: 13px;
+  justify-content: center;
+  padding: 16px;
 }
 
-/* Table */
-.share-table {
+/* Share list */
+.share-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   border: 1px solid var(--theme--border-color);
   border-radius: var(--theme--border-radius);
   overflow: hidden;
 }
 
-.share-table-header,
-.share-table-row {
-  display: grid;
-  grid-template-columns: 1fr 80px 160px 64px;
-  align-items: center;
-  padding: 0 12px;
-  gap: 8px;
-}
-
-.share-table-header {
-  background: var(--theme--background-subdued);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--theme--foreground-subdued);
-  height: 36px;
-}
-
-.share-table-row {
-  height: 44px;
-  border-top: 1px solid var(--theme--border-color);
-  font-size: 13px;
-}
-
-.share-table-row:hover {
-  background: var(--theme--background-subdued);
-}
-
-.share-url-cell {
-  overflow: hidden;
-}
-
-.share-url-text {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--theme--foreground);
-  font-family: var(--theme--fonts--mono--font-family);
-  font-size: 12px;
-}
-
-.col-pwd,
-.col-expiry,
-.col-actions {
+.share-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--theme--background);
+  border-bottom: 1px solid var(--theme--border-color);
+}
+
+.share-row:last-child {
+  border-bottom: none;
+}
+
+.share-row:hover {
+  background: var(--theme--background-subdued);
+}
+
+.share-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.share-url {
+  font-family: var(--theme--fonts--mono--font-family, monospace);
+  font-size: 12px;
+  color: var(--theme--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.share-meta {
+  display: flex;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
-.col-actions {
-  justify-content: flex-end;
-}
-
-.no-value {
+.meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
   color: var(--theme--foreground-subdued);
 }
 
-.icon-lock {
-  color: var(--theme--warning);
-}
-
-.expired {
+.meta-badge.expired {
   color: var(--theme--danger);
 }
 
-.action-icon {
+.share-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.icon-delete {
   color: var(--theme--foreground-subdued);
   transition: color 0.15s;
 }
 
-.action-icon:hover {
-  color: var(--theme--foreground);
-}
-
-.icon-revoke:hover {
+.icon-delete:hover {
   color: var(--theme--danger);
 }
 
-.icon-copied {
-  color: var(--theme--success) !important;
-}
-
 /* Empty / footer */
-.share-empty {
-  color: var(--theme--foreground-subdued);
+.empty-state {
   font-size: 13px;
-}
-
-.share-footer {
-  display: flex;
-  align-items: center;
-}
-
-/* Dialog form */
-.form-field {
-  margin-bottom: 20px;
-}
-
-.form-label {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 6px;
   color: var(--theme--foreground-subdued);
+  margin: 0;
 }
 
-.optional {
-  font-weight: 400;
-  color: var(--theme--foreground-subdued);
-}
-
-/* Chip input */
-.chip-input-wrap {
+.footer {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  min-height: 42px;
-  padding: 6px 10px;
-  border: 1px solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius);
-  background: var(--theme--background);
-  cursor: text;
-  transition: border-color 0.2s;
 }
 
-.chip-input-wrap:focus-within {
-  border-color: var(--theme--primary);
-}
-
-.chip-input-wrap.disabled {
-  background: var(--theme--background-subdued);
-  cursor: not-allowed;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px 2px 10px;
-  background: var(--theme--primary);
-  color: #fff;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.6;
-}
-
-.chip-remove {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  font-size: 15px;
-  line-height: 1;
-  padding: 0;
+/* Dialog fields */
+.fields {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--theme--form--row-gap, 24px);
 }
 
-.chip-remove:hover {
-  color: #fff;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.chip-text-input {
-  flex: 1;
-  min-width: 160px;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 13px;
+.label {
   color: var(--theme--foreground);
 }
 
-.chip-text-input::placeholder {
+.subdued {
   color: var(--theme--foreground-subdued);
+  font-weight: 400;
+}
+
+.notice {
+  margin-top: var(--theme--form--row-gap, 24px);
 }
 </style>

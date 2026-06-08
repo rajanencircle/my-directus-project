@@ -169,8 +169,8 @@ export default defineComponent({
     groupByParentKeyField: { type: String, default: "" },
     enableChildCategories: { type: Boolean, default: false },
     rowCollection: { type: String, default: "cruises_price_dates" },
-    rowStartDateField: { type: String, default: "departure_date" },
-    rowEndDateField: { type: String, default: "arrival_date" },
+    rowStartDateField: { type: String, default: "date_departure" },
+    rowEndDateField: { type: String, default: "date_arrival" },
     sellStatusField: { type: String, default: "sell_prices_status" },
     sellUpdatedAtField: { type: String, default: "sell_prices_updated_at" },
     // Currency (display only — no exchange rate lookup in direct mode)
