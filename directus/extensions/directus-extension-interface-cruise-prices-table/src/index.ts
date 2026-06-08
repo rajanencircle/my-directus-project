@@ -23,6 +23,34 @@ export default defineInterface({
     });
 
     return [
+      // ─── General ─────────────────────────────────────────────────────────────
+      divider("divider_general", "General"),
+      {
+        field: "label",
+        type: "string",
+        name: "$t:label",
+        meta: {
+          width: "full",
+          interface: "system-input-translated-string",
+          options: { placeholder: "$t:label" },
+        },
+      },
+      {
+        field: "buttonPosition",
+        name: "Button Position",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "select-dropdown",
+          options: {
+            choices: [
+              { text: "Top", value: "top" },
+              { text: "Bottom", value: "bottom" },
+            ],
+          },
+        },
+        schema: { default_value: "bottom" },
+      },
       // ─── Mode ────────────────────────────────────────────────────────────────
       {
         field: "mode",
@@ -44,6 +72,53 @@ export default defineInterface({
 
       // ─── Table Layout ────────────────────────────────────────────────────────
       divider("divider_layout", "Table Layout"),
+      {
+        field: "fromPriceSymbol",
+        name: "From Price Icon",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "select-icon",
+          note: "Icon shown next to any item (occupancy, cabin category, price date) marked as a 'from price'. Pick any Material icon. Leave empty to disable the indicator entirely.",
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "groupFromPriceField",
+        name: "Category From-Price Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the group-by collection that marks a cabin category as a 'from price'. Leave empty to disable the from-price indicator on category headers.",
+          options: { placeholder: "e.g. price_start" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "occupancyFromPriceField",
+        name: "Occupancy From-Price Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the occupancy record that marks it as a 'from price' column (e.g. from_price). Leave empty to disable the from-price indicator on column headers.",
+          options: { placeholder: "e.g. from_price" },
+        },
+        schema: { default_value: "from_price" },
+      },
+      {
+        field: "rowFromPriceField",
+        name: "Date (Row) From-Price Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "Field on the row collection that marks a price date as a 'from price' row. Leave empty to disable the from-price indicator on row labels.",
+          options: { placeholder: "e.g. from_price" },
+        },
+        schema: { default_value: "" },
+      },
       {
         field: "groupByField",
         name: "Group By Field",
@@ -102,6 +177,58 @@ export default defineInterface({
           note: "When enabled, users can add new price rows directly inside the table.",
         },
         schema: { default_value: false },
+      },
+
+      // ─── Labels ──────────────────────────────────────────────────────────────
+      divider("divider_labels", "Labels"),
+      {
+        field: "buyLabel",
+        name: "Buy Price Label",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          options: { placeholder: "e.g. Buy" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "sellLabel",
+        name: "Sell Price Label",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          options: { placeholder: "e.g. Sell" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "emptyStateTitle",
+        name: "Empty State Title",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          note: "Heading shown when there are no prices to display. Supports $t: translation keys.",
+          options: { placeholder: "e.g. No cruise prices configured yet" },
+        },
+        schema: { default_value: "" },
+      },
+      {
+        field: "emptyStateHint",
+        name: "Empty State Hint",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "system-input-translated-string",
+          note: "Subtext shown below the empty state heading. Supports $t: translation keys.",
+          options: {
+            placeholder:
+              "e.g. Add price periods, cabin categories, and occupancies to see them here.",
+          },
+        },
+        schema: { default_value: "" },
       },
 
       // ─── Flow ────────────────────────────────────────────────────────────────
