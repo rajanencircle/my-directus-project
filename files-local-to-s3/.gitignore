@@ -1,0 +1,5 @@
+.env
+node_modules/
+botg/
+uploads/
+update-storage.sql

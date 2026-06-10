@@ -1,0 +1,16 @@
+{
+  "name": "files-local-to-s3",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "migrate": "node migrate.js",
+    "migrate:dry": "node migrate.js --dry-run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/lib-storage": "^3.600.0",
+    "dotenv": "^16.4.5",
+    "mime-types": "^2.1.35",
+    "tar-stream": "^3.1.7"
+  }
+}
