@@ -1,5 +1,7 @@
 # BestOf Migration — Database Comparison & Findings
 
+> **UPDATE 2026-06-11 — see [§6 New dump `bestof_full_new_09-06-2026.sql`](#6-update-2026-06-11--new-dump-with-freigabe) at the bottom.** The client delivered a corrected dump that **resolves the two open blockers**: `freigabe` (active/inactive) is now present on 51 tables, and `px_feldlisten` is restored. Active/inactive is fully answered there.
+
 **Date:** 2026-06-08
 **Databases compared (local MySQL):**
 
@@ -145,3 +147,61 @@ Reference examples (client-confirmed):
 - Table/column diffs computed by set comparison; row deltas from `information_schema.table_rows`.
 - New-hotel list = `oid` in `bestof_full.hotels` not in `bestof.hotels`, named from the `D`-language row.
 - **No write operations were performed on either database.**
+
+---
+
+## 6. UPDATE 2026-06-11 — New dump with freigabe
+
+**File:** `bestof_full_new_09-06-2026.sql` (307 MB), imported to local DB **`bestof_0906`** (179 tables).
+This corrected dump resolves both open blockers from the earlier analysis.
+
+### 6a. Schema changes vs the previous full dump (`bestof_full`)
+
+| Change | Detail |
+|---|---|
+| **+ Table `px_feldlisten` restored** | The field value/option-list mapping table is back (was missing before; required for migration). |
+| **+ Column `freigabe`** | Added as `int(11) NOT NULL` on **51 tables** (the publish / active-inactive flag). |
+| **+ Column `objects_calculation.kid`** | New column on the calculation table. |
+| Columns removed | None |
+| Tables removed | None |
+
+So: `bestof_0906` = `bestof_full` + `px_feldlisten` + `freigabe` (51 tables) + `objects_calculation.kid`.
+
+### 6b. The 51 tables carrying `freigabe`
+
+agencies, camper, camper_depots, camper_price_periods, camper_rental_period, camper_specials, camper_surcharges, camper_vehicle, flex_prices, flex_prices_columns, flex_prices_depots, flex_prices_lines, flex_prices_price_periods, flex_prices_reduction, hotels, hotels_price_periods, hotels_room_categories, hotels_room_occupancy, hotels_specials, hotels_surcharges, image_pages, rentalcars, rentalcars_avisonewaytabna, rentalcars_avisonewaytabsa, rentalcars_avisonewaytabunlimited, rentalcars_avistabcharges, rentalcars_avistabcrossborgercharges, rentalcars_depots, rentalcars_onewaytableaud, rentalcars_price_periods, rentalcars_rental_period, rentalcars_specials, rentalcars_surcharges, rentalcars_vehicle, tours, tours_categories, tours_price_periods, tours_room_occupancy, tours_routes, tours_specials, tours_surcharges, tours_tour_dates_web, trips, trips_category, trips_price_periods, trips_room_occupancy, trips_routes, trips_specials, trips_surcharges, trips_tour_dates_catalogue, trips_tour_dates_web.
+
+Notes: `freigabe` is consistent across all 7 language rows of a given `oid` (0 hotels have mixed values). `freigabe=1` = active/published, `freigabe=0` = inactive.
+
+### 6c. Active / inactive by product (distinct oid)
+
+| Product | Active (1) | Inactive (0) | Total |
+|---|---:|---:|---:|
+| hotels | 1,179 | 816 | 1,995 |
+| trips | 751 | 882 | 1,633 |
+| tours | 346 | 204 | 550 |
+| agencies | 152 | 31 | 183 |
+| image_pages | 92 | 71 | 163 |
+| camper | 23 | 12 | 35 |
+| rentalcars | 22 | 12 | 34 |
+| flex_prices | 0 | 25 | 25 |
+
+### 6d. Key insight — the old `bestof` dump was the ACTIVE subset
+
+- All **1,178** hotels in the old `bestof` dump are `freigabe=1` (active) in the new dump — **0** of them are now inactive.
+- The new dump has **1,179** active hotels = those 1,178 + exactly **1 brand-new active hotel**: **Tufi Resort** (oid 93889, Papua-Neuguinea).
+- The remaining **816** of the previously-identified 817 "new" hotels are all **inactive** (`freigabe=0`) — they were simply not part of the old published subset.
+
+This confirms `freigabe` is the correct active/inactive flag and explains the earlier "new hotels" count.
+
+### 6e. Note on reference example `oid 113795`
+
+Earlier this hotel (Accent House B&B) was thought to be active, but in this authoritative dump it is **`freigabe=0` (inactive)** across all languages — consistent with its prices only running to Feb-2025. The other two references (112417, 124897) are also `freigabe=0`. (Original recollection was uncertain; the dump is authoritative.)
+
+### 6f. Deliverable updated
+
+[`new_hotels_bestof_full.csv`](new_hotels_bestof_full.csv) now includes `freigabe` + `status` columns. Columns: `id, oid, freigabe, status, name, country, destination`. Of the 817 new hotels: **1 active, 816 inactive.**
+
+### Still open
+- `objects_calculation` data mismatch vs Primarix (e.g. oid 443) — still pending DBA guidance.
+- DBA explanation of calculation logic and relations across products — still requested.
