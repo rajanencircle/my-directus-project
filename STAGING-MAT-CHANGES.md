@@ -106,9 +106,14 @@ module.exports = async function (data) {
 
 ### B2. `[MAT] Update` — `84b8b457-0703-44b2-9eba-cdf0da8681b1`
 
+> **2026-06-11 fix:** `[MAT] Update` was extended again so that editing the MAT record also **creates missing** tour rows (not just updates existing ones). Previously, saving MAT only updated tours that already had a `tours_translations` row, so a tour with no rows yet (e.g. a freshly-imported/untouched tour) showed nothing until the tour itself was created/updated. This added `read_all_tours`, a `read_translations`, and `create_tour`, and expanded the script with a tours update-or-create cross-join over all tours × languages. Hotels & cruises remain update-only (they always have translation rows).
+
 **NEW operations added (delete on revert):**
 - read_data_tour `34a37e89-7ddd-498a-a3a0-8a3beb9cd845`
-- update_tour `4b617cd6-c05f-4e68-be4e-46e02eafcbc9`
+- update_tour `4b617cd6-c05f-4e68-be4e-46e02eafcbc9` — payload `{{script.toursTranslationDataToUpdate}}`
+- read_all_tours `6c3f2899-18b2-4816-9a43-2cbfedde2978` — *(2026-06-11 fix)* reads `tours` `["id"]`, limit -1
+- read_translations `1de23075-d7b6-42cc-92d4-5aceeb6d713e` — *(2026-06-11 fix)* reads `translations` `["id","code"]`
+- create_tour `d515935d-5b5d-4894-bbe3-07171d00ee4a` — *(2026-06-11 fix)* item-create `tours_translations`, payload `{{script.toursTranslationDataToCreate}}`
 
 **Existing ops changed:**
 | Op | ID | Changed | Baseline value (restore this) |
@@ -118,7 +123,9 @@ module.exports = async function (data) {
 | update_hotel | `9e772091-fd83-4eb1-a521-ba9bfc44f722` | `resolve` → null | `null` |
 | script | `f0eb1d5d-ad58-441b-ab94-e929a3621c5d` | `options.code` | baseline code below |
 
-Baseline chain: read_data_mat(`4711b4bf`) → read_data_cruise(`9d08225b`) → read_data_hotel(`faa75aa9`) → script(`f0eb1d5d`) → update_cruise(`8c2adc4b`) → update_hotel(`9e772091`) → null.
+Current chain (after fix): read_data_mat(`4711b4bf`) → read_data_cruise(`9d08225b`) → read_data_hotel(`faa75aa9`) → read_data_tour(`34a37e89`) → read_all_tours(`6c3f2899`) → read_translations(`1de23075`) → script(`f0eb1d5d`) → update_cruise(`8c2adc4b`) → update_hotel(`9e772091`) → update_tour(`4b617cd6`) → create_tour(`d515935d`) → null.
+
+Original baseline chain (restore target): read_data_mat(`4711b4bf`) → read_data_cruise(`9d08225b`) → read_data_hotel(`faa75aa9`) → script(`f0eb1d5d`) → update_cruise(`8c2adc4b`) → update_hotel(`9e772091`) → null.
 
 <details><summary>MAT Update — BASELINE script code (restore)</summary>
 
@@ -185,7 +192,7 @@ Run all via the `directus-staging` MCP. Order matters (undo flows first, then sc
    b. `operations` update `9e772091…` → `resolve = null`.
    c. `operations` update `4711b4bf…` → `options.query.fields = ["id","hotel_translations.*","cruises_translations.*"]`.
    d. `operations` update `f0eb1d5d…` → restore baseline script (B2).
-   e. `operations` delete `34a37e89-7ddd-498a-a3a0-8a3beb9cd845` and `4b617cd6-c05f-4e68-be4e-46e02eafcbc9`.
+   e. `operations` delete all 5 added ops: `34a37e89-7ddd-498a-a3a0-8a3beb9cd845`, `4b617cd6-c05f-4e68-be4e-46e02eafcbc9`, `6c3f2899-18b2-4816-9a43-2cbfedde2978`, `1de23075-d7b6-42cc-92d4-5aceeb6d713e`, `d515935d-5b5d-4894-bbe3-07171d00ee4a`.
 
 4. **Delete schema additions:**
    a. `fields` delete `tours_translations.mobility_advice_text`.
@@ -199,4 +206,7 @@ Run all via the `directus-staging` MCP. Order matters (undo flows first, then sc
 ## Verification done on staging
 - Re-read `[MAT] Cruise TRIGGER` and `[MAT] Update` after editing — both operation chains confirmed wired correctly (see chain definitions in B1/B2).
 - Schema confirmed: `mobility_advice_text_translations_2` created, `tours_translations` M2M present on `mobility_advice_text`, `tours_translations.mobility_advice_text` present.
-- No end-to-end item test was run on staging (to avoid leaving test data). The identical configuration was tested end-to-end on local: a tour update created `tours_translations` rows from MAT text, and editing MAT re-synced existing rows.
+- **2026-06-11 fix verified on staging:** changed the MAT de-DE tours text to a marker and saved the MAT record → both tours' de-DE `tours_translations.mobility_advice_text` rows re-synced to the marker; `[MAT] Update` run counter incremented with **0 errors**; then the original de-DE text was restored (rows confirmed reverted). Create-missing branch produced an empty payload in this run (both tours already had all language rows) and `create_tour` executed without error; the create logic mirrors the already-proven per-tour TRIGGER `create_tour`.
+
+## Note on the tour edit page (not a bug)
+The tour detail page shows a top-level **"Text Mobility Advice"** field which is the legacy base column `tours.mobility_advice_text` (readonly, in `price_info_group`). The MAT sync does **not** write this base field — it writes the per-language `tours_translations.mobility_advice_text`, shown in the tour's **translations** section (`tours_description_translations`). This matches hotels/cruises (which have no base field at all). If the base field must also reflect MAT text, that is a separate change (not implemented).
