@@ -293,6 +293,7 @@ export default defineComponent({
     // From-price indicators / labels (UI only)
     fromPriceSymbol: { type: String, default: "" },
     groupFromPriceField: { type: String, default: "" },
+    groupByLabelField: { type: String, default: "name" },
     occupancyFromPriceField: { type: String, default: "from_price" },
     rowFromPriceField: { type: String, default: "" },
     emptyStateTitle: { type: String, default: "" },
@@ -338,6 +339,7 @@ export default defineComponent({
       const primaryKeyField = props.occupancyJunctionPrimaryKeyField || "id";
       const relatedField =
         props.occupancyJunctionRelatedField || "cruises_occupancies_id";
+      const fromPriceField = props.occupancyFromPriceField || "from_price";
       const junctionId = junctionRow?.[primaryKeyField];
       const related = junctionRow?.[relatedField];
       const relatedRecord =
@@ -352,10 +354,8 @@ export default defineComponent({
           relatedRecord.name ?? junctionRow?.name ?? String(junctionId ?? ""),
         value: relatedRecord.value ?? junctionRow?.value ?? null,
         from_price:
-          relatedRecord.from_price ??
-          relatedRecord.fromPrice ??
-          junctionRow?.from_price ??
-          junctionRow?.fromPrice ??
+          relatedRecord[fromPriceField] ??
+          junctionRow?.[fromPriceField] ??
           false,
       };
     };
@@ -609,6 +609,7 @@ export default defineComponent({
       const relatedField =
         props.occupancyJunctionRelatedField || "cruises_occupancies_id";
 
+      const fromPriceField = props.occupancyFromPriceField || "from_price";
       const { data } = await api.get(
         `/items/${props.occupancyJunctionCollection}`,
         {
@@ -620,7 +621,7 @@ export default defineComponent({
               `${relatedField}.id`,
               `${relatedField}.name`,
               `${relatedField}.value`,
-              `${relatedField}.from_price`,
+              `${relatedField}.${fromPriceField}`,
             ],
             filter: {
               [parentField]: { _eq: parent_id.value },
@@ -641,7 +642,7 @@ export default defineComponent({
           `/items/${props.occupancyCollection}`,
           {
             params: {
-              fields: ["id", "name", "value", "from_price"],
+              fields: ["id", "name", "value", fromPriceField],
               filter: { id: { _in: [...new Set(originalIds)] } },
               limit: -1,
             },
@@ -679,7 +680,7 @@ export default defineComponent({
             params: {
               fields: [
                 "*",
-                props.categoryOrderField,
+                `${props.categoryOrderField}.*`,
                 props.sellStatusField,
                 props.sellUpdatedAtField,
                 `${props.occupanciesField}.*`,
@@ -696,6 +697,13 @@ export default defineComponent({
           categoryOrder.value = parentRecord.value[
             props.categoryOrderField
           ].map((cat: any) => (typeof cat === "string" ? cat : cat.id || cat));
+          // Populate category lookup from nested data — avoids a direct
+          // collection query that the role may not have permission for.
+          parentRecord.value[props.categoryOrderField].forEach((cat: any) => {
+            if (cat && typeof cat === "object" && cat.id) {
+              lookupData.value.categories.set(String(cat.id), cat);
+            }
+          });
         }
         lookupData.value.occupancies = new Map();
         if (Array.isArray(parentRecord.value[props.occupanciesField])) {
@@ -726,61 +734,56 @@ export default defineComponent({
     const fetchLookupData = async () => {
       if (!parent_id.value) return;
       try {
-        const parentKeyField =
-          props.groupByParentKeyField || props.foreignKeyField;
+        // Dates are always fetched directly.
+        const dateRes = await api.get(`/items/${props.rowCollection}`, {
+          params: { limit: -1 },
+        });
+        (dateRes.data.data || []).forEach((date: any) =>
+          lookupData.value.dates.set(String(date.id), date),
+        );
 
-        const catFields = props.enableChildCategories
-          ? ["id", "name", "sharedId"]
-          : ["id", "cabin_categories"];
-        const [baseCatRes, dateRes] = await Promise.all([
-          api.get(`/items/${props.groupByCollection}`, {
+        // Primary categories come from the parent record (fetched in
+        // fetchCruiseAndRates via nested fields), so no direct collection
+        // query is needed — that avoids 403s when the role only has read
+        // access to the parent collection.
+        //
+        // Only query the collection directly for child/shared categories
+        // (hotel pattern where enableChildCategories = true).
+        if (props.enableChildCategories) {
+          const parentKeyField =
+            props.groupByParentKeyField || props.foreignKeyField;
+          const labelField = props.groupByLabelField || "name";
+          const catFields = ["id", labelField, "sharedId", ...(props.groupFromPriceField ? [props.groupFromPriceField] : [])];
+
+          const baseCatRes = await api.get(`/items/${props.groupByCollection}`, {
             params: {
               filter: { [parentKeyField]: { _eq: parent_id.value } },
               fields: catFields,
               limit: -1,
             },
-          }),
-          api.get(`/items/${props.rowCollection}`, { params: { limit: -1 } }),
-        ]);
+          });
+          const parentCats = baseCatRes.data.data || [];
+          parentCats.forEach((cat: any) =>
+            lookupData.value.categories.set(String(cat.id), cat),
+          );
 
-        const parentCats = baseCatRes.data.data || [];
-
-        parentCats.forEach((cat: any) =>
-          lookupData.value.categories.set(String(cat.id), cat),
-        );
-
-        // Only fetch child/shared categories when enabled (hotel pattern, not cruise)
-        if (props.enableChildCategories) {
-          const parentCategoryIds = parentCats
-            .map((cat: any) => cat.id)
-            .filter(Boolean);
-
+          const parentCategoryIds = parentCats.map((cat: any) => cat.id).filter(Boolean);
           if (parentCategoryIds.length) {
-            const childRes = await api.get(
-              `/items/${props.groupByCollection}`,
-              {
-                params: {
-                  filter: {
-                    sharedId: { _in: parentCategoryIds },
-                    id: { _nin: parentCategoryIds },
-                  },
-                  fields: ["id", "name", "sharedId"],
-                  limit: -1,
+            const childRes = await api.get(`/items/${props.groupByCollection}`, {
+              params: {
+                filter: {
+                  sharedId: { _in: parentCategoryIds },
+                  id: { _nin: parentCategoryIds },
                 },
+                fields: ["id", labelField, "sharedId"],
+                limit: -1,
               },
-            );
-            const childCats = childRes.data.data || [];
-
-            childCats.forEach((cat: any) =>
+            });
+            (childRes.data.data || []).forEach((cat: any) =>
               lookupData.value.categories.set(String(cat.id), cat),
             );
           }
         }
-
-        const dates = dateRes.data.data || [];
-        dates.forEach((date: any) =>
-          lookupData.value.dates.set(String(date.id), date),
-        );
       } catch (err) {
         console.error("[CruisePricesTable] Error fetching lookup data:", err);
       }
@@ -1118,7 +1121,10 @@ export default defineComponent({
     const getGroupLabel = (key: string) => {
       if (key === "ungrouped") return "Ungrouped";
       const cat = lookupData.value.categories.get(key);
-      if (cat) return cat.name || cat.cabin_categories || key;
+      if (cat) {
+        const labelField = props.groupByLabelField || "name";
+        return cat[labelField] || cat.name || key;
+      }
       const date = lookupData.value.dates.get(key);
       if (date) return date.name || key;
       return key;

@@ -335,6 +335,18 @@ export default defineInterface({
         schema: { default_value: "cruises_cabins_categories" },
       },
       {
+        field: "groupByLabelField",
+        name: "Group By Label Field",
+        type: "string",
+        meta: {
+          width: "half",
+          interface: "input",
+          note: "The field on the Group By Collection used as the display label for each section header. e.g. 'cabin_categories' for cruises, 'name' for hotels.",
+          options: { placeholder: "e.g. cabin_categories" },
+        },
+        schema: { default_value: "name" },
+      },
+      {
         field: "groupByParentKeyField",
         name: "Group By → Parent FK Field",
         type: "string",
