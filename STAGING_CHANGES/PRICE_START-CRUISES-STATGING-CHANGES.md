@@ -1,5 +1,25 @@
 # Directus Staging Changes Log
 
+---
+
+## 2026-06-15 — Activate Cruise From Price Selection Flow
+
+**Change:** Activated the `[PRICE CALCULATOR] Cruise From Price Selection` flow (status changed `inactive` → `active`).
+
+**Flow ID:** `0f17cb08-cde0-4194-badb-f417e980e801`
+
+**Why now:** All prerequisite fields (`price_start` flags on cabin categories, price dates, and occupancies; `from_price` M2O on `cruises_translations_1`) and all 10 flow operations were already in place and verified correct. The flow was left inactive when first built pending sign-off.
+
+**What this enables:** From this point on, whenever a `cruises` item is saved or a `cruise_prices_translations` sell price is updated, the flow automatically calculates the lowest sell price (respecting `price_start` flags) and writes the winning `cruise_prices.id` to `cruises_translations_1.from_price` for each market language.
+
+### Revert
+```sql
+UPDATE directus_flows SET status = 'inactive' WHERE id = '0f17cb08-cde0-4194-badb-f417e980e801';
+```
+Or via UI: Settings → Flows → `[PRICE CALCULATOR] Cruise From Price Selection` → toggle status to Inactive.
+
+---
+
 Track of schema and flow changes made in the **directus-staging** server.
 Use this file to audit what was added, understand intent, and revert if needed.
 
