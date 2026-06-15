@@ -5,10 +5,13 @@ export default defineInterface({
   id: "cruise-prices-table",
   name: "Cruise Prices Table",
   icon: "table_chart",
-  description: "Display and edit cruise prices in a grouped table format. Fully configurable for cruises or any similar product.",
+  description:
+    "Display and edit cruise prices in a grouped table format. Fully configurable for cruises or any similar product.",
   component: InterfaceComponent,
   options: () => {
-    const hideWhenDirect = [{ name: "Direct mode", rule: { mode: { _eq: "direct" } }, hidden: true }];
+    const hideWhenDirect = [
+      { name: "Direct mode", rule: { mode: { _eq: "direct" } }, hidden: true },
+    ];
 
     const divider = (field: string, title: string, conditions?: any[]) => ({
       field,
@@ -318,7 +321,10 @@ export default defineInterface({
           width: "half",
           interface: "input",
           note: "Only needed when placed on a junction/translation collection instead of the parent directly. Enter the field on the junction that holds the parent ID. e.g. 'cruises_id' when placed on 'cruises_translations_1'. Leave empty if placed directly on the parent collection.",
-          options: { placeholder: "e.g. cruises_id — leave empty if on parent collection directly" },
+          options: {
+            placeholder:
+              "e.g. cruises_id — leave empty if on parent collection directly",
+          },
         },
         schema: { default_value: "" },
       },
@@ -427,7 +433,10 @@ export default defineInterface({
           note: "Where column occupancies are loaded from. Use Junction Collection when the price record stores the M2M junction row ID.",
           options: {
             choices: [
-              { text: "Auto (Junction first, parent field fallback)", value: "auto" },
+              {
+                text: "Auto (Junction first, parent field fallback)",
+                value: "auto",
+              },
               { text: "Parent Field Array", value: "parent_field" },
               { text: "Junction Collection", value: "junction" },
             ],
@@ -533,7 +542,11 @@ export default defineInterface({
       },
 
       // ─── Junction / Translation Collection ───────────────────────────────────
-      divider("divider_junction", "Junction / Translation Collection", hideWhenDirect),
+      divider(
+        "divider_junction",
+        "Junction / Translation Collection",
+        hideWhenDirect,
+      ),
       {
         field: "junctionCollection",
         name: "Junction Collection",
@@ -588,7 +601,11 @@ export default defineInterface({
       },
 
       // ─── Translations Collection (Sell Prices) ───────────────────────────────
-      divider("divider_translations", "Translations Collection (Sell Prices)", hideWhenDirect),
+      divider(
+        "divider_translations",
+        "Translations Collection (Sell Prices)",
+        hideWhenDirect,
+      ),
       {
         field: "translationsCollection",
         name: "Translations Collection",
