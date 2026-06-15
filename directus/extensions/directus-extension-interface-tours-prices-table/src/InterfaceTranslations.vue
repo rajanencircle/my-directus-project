@@ -69,7 +69,7 @@
                   </div>
                 </th>
                 <th v-for="col in columns" :key="col.id" class="column-header">
-                  {{ col.price_category || col.name }}
+                  {{ col.name }}
                   <span
                     v-if="fromPriceSymbol && col.from_price"
                     class="from-price-wrapper"
@@ -293,8 +293,7 @@ export default defineComponent({
         id: relatedRecord.id ?? null,
         junction_id: junctionId,
         original_id: relatedRecord.id ?? related ?? null,
-        name: relatedRecord.price_category ?? relatedRecord.name ?? String(junctionId ?? ""),
-        price_category: relatedRecord.price_category ?? relatedRecord.name ?? String(junctionId ?? ""),
+        name: relatedRecord[props.occupancyNameField] ?? String(junctionId ?? ""),
         from_price: props.occupancyFromPriceField
           ? (relatedRecord[props.occupancyFromPriceField] ?? junctionRow?.[props.occupancyFromPriceField] ?? false)
           : false,
@@ -490,7 +489,7 @@ export default defineComponent({
             parentField,
             relatedField,
             `${relatedField}.id`,
-            `${relatedField}.price_category`,
+            `${relatedField}.${props.occupancyNameField}`,
             ...(props.occupancyFromPriceField ? [`${relatedField}.${props.occupancyFromPriceField}`] : []),
             ...(props.occupancySortField ? [`${relatedField}.${props.occupancySortField}`] : []),
           ],
@@ -510,7 +509,7 @@ export default defineComponent({
           params: {
             fields: [
               "id",
-              "price_category",
+              props.occupancyNameField,
               ...(props.occupancyFromPriceField ? [props.occupancyFromPriceField] : []),
               ...(props.occupancySortField ? [props.occupancySortField] : []),
             ],
