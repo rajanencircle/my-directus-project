@@ -104,13 +104,11 @@
               >
                 <td class="row-label sticky-col">
                   <div class="row-label-content">
-                    <strong class="date-name">{{
-                      row?.name ||
-                      formatDateNumericRange(
-                        row[rowStartDateField],
-                        row[rowEndDateField],
-                      )
-                    }}</strong>
+                    <strong
+                      v-if="row?.name && !isDateRangeName(row.name)"
+                      class="date-name"
+                      >{{ row.name }}
+                    </strong>
                     <small class="date-range">
                       {{
                         formatDateRange(
@@ -221,6 +219,7 @@ import {
 } from "vue";
 import { useApi, useStores } from "@directus/extensions-sdk";
 import { nextTick } from "vue";
+import { isValid, parse } from "date-fns";
 
 export default defineComponent({
   props: {
@@ -1171,6 +1170,13 @@ export default defineComponent({
       return end ? `${format(start)} - ${format(end)}` : format(start);
     };
 
+    const isDateRangeName = (name: string): boolean => {
+      const parts = name.split(/\s*[-–]\s*/);
+      if (parts.length !== 2) return false;
+      const ref = new Date(2000, 0, 1);
+      return parts.every((p) => isValid(parse(p.trim(), "dd.MM.yyyy", ref)));
+    };
+
     const toggleGroup = (groupKey: string) => {
       expandedGroups.value[groupKey] = !expandedGroups.value[groupKey];
     };
@@ -1327,6 +1333,7 @@ export default defineComponent({
       formatPrice,
       formatDateRange,
       formatDateNumericRange,
+      isDateRangeName,
       getCell,
       isCellModified,
       handleBuyPriceInput,
@@ -1390,6 +1397,8 @@ export default defineComponent({
 }
 .table-wrapper {
   overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
 }
 .prices-table {
   width: 100%;
@@ -1445,7 +1454,7 @@ col.col-price {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--theme--primary);
-  white-space: nowrap;
+  white-space: normal;
 }
 .column-header {
   background: var(--theme--background-subdued);
@@ -1454,7 +1463,9 @@ col.col-price {
   font-size: 14px;
   text-align: center;
   min-width: 100px;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .sticky-col {
   position: sticky;
@@ -1472,9 +1483,10 @@ col.col-price {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  overflow-wrap: break-word;
 }
 .date-range {
-  color: var(--theme--foreground-subdued);
+  color: var(--theme--foreground-accent);
   font-weight: 400;
   font-size: 0.75rem;
 }

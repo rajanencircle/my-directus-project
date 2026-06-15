@@ -22,5 +22,7 @@
     "typescript": "^5.0.0",
     "vue": "^3.3.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "date-fns": "^4.2.1"
+  }
 }
