@@ -40,7 +40,7 @@
           <tbody>
             <tr v-for="item in items" :key="item.id" class="data-row">
               <td class="name-cell sticky-col">
-                <span class="item-name">{{ item.name }}</span>
+                <span class="item-name">{{ item[surchargeNameField] }}</span>
               </td>
               <td class="label-cell">
                 <div class="price-labels">
@@ -130,6 +130,12 @@ export default defineComponent({
     exchangeRateField: { type: String, default: "surcharge_exchange_rate" },
     junctionHotelField: { type: String, default: "hotels_id" },
     junctionLanguageField: { type: String, default: "translations_id" },
+    surchargeNameField: { type: String, default: "name" },
+    translationsSurchargeField: { type: String, default: "surcharges_id" },
+    translationsLanguageField: { type: String, default: "translations_id" },
+    fromCurrencyField: { type: String, default: "from_currency" },
+    toCurrencyField: { type: String, default: "to_currency" },
+    currencySymbolField: { type: String, default: "symbol" },
     type: { type: String, default: null },
     relation: { type: Object, default: null },
     fieldData: { type: Object, default: null },
@@ -202,14 +208,15 @@ export default defineComponent({
 
     const fetchCurrencySymbols = async (rateKey: string) => {
       try {
+        const fc = props.fromCurrencyField || "from_currency";
+        const tc = props.toCurrencyField || "to_currency";
+        const sf = props.currencySymbolField || "symbol";
         const { data } = await api.get(
           `/items/${props.ratesCollection}/${rateKey}`,
-          {
-            params: { fields: ["from_currency.symbol", "to_currency.symbol"] },
-          },
+          { params: { fields: [`${fc}.${sf}`, `${tc}.${sf}`] } },
         );
-        buyCurrencySymbol.value = data.data.from_currency?.symbol || "€";
-        sellCurrencySymbol.value = data.data.to_currency?.symbol || "$";
+        buyCurrencySymbol.value = data.data[fc]?.[sf] || "€";
+        sellCurrencySymbol.value = data.data[tc]?.[sf] || "$";
       } catch (err) {
         console.error("[SurchargePrices] fetchCurrencySymbols error:", err);
       }
@@ -220,6 +227,10 @@ export default defineComponent({
 
       loading.value = true;
       try {
+        const nameField = props.surchargeNameField || "name";
+        const tSurchargeField = props.translationsSurchargeField || "surcharges_id";
+        const tLanguageField = props.translationsLanguageField || "translations_id";
+
         const { data: sRes } = await api.get(
           `/items/${props.surchargesCollection}`,
           {
@@ -227,7 +238,7 @@ export default defineComponent({
               filter: { [props.hotelField]: { _eq: hotelId.value } },
               fields: [
                 "id",
-                "name",
+                nameField,
                 props.buyPriceField,
                 ...(props.sortField ? [props.sortField] : []),
               ],
@@ -247,8 +258,8 @@ export default defineComponent({
               params: {
                 filter: {
                   _and: [
-                    { surcharges_id: { _in: sIds } },
-                    { translations_id: { _eq: languageId.value } },
+                    { [tSurchargeField]: { _in: sIds } },
+                    { [tLanguageField]: { _eq: languageId.value } },
                   ],
                 },
                 limit: -1,
@@ -256,7 +267,7 @@ export default defineComponent({
             },
           );
           tRes.data.forEach((t: any) => {
-            translations[t.surcharges_id] = t;
+            translations[t[tSurchargeField]] = t;
           });
         }
 
@@ -293,6 +304,8 @@ export default defineComponent({
     };
 
     const saveChanges = async () => {
+      const tSurchargeField = props.translationsSurchargeField || "surcharges_id";
+      const tLanguageField = props.translationsLanguageField || "translations_id";
       const tasks: Promise<any>[] = [];
       for (const item of items.value) {
         if (!item._dirty) continue;
@@ -311,8 +324,8 @@ export default defineComponent({
         } else if (languageId.value) {
           tasks.push(
             api.post(`/items/${props.translationsCollection}`, {
-              surcharges_id: item.id,
-              translations_id: languageId.value,
+              [tSurchargeField]: item.id,
+              [tLanguageField]: languageId.value,
               [props.sellPriceField]: item[props.sellPriceField],
             }),
           );
@@ -379,6 +392,7 @@ export default defineComponent({
       sellCurrencySymbol,
       buyPriceField: props.buyPriceField,
       sellPriceField: props.sellPriceField,
+      surchargeNameField: props.surchargeNameField || "name",
       handleBuyPriceInput,
       calculateAndSave,
       formatValue,
