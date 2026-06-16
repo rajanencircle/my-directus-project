@@ -76,7 +76,8 @@ function toggle() {
 
 <style scoped>
 .sidebar-detail {
-  display: contents;
+  display: block;
+  flex-shrink: 0;
 }
 
 .detail-trigger {
@@ -134,6 +135,5 @@ function toggle() {
 .detail-content {
   border-block-end: var(--theme--sidebar--section--toggle--border-width, 1px) solid
     var(--theme--sidebar--section--toggle--border-color, var(--theme--border-color-subdued));
-  overflow-y: auto;
 }
 </style>

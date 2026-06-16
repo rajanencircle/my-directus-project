@@ -203,6 +203,7 @@ function onClickOutside(event: any) {
   display: flex;
   align-items: center;
   inline-size: calc(1rem * 2 + 0.375rem + 0.25rem + 0.4375rem);
+  padding-inline-end: 0.4375rem;
   min-block-size: var(--input-size);
   overflow: hidden;
   border: var(--theme--border-width, 2px) solid var(--theme--form--field--input--border-color);

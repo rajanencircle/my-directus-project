@@ -74,10 +74,10 @@ function stripFields(obj, fields) {
 // - neither set → include (no date restriction)
 function isPublicationActive(item, today) {
   if (item.status === "unpublished") return false;
-  const start = item.publish_start ?? null;
-  const end = item.publish_end ?? null;
-  if (!start && end) return false;
-  if (start && end) return today >= start && today <= end;
+  const start = item.publish_start ? item.publish_start.slice(0, 10) : null;
+  const end = item.publish_end ? item.publish_end.slice(0, 10) : null;
+  if (end && today > end) return false;
+  if (start && today < start) return false;
   return true;
 }
 
@@ -237,9 +237,9 @@ export function shapeHotelDetail(hotel, lang) {
   const today = new Date().toISOString().slice(0, 10);
 
   // Specials — filter by publication status and date range
-  const specials = (hotel.hotels_specials ?? []).filter((s) =>
-    isPublicationActive(s, today),
-  );
+  const specials = (hotel.hotels_specials ?? [])
+    .filter((s) => isPublicationActive(s, today))
+    .map(({ status, publish_start, publish_end, ...rest }) => rest);
 
   // Rooms with new shape — filter room_categories and price_dates by publication
   const roomCategories = (hotel.room_categories ?? []).filter((rc) =>

@@ -10,6 +10,10 @@ export default defineModule({
   hidden: true,
   routes: [
     {
+      path: '',
+      redirect: '/media-library',
+    },
+    {
       path: ':shareId',
       component: AccessGate,
     },

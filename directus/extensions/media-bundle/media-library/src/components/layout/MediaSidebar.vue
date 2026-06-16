@@ -47,22 +47,30 @@
     </v-item-group>
 
     <!-- Albums section -->
-    <template v-if="albumsStore.albums.length > 0 || albumsStore.isLoading">
-      <v-divider />
+    <v-divider />
 
-      <v-list-item disabled class="albums-section-header">
+    <v-list-item class="albums-section-header">
+      <v-list-item-content>
+        <v-text-overflow :text="albumsSectionLabel" />
+      </v-list-item-content>
+      <v-list-item-icon class="add-album-btn" @click.stop="createDialogOpen = true">
+       Add <v-icon v-tooltip="'Create Album'" name="add" small />
+      </v-list-item-icon>
+    </v-list-item>
+
+    <v-list-item v-if="albumsStore.isLoading">
+      <v-progress-circular x-small indeterminate />
+    </v-list-item>
+
+    <template v-else>
+      <v-list-item v-if="albumsStore.albums.length === 0" disabled>
         <v-list-item-content>
-          <v-text-overflow :text="albumsSectionLabel" />
+          <v-text-overflow :text="t('no_items')" />
         </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item v-if="albumsStore.isLoading">
-        <v-progress-circular x-small indeterminate />
       </v-list-item>
 
       <v-list-item
         v-for="album in albumsStore.albums"
-        v-else
         :key="album.id"
         clickable
         class="album-item"
@@ -81,6 +89,23 @@
       </v-list-item>
     </template>
   </v-list>
+
+  <!-- Create album dialog -->
+  <v-dialog v-model="createDialogOpen" @esc="createDialogOpen = false">
+    <v-card>
+      <v-card-title>Create Album</v-card-title>
+      <v-card-text>
+        <v-input v-model="newAlbumName" placeholder="Album name" autofocus @keydown.enter="confirmCreateAlbum" />
+      </v-card-text>
+      <v-card-actions>
+        <v-button secondary @click="createDialogOpen = false">{{ t('cancel') }}</v-button>
+        <v-button :disabled="!newAlbumName.trim()" :loading="isCreating" @click="confirmCreateAlbum">
+          <v-icon name="add" left />
+          Create
+        </v-button>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
   <!-- Delete album confirmation dialog -->
   <v-dialog v-model="deleteDialogOpen" @esc="deleteDialogOpen = false">
@@ -124,6 +149,10 @@ const { settings, fetchSettings } = useMediaSettings()
 const openFolders = ref<string[]>([])
 
 const albumsSectionLabel = computed(() => resolveTranslatable(settings.value.albums_section_label, t, 'Albums'))
+
+const createDialogOpen = ref(false)
+const newAlbumName = ref('')
+const isCreating = ref(false)
 
 const deleteDialogOpen = ref(false)
 const albumToDeleteId = ref<string | null>(null)
@@ -181,6 +210,20 @@ async function onAlbumSelect(id: string) {
   navigateToLibrary()
 }
 
+async function confirmCreateAlbum() {
+  if (!newAlbumName.value.trim()) return
+  isCreating.value = true
+  try {
+    await albumsStore.createAlbum(newAlbumName.value.trim())
+    createDialogOpen.value = false
+    newAlbumName.value = ''
+  } catch (err) {
+    console.warn('[media-library] Failed to create album:', err)
+  } finally {
+    isCreating.value = false
+  }
+}
+
 function promptDeleteAlbum(id: string, name: string) {
   albumToDeleteId.value = id
   albumToDeleteName.value = name
@@ -211,6 +254,18 @@ async function confirmDeleteAlbum() {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   pointer-events: none;
+}
+
+.albums-section-header .add-album-btn {
+  display: flex;
+  align-items: center;
+  pointer-events: all;
+  opacity: 1;
+  color: var(--theme--primary);
+  cursor: pointer;
+  -webkit-text-stroke: 0.5px currentColor;
+  color: var(--theme-background);
+  gap: 5px;
 }
 
 .album-item .album-delete-btn {

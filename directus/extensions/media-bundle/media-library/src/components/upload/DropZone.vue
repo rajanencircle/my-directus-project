@@ -175,6 +175,7 @@ function clearCompleted() {
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 0 !important;
 }
 
 .drop-overlay {

@@ -97,12 +97,21 @@
 
     <!-- ── Right info sidebar ──────────────────────────────────────── -->
     <template #sidebar>
-      <SidebarDetail icon="info" :title="lbl('sidebar_file_info', 'File Info')" :start-open="true">
+      <div class="sidebar-scroll-wrap">
+      <SidebarDetail icon="info" :title="lbl('sidebar_file_info', 'File Details')" :start-open="true">
         <div class="sidebar-info">
           <template v-if="file">
+            <div class="sidebar-row">
+              <span class="sidebar-label">Copy ID</span>
+              <button class="copy-id-btn" v-tooltip.left="fileIdCopied ? t('copied') : t('copy')" @click="copyFileId">
+                <v-icon :name="fileIdCopied ? 'check' : 'content_copy'" x-small />
+              </button>
+            </div>
             <div v-for="row in sidebarInfoRows" :key="row.label" class="sidebar-row">
               <span class="sidebar-label">{{ row.label }}</span>
-              <span class="sidebar-value">{{ row.value }}</span>
+              <a v-if="row.href" class="sidebar-link" :href="row.href" target="_blank" rel="noopener">{{ row.value }}</a>
+              <a v-else-if="row.to" class="sidebar-link" href="#" @click.prevent="router.push(row.to)">{{ row.value }}</a>
+              <span v-else class="sidebar-value">{{ row.value }}</span>
             </div>
           </template>
           <v-skeleton-loader v-else type="list-item" />
@@ -128,6 +137,7 @@
           </v-button>
         </div>
       </SidebarDetail>
+      </div>
 
     </template>
 
@@ -153,6 +163,13 @@
             :src="previewUrl"
             :alt="file.title ?? file.filename_disk"
             class="preview-image"
+          />
+          <video
+            v-else-if="isVideoType(file.type)"
+            :src="videoUrl"
+            class="preview-video"
+            controls
+            preload="metadata"
           />
           <div v-else class="preview-placeholder">
             <v-icon :name="getFileIcon(file.type)" class="preview-file-icon" />
@@ -328,6 +345,9 @@ const selectedFolder = ref<string | null>(null)
 const confirmLeave = ref(false)
 const pendingLeave = ref<string | null>(null)
 
+// ── Copy ID state ──────────────────────────────────────────────────
+const fileIdCopied = ref(false)
+
 // ── Share state ────────────────────────────────────────────────────
 const shareDialogActive = ref(false)
 const sharePassword = ref('')
@@ -343,9 +363,8 @@ const shareCopied = ref(false)
 const hasEdits = computed(() => Object.keys(edits.value).length > 0)
 
 const FIELDS_DENY_LIST = [
-  'type', 'width', 'height', 'filesize', 'created_on', 'uploaded_by',
-  'uploaded_on', 'modified_by', 'modified_on', 'duration', 'folder',
-  'charset', 'embed', 'storage', 'filename_disk', 'filename_download',
+  'storage_divider', 'filename_disk', 'filename_download', 'metadata', 'type', 'filesize', 'focal_point_divider', 'focal_point_x', 'focal_point_y', 'location', 'charset', 'created_on', 'modified_on', 'uploaded_by', 'modified_by', 'width', 'height', 'duration',
+  'folder', 'storage',
 ]
 
 const editableFields = computed(() => {
@@ -357,21 +376,72 @@ const editableFields = computed(() => {
   }
 })
 
+
 const previewUrl = computed(() => file.value ? getPreviewUrl(file.value.id) : '')
+const videoUrl = computed(() => file.value ? getAssetUrl(file.value.id) : '')
+
+function getFieldLabel(fieldName: string, fallback: string): string {
+  const field = fieldsStore.getField('directus_files', fieldName)
+  const translations: Array<{ language: string; translation: string }> = field?.meta?.translations ?? []
+  if (!translations.length) return fallback
+  const locale = document.documentElement.lang || 'en-US'
+  const lang = locale.split('-')[0] ?? ''
+  const match = translations.find(t => t.language === locale)
+    ?? translations.find(t => t.language.startsWith(lang))
+    ?? translations[0]
+  return match?.translation ?? fallback
+}
+
 
 const sidebarInfoRows = computed(() => {
   if (!file.value) return []
-  const f = file.value
-  const rows: { label: string; value: string }[] = [
-    { label: lbl('sidebar_type', 'Type'), value: f.type ?? '—' },
-    { label: lbl('sidebar_size', 'Size'), value: formatFilesize(f.filesize) },
-  ]
-  if (f.width && f.height) rows.push({ label: lbl('sidebar_dimensions', 'Dimensions'), value: `${f.width} × ${f.height}` })
-  rows.push(
-    { label: lbl('sidebar_uploaded', 'Uploaded'), value: formatDate(f.uploaded_on) },
-    { label: lbl('sidebar_modified', 'Modified'), value: formatDate((f as any).modified_on) },
-    { label: lbl('sidebar_id', 'ID'), value: f.id },
-  )
+  const f = file.value as any
+  const rows: { label: string; value: string; href?: string; to?: string }[] = []
+
+  const add = (label: string, value: any, format?: (v: any) => string | null, opts?: { href?: string; to?: string }) => {
+    const display = (value !== null && value !== undefined && value !== '')
+      ? (format ? format(value) : String(value))
+      : null
+    rows.push({ label, value: display ?? '—', ...opts })
+  }
+
+  // Standard file info
+  add('Created', f.created_on ?? f.uploaded_on, formatDate)
+
+  if (f.uploaded_by) {
+    const ub = f.uploaded_by
+    const name = typeof ub === 'object' ? [ub.first_name, ub.last_name].filter(Boolean).join(' ') : null
+    if (name) rows.push({ label: 'Owner', value: name, to: `/users/${ub.id}` })
+  }
+
+  add(getFieldLabel('uploaded_on', 'Uploaded'), f.uploaded_on, formatDate)
+  add(getFieldLabel('modified_on', 'Modified'), f.modified_on, formatDate)
+
+  {
+    const mb = f.modified_by
+    const name = mb && typeof mb === 'object' ? [mb.first_name, mb.last_name].filter(Boolean).join(' ') : null
+    rows.push({ label: 'Edited by', value: name ?? '—', ...(mb?.id ? { to: `/users/${mb.id}` } : {}) })
+  }
+
+  rows.push({ label: 'File', value: 'Open in New Window', href: getAssetUrl(f.id) })
+
+  if (f.folder) {
+    const folderName = typeof f.folder === 'object' ? (f.folder as any).name : null
+    const folderId = typeof f.folder === 'object' ? (f.folder as any).id : f.folder
+    const linkText = folderName ? `Open "${folderName}" folder` : 'Open folder'
+    rows.push({ label: 'Folder', value: linkText, to: `/media-library?folder=${folderId}` })
+  }
+
+  add(getFieldLabel('storage', 'Storage'), f.storage)
+
+  // Media technical fields
+  add(getFieldLabel('file_size_mb', 'File Size (MB)'), f.file_size_mb)
+  add(getFieldLabel('file_format', 'File Format'), f.file_format)
+  add(getFieldLabel('dimensions_px', 'Dimensions (px)'), f.dimensions_px)
+  add(getFieldLabel('resolution_dpi', 'Resolution DPI'), f.resolution_dpi)
+  add(getFieldLabel('media_sizes_cm', 'Media Sizes (cm)'), f.media_sizes_cm)
+  add(getFieldLabel('color_space', 'Color Space'), f.color_space)
+
   return rows
 })
 
@@ -463,7 +533,26 @@ watch(() => props.id, async () => {
 async function loadFile() {
   isLoading.value = true
   try {
-    const res = await api.get(`/files/${props.id}`, { params: { fields: ['*', 'uploaded_by.id', 'uploaded_by.first_name', 'uploaded_by.last_name'] } })
+    const geoTranslationFields = (rel: string) => [
+      `${rel}.id`,
+      `${rel}.translations.name`,
+      `${rel}.translations.translations_id.code`,
+    ]
+    const res = await api.get(`/files/${props.id}`, {
+      params: {
+        fields: [
+          '*',
+          'uploaded_by.id', 'uploaded_by.first_name', 'uploaded_by.last_name',
+          'modified_by.id', 'modified_by.first_name', 'modified_by.last_name',
+          'folder.id', 'folder.name',
+          ...geoTranslationFields('place'),
+          ...geoTranslationFields('state'),
+          ...geoTranslationFields('region'),
+          ...geoTranslationFields('country'),
+          ...geoTranslationFields('destination'),
+        ],
+      },
+    })
     file.value = res.data?.data ?? null
     selectedFolder.value = file.value?.folder ?? null
   } catch (err) {
@@ -481,7 +570,7 @@ async function save() {
   validationErrors.value = []
 
   // Build merged item for condition evaluation
-  const allFields = editableFields.value
+  const allFields = fieldsStore.getFieldsForCollection('directus_files')
   const merged = { ...(file.value ?? {}), ...edits.value }
 
   // Client-side validation: respects conditions, hidden flags, and custom validation rules
@@ -496,9 +585,9 @@ async function save() {
 
   isSaving.value = true
   try {
-    const res = await api.patch(`/files/${props.id}`, payload)
-    file.value = res.data?.data ?? file.value
+    await api.patch(`/files/${props.id}`, payload)
     edits.value = {}
+    await loadFile()
   } catch (err: any) {
     const errors = err?.response?.data?.errors ?? []
     validationErrors.value = errors
@@ -556,6 +645,15 @@ function discardAndLeave() {
 async function copyAssetUrl() {
   if (!file.value) return
   await navigator.clipboard.writeText(getAssetUrl(file.value.id))
+}
+
+async function copyFileId() {
+  if (!file.value) return
+  try {
+    await navigator.clipboard.writeText(file.value.id)
+    fileIdCopied.value = true
+    setTimeout(() => { fileIdCopied.value = false }, 2000)
+  } catch { /* no-op */ }
 }
 
 // ── Share actions ──────────────────────────────────────────────────
@@ -632,6 +730,10 @@ function isImageType(mimeType: string): boolean {
   return mimeType?.startsWith('image/') ?? false
 }
 
+function isVideoType(mimeType: string): boolean {
+  return mimeType?.startsWith('video/') ?? false
+}
+
 function getFileIcon(mimeType: string): string {
   if (!mimeType) return 'insert_drive_file'
   if (mimeType.startsWith('video/')) return 'movie'
@@ -643,14 +745,6 @@ function getFileIcon(mimeType: string): string {
   return 'insert_drive_file'
 }
 
-function formatFilesize(bytes: number): string {
-  if (!bytes) return '—'
-  const kb = bytes / 1024
-  if (kb < 1024) return `${kb.toFixed(1)} KB`
-  const mb = kb / 1024
-  if (mb < 1024) return `${mb.toFixed(1)} MB`
-  return `${(mb / 1024).toFixed(1)} GB`
-}
 
 function formatDate(isoString: string): string {
   if (!isoString) return '—'
@@ -714,6 +808,11 @@ function formatDate(isoString: string): string {
   object-fit: contain;
 }
 
+.preview-video {
+  max-width: 100%;
+  max-height: 500px;
+}
+
 .preview-placeholder {
   display: flex;
   flex-direction: column;
@@ -728,16 +827,24 @@ function formatDate(isoString: string): string {
 }
 
 /* ── Sidebar ──────────────────────────────────────────────────────── */
+.sidebar-scroll-wrap {
+  overflow-y: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .sidebar-info {
-  padding: 8px 16px 16px;
+  padding: 4px 16px 12px;
 }
 
 .sidebar-row {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--theme--border-color);
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--theme--border-color-subdued);
 }
 
 .sidebar-row:last-child {
@@ -745,17 +852,55 @@ function formatDate(isoString: string): string {
 }
 
 .sidebar-label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--theme--foreground-subdued);
+  color: var(--theme--foreground);
+  flex-shrink: 0;
 }
 
 .sidebar-value {
   font-size: 13px;
-  color: var(--theme--foreground);
-  word-break: break-all;
+  color: var(--theme--foreground-subdued);
+  text-align: right;
+  word-break: break-word;
+}
+
+.sidebar-link {
+  font-size: 13px;
+  color: var(--theme--primary);
+  text-decoration: none;
+  text-align: right;
+  word-break: break-word;
+}
+
+.sidebar-link:hover {
+  text-decoration: underline;
+}
+
+.copy-id-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--theme--primary);
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+/* ── Publishable field star indicator ────────────────────────────── */
+:deep([data-field="copyright"] .field-label-content::after),
+:deep([data-field="photographer"] .field-label-content::after),
+:deep([data-field="company_name"] .field-label-content::after),
+:deep([data-field="original_filename"] .field-label-content::after),
+:deep([data-field="alt_text"] .field-label-content::after),
+:deep([data-field="contact_email"] .field-label-content::after) {
+  content: '*';
+  color: var(--theme--warning);
+  margin-left: 2px;
+  font-size: 0.75rem;
+  vertical-align: super;
+  line-height: 0;
 }
 
 /* ── Downloads section content ────────────────────────────────────── */

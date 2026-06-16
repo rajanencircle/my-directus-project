@@ -21,7 +21,7 @@
     <div class="batch-content">
       <v-form
         v-model="edits"
-        collection="directus_files"
+        :fields="editableFields"
         batch-mode
         primary-key="+"
         :validation-errors="validationErrors"
@@ -52,6 +52,7 @@ const { useFieldsStore } = useStores()
 const fieldsStore = useFieldsStore()
 const { t } = useT()
 
+
 const edits = ref<Record<string, any>>({})
 const saving = ref(false)
 const validationErrors = ref<any[]>([])
@@ -59,6 +60,19 @@ const validationErrors = ref<any[]>([])
 const internalActive = computed({
   get: () => props.active,
   set: (val) => emit('update:active', val),
+})
+
+const FIELDS_DENY_LIST = [
+  'storage_divider', 'filename_disk', 'filename_download','metadata','type','filesize', 'focal_point_divider', 'focal_point_x', 'focal_point_y',
+]
+
+const editableFields = computed(() => {
+  try {
+    return fieldsStore.getFieldsForCollection('directus_files')
+      .filter((f: any) => !FIELDS_DENY_LIST.includes(f.field))
+  } catch {
+    return []
+  }
 })
 
 function validateBatchEdits(): any[] {
@@ -160,4 +174,11 @@ function cancel() {
   padding: var(--content-padding);
   padding-bottom: var(--content-padding-bottom);
 }
+
+/* Suppress the batch-mode checkbox on the synthetic $system_divider — it has no
+   no-data special in older Directus builds, causing an unlabeled checkbox to appear. */
+:deep([data-field="$system_divider"] .field-label) {
+  display: none;
+}
+
 </style>

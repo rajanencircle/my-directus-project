@@ -13,7 +13,34 @@ export interface DirectusFile {
   height: number | null
   uploaded_on: string
   uploaded_by: string | { id: string; first_name: string; last_name: string; avatar: string | null } | null
+  modified_on?: string | null
+  modified_by?: string | { id: string; first_name: string; last_name: string } | null
   folder: string | null
+  // Media Data fields
+  copyright?: string | null
+  expiry_date?: string | null
+  photographer?: string | null
+  company_name?: string | null
+  original_filename?: string | null
+  alt_text?: string | null
+  contact_email?: string | null
+  resolution_dpi?: number | null
+  media_sizes_cm?: string | null
+  file_size_mb?: number | null
+  file_format?: string | null
+  dimensions_px?: string | null
+  color_space?: string | null
+  keyword_ids?: string[] | null
+  place?: number | { id: number; translations: Array<{ name: string; translations_id: { code: string } }> } | null
+  state?: number | { id: number; translations: Array<{ name: string; translations_id: { code: string } }> } | null
+  region?: number | { id: number; translations: Array<{ name: string; translations_id: { code: string } }> } | null
+  country?: number | { id: number; translations: Array<{ name: string; translations_id: { code: string } }> } | null
+  destination?: number | { id: number; translations: Array<{ name: string; translations_id: { code: string } }> } | null
+  iptc_creation_date?: string | null
+  iptc_creation_time?: string | null
+  is_map?: boolean | null
+  tour32_export?: boolean | null
+  draft_status?: string | null
 }
 
 export interface SortConfig {

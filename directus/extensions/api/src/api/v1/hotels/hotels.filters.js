@@ -61,6 +61,16 @@ export function buildPublicationDeepFilter() {
   return {
     room_categories: { _filter: { _and: [{ status: { _eq: 'published' } }, ...dateRangeFilter] } },
     price_dates: { _filter: { _and: [{ status: { _eq: 'published' } }, ...dateRangeFilter] } },
+    media: {
+      _filter: {
+        directus_files_id: {
+          _or: [
+            { draft_status: { _null: true } },
+            { draft_status: { _neq: 'draft' } },
+          ],
+        },
+      },
+    },
   };
 }
 

@@ -1,0 +1,15 @@
+{
+  "name": "media-share-viewer",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build --watch"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "latest",
+    "typescript": "latest",
+    "vite": "^6.0.0",
+    "vue": "^3.4.0",
+    "vue-router": "^4.6.3"
+  }
+}

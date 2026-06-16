@@ -12,6 +12,7 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
   const base = (process.env.DIRECTUS_PUBLIC_URL ?? "").replace(/\/$/, "");
 
   return (mediaJunctionRows ?? [])
+    .filter((row) => row.directus_files_id?.draft_status !== 'draft')
     .map((row, index) => {
       const file = row.directus_files_id;
       if (!file?.id) return null;

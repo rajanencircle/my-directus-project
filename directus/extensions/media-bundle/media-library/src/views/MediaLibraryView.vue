@@ -48,6 +48,11 @@
 
       <AddFolder :parent="foldersStore.selectedFolderId" />
 
+      <!-- View toggle -->
+      <v-button icon small rounded secondary :v-tooltip.bottom="viewMode === 'list' ? 'Switch to grid' : 'Switch to list'" @click="viewMode = viewMode === 'list' ? 'grid' : 'list'">
+        <v-icon :name="viewMode === 'list' ? 'grid_view' : 'view_list'" />
+      </v-button>
+
       <!-- Upload -->
       <v-button icon small rounded @click="showUploadModal = true">
         <v-icon name="add" />
@@ -126,12 +131,17 @@
           <template #[`item.thumbnail`]="{ item }">
             <div class="thumb-cell">
               <img
-                v-if="isImageType(item.type)"
+                v-if="isImageType(item.type) && !failedImages.has(item.id)"
                 :src="getThumbnailUrl(item.id)"
                 :alt="item.title ?? item.filename_disk"
                 class="thumb-img"
                 loading="lazy"
+                @error="onImageError(item.id)"
               />
+              <div v-else-if="isImageType(item.type)" class="thumb-fallback">
+                <v-icon name="insert_drive_file" class="thumb-fallback-icon" />
+                <span class="thumb-fallback-ext">{{ getExtension(item.type) }}</span>
+              </div>
               <v-icon v-else :name="getFileIcon(item.type)" class="file-type-icon" />
             </div>
           </template>
@@ -251,16 +261,31 @@
           v-for="file in filesStore.files"
           :key="file.id"
           class="grid-cell"
-          @click="openFile(file.id)"
+          :class="{ selected: selectedIds.includes(file.id) }"
+          @click="handleGridClick(file)"
         >
           <div class="grid-thumb">
+            <div class="grid-checkbox" @click.stop="toggleGridSelection(file.id)">
+              <v-checkbox
+                :model-value="selectedIds.includes(file.id)"
+                :value="file.id"
+                icon-on="check_circle"
+                icon-off="radio_button_unchecked"
+                @update:model-value="toggleGridSelection(file.id)"
+              />
+            </div>
             <img
-              v-if="isImageType(file.type)"
+              v-if="isImageType(file.type) && !failedImages.has(file.id)"
               :src="getThumbnailUrl(file.id, 200)"
               :alt="file.title ?? file.filename_disk"
               class="grid-img"
               loading="lazy"
+              @error="onImageError(file.id)"
             />
+            <div v-else-if="isImageType(file.type)" class="grid-icon-bg grid-file-fallback">
+              <v-icon name="insert_drive_file" class="grid-fallback-icon" />
+              <span class="grid-fallback-ext">{{ getExtension(file.type) }}</span>
+            </div>
             <div v-else class="grid-icon-bg">
               <v-icon :name="getFileIcon(file.type)" class="grid-file-icon" />
             </div>
@@ -323,8 +348,17 @@ const foldersStore = useFoldersStore()
 const filesStore = useFilesStore()
 const { getThumbnailUrl } = useAssetUrl()
 
+// ── Failed image tracking ──────────────────────────────────────────
+const failedImages = ref(new Set<string>())
+function onImageError(fileId: string) {
+  failedImages.value = new Set([...failedImages.value, fileId])
+}
+
 // ── View state ─────────────────────────────────────────────────────
-const viewMode = ref<'list' | 'grid'>('list')
+const viewMode = ref<'list' | 'grid'>(
+  (localStorage.getItem('media-library-view-mode') as 'list' | 'grid') ?? 'list'
+)
+watch(viewMode, (v) => localStorage.setItem('media-library-view-mode', v))
 const selectedIds = ref<string[]>([])
 const tableRowHeight = 48
 const showUploadModal = ref(false)
@@ -578,6 +612,22 @@ function openFile(id: string) {
   router.push(`/media-library/${id}`)
 }
 
+function toggleGridSelection(id: string) {
+  if (selectedIds.value.includes(id)) {
+    selectedIds.value = selectedIds.value.filter((k) => k !== id)
+  } else {
+    selectedIds.value = [...selectedIds.value, id]
+  }
+}
+
+function handleGridClick(file: DirectusFile) {
+  if (selectedIds.value.length > 0) {
+    toggleGridSelection(file.id)
+  } else {
+    openFile(file.id)
+  }
+}
+
 function handleRowClick({ item }: { item: DirectusFile; event: PointerEvent }) {
   // If any items are already selected, clicking a row toggles selection instead of navigating
   if (selectedIds.value.length > 0) {
@@ -635,6 +685,15 @@ function getFileIcon(mimeType: string): string {
   if (mimeType.includes('word') || mimeType.includes('document')) return 'description'
   if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return 'table_chart'
   return 'insert_drive_file'
+}
+
+function getExtension(mimeType: string): string {
+  const map: Record<string, string> = {
+    'image/jpeg': 'JPG', 'image/jpg': 'JPG', 'image/png': 'PNG',
+    'image/gif': 'GIF', 'image/webp': 'WEBP', 'image/svg+xml': 'SVG',
+    'image/avif': 'AVIF', 'image/tiff': 'TIFF', 'image/bmp': 'BMP',
+  }
+  return map[mimeType] ?? mimeType.split('/')[1]?.toUpperCase() ?? 'FILE'
 }
 
 function formatFilesize(bytes: number): string {
@@ -780,6 +839,27 @@ function formatFilesize(bytes: number): string {
 .thumb-img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
 .file-type-icon { --v-icon-color: var(--theme--foreground-subdued); }
 
+.thumb-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background: var(--theme--primary-background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+.thumb-fallback-icon { --v-icon-size: 18px; --v-icon-color: var(--theme--primary); }
+.thumb-fallback-ext {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--theme--primary);
+  line-height: 1;
+}
+
 /* ── Column add button ────────────────────────────────────────────── */
 .add-field {
   --v-icon-color-hover: var(--theme--foreground);
@@ -788,15 +868,116 @@ function formatFilesize(bytes: number): string {
 .flip { transform: scaleY(-1); }
 
 /* ── Grid view ────────────────────────────────────────────────────── */
-.grid-wrapper { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; align-content: start; }
-.grid-cell { cursor: pointer; border-radius: 8px; overflow: hidden; border: 1px solid var(--theme--border-color); background: var(--theme--background); transition: border-color var(--fast) var(--transition); }
-.grid-cell:hover { border-color: var(--theme--primary); }
-.grid-thumb { width: 100%; aspect-ratio: 1; overflow: hidden; background: var(--theme--background-subdued); }
-.grid-img { width: 100%; height: 100%; object-fit: cover; }
-.grid-icon-bg { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.grid-wrapper {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  align-content: start;
+  padding: 22px !important;
+}
+
+.grid-cell {
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--theme--border-color);
+  background: var(--theme--background);
+  transition: border-color var(--fast) var(--transition), box-shadow var(--fast) var(--transition);
+}
+.grid-cell:hover {
+  border-color: var(--theme--primary);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+.grid-cell.selected { border-color: var(--theme--primary); }
+
+.grid-thumb {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--theme--background-subdued);
+  line-height: 0; /* prevent gap below inline img */
+}
+
+/* Hover overlay */
+.grid-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transition: opacity var(--fast) var(--transition);
+  pointer-events: none;
+  z-index: 1;
+}
+.grid-cell:hover .grid-thumb::after { opacity: 1; }
+
+.grid-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.grid-cell:hover .grid-img { transform: scale(1.04); }
+
+.grid-icon-bg {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .grid-file-icon { --v-icon-size: 40px; --v-icon-color: var(--theme--foreground-subdued); }
+
+.grid-file-fallback {
+  background: var(--theme--primary-background);
+  flex-direction: column;
+  gap: 6px;
+}
+.grid-fallback-icon { --v-icon-size: 40px; --v-icon-color: var(--theme--primary); }
+.grid-fallback-ext {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--theme--primary);
+}
 .grid-label { padding: 8px 8px 2px; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--theme--foreground); }
 .grid-meta { padding: 0 8px 8px; font-size: 11px; color: var(--theme--foreground-subdued); }
+
+.grid-checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity var(--fast) var(--transition);
+}
+.grid-cell:hover .grid-checkbox,
+.grid-cell.selected .grid-checkbox {
+  opacity: 1;
+}
+
+/* Unchecked: white circle with dark shadow so it shows on light images */
+.grid-checkbox :deep(.v-checkbox) {
+  --v-checkbox-unchecked-color: rgba(255, 255, 255, 0.95);
+}
+.grid-checkbox :deep(.v-checkbox .checkbox) {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Checked: primary-colored circle icon with white cutout checkmark.
+   White background behind the icon makes the checkmark cut-out appear white. */
+.grid-checkbox :deep(.v-checkbox.checked) {
+  --v-icon-color: var(--theme--primary);
+}
+.grid-checkbox :deep(.v-checkbox.checked .checkbox) {
+  background: white;
+  border-radius: 50%;
+  filter: none;
+}
 
 /* ── Pagination footer ────────────────────────────────────────────── */
 .footer {

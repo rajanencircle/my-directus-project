@@ -9,11 +9,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStores } from '@directus/extensions-sdk';
 
 const route = useRoute();
+const router = useRouter();
 const reason = route.params.reason as string;
+
+const { useUserStore } = useStores();
+const userStore = useUserStore();
+
+// Authenticated admins who land here (e.g. from a stale lastRoute in localStorage)
+// should be redirected to the media library instead of seeing the error page.
+onMounted(() => {
+  if (userStore.currentUser) {
+    router.replace('/media-library');
+  }
+});
 
 const message = computed(() => {
   if (reason === 'not_found') return 'This share link is invalid or does not exist.';

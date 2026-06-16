@@ -37,6 +37,13 @@ export const useAlbumsStore = defineStore('media-library-albums', () => {
     selectedAlbumId.value = id
   }
 
+  async function createAlbum(name: string): Promise<DirectusAlbum> {
+    const res = await api.post('/items/albums_directus', { name, status: 'published' })
+    const created: DirectusAlbum = res.data?.data
+    albums.value = [...albums.value, created]
+    return created
+  }
+
   async function deleteAlbum(id: string): Promise<void> {
     try {
       await api.delete(`/items/albums_directus/${id}`)
@@ -50,5 +57,5 @@ export const useAlbumsStore = defineStore('media-library-albums', () => {
     }
   }
 
-  return { albums, selectedAlbumId, isLoading, fetchAlbums, selectAlbum, deleteAlbum }
+  return { albums, selectedAlbumId, isLoading, fetchAlbums, selectAlbum, createAlbum, deleteAlbum }
 })
