@@ -1,7 +1,6 @@
 # Directus AI + MCP — Complete Client Documentation
 
 **Project:** BoTG — Directus CMS  
-**Prepared by:** Encircle Technologies  
 **Date:** June 2026  
 **Version:** 1.0
 
@@ -1180,5 +1179,3 @@ Because we use a dedicated AI user for MCP operations, every change made by the 
 - Installation & Connection: https://directus.com/docs/guides/ai/mcp/installation#connect-your-ai-client
 
 ---
-
-_This document is maintained by Encircle Technologies. For questions or updates, contact the project team._
