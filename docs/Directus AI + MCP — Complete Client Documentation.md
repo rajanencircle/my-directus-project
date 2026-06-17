@@ -1,6 +1,6 @@
 # Directus AI + MCP — Complete Client Documentation
 
-**Project:** BoTG / Functional — Directus CMS  
+**Project:** BoTG — Directus CMS  
 **Prepared by:** Encircle Technologies  
 **Date:** June 2026  
 **Version:** 1.0
@@ -38,18 +38,9 @@
 
 All BoTG environments are running Directus **11.17.4**, which is above the minimum required version for the built-in MCP server. MCP can be enabled on all three environments immediately.
 
-### 1.2 Functional Environments
+### 1.2 MCP Minimum Version Requirement
 
-| Environment | URL                                      | Directus Version | MCP Supported       |
-| ----------- | ---------------------------------------- | ---------------- | ------------------- |
-| Production  | https://directus.functional.team         | 11.11.0          | ❌ Requires upgrade |
-| Staging     | https://directus.staging.functional.team | 11.11.0          | ❌ Requires upgrade |
-
-Functional environments are currently running Directus **11.11.0**, which is **below the minimum required version** (v11.12.0) for the built-in MCP server. To use MCP on Functional, the Directus instance must first be upgraded to v11.12.0 or newer.
-
-### 1.3 MCP Minimum Version Requirement
-
-The built-in MCP server was introduced in Directus **v11.12.0**. Any instance below this version cannot use the native MCP functionality. The upgrade to v11.12.0 or newer is a prerequisite for Functional environments.
+The built-in MCP server was introduced in Directus **v11.12.0**. Any instance below this version cannot use the native MCP functionality. All BoTG environments (11.17.4) already meet this requirement.
 
 ---
 
@@ -151,7 +142,7 @@ claude mcp add --transport http directus https://your-directus-url.com/mcp \
 
 Once configured, the AI client will be able to interact with the Directus instance through MCP using the **permissions of the user associated with the generated token**.
 
-> If you would like us to perform the Functional upgrade or assist with the MCP configuration, please let us know.
+> If you would like us to assist with the MCP configuration, please let us know.
 
 ---
 
@@ -800,11 +791,6 @@ Working _with_ these rules — not against them — is what keeps the instance s
 - All schema and collection changes must start in Development or Staging
 - Never make direct schema changes in Production
 
-**Functional:**
-
-- Staging → Production
-- Same rule: always start in Staging
-
 **Recommended workflow:**
 
 1. Make all schema, collection, field, and flow changes in Staging
@@ -903,16 +889,15 @@ In the current setup, database-level backups are the primary safety net. For sch
 
 ## 11. Collaboration, Content Safety & Deployment — Policy and Assessment
 
-This section sets out our assessment and recommended practices for collaboration, content safety, environment management, and deployment. The considerations apply to **both Functional and BoTG environments**.
+This section sets out our assessment and recommended practices for collaboration, content safety, environment management, and deployment across the **BoTG environments**.
 
 ---
 
 ### 11.1 Where Content Can Be Edited So That It Is Never Lost
 
-The available environments are:
+The available BoTG environments are:
 
 - **BoTG:** Development, Staging, Production
-- **Functional:** Staging, Production
 
 It is important to note that Directus does **not** provide a native mechanism to isolate individual content, schema, flow, or configuration changes during environment migrations.
 
@@ -947,7 +932,7 @@ To maintain a controlled workflow, we recommend:
 - Performing thorough testing and validation
 - Deploying approved changes to **Production** only after verification
 
-This approach applies to both BoTG and Functional and helps reduce the risk of unintended production changes. AI + MCP is our primary tool for applying schema changes — the AI reads the staging environment, applies the changes, and documents everything with revert instructions before production is touched.
+This approach applies across all BoTG environments and helps reduce the risk of unintended production changes. AI + MCP is our primary tool for applying schema changes — the AI reads the staging environment, applies the changes, and documents everything with revert instructions before production is touched.
 
 ---
 
@@ -1010,7 +995,6 @@ MCP can be enabled and used with Claude or other MCP-compatible AI tools, provid
 **Current status:**
 
 - **BoTG (all environments):** Running v11.17.4 — MCP is supported and can be enabled immediately
-- **Functional (both environments):** Running v11.11.0 — requires upgrade to v11.12.0+ before MCP can be used
 
 **To enable MCP** (per environment where MCP should be available):
 
@@ -1022,7 +1006,7 @@ MCP can be enabled and used with Claude or other MCP-compatible AI tools, provid
 
 **To connect Claude:** See Section 4 of this document for full instructions (OAuth and static token methods).
 
-Please let us know if you would like us to perform the Functional upgrade or assist with the MCP configuration.
+Please let us know if you would like us to assist with the MCP configuration.
 
 ---
 
