@@ -26,6 +26,8 @@
 
 ---
 
+<div style="page-break-before: always;"></div>
+
 ## 1. Environment Overview — Current Status
 
 ### 1.1 BoTG Environments
@@ -43,6 +45,8 @@ All BoTG environments are running Directus **11.17.4**, which is above the minim
 The built-in MCP server was introduced in Directus **v11.12.0**. Any instance below this version cannot use the native MCP functionality. All BoTG environments (11.17.4) already meet this requirement.
 
 ---
+
+<div style="page-break-before: always;"></div>
 
 ## 2. What is MCP and How it Connects to Directus
 
@@ -146,6 +150,8 @@ Once configured, the AI client will be able to interact with the Directus instan
 
 ---
 
+<div style="page-break-before: always;"></div>
+
 ## 3. Enabling MCP on Your Directus Instance
 
 ### 3.1 Step-by-Step: Enable MCP in the Directus Admin Panel
@@ -183,6 +189,8 @@ The MCP server authenticates using a **Static Token** — a permanent, non-expir
 Use a **different token for each environment** (development, staging, production). This ensures that a staging breach does not affect production, and that you can revoke access per environment independently.
 
 ---
+
+<div style="page-break-before: always;"></div>
 
 ## 4. Connecting an AI Client (Claude)
 
@@ -267,6 +275,8 @@ Reference documentation:
 - https://directus.com/docs/guides/ai/mcp/installation#connect-your-ai-client
 
 ---
+
+<div style="page-break-before: always;"></div>
 
 ## 5. What IS Possible via MCP — Verified Capabilities
 
@@ -432,6 +442,8 @@ The AI can execute **manual flows** directly, passing data payloads and collecti
 
 ---
 
+<div style="page-break-before: always;"></div>
+
 ## 6. Our AI Workflow in Practice
 
 ### 6.1 Standard Workflow — Human Stays in Control
@@ -492,6 +504,8 @@ A single-record `mobility_advice_text` collection holds global per-language mobi
 A phased 10-step migration (ongoing) in which AI via MCP created all new `daytrips_*` collections, fields, relations, and flows — all without touching the existing `tours_*` collections. This additive approach allowed the new structure to be verified in staging before the old structure is cleaned up.
 
 ---
+
+<div style="page-break-before: always;"></div>
 
 ## 7. Creating Collections, Fields, Translations & Flows via AI
 
@@ -629,6 +643,8 @@ Claude will:
 
 ---
 
+<div style="page-break-before: always;"></div>
+
 ## 8. Custom Extensions — How They Work with AI
 
 ### 8.1 What Extensions Are
@@ -720,6 +736,8 @@ Directus scans the `extensions/` directory at startup and loads every extension 
 
 ---
 
+<div style="page-break-before: always;"></div>
+
 ## 9. Critical Considerations Before Any Change — Directus Is a CMS, Not a Freeform App
 
 This is the single most important section for anyone using AI (or working manually) on this project. **Directus is a Content Management System built on a relational database — it is not a custom application that can be freely rewritten.** Every collection, field, relation, and flow is bound by database rules and by dependencies on other objects. A change that looks isolated is rarely isolated.
@@ -780,6 +798,8 @@ Directus is opinionated and enforces conventions that cannot be bypassed:
 Working _with_ these rules — not against them — is what keeps the instance stable. This is precisely why AI is instructed to read the schema first and follow existing patterns rather than invent new structures.
 
 ---
+
+<div style="page-break-before: always;"></div>
 
 ## 10. Migration Management — Environments & Deployments
 
@@ -886,6 +906,8 @@ Directus does not provide a built-in snapshot and restore system. A complete bac
 In the current setup, database-level backups are the primary safety net. For schema, the `STAGING_CHANGES/` documentation provides a manual revert path via AI + MCP.
 
 ---
+
+<div style="page-break-before: always;"></div>
 
 ## 11. Collaboration, Content Safety & Deployment — Policy and Assessment
 
@@ -1010,6 +1032,8 @@ Please let us know if you would like us to assist with the MCP configuration.
 
 ---
 
+<div style="page-break-before: always;"></div>
+
 ## 12. What AI Cannot Do — Limitations
 
 Understanding limitations is as important as understanding capabilities. This section covers both hard technical limitations and reliability boundaries.
@@ -1046,6 +1070,8 @@ Understanding limitations is as important as understanding capabilities. This se
 
 ---
 
+<div style="page-break-before: always;"></div>
+
 ## 13. Summary Capability Table
 
 | Capability                         | MCP (with Claude)    | AI (without MCP)                |
@@ -1070,6 +1096,8 @@ Understanding limitations is as important as understanding capabilities. This se
 | Native backup/restore              | ❌                   | ❌ (requires custom tool)       |
 
 ---
+
+<div style="page-break-before: always;"></div>
 
 ## 14. Security Best Practices
 
