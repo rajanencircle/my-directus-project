@@ -411,11 +411,27 @@ Note: `camper_price_periods_list`, `camper_rental_periods_list`, and `camper_sea
 
 ---
 
+## Section 14 — `camper_specials` Sub-field Title Correction (Both Environments)
+
+**Date:** 2026-06-18
+
+The `camper_specials` list sub-field `title.name` was set to `"Titel"` (German) in Section 12. Corrected back to `"Title"` (English) on **both local and staging**.
+
+| Field | Collection | Change |
+|---|---|---|
+| `camper_specials` options.fields[0].name | `campers` (local) | `"Titel"` → `"Title"` |
+| `camper_specials` options.fields[0].name | `campers` (staging) | `"Titel"` → `"Title"` |
+
+**Revert:** Set `options.fields[0].name` back to `"Titel"` on both environments via MCP fields update.
+
+---
+
 ## Full Revert Order
 
 To fully remove the camper schema from staging, run in this order:
 
-1. **Section 12** — Revert labels on 12 fields across 4 collections; revert `season_label.special` to null
+1. **Section 14** — Revert `camper_specials` sub-field title to `"Titel"` on both environments
+2. **Section 12** — Revert labels on 12 fields across 4 collections; revert `season_label.special` to null
 2. **Section 11** — Delete `sort` from `camper_vehicle_categories`, `camper_surcharges`, `camper_depots`
 3. **Section 9** — Set `options: null` on `camper_depots.town/state/country`
 4. **Section 8** — Set `options: null` and `conditions: null` on 17 `campers` fields
