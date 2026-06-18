@@ -322,6 +322,48 @@ Both collections were confirmed to already exist on staging and are fully in syn
 
 ---
 
+## Section 12 — Field Label & Options Sync (This Session)
+
+**Date:** 2026-06-18
+
+Applied after a full local↔staging diff. All changes are on **staging only**.
+
+### `campers` — 4 fields
+
+| Field | What changed |
+|---|---|
+| `status_primarix` | Translations fixed: `"Status (Primarix)"` → `"Status Primarix"` (all 3 languages, to match hotels pattern) |
+| `user_updated` | Translations fixed: `"Updated by"/"Zuletzt geändert von"/"Bijgewerkt door"` → `"by"/"von"/"door"` (hotels pattern). Template fixed: `{{avatar}} {{first_name}} {{last_name}}` → `{{first_name}} {{last_name}}` (avatar reference was causing display issues) |
+| `date_updated` | Translations fixed: `"Updated at"/"Zuletzt geändert am"/"Bijgewerkt op"` → `"Last Update"/"Zuletzt aktualisiert"/"Laatste update"` (hotels pattern). Options added: `{"format": "dd.MM.yyyy HH:mm:ss"}` |
+| `camper_specials` | Sub-field `title` name fixed: `"Title"` → `"Titel"` (German label). Sub-field `text` width fixed: `"full"` → `"half"` (matches local) |
+
+### `camper_price_periods_list` — 3 fields
+
+| Field | Translations (de-DE / en-GB / nl-NL) |
+|---|---|
+| `price_period_start` | `"Preiszeitraum: von"` / `"Price Period: From"` / `"Prijsperiode: van"` |
+| `price_period_end` | `"Preiszeitraum: bis"` / `"Price Period: To"` / `"Prijsperiode: tot"` |
+| `price_start` | `"Ab-Preis"` / `"Starting Price"` / `"Vanaf-prijs"` |
+
+### `camper_rental_periods_list` — 2 fields
+
+| Field | Translations (de-DE / en-GB / nl-NL) |
+|---|---|
+| `min_days` | `"Mindestmietdauer (Tage)"` / `"Min. Rental Days"` / `"Min. huur (dagen)"` |
+| `max_days` | `"Maximale Mietdauer (Tage)"` / `"Max. Rental Days"` / `"Max. huur (dagen)"` |
+
+### `camper_seasons_list` — 3 fields + 1 special fix
+
+| Field | Change |
+|---|---|
+| `season_label` | `special` fixed: `null` → `["m2o"]`. Translations: `"Saison"` / `"Season Label"` / `"Seizoenlabel"` |
+| `season_start` | Translations: `"Saison: von"` / `"Season: From"` / `"Seizoen: van"` |
+| `season_end` | Translations: `"Saison: bis"` / `"Season: To"` / `"Seizoen: tot"` |
+
+**Revert:** Set translations back to the staging-created short labels and set `season_label.special` back to `null` via MCP fields update.
+
+---
+
 ## Section 11 — Missing `sort` Fields on Sub-Collections (This Session)
 
 **Date:** 2026-06-18
@@ -340,24 +382,54 @@ Note: `camper_price_periods_list`, `camper_rental_periods_list`, and `camper_sea
 
 ---
 
+## Section 13 — Relations Status After Full Diff
+
+**Date:** 2026-06-18
+
+### Relations already correct on staging (CASCADE — appropriate for junction tables)
+
+| Junction | Field | on_delete |
+|---|---|---|
+| `campers_partner.campers_id → campers` | campers_id | CASCADE ✅ |
+| `campers_partner.partner_id → partner` | partner_id | CASCADE ✅ |
+| `campers_directus_files.campers_id → campers` | campers_id | CASCADE ✅ |
+| `campers_directus_files.directus_files_id → directus_files` | directus_files_id | CASCADE ✅ |
+
+> Note: local has SET NULL for these — CASCADE is more correct for M2M junction tables. No change needed on staging.
+
+### Still blocked — requires staging DB SQL (see Blockers 1 & 2 above)
+
+| Missing relation | Blocker |
+|---|---|
+| `camper_vehicle_categories_translations.camper_vehicle_categories_id → camper_vehicle_categories` | Blocker 1 — UUID/integer type mismatch on PK |
+| `campers_descriptions_translations.languages_code → translations` | Blocker 2 — metadata-only relation |
+| `campers_price_infos_translations.languages_code → translations` | Blocker 2 |
+| `campers_conditions_translations.languages_code → translations` | Blocker 2 |
+| `campers_image_badge_translations.languages_code → translations` | Blocker 2 |
+| `camper_vehicle_categories_translations.languages_code → translations` | Blocker 2 |
+| `camper_surcharges_translations.languages_code → translations` | Blocker 2 |
+
+---
+
 ## Full Revert Order
 
 To fully remove the camper schema from staging, run in this order:
 
-1. **Section 11** — Delete `sort` from `camper_vehicle_categories`, `camper_surcharges`, `camper_depots`
-2. **Section 9** — Set `options: null` on `camper_depots.town/state/country`
-2. **Section 8** — Set `options: null` and `conditions: null` on 17 `campers` fields
-3. **Section 7** — Restore original field notes/translations on 4 fields
-4. **Section 6** — Set `group: null` on all 44 assigned fields
-5. **Section 5** — Delete relations 1364–1371
-6. **Section 4** — Drop `campers_partner`, `campers_directus_files`
-7. **Section 3** — Drop `camper_price_periods_list`, `camper_rental_periods_list`, `camper_seasons_list`
-8. **Section 2** — Delete relations 1347–1363
-9. **Section 1e** — Drop all 6 translation collections
-10. **Section 1d** — Drop `camper_vehicle_categories`, `camper_surcharges`, `camper_depots`
-11. **Section 1c** — Delete 12 O2M/M2M/translation alias fields from `campers`
-12. **Section 1b** — Delete 14 tab/group alias fields from `campers`
-13. **Section 1a** — Delete 44 scalar fields from `campers`
+1. **Section 12** — Revert labels on 12 fields across 4 collections; revert `season_label.special` to null
+2. **Section 11** — Delete `sort` from `camper_vehicle_categories`, `camper_surcharges`, `camper_depots`
+3. **Section 9** — Set `options: null` on `camper_depots.town/state/country`
+4. **Section 8** — Set `options: null` and `conditions: null` on 17 `campers` fields
+5. **Section 7** — Restore original field notes/translations on 4 fields
+6. **Section 6** — Set `group: null` on all 44 assigned fields
+7. **Section 5** — Delete relations 1364–1371
+8. **Section 4** — Drop `campers_partner`, `campers_directus_files`
+9. **Section 3** — Drop `camper_price_periods_list`, `camper_rental_periods_list`, `camper_seasons_list`
+10. **Section 2** — Delete relations 1347–1363
+11. **Section 1e** — Drop all 6 translation collections
+12. **Section 1d** — Drop `camper_vehicle_categories`, `camper_surcharges`, `camper_depots`
+13. **Section 1c** — Delete 12 O2M/M2M/translation alias fields from `campers`
+14. **Section 1b** — Delete 14 tab/group alias fields from `campers`
+15. **Section 1a** — Delete 44 scalar fields from `campers`
 
 If the SQL blockers (Blocker 1 & 2) were applied, revert those first:
 - Delete the 6 languages_code → translations relation rows from `directus_relations`
