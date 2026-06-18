@@ -251,21 +251,113 @@ Updated `group` meta on all scalar `campers` fields so they render in the correc
 
 ---
 
+## Section 8 — Field Options & Conditions on `campers` (This Session)
+
+**Date:** 2026-06-18
+
+Applied missing `options` and `conditions` to 17 `campers` fields on **both local and staging**.
+
+### Cascading Interface Options (fixes "viewing data not working")
+
+| Field | Options Applied |
+|---|---|
+| `place` | `{"target_collection": "places", "icon": "location_city", "searchLimit": 200, "filterBy": [{"fieldKey": "country", "fk": "country_id"}]}` |
+| `location_tour32` | `{"target_collection": "locations_tour32", "searchLimit": 200, "icon": "pin_drop", "cascadeFrom": [{"fieldKey": "place", "parentCollection": "places", "fk": "location_tour32"}]}` |
+| `country` | `{"target_collection": "countries", "icon": "flag", "searchLimit": 200, "cascadeFrom": [{"fieldKey": "place", "parentCollection": "places", "fk": "country_id"}]}` |
+| `state` | `{"target_collection": "states", "icon": "map", "searchLimit": 200, "cascadeFrom": [{"fieldKey": "place", "parentCollection": "places", "fk": "state_id"}]}` |
+
+### M2O / Dropdown Options
+
+| Field | Options Applied |
+|---|---|
+| `season` | `{"template": "{{season}}", "enableCreate": false}` |
+| `booking` | `{"enableCreate": false}` + `hidden: true` |
+| `partner` | `{"template": "{{partner_id.label}}", "limit": 20, "enableCreate": false}` |
+| `partner_group` | `{"start": "open"}` |
+| `reservation_group` | `{"start": "open"}` |
+
+### List O2M Options (`enableCreate: true, enableSelect: false`)
+
+`vehicle_categories`, `price_periods`, `rental_periods`, `camper_seasons`, `surcharges_list`, `depots`
+
+### Conditions
+
+| Field | Condition |
+|---|---|
+| `booking` | Show when `booking_partner = "selected"` (hidden by default) |
+| `partner` | Hide when `partner_type = "all"` |
+| `user_updated` | Readonly + visible when `id` is not null (View on Edit) |
+| `date_updated` | Readonly + visible when `id` is not null (View on Edit) |
+
+**Revert:** Set `options: null` and `conditions: null` on all 17 fields listed above via MCP fields update on both local and staging.
+
+---
+
+## Section 9 — `camper_depots` Cascading Options (This Session)
+
+**Date:** 2026-06-18
+
+Applied cascading interface options to `camper_depots.town/state/country` on **both local and staging**.
+
+| Field | Options Applied |
+|---|---|
+| `town` | `{"target_collection": "places", "icon": "location_city", "searchLimit": 200, "filterBy": [{"fieldKey": "country", "fk": "country_id"}]}` |
+| `state` | `{"target_collection": "states", "icon": "map", "searchLimit": 200, "cascadeFrom": [{"fieldKey": "town", "parentCollection": "places", "fk": "state_id"}]}` |
+| `country` | `{"target_collection": "countries", "icon": "flag", "searchLimit": 200, "cascadeFrom": [{"fieldKey": "town", "parentCollection": "places", "fk": "country_id"}]}` |
+
+**Revert:** Set `options: null` on `town`, `state`, `country` in `camper_depots` via MCP fields update on both environments.
+
+---
+
+## Section 10 — `batch_camper` & `batch_camper_locale` on Staging (Confirmed Existing)
+
+**Date:** 2026-06-18
+
+Both collections were confirmed to already exist on staging and are fully in sync with local. No changes were needed.
+
+| Collection | Fields | Status |
+|---|---|---|
+| `batch_camper` | id, sort, user_created, date_created, user_updated, date_updated, name, destination, buy_price, notice-myss4a, translations | ✅ Already synced |
+| `batch_camper_locale` | id, batch_camper_id, translations_id, margin, exchange_rate, sell_price | ✅ Already synced |
+
+---
+
+## Section 11 — Missing `sort` Fields on Sub-Collections (This Session)
+
+**Date:** 2026-06-18
+
+Three sub-collections created in an earlier session were missing the `sort` field on staging. The `list-o2m` interface always requests `sort` for drag-to-reorder, causing a "field does not exist" error when opening any camper item.
+
+| Collection | Field Added | Type |
+|---|---|---|
+| `camper_vehicle_categories` | `sort` | integer, hidden, nullable |
+| `camper_surcharges` | `sort` | integer, hidden, nullable |
+| `camper_depots` | `sort` | integer, hidden, nullable |
+
+Note: `camper_price_periods_list`, `camper_rental_periods_list`, and `camper_seasons_list` already had `sort` — they were created in a later session that included it.
+
+**Revert:** Delete `sort` field from `camper_vehicle_categories`, `camper_surcharges`, `camper_depots` on staging via MCP fields delete.
+
+---
+
 ## Full Revert Order
 
 To fully remove the camper schema from staging, run in this order:
 
-1. **Section 7** — Restore original field notes/translations on 4 fields
-2. **Section 6** — Set `group: null` on all 44 assigned fields
-3. **Section 5** — Delete relations 1364–1371
-4. **Section 4** — Drop `campers_partner`, `campers_directus_files`
-5. **Section 3** — Drop `camper_price_periods_list`, `camper_rental_periods_list`, `camper_seasons_list`
-6. **Section 2** — Delete relations 1347–1363
-7. **Section 1e** — Drop all 6 translation collections
-8. **Section 1d** — Drop `camper_vehicle_categories`, `camper_surcharges`, `camper_depots`
-9. **Section 1c** — Delete 12 O2M/M2M/translation alias fields from `campers`
-10. **Section 1b** — Delete 14 tab/group alias fields from `campers`
-11. **Section 1a** — Delete 44 scalar fields from `campers`
+1. **Section 11** — Delete `sort` from `camper_vehicle_categories`, `camper_surcharges`, `camper_depots`
+2. **Section 9** — Set `options: null` on `camper_depots.town/state/country`
+2. **Section 8** — Set `options: null` and `conditions: null` on 17 `campers` fields
+3. **Section 7** — Restore original field notes/translations on 4 fields
+4. **Section 6** — Set `group: null` on all 44 assigned fields
+5. **Section 5** — Delete relations 1364–1371
+6. **Section 4** — Drop `campers_partner`, `campers_directus_files`
+7. **Section 3** — Drop `camper_price_periods_list`, `camper_rental_periods_list`, `camper_seasons_list`
+8. **Section 2** — Delete relations 1347–1363
+9. **Section 1e** — Drop all 6 translation collections
+10. **Section 1d** — Drop `camper_vehicle_categories`, `camper_surcharges`, `camper_depots`
+11. **Section 1c** — Delete 12 O2M/M2M/translation alias fields from `campers`
+12. **Section 1b** — Delete 14 tab/group alias fields from `campers`
+13. **Section 1a** — Delete 44 scalar fields from `campers`
 
 If the SQL blockers (Blocker 1 & 2) were applied, revert those first:
 - Delete the 6 languages_code → translations relation rows from `directus_relations`
