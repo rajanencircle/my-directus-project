@@ -705,3 +705,115 @@ To fully revert this migration (before data migration):
     - Update `daytrips_price_dates` id=1,2: set daytrip_id=null
 
 11. **`tours` and all `tours_*` collections remain untouched throughout**
+
+---
+
+## Phase 11: Tab Structure (UI Layout)
+
+**Date:** 2026-06-18  
+**Goal:** Add the same tab layout to `daytrips` as exists in `tours`
+
+### Stage 1–3: Tab group containers created on `daytrips`
+
+| Field | Interface | Parent | Sort | Notes |
+|---|---|---|---|---|
+| `tabs` | group-tabs | (root) | 6 | Root tabs container |
+| `master_data_group` | group-raw | tabs | 1 | Master Data tab |
+| `partner_filter_group` | group-raw | tabs | 2 | Partner Filter tab |
+| `tour_operator_group` | group-raw | tabs | 3 | Tour Operator tab |
+| `reservation_group` | group-raw | tabs | 4 | Reservation tab |
+| `description_group` | group-raw | tabs | 5 | Description tab |
+| `tour_dates_group` | group-raw | tabs | 6 | Tour Dates tab |
+| `price_info_group` | group-raw | tabs | 7 | Price Info tab |
+| `price_basics` | group-raw | tabs | 8 | Price Basics tab |
+| `locale_prices` | group-raw | tabs | 9 | Locale Prices tab (equivalent of tours "prices" tab) |
+| `offer_specials_group` | group-raw | tabs | 10 | Offer Specials tab |
+| `surcharge_group` | group-raw | tabs | 11 | Surcharges tab |
+| `image_badge_group` | group-raw | tabs | 12 | Image Badge tab |
+| `media_group` | group-raw | tabs | 13 | Media tab |
+| `main_group` | group-raw | master_data_group | 1 | Nested sub-group in Master Data |
+| `tour_details_group` | group-raw | tour_operator_group | 3 | Nested (hidden) sub-group in Tour Operator |
+| `tour_departures_group` | group-raw | tour_dates_group | 2 | Nested sub-group for departures |
+| `tour_routes_group` | group-raw | tour_dates_group | 3 | Nested sub-group for routes |
+| `divider_1` | presentation-divider | price_basics | 2 | Divider between categories and price_periods |
+| `divider_2` | presentation-divider | price_basics | 4 | Divider between price_periods and room_occupancies |
+| `header` | header | (root) | 5 | Display header: `{{name}}` / `{{object_id}} - {{season.season}}` |
+
+> **Note:** `locale_prices` is named differently from tours (where the tab is called `prices`) because in daytrips, `prices` is already an O2M alias field pointing to `daytrips_prices`.
+
+### Stage 4: All fields assigned to correct groups
+
+All existing daytrips fields updated with correct `group` and `sort` values:
+
+| Field | Group | Sort |
+|---|---|---|
+| object_id | main_group | 1 |
+| object_info_primarix | main_group | 2 |
+| season | main_group | 3 |
+| status_primarix | main_group | 4 |
+| internal_remarks | main_group | 5 |
+| date_updated | main_group | 6 |
+| user_updated | main_group | 7 |
+| partner_type | partner_filter_group | 1 |
+| partner | partner_filter_group | 2 |
+| operator | tour_operator_group | 1 |
+| operator_fk | tour_operator_group | 2 |
+| name | tour_details_group | 1 |
+| street | tour_details_group | 2 |
+| street_number | tour_details_group | 3 |
+| zip_code | tour_details_group | 4 |
+| place | tour_details_group | 5 |
+| location_tour32 | tour_details_group | 6 |
+| state | tour_details_group | 7 |
+| country | tour_details_group | 8 |
+| phone_general | tour_details_group | 9 |
+| phone_ah | tour_details_group | 10 |
+| email_general | tour_details_group | 11 |
+| website | tour_details_group | 12 |
+| booking_partner | reservation_group | 1 |
+| booking | reservation_group | 2 |
+| id_tour_user | reservation_group | 3 |
+| haupt_id_tour_user | reservation_group | 4 |
+| booking_email | reservation_group | 5 |
+| internal_remarks_reservation | reservation_group | 6 |
+| destination | description_group | 1 |
+| countries | description_group | 2 |
+| travel_categories | description_group | 3 |
+| translations | description_group | 4 |
+| dates_translations | tour_dates_group | 1 |
+| tour_dates_web | tour_departures_group | 1 |
+| routes | tour_routes_group | 1 |
+| supplier_product_code | price_info_group | 1 |
+| price_subline | price_info_group | 2 |
+| price_info_translations | price_info_group | 3 |
+| children_free_age | price_info_group | 4 |
+| children_free_number | price_info_group | 5 |
+| participants_min | price_info_group | 6 |
+| participants_max | price_info_group | 7 |
+| week_min_before_start | price_info_group | 8 |
+| mobility_advice_text | price_info_group | 9 |
+| categories | price_basics | 1 |
+| divider_1 | price_basics | 2 |
+| price_periods | price_basics | 3 |
+| divider_2 | price_basics | 4 |
+| room_occupancies | price_basics | 5 |
+| prices | price_basics | 6 |
+| sell_prices_status | price_basics | 7 |
+| sell_prices_updated_at | price_basics | 8 |
+| translations_1 | locale_prices | 1 |
+| daytrips_specials | offer_specials_group | 1 |
+| surcharges_translations | surcharge_group | 1 |
+| surcharges_items | surcharge_group | 2 |
+| image_badge_translations | image_badge_group | 1 |
+| image_badge_start_date | image_badge_group | 2 |
+| image_badge_end_date | image_badge_group | 3 |
+| image_badge_status | image_badge_group | 4 |
+| media | media_group | 1 |
+
+### Cleanup
+- `default_group` (original flat structure container) — set `hidden: true`
+
+### Revert Steps for Phase 11
+1. Delete all tab/group alias fields created in Stage 1–3 (tabs, master_data_group, partner_filter_group, tour_operator_group, reservation_group, description_group, tour_dates_group, price_info_group, price_basics, locale_prices, offer_specials_group, surcharge_group, image_badge_group, media_group, main_group, tour_details_group, tour_departures_group, tour_routes_group, divider_1, divider_2, header)
+2. Reset all field `group` values back to `null` (or `default_group`)
+3. Set `default_group` hidden back to `false`
