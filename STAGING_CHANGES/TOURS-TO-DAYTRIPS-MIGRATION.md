@@ -817,3 +817,105 @@ All existing daytrips fields updated with correct `group` and `sort` values:
 1. Delete all tab/group alias fields created in Stage 1–3 (tabs, master_data_group, partner_filter_group, tour_operator_group, reservation_group, description_group, tour_dates_group, price_info_group, price_basics, locale_prices, offer_specials_group, surcharge_group, image_badge_group, media_group, main_group, tour_details_group, tour_departures_group, tour_routes_group, divider_1, divider_2, header)
 2. Reset all field `group` values back to `null` (or `default_group`)
 3. Set `default_group` hidden back to `false`
+
+---
+
+## Phase 12: Beautification — Labels, Translations, Notes, Widths
+
+**Date:** 2026-06-18  
+**Goal:** Match all daytrips field labels, multilingual translations, notes, and widths to the tours collection. Also fix surcharges sort order and add tab group translations.
+
+### What changed
+
+All updates were applied via the Directus fields API (`PATCH /fields/daytrips`).
+
+#### Tab group container translations (all 4 languages: en-GB / de-DE / nl-NL + en-US where applicable)
+
+| Field (alias group) | en-GB | de-DE | nl-NL |
+|---|---|---|---|
+| `master_data_group` | Master Data | Stammdaten | Stamgegevens |
+| `partner_filter_group` | Partner Filter | Partner Filter | Partner Filter |
+| `tour_operator_group` | Operator | Veranstalter | Organisator |
+| `reservation_group` | Reservation | Reservierung | Reservering |
+| `description_group` | Description | Beschreibung | Beschrijving |
+| `tour_dates_group` | Travel Dates | Reise-Termine | Reisdata |
+| `price_info_group` | Price Information | Preis-Infos | Prijsinformatie |
+| `price_basics` | Price Basics | Preisgrundlagen | Prijsgrondslagen |
+| `locale_prices` | Prices | Preise | Prijzen |
+| `offer_specials_group` | Offers | Angebote / Specials | Aanbiedingen |
+| `surcharge_group` | Surcharges | Zuschläge | Toeslagen |
+| `image_badge_group` | Image Badge | Bild Hinweis | Afbeelding badge |
+| `media_group` | Media | Medien | Media |
+
+#### Field-level changes
+
+| Field | Label (en-US) | en-GB | de-DE | nl-NL | Width | Note |
+|---|---|---|---|---|---|---|
+| `object_id` | — | Object-ID | Objekt-ID | Object-ID | half | "Automatically set from Primarix." |
+| `object_info_primarix` | — | Object Title Primarix | Objekt Titel Primarix | Objecttitel Primarix | half | — |
+| `season` | Season Validity | Season Validity | Saison-Gültigkeit | Seizoengeldigheid | half | — |
+| `internal_remarks` | Internal Remarks | Internal Remarks | Interne Hinweise | Interne opmerking | full | "Internal Remarks from Primarix. - Please consider for the future the Comments-Feature (Icon on right side)." |
+| `date_updated` | — | Last Update | Zuletzt aktualisiert | Laatste update | half | — |
+| `user_updated` | — | by | von | door | half | — |
+| `partner_type` | Partner Filter | — | — | — | full | — |
+| `operator` | Trip Operator? | Trip Operator? | Veranstalter mit mehreren Angeboten | Reisorganisator? | full | — |
+| `operator_fk` | Tour Operator | Tour Operator | Tour Operator | Touroperator | full | — |
+| `name` | Name | Name | Name | Naam | **half** | — |
+| `street` | Street | Street | Straße | Straat | **half** | — |
+| `street_number` | Street Number | Street Number | Hausnummer | Huisnummer | **half** | — |
+| `zip_code` | Postal Code | Postal Code | PLZ | Postcode | **half** | — |
+| `place` | City/Town | City/Town | Ort | Plaats | **half** | — |
+| `location_tour32` | Search Location (Tour32 only) | Search Location (Tour User only) | Suchort (Tour User only) | Zoeklocatie (Tour User only) | **half** | — |
+| `state` | State / Province | State / Province | Staat / Bundesland | Staat / Provincie | **half** | — |
+| `country` | Country | Country | Land | Land | **half** | — |
+| `phone_general` | Phone (General) | Phone (general) | Telefon (allgemein) | Telefoon (algemeen) | **half** | — |
+| `phone_ah` | Phone (After Hours) | Phone (after hours) | Telefon (after hours) | Telefoon (na kantooruren) | **half** | — |
+| `email_general` | Email (General) | E-mail (general) | Email (allgemein) | Email (algemeen) | **half** | — |
+| `website` | Website | Web Site | Webseite | Homepage | **half** | — |
+| `booking` | Booking via | Booking via | Buchung über | Boeking via | full | — |
+| `id_tour_user` | Service Provider (Tour32 only) | Service Provider (Tour32 only) | Leistungsträger (Tour32 only) | Dienstverlener (Tour32 only) | **half** | — |
+| `haupt_id_tour_user` | Main Service Provider (Tour32 only) | Main Service Provider (Tour32 only) | Haupt-Leistungsträger (Tour32 only) | Hoofddienstverlener (Tour32 only) | **half** | — |
+| `booking_email` | Email Reservation | E-Mail Reservation | Email Reservierung | Email reservering | **half** | — |
+| `internal_remarks_reservation` | Internal Reservation Infos / Remarks | Internal Reservation Infos / Remarks | Interne Buchungsinfos /-Hinweise | Interne boekingsinfo / -opmerkingen | **half** | — |
+| `destination` | Continent | Continent | Kontinent | Continent | full | — |
+| `countries` | Countries | Countries | Länder | Landen | full | — |
+| `travel_categories` | Tour Types | Tour Type | Reiseart | Type Reis | full | — |
+| `translations` | Description | Description | Beschreibung | Beschrijving | full | — |
+| `dates_translations` | Travel Dates | Travel Dates | Reise-Termine | Reisdata | full | — |
+| `tour_dates_web` | Departure Times | Departure Times | Abfahrtszeiten | Vertrektijden | full | — |
+| `routes` | Daytrip Routes | Daytrip Routes | Tagesausflug-Routen | Dagtochten Routes | full | — |
+| `supplier_product_code` | Daytrip Code(s) | Daytrip Code(s) | Tagesausflug-Code(s) | Dagtochten Code(s) | full | — |
+| `price_subline` | Trip Subline (Duration + Days) | Trip Subline (Duration + Days) | Reise-Subline (Dauer + Tage) | Reis-subline (duur + dagen) | full | "Import only — hidden in UI." |
+| `price_info_translations` | Price Information | Price Information | Preis-Infos | Prijsinformatie | full | — |
+| `children_free_age` | Max. Child Age (Free) | Max. Child Age | Max. Kindesalter kostenfrei | Max. kinderleeftijd | full | "Maximales Alter (in Jahren) bis zu dem Kinder kostenlos mitreisen." |
+| `children_free_number` | Number of Children Free of Charge | Number of Children Free of Charge | Anzahl Kinder kostenfrei | Aantal kinderen gratis | full | "Anzahl der Kinder die kostenlos mitreisen können." |
+| `participants_min` | Minimum Number of Participants | Minimum Number of Participants | Mindestanzahl Teilnehmer | Minimum aantal deelnemers | full | — |
+| `participants_max` | Maximum Number of Participants | Maximum Number of Participants | Maximalanzahl Teilnehmer | Maximaal aantal deelnemers | full | — |
+| `week_min_before_start` | Min. Participants up to x Weeks before Departure | Min. Participants up to x Weeks before Departure | Min. Teilnehmer bis x Wochen vor Reiseantritt | Min. deelnemers tot x weken voor vertrek | full | — |
+| `mobility_advice_text` | Text Mobility Advice | Text Mobility Advice | Text Mobilitätshinweis | Tekst mobiliteitsadvies | full | — |
+| `room_occupancies` | Price Categories | — | Preiskategorien | Prijscategorieën | full | — |
+| `prices` | Daytrip Prices | Daytrip Prices | Tagesausflug Preise | Dagtochten Prijzen | full | — |
+| `sell_prices_status` | Sell Prices Status | — | Verkaufspreise Status | — | **half** | — |
+| `sell_prices_updated_at` | Sell Prices Updated At | — | Verkaufspreise aktualisiert am | — | **half** | "Last successful sell price calculation" |
+| `translations_1` | Prices | Prices | Preise | Prijzen | full | — |
+| `daytrips_specials` | Specials | Specials | Angebote | Aanbiedingen | full | — |
+| `surcharges_items` | Surcharges | Surcharges | Zuschläge | Toeslagen | full | sort → **1** (was 2) |
+| `surcharges_translations` | Surcharge Calculator | Surcharge Calculator | Zuschlagsrechner | Toeslag Rekenmachine | full | sort → **2** (was 1) |
+| `image_badge_translations` | Image Badge | Image Badge | Bild Hinweis | Afbeelding badge | full | — |
+| `image_badge_start_date` | Start Date | Start Date | Startdatum | Startdatum | **half** | — |
+| `image_badge_end_date` | End Date | End Date | Enddatum | Einddatum | **half** | — |
+| `image_badge_status` | Status | Status | Status | Status | full | "Define as non-editable field. In case of editing in Directus the flag is being set automatically." |
+| `media` | Media | Media | Medien | Media | full | — |
+
+> **Bold width** = changed from the previous `full` default to `half` to match tours layout.  
+> **Surcharges sort** = swapped: items list first (sort=1), calculator/translations second (sort=2).
+
+### Revert Steps for Phase 12
+
+To revert these beautification changes:
+
+1. **Reset field translations** — for each field in the table above, set `translations` back to `[{"language": "en-US", "translation": "<original single label>"}]`
+2. **Reset field notes** — set `note: null` for all fields that previously had no note; restore original note text where it existed
+3. **Reset field widths** — set `width: "full"` for all fields that were changed to `"half"` (see **bold** entries above)
+4. **Reset surcharges sort** — set `surcharges_items` sort=2, `surcharges_translations` sort=1
+5. **Reset tab group translations** — set `translations: null` on all group alias fields (master_data_group, partner_filter_group, tour_operator_group, reservation_group, description_group, tour_dates_group, price_info_group, price_basics, locale_prices, offer_specials_group, surcharge_group, image_badge_group, media_group)
