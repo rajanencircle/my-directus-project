@@ -919,3 +919,201 @@ To revert these beautification changes:
 3. **Reset field widths** — set `width: "full"` for all fields that were changed to `"half"` (see **bold** entries above)
 4. **Reset surcharges sort** — set `surcharges_items` sort=2, `surcharges_translations` sort=1
 5. **Reset tab group translations** — set `translations: null` on all group alias fields (master_data_group, partner_filter_group, tour_operator_group, reservation_group, description_group, tour_dates_group, price_info_group, price_basics, locale_prices, offer_specials_group, surcharge_group, image_badge_group, media_group)
+
+---
+
+## Phase 13: Make daytrips Identical to tours — Missing Fields, Relations, and Settings
+
+**Date:** 2026-06-18  
+**Goal:** Close all remaining gaps between daytrips and tours by adding missing fields, creating `daytrips_categories_translations`, and fixing settings (conditions, options, templates, widths, readonly, display) across all sub-collections.
+
+> **IMPORTANT:** All changes are additive to daytrips. NO tours changes were made. Flow IDs referencing tours-specific flows are set to `null` as placeholder — update when daytrips-specific flows are created in a later phase.
+
+---
+
+### A. New Fields Added
+
+#### `daytrips_tour_dates_web` — added `departure_frequencies`
+- type: alias, special: [m2m], interface: list-m2m
+- options: `{"template": "{{trips_frequencies_id.name}}"}`
+- sort: 6, width: full
+- M2M junction: `daytrips_tour_dates_web_trips_frequencies` (already existed; relations already wired)
+- Translations: en-US/en-GB "Frequency / Weekdays", de-DE "Frequenz / Wochentage", nl-NL "Frequentie / Weekdagen"
+
+#### `daytrips_surcharges_translations` — added `save_stay_surcharge` + `rate_table`
+- `save_stay_surcharge`: interface save-and-stay-trigger-flow, sort=24, flowId=null (placeholder)
+- `rate_table`: interface directus-extension-interface-surcharge-prices, sort=25
+  - options: surchargesCollection=daytrips_surcharges_items, translationsCollection=daytrips_surcharges_items_translations, hotelField=daytrip_id, junctionHotelField=daytrips_id, translationsSurchargeField=daytrips_surcharges_items_id, calculateFlowId=null
+  - Translations: en-GB "Surcharge Prices", de-DE "Aufpreise", nl-NL "Toeslag Prijzen"
+
+#### `daytrips_surcharges_items` — added `translations` alias
+- type: alias, special: [translations], interface: translations
+- options: languageField=code, languageDirectionField=code, userLanguage=true
+- sort: 11, width: full
+- Translations: en-GB "Surcharge Details", de-DE "Zuschlagsdetails", nl-NL "Toeslag Details"
+
+#### `daytrips` — added `save_and_stay_price` + `item_preview_button`
+- `save_and_stay_price`: interface save-and-stay-trigger-flow, group=price_basics, sort=9, flowId=null (placeholder)
+- `item_preview_button`: interface item-preview-button, sort=10, group=null
+  - Adapted groups config for daytrips field names: translations (was tours_description_translations), price_info_translations (was price_info)
+  - Note: "Opens a read-only preview overlay of this daytrip's key fields per language."
+
+#### `daytrips_translations_1` — added `daytrip_prices` alias
+- type: alias, special: [alias, no-data], interface: tours-prices-table
+- options: parentKeyField=daytrips_id, label="Save and Calculate", calculateSellPricesFlowId=null
+- sort: 10, width: full
+- Translations: en-US/en-GB "Daytrip Prices", de-DE "Tagesausflugpreise", nl-NL "Daguitstapprijzen"
+
+#### `daytrips_prices` — added `daytrips_prices_translations` alias
+- type: alias, special: [translations], interface: translations, sort: 8, width: full
+- Translations: en-US/en-GB "Sell Prices", de-DE "Verkaufspreise", nl-NL "Verkoopprijzen"
+
+---
+
+### B. New Collection: `daytrips_categories_translations`
+
+**Purpose:** Per-locale category name overrides for `daytrips_categories` (equivalent of `tours_categories_translations`)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | integer PK | auto-increment, hidden |
+| `daytrips_categories_id` | uuid | FK → daytrips_categories.id, hidden |
+| `translations_id` | uuid | FK → translations.id, hidden |
+| `category_original` | text | interface: input-multiline, sort=4; en-US "Original Name" |
+| `category_text` | string | interface: input, sort=5; en-US "Free Text (alternative)" |
+
+**Relations created:**
+- `daytrips_categories_translations.daytrips_categories_id → daytrips_categories` (ON DELETE CASCADE, one_field=translations, junction_field=translations_id)
+- `daytrips_categories_translations.translations_id → translations` (ON DELETE SET NULL)
+
+**`translations` alias added to `daytrips_categories`:**
+- type: alias, special: [translations], interface: translations, sort=13, width: full
+- Translations: en-US/en-GB "Category Translations", de-DE "Kategorie-Übersetzungen", nl-NL "Categorie-vertalingen"
+
+**DAYTRIPS-SPECIFIC — delete when reverting daytrips:**
+- Collection `daytrips_categories_translations` and all its fields
+- Field `translations` on `daytrips_categories`
+- Relations: daytrips_categories_translations.daytrips_categories_id and daytrips_categories_translations.translations_id
+
+---
+
+### C. `daytrips_translations_1` Field Fixes
+
+| Field | What Changed |
+|-------|--------------|
+| `buy_price_type` | width: full → **half**; choices: ["Per Unit","Per Person"] → ["Price Per Unit","Price Per Person"]; translations: +en-GB/de-DE/nl-NL (Buy Entity / Einkauf Einheit / Inkoopeenheid) |
+| `sell_price_type` | width: full → **half**; same choice fix; translations: +en-GB/de-DE/nl-NL (Sell Entity / Verkauf Einheit / Verkoopeenheid) |
+| `percentage_type` | width: full → **half**; choices: ["Net","Gross"] → ["Net (excl. Commission)","Gross (incl. Commission)"]; translations: +en-GB/de-DE/nl-NL (Buy Price Type / Einkaufspreis Art / Inkoopprijstype) |
+| `provision_percentage` | width: full → **half**; options: added placeholder="5%", min=0, max=100; **conditions added**: net→readonly, gross→required; translations: +en-GB/de-DE/nl-NL |
+| `margin_percentage` | width: full → **half**; options: added placeholder="20%", min=0, max=35; translations: +en-GB/de-DE/nl-NL |
+| `exchange_rate` | width: full → **half**; options.template: "{{name}}" → "{{from_currency.code}}->{{to_currency.code}}@{{rate}}"; translations: +en-GB/de-DE/nl-NL |
+| `from_price` | readonly: false → **true**; sort: 10 → **11**; options.template added (daytrips field names); translations: +en-GB/de-DE/nl-NL |
+
+**Revert:** Set widths back to "full", restore original choice texts, remove conditions from provision_percentage, reset exchange_rate template to "{{name}}", set from_price readonly=false.
+
+---
+
+### D. `daytrips_surcharges_translations` Field Fixes
+
+| Field | What Changed |
+|-------|--------------|
+| `surcharge_percentage_type` | width: full → **half**; sort: 4 → **20**; choices: ["Net","Gross"] → ["$t:net_excl_commission","$t:gross_incl_commission"]; translations: +en-GB/de-DE/nl-NL |
+| `surcharge_provision_percentage` | width: full → **half**; sort: 5 → **21**; options: added placeholder="5%", min=0, max=100; **conditions added**: net→readonly, gross→required; translations: +en-GB/de-DE/nl-NL |
+| `surcharge_margin_percentage` | width: full → **half**; sort: 6 → **22**; options: added placeholder="20%", min=0, max=35; translations: +en-GB/de-DE/nl-NL |
+| `surcharge_exchange_rate` | width: full → **half**; sort: 7 → **23**; options.template: "{{name}}" → "{{from_currency.code}}->{{to_currency.code}}@{{rate}}"; translations: +nl-NL |
+
+---
+
+### E. `daytrips_surcharges_items` Field Fixes
+
+| Field | What Changed |
+|-------|--------------|
+| `name` | width: full → **half**; translations: +en-GB/de-DE/nl-NL (Surcharge Name / Zuschlagsname / Toeslagnaam) |
+| `buy_price` | width: full → **half**; options: added min=0; translations: +en-GB/de-DE/nl-NL |
+| `status` | display: null → **labels**; display_options added (published=#2ECDA7, unpublished=#A2B5CD) |
+| `px_source_id` | hidden: false → **true** |
+
+---
+
+### F. `daytrips_surcharges_items_translations` Field Fixes
+
+| Field | What Changed |
+|-------|--------------|
+| `sell_price` | hidden: false → **true**; options: added placeholder="Sell Price"; translations: +en-GB/de-DE/nl-NL |
+| `surcharge_type` | options: added template="{{designation}}", enableCreate=false; translations: +en-GB/de-DE/nl-NL |
+| `surcharge_calc_type` | options: added template="{{designation}}", enableCreate=false; translations: +en-GB/de-DE/nl-NL (Calculation Method for IT Systems) |
+| `surcharge_booking_name` | translations: changed to +en-GB/de-DE/nl-NL (Original / Booking Name) |
+
+---
+
+### G. `daytrips_translations` Sub-collection Fixes
+
+| Field | What Changed |
+|-------|--------------|
+| `tour_title` | width: full → **half**; translations: +de-DE/en-GB/nl-NL (Tour-Titel / Tour Title / Tourtitel) |
+| `subline` | width: full → **half**; translations: +de-DE/en-GB/nl-NL (Subline Tour / Tour Subline / Subline tour) |
+| `px_source_id` | hidden: false → **true** |
+| `mobility_advice_text` | **conditions added**: when value is _nnull (has a value), set readonly=true; translations: +en-GB/de-DE/nl-NL |
+
+---
+
+### H. `daytrips_prices` + `daytrips_prices_translations` Fixes
+
+| Collection | Field | What Changed |
+|------------|-------|--------------|
+| `daytrips_prices` | `daytrips_category_id` | readonly: false → **true** |
+| `daytrips_prices` | `price_date_id` | readonly: false → **true** |
+| `daytrips_prices` | `daytrips_room_occupancy_id` | readonly: false → **true** |
+| `daytrips_prices` | `buy_price` | width: full → **half**; translations: +en-GB/de-DE/nl-NL |
+| `daytrips_prices_translations` | `sell_price` | width: full → **half**; options: added min=0; translations: +en-GB/de-DE/nl-NL |
+
+---
+
+### I. `daytrips_room_occupancies` Fixes
+
+| Field | What Changed |
+|-------|--------------|
+| `id` | special: null → **["uuid"]** |
+| `price_start` | schema.default_value: null → **false** |
+| `value` | options: null → **{min: 1}** |
+
+---
+
+### J. Multilingual Labels Applied to Sub-collections
+
+| Collection | Fields Updated |
+|------------|---------------|
+| `daytrips_price_info_translations` | services_included, services_not_included, deviating_cancelation_terms, children_policy, participants_text, additional_information, price_infos_supplementary |
+| `daytrips_image_badge_translations` | image_badge_teaser, image_badge_details |
+| `daytrips_dates_translations` | depatures_text |
+| `daytrips_tour_dates_web` | available_from (From / In der Zeit von / Van), available_to (To / bis / tot) |
+| `daytrips_routes` | tour_departure (+template {{translations.name}}), tour_arrival (+template {{translations.name}}) |
+
+---
+
+### Revert Steps for Phase 13
+
+**A. New fields to delete:**
+- `daytrips_tour_dates_web.departure_frequencies` (note: this only removes the alias — the junction table `daytrips_tour_dates_web_trips_frequencies` is not affected)
+- `daytrips_surcharges_translations.save_stay_surcharge`
+- `daytrips_surcharges_translations.rate_table`
+- `daytrips_surcharges_items.translations`
+- `daytrips.save_and_stay_price`
+- `daytrips.item_preview_button`
+- `daytrips_translations_1.daytrip_prices`
+- `daytrips_prices.daytrips_prices_translations`
+
+**B. New collection to delete:**
+- Delete collection `daytrips_categories_translations` (drops table + fields + relations)
+- Delete field `daytrips_categories.translations`
+
+**C–J. Setting reversals:**
+- `daytrips_translations_1`: set widths=full, restore original choice labels, remove conditions from provision_percentage, reset exchange_rate template to "{{name}}", set from_price readonly=false/sort=10/options=null
+- `daytrips_surcharges_translations`: set widths=full, restore original choice labels, remove conditions from surcharge_provision_percentage, reset exchange_rate template to "{{name}}", restore original sorts (4/5/6/7)
+- `daytrips_surcharges_items`: set name/buy_price width=full, remove buy_price options, set status display=null/display_options=null, set px_source_id hidden=false
+- `daytrips_surcharges_items_translations`: set sell_price hidden=false/options=null, clear surcharge_type/surcharge_calc_type options, restore surcharge_booking_name translation to en-US "Booking Name"
+- `daytrips_translations`: set tour_title/subline width=full, restore single en-US translations, set px_source_id hidden=false, remove mobility_advice_text conditions
+- `daytrips_prices`: set daytrips_category_id/price_date_id/daytrips_room_occupancy_id readonly=false, set buy_price width=full
+- `daytrips_prices_translations`: set sell_price width=full, remove options
+- `daytrips_room_occupancies`: remove special from id, set price_start default_value=null, remove value options
+- Sub-collection labels: reset to single en-US translations for all fields listed in section J
