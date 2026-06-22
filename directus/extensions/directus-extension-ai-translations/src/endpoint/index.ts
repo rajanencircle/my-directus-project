@@ -2,13 +2,22 @@ import { defineEndpoint } from '@directus/extensions-sdk';
 
 export default defineEndpoint({
   id: 'ai-translations',
-  handler: (router, { env }: any) => {
+  handler: (router, { database }: any) => {
 
-    function getConfig(env: any) {
+    async function getConfig() {
+      const rows: { key: string; value: string }[] = await database('global_configurations')
+        .where({ entity_type: 'ai-api' })
+        .select('key', 'value');
+
+      const cfg: Record<string, string> = {};
+      for (const row of rows) {
+        cfg[row.key] = row.value;
+      }
+
       return {
-        apiUrl: env['TRANSLATION_API_URL'],
-        apiKey: env['TRANSLATION_API_KEY'] as string | undefined,
-        model: env['TRANSLATION_API_MODEL']
+        apiUrl: cfg['url'] as string | undefined,
+        apiKey: cfg['token'] as string | undefined,
+        model:  cfg['model'] as string | undefined,
       };
     }
 
@@ -42,9 +51,9 @@ export default defineEndpoint({
         return res.status(400).json({ error: 'Missing required fields: text, targetLanguage' });
       }
 
-      const { apiUrl, apiKey, model } = getConfig(env);
-      if (!apiKey) {
-        return res.status(500).json({ error: 'TRANSLATION_API_KEY is not set in your Directus environment variables.' });
+      const { apiUrl, apiKey, model } = await getConfig();
+      if (!apiUrl || !apiKey || !model) {
+        return res.status(500).json({ error: 'AI API not fully configured. Ensure rows with entity_type="ai-api" and keys "url", "token", "model" exist in global_configurations.' });
       }
 
       try {
@@ -72,9 +81,9 @@ export default defineEndpoint({
         return res.status(400).json({ error: 'Missing required fields: fields (object), targetLanguage' });
       }
 
-      const { apiUrl, apiKey, model } = getConfig(env);
-      if (!apiKey) {
-        return res.status(500).json({ error: 'TRANSLATION_API_KEY is not set in your Directus environment variables.' });
+      const { apiUrl, apiKey, model } = await getConfig();
+      if (!apiUrl || !apiKey || !model) {
+        return res.status(500).json({ error: 'AI API not fully configured. Ensure rows with entity_type="ai-api" and keys "url", "token", "model" exist in global_configurations.' });
       }
 
       try {
