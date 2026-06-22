@@ -1,12 +1,26 @@
 import { defineEndpoint } from '@directus/extensions-sdk';
 
+const DEFAULTS = {
+  collection:  'global_configurations',
+  entityType:  'ai-api',
+  urlKey:      'url',
+  tokenKey:    'token',
+  modelKey:    'model',
+} as const;
+
 export default defineEndpoint({
   id: 'ai-translations',
   handler: (router, { database }: any) => {
 
-    async function getConfig() {
-      const rows: { key: string; value: string }[] = await database('global_configurations')
-        .where({ entity_type: 'ai-api' })
+    async function getConfig(params: {
+      collection: string;
+      entityType: string;
+      urlKey: string;
+      tokenKey: string;
+      modelKey: string;
+    }) {
+      const rows: { key: string; value: string }[] = await database(params.collection)
+        .where({ entity_type: params.entityType })
         .select('key', 'value');
 
       const cfg: Record<string, string> = {};
@@ -15,9 +29,19 @@ export default defineEndpoint({
       }
 
       return {
-        apiUrl: cfg['url'] as string | undefined,
-        apiKey: cfg['token'] as string | undefined,
-        model:  cfg['model'] as string | undefined,
+        apiUrl: cfg[params.urlKey]   as string | undefined,
+        apiKey: cfg[params.tokenKey] as string | undefined,
+        model:  cfg[params.modelKey] as string | undefined,
+      };
+    }
+
+    function resolveConfig(body: any) {
+      return {
+        collection: body.configCollection  || DEFAULTS.collection,
+        entityType: body.configEntityType  || DEFAULTS.entityType,
+        urlKey:     body.configUrlKey      || DEFAULTS.urlKey,
+        tokenKey:   body.configTokenKey    || DEFAULTS.tokenKey,
+        modelKey:   body.configModelKey    || DEFAULTS.modelKey,
       };
     }
 
@@ -43,6 +67,11 @@ export default defineEndpoint({
       return data.choices?.[0]?.message?.content?.trim() ?? '';
     }
 
+    function missingConfigError(cfg: ReturnType<typeof resolveConfig>) {
+      return `AI API not fully configured. Ensure rows with entity_type="${cfg.entityType}" ` +
+        `and keys "${cfg.urlKey}", "${cfg.tokenKey}", "${cfg.modelKey}" exist in the "${cfg.collection}" collection.`;
+    }
+
     // ── Single field translation ──────────────────────────────────────
     router.post('/translate', async (req: any, res: any) => {
       const { text, sourceLanguage, targetLanguage } = req.body;
@@ -51,9 +80,10 @@ export default defineEndpoint({
         return res.status(400).json({ error: 'Missing required fields: text, targetLanguage' });
       }
 
-      const { apiUrl, apiKey, model } = await getConfig();
+      const cfg = resolveConfig(req.body);
+      const { apiUrl, apiKey, model } = await getConfig(cfg);
       if (!apiUrl || !apiKey || !model) {
-        return res.status(500).json({ error: 'AI API not fully configured. Ensure rows with entity_type="ai-api" and keys "url", "token", "model" exist in global_configurations.' });
+        return res.status(500).json({ error: missingConfigError(cfg) });
       }
 
       try {
@@ -81,9 +111,10 @@ export default defineEndpoint({
         return res.status(400).json({ error: 'Missing required fields: fields (object), targetLanguage' });
       }
 
-      const { apiUrl, apiKey, model } = await getConfig();
+      const cfg = resolveConfig(req.body);
+      const { apiUrl, apiKey, model } = await getConfig(cfg);
       if (!apiUrl || !apiKey || !model) {
-        return res.status(500).json({ error: 'AI API not fully configured. Ensure rows with entity_type="ai-api" and keys "url", "token", "model" exist in global_configurations.' });
+        return res.status(500).json({ error: missingConfigError(cfg) });
       }
 
       try {

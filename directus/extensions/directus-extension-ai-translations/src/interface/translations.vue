@@ -359,6 +359,12 @@ const props = withDefaults(
     useCurrentUserLanguage?: boolean;
     defaultSplitView?: boolean;
     defaultOpenSplitView?: boolean;
+    // AI API config
+    configCollection?: string;
+    configEntityType?: string;
+    configUrlKey?: string;
+    configTokenKey?: string;
+    configModelKey?: string;
   }>(),
   {
     value: null,
@@ -372,6 +378,11 @@ const props = withDefaults(
     useCurrentUserLanguage: false,
     defaultSplitView: undefined,
     defaultOpenSplitView: false,
+    configCollection: "global_configurations",
+    configEntityType: "ai-api",
+    configUrlKey: "url",
+    configTokenKey: "token",
+    configModelKey: "model",
   },
 );
 
@@ -908,6 +919,17 @@ function deleteData(langCode: string | null) {
 // ─────────────────────────────────────────────────────────────────────────────
 // AI Translation
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Payload sent with every AI API call so the endpoint can look up the right
+// config rows without hardcoded values.
+const aiConfig = computed(() => ({
+  configCollection: props.configCollection,
+  configEntityType: props.configEntityType,
+  configUrlKey: props.configUrlKey,
+  configTokenKey: props.configTokenKey,
+  configModelKey: props.configModelKey,
+}));
+
 async function translateSingleField(
   fieldName: string,
   src: string,
@@ -921,6 +943,7 @@ async function translateSingleField(
     text: sourceText,
     sourceLanguage: src,
     targetLanguage: tgt,
+    ...aiConfig.value,
   });
   return data?.translated ?? null;
 }
@@ -994,6 +1017,7 @@ async function runAiTranslateAll() {
         fields: batch,
         sourceLanguage: sourceLanguage.value,
         targetLanguage: targetLanguage.value,
+        ...aiConfig.value,
       });
 
       const translated: Record<string, string> = data.translated ?? {};
@@ -1017,6 +1041,7 @@ async function runAiTranslateAll() {
               text: val,
               sourceLanguage: sourceLanguage.value,
               targetLanguage: targetLanguage.value,
+              ...aiConfig.value,
             });
             translatedItem[key] = data?.translated ?? val;
           } else {
