@@ -185,6 +185,34 @@ const routeConfig: RouteConfig[] = [
     },
   },
   {
+    path: "/content/excursions",
+    children: true,
+    actions: {
+      hideLabels: {
+        fields: [
+          "booking_partner",
+          "partner",
+          "item_preview_button",
+          "image_badge_translations",
+          "price_info_translations",
+          "save_and_stay_price",
+          "save_and_stay_surcharge",
+        ],
+      },
+      addClasses: [],
+      tabGroupRawStyles: [
+        {
+          tabIds: ["tab_master_data", "tab_calculator_inputs"],
+          styles: {
+            "background-color": "transparent",
+            padding: "0px",
+            border: "0px solid #E5E7EB",
+          },
+        },
+      ],
+    },
+  },
+  {
     path: "/content",
     children: true,
     actions: {
