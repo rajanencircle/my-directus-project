@@ -1,16 +1,41 @@
 import { defineEndpoint } from '@directus/extensions-sdk';
 
 const DEFAULTS = {
-  collection:  'global_configurations',
-  entityType:  'ai-api',
-  urlKey:      'url',
-  tokenKey:    'token',
-  modelKey:    'model',
+  collection: 'global_configurations',
+  entityType: 'ai-api',
+  urlKey:     'url',
+  tokenKey:   'token',
+  modelKey:   'model',
 } as const;
 
 export default defineEndpoint({
   id: 'ai-translations',
   handler: (router, { database }: any) => {
+
+    /**
+     * Read the interface's configured options from directus_fields (server-side).
+     * The client only supplies the collection+field identifiers so we know WHICH
+     * field to read — the actual config values (collection name, entity type, key
+     * names) are never taken from the request body.
+     */
+    async function resolveConfig(sourceCollection: string, sourceField: string) {
+      const row = await database('directus_fields')
+        .where({ collection: sourceCollection, field: sourceField })
+        .select('meta')
+        .first();
+
+      const rawMeta = row?.meta ?? {};
+      const meta = typeof rawMeta === 'string' ? JSON.parse(rawMeta) : rawMeta;
+      const options = meta?.options ?? {};
+
+      return {
+        collection: options.configCollection || DEFAULTS.collection,
+        entityType: options.configEntityType || DEFAULTS.entityType,
+        urlKey:     options.configUrlKey     || DEFAULTS.urlKey,
+        tokenKey:   options.configTokenKey   || DEFAULTS.tokenKey,
+        modelKey:   options.configModelKey   || DEFAULTS.modelKey,
+      };
+    }
 
     async function getConfig(params: {
       collection: string;
@@ -35,14 +60,12 @@ export default defineEndpoint({
       };
     }
 
-    function resolveConfig(body: any) {
-      return {
-        collection: body.configCollection  || DEFAULTS.collection,
-        entityType: body.configEntityType  || DEFAULTS.entityType,
-        urlKey:     body.configUrlKey      || DEFAULTS.urlKey,
-        tokenKey:   body.configTokenKey    || DEFAULTS.tokenKey,
-        modelKey:   body.configModelKey    || DEFAULTS.modelKey,
-      };
+    function missingConfigError(cfg: { collection: string; entityType: string; urlKey: string; tokenKey: string; modelKey: string }) {
+      return (
+        `AI API not fully configured. Ensure rows with entity_type="${cfg.entityType}" ` +
+        `and keys "${cfg.urlKey}", "${cfg.tokenKey}", "${cfg.modelKey}" ` +
+        `exist in the "${cfg.collection}" collection.`
+      );
     }
 
     async function callAI(apiUrl: string, apiKey: string, model: string, prompt: string): Promise<string> {
@@ -67,20 +90,22 @@ export default defineEndpoint({
       return data.choices?.[0]?.message?.content?.trim() ?? '';
     }
 
-    function missingConfigError(cfg: ReturnType<typeof resolveConfig>) {
-      return `AI API not fully configured. Ensure rows with entity_type="${cfg.entityType}" ` +
-        `and keys "${cfg.urlKey}", "${cfg.tokenKey}", "${cfg.modelKey}" exist in the "${cfg.collection}" collection.`;
-    }
-
     // ── Single field translation ──────────────────────────────────────
     router.post('/translate', async (req: any, res: any) => {
-      const { text, sourceLanguage, targetLanguage } = req.body;
+      if (!req.accountability?.user) {
+        return res.status(401).json({ error: 'Authentication required.' });
+      }
+
+      const { text, sourceLanguage, targetLanguage, sourceCollection, sourceField } = req.body;
 
       if (!text || !targetLanguage) {
         return res.status(400).json({ error: 'Missing required fields: text, targetLanguage' });
       }
+      if (!sourceCollection || !sourceField) {
+        return res.status(400).json({ error: 'Missing required fields: sourceCollection, sourceField' });
+      }
 
-      const cfg = resolveConfig(req.body);
+      const cfg = await resolveConfig(sourceCollection, sourceField);
       const { apiUrl, apiKey, model } = await getConfig(cfg);
       if (!apiUrl || !apiKey || !model) {
         return res.status(500).json({ error: missingConfigError(cfg) });
@@ -101,17 +126,26 @@ export default defineEndpoint({
 
     // ── Batch translation (all fields in one AI call) ─────────────────
     router.post('/translate-batch', async (req: any, res: any) => {
-      const { fields, sourceLanguage, targetLanguage } = req.body as {
+      if (!req.accountability?.user) {
+        return res.status(401).json({ error: 'Authentication required.' });
+      }
+
+      const { fields, sourceLanguage, targetLanguage, sourceCollection, sourceField } = req.body as {
         fields: Record<string, string>;
         sourceLanguage?: string;
         targetLanguage: string;
+        sourceCollection: string;
+        sourceField: string;
       };
 
       if (!fields || typeof fields !== 'object' || !targetLanguage) {
         return res.status(400).json({ error: 'Missing required fields: fields (object), targetLanguage' });
       }
+      if (!sourceCollection || !sourceField) {
+        return res.status(400).json({ error: 'Missing required fields: sourceCollection, sourceField' });
+      }
 
-      const cfg = resolveConfig(req.body);
+      const cfg = await resolveConfig(sourceCollection, sourceField);
       const { apiUrl, apiKey, model } = await getConfig(cfg);
       if (!apiUrl || !apiKey || !model) {
         return res.status(500).json({ error: missingConfigError(cfg) });

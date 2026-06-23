@@ -920,14 +920,12 @@ function deleteData(langCode: string | null) {
 // AI Translation
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Payload sent with every AI API call so the endpoint can look up the right
-// config rows without hardcoded values.
-const aiConfig = computed(() => ({
-  configCollection: props.configCollection,
-  configEntityType: props.configEntityType,
-  configUrlKey: props.configUrlKey,
-  configTokenKey: props.configTokenKey,
-  configModelKey: props.configModelKey,
+// Identifiers sent with every AI API call so the endpoint can load the right
+// interface options server-side from directus_fields — the actual config
+// values (collection name, keys, etc.) never travel over the wire.
+const aiSourceRef = computed(() => ({
+  sourceCollection: props.collection,
+  sourceField: props.field,
 }));
 
 async function translateSingleField(
@@ -943,7 +941,7 @@ async function translateSingleField(
     text: sourceText,
     sourceLanguage: src,
     targetLanguage: tgt,
-    ...aiConfig.value,
+    ...aiSourceRef.value,
   });
   return data?.translated ?? null;
 }
@@ -1017,7 +1015,7 @@ async function runAiTranslateAll() {
         fields: batch,
         sourceLanguage: sourceLanguage.value,
         targetLanguage: targetLanguage.value,
-        ...aiConfig.value,
+        ...aiSourceRef.value,
       });
 
       const translated: Record<string, string> = data.translated ?? {};
@@ -1041,7 +1039,7 @@ async function runAiTranslateAll() {
               text: val,
               sourceLanguage: sourceLanguage.value,
               targetLanguage: targetLanguage.value,
-              ...aiConfig.value,
+              ...aiSourceRef.value,
             });
             translatedItem[key] = data?.translated ?? val;
           } else {
