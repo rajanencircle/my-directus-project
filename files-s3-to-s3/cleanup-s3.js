@@ -10,11 +10,22 @@
  */
 
 import "dotenv/config";
+import readline from "readline";
 import {
   S3Client,
   ListObjectsV2Command,
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
+
+function confirm(question) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(`${question} (yes/no): `, (answer) => {
+      rl.close();
+      resolve(answer.trim().toLowerCase() === "yes");
+    });
+  });
+}
 
 const isDryRun = process.argv.includes("--dry-run");
 
@@ -81,6 +92,12 @@ async function main() {
   if (isDryRun) {
     console.log(`\n(DRY RUN — ${keys.length} object(s) would be deleted)`);
     return;
+  }
+
+  const ok = await confirm(`\nDelete all ${keys.length} object(s) from s3://${bucket}?`);
+  if (!ok) {
+    console.log("Aborted.");
+    process.exit(0);
   }
 
   const CHUNK = 1000;

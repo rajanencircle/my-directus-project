@@ -16,6 +16,7 @@
  */
 
 import "dotenv/config";
+import readline from "readline";
 import {
   S3Client,
   HeadObjectCommand,
@@ -23,6 +24,19 @@ import {
   CopyObjectCommand,
   DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
+
+// =============================================================================
+// Confirmation prompt
+// =============================================================================
+function confirm(question) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(`${question} (yes/no): `, (answer) => {
+      rl.close();
+      resolve(answer.trim().toLowerCase() === "yes");
+    });
+  });
+}
 
 // =============================================================================
 // Config — all values come from .env
@@ -162,6 +176,12 @@ async function cleanDstBucket() {
     return;
   }
 
+  const ok = await confirm(`\n  Delete all ${keys.length} object(s) from s3://${C.DST_S3_BUCKET}?`);
+  if (!ok) {
+    console.log("  Aborted.");
+    process.exit(0);
+  }
+
   const CHUNK = 1000;
   let deleted = 0;
   let errors = 0;
@@ -247,6 +267,12 @@ async function main() {
     );
     printSummary(srcKeys.length, alreadyExists, missing.length, 0, true);
     return;
+  }
+
+  const ok = await confirm(`\nCopy ${missing.length} object(s) from s3://${C.SRC_S3_BUCKET} → s3://${C.DST_S3_BUCKET}?`);
+  if (!ok) {
+    console.log("Aborted.");
+    process.exit(0);
   }
 
   let copied = 0;
