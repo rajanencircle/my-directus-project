@@ -1,0 +1,29 @@
+{
+  "name": "directus-schema-import",
+  "version": "1.0.0",
+  "description": "Additive schema importer for Directus — imports new collections/fields/relations without touching existing schema",
+  "scripts": {
+    "dry:excursions": "node import.js --env local --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml --dry-run",
+    "dry:tours": "node import.js --env local --yamls ../YAMLs/tours_schema_26-06-22.yaml --dry-run",
+    "dry:all": "node import.js --env local --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml ../YAMLs/tours_schema_26-06-22.yaml --dry-run",
+    "apply:excursions": "node import.js --env local --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml",
+    "apply:tours": "node import.js --env local --yamls ../YAMLs/tours_schema_26-06-22.yaml",
+    "apply:all": "node import.js --env local --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml ../YAMLs/tours_schema_26-06-22.yaml",
+    "staging:dry:excursions": "node import.js --env staging --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml --dry-run",
+    "staging:apply:excursions": "node import.js --env staging --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml",
+    "build:excursions": "node build-apply-json.js --env local --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml",
+    "build:tours": "node build-apply-json.js --env local --yamls ../YAMLs/tours_schema_26-06-22.yaml",
+    "build:all": "node build-apply-json.js --env local --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml ../YAMLs/tours_schema_26-06-22.yaml",
+    "build:from-file": "node build-apply-json.js --snapshot ../snapshot.json --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml",
+    "staging:build:excursions": "node build-apply-json.js --env staging --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml",
+    "merge:excursions": "node merge-yaml.js --env local --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml",
+    "merge:tours": "node merge-yaml.js --env local --yamls ../YAMLs/tours_schema_26-06-22.yaml",
+    "merge:all": "node merge-yaml.js --env local --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml ../YAMLs/tours_schema_26-06-22.yaml",
+    "staging:merge:excursions": "node merge-yaml.js --env staging --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml",
+    "staging:merge:all": "node merge-yaml.js --env staging --yamls ../YAMLs/excursions_schema_26-06-22_v2.yaml ../YAMLs/tours_schema_26-06-22.yaml"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "js-yaml": "^4.1.0"
+  }
+}
