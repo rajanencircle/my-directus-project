@@ -717,7 +717,7 @@ export default defineComponent({
               filter: { hotel_id: { _eq: parent_id.value } },
               fields: [
                 "id",
-                "room_category.name",
+                "room_category",
                 "translations.translations_id",
                 "translations.room_category_additions",
                 "sharedId",
@@ -728,7 +728,7 @@ export default defineComponent({
                 ...(props.groupSortField &&
                 ![
                   "id",
-                  "room_category.name",
+                  "room_category",
                   "translations.translations_id",
                   "translations.room_category_additions",
                   "sharedId",
@@ -762,7 +762,7 @@ export default defineComponent({
               },
               fields: [
                 "id",
-                "room_category.name",
+                "room_category",
                 "translations.translations_id",
                 "translations.room_category_additions",
                 "sharedId",
@@ -772,7 +772,7 @@ export default defineComponent({
                 ...(props.groupSortField &&
                 ![
                   "id",
-                  "room_category.name",
+                  "room_category",
                   "translations.translations_id",
                   "translations.room_category_additions",
                   "sharedId",
@@ -1177,18 +1177,13 @@ export default defineComponent({
       if (key === "ungrouped") return "Ungrouped";
       const cat = lookupData.value.categories.get(key);
 
-      // Determine base name: M2O name → translations fallback → date name → key
-      let name: string;
-      if (cat?.room_category?.name) {
-        name = cat.room_category.name;
-      } else {
-        const translation = (cat?.translations || []).find(
+      let name: string =
+        (typeof cat?.room_category === "string" && cat.room_category) ||
+        cat?.room_category?.name ||
+        (cat?.translations || []).find(
           (t: any) => t.translations_id === translations_id.value,
-        );
-        name = translation?.room_category_additions ||
-               lookupData.value.dates.get(key)?.name ||
-               key;
-      }
+        )?.room_category_additions ||
+        key;
 
       // Append days_label from parent's days_repeater when this is a child category
       if (cat?.sharedId && cat.sharedId !== key) {
@@ -1420,6 +1415,26 @@ export default defineComponent({
       () => {
         hasChanges.value =
           JSON.stringify(items.value) !== JSON.stringify(originalItems.value);
+      },
+      { deep: true },
+    );
+
+    watch(
+      () => props.values,
+      async (newVal) => {
+        if (props.primaryKey === "+") {
+          const parentField = props.junctionParentKeyField || "hotels_id";
+          const langField = props.junctionLanguageField || "translations_id";
+          const hId = newVal?.[parentField];
+          const tId = newVal?.[langField];
+          if (hId && hId !== parent_id.value) {
+            parent_id.value = typeof hId === "object" ? hId.id : hId;
+          }
+          if (tId && tId !== translations_id.value) {
+            translations_id.value = typeof tId === "object" ? tId.id : tId;
+            await fetchItems();
+          }
+        }
       },
       { deep: true },
     );

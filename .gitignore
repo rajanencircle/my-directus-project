@@ -54,3 +54,6 @@ test.csv
 Workbook1.csv
 /directus/local-dump
 *.dump
+*.zip
+*.gz
+*.tar.gz

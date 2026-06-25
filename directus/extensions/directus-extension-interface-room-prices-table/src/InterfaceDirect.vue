@@ -501,14 +501,16 @@ export default defineComponent({
               filter: { hotel_id: { _eq: parent_id.value } },
               fields: [
                 "id",
-                "room_category.name",
+                "room_category",
+                "translations.translations_id",
+                "translations.room_category_additions",
                 "sharedId",
                 "days_repeater",
                 ...(props.groupFromPriceField
                   ? [props.groupFromPriceField]
                   : []),
                 ...(props.groupSortField &&
-                !["id", "room_category.name", "sharedId", "days_repeater", props.groupFromPriceField].includes(
+                !["id", "room_category", "translations.translations_id", "translations.room_category_additions", "sharedId", "days_repeater", props.groupFromPriceField].includes(
                   props.groupSortField,
                 )
                   ? [props.groupSortField]
@@ -537,13 +539,15 @@ export default defineComponent({
               },
               fields: [
                 "id",
-                "room_category.name",
+                "room_category",
+                "translations.translations_id",
+                "translations.room_category_additions",
                 "sharedId",
                 ...(props.groupFromPriceField
                   ? [props.groupFromPriceField]
                   : []),
                 ...(props.groupSortField &&
-                !["id", "room_category.name", "sharedId", props.groupFromPriceField].includes(
+                !["id", "room_category", "translations.translations_id", "translations.room_category_additions", "sharedId", props.groupFromPriceField].includes(
                   props.groupSortField,
                 )
                   ? [props.groupSortField]
@@ -844,8 +848,9 @@ export default defineComponent({
       const cat = lookupData.value.categories.get(key);
 
       let name: string =
+        (typeof cat?.room_category === "string" && cat.room_category) ||
         cat?.room_category?.name ||
-        lookupData.value.dates.get(key)?.name ||
+        (cat?.translations || [])[0]?.room_category_additions ||
         key;
 
       // Append days_label from parent's days_repeater when this is a child category
