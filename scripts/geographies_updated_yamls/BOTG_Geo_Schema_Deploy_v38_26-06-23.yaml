@@ -1,0 +1,4621 @@
+# ==========================================================================
+# BOTG ContentHub - Geo collections schema deploy (Staging)
+# Generated 26-06-23 from DEV brief v38 (sheet 'Geografies').  REV: status is now 3-state.
+# Target: Directus 11.17.4 - apply via `directus schema apply`.
+# ==========================================================================
+# CONTAINS (full desired field state of the 7 geo collections):
+#   - section_* layout groups (group-detail, collapse open/closed)
+#   - new fields: status (active/review/archived), media_code, media_code_legacy_botg/_karawane, is_non_geographic
+#   - status now on 6 levels: countries, destinations, states, regions, places, locations_tour32
+#     (destinations_cluster has NO status - it is a pure grouping)
+#   - status values: active (green #2ECDA7) / review (ORANGE #F2994A) / archived (grey #A2B5CD)
+#     review = legacy entry needing triage (wrong level, e.g. a state in a country field, or ambiguous spelling)
+#   - existing fields: group + DE/EN/NL labels + notes; ISO fields read-only
+#   - editable name lives in <collection>_translations.name (labels set there)
+#
+# !!! INTENTIONAL DELETIONS (defined in v38 via strikethrough) - dropped on apply:
+#     - destinations.short_code
+#     - destinations_cluster.short_code
+#     - destinations_cluster.ISO_alpha_3_code
+#
+# APPLY (detail + manual fallback in the English guide):
+#   1) npx directus schema snapshot ./staging-current.yaml
+#   2) For the 7 geo PARENT collections, REPLACE their `fields:` entries with the full sets here.
+#   3) For the *_translations collections, UPDATE only the `name` field meta.
+#   4) npx directus schema apply --dry-run ./staging-current.yaml   (verify adds/mods + the 3 deletions only)
+#   5) npx directus schema apply ./staging-current.yaml
+#   2-space list indentation; folders Global_Data > Geographies already exist (no folder defs needed).
+# ==========================================================================
+fields:
+  - collection: countries
+    field: id
+    type: integer
+    schema:
+      name: id
+      table: countries
+      data_type: integer
+      default_value: nextval('countries_id_seq'::regclass)
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      has_auto_increment: true
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: id
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 1
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: sort
+    type: integer
+    schema:
+      name: sort
+      table: countries
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: sort
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: true
+      sort: 2
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: user_created
+    type: uuid
+    schema:
+      name: user_created
+      table: countries
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: countries
+      field: user_created
+      special:
+        - user-created
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 3
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: date_created
+    type: timestamp
+    schema:
+      name: date_created
+      table: countries
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: date_created
+      special:
+        - date-created
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 4
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: user_updated
+    type: uuid
+    schema:
+      name: user_updated
+      table: countries
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: countries
+      field: user_updated
+      special:
+        - user-updated
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 5
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: date_updated
+    type: timestamp
+    schema:
+      name: date_updated
+      table: countries
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: date_updated
+      special:
+        - date-updated
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 6
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: section_status_assignment
+    type: alias
+    schema: null
+    meta:
+      collection: countries
+      field: section_status_assignment
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 10
+      width: full
+      translations:
+        - language: de-DE
+          translation: Status & Zuordnung
+        - language: en-GB
+          translation: Status & Assignment
+        - language: nl-NL
+          translation: Status & toewijzing
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: countries
+    field: status
+    type: string
+    schema:
+      name: status
+      table: countries
+      data_type: character varying
+      default_value: active
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: status
+      special: null
+      interface: select-dropdown
+      options: &id001
+        choices:
+          - text: Active
+            value: active
+            color: '#2ECDA7'
+            icon: check_circle
+          - text: Review
+            value: review
+            color: '#F2994A'
+            icon: rate_review
+          - text: Archived
+            value: archived
+            color: '#A2B5CD'
+            icon: archive
+      display: labels
+      display_options: &id002
+        showAsDot: true
+        choices:
+          - text: Active
+            value: active
+            color: '#2ECDA7'
+            background: '#E6F8F2'
+            foreground: '#0E7C5A'
+          - text: Review
+            value: review
+            color: '#F2994A'
+            background: '#FCEFDD'
+            foreground: '#B26A00'
+          - text: Archived
+            value: archived
+            color: '#A2B5CD'
+            background: '#EEF1F5'
+            foreground: '#5B6B7E'
+      readonly: false
+      hidden: false
+      sort: 11
+      width: half
+      translations:
+        - language: de-DE
+          translation: Status
+        - language: en-GB
+          translation: Status
+        - language: nl-NL
+          translation: Status
+      note: active / review (needs triage – wrong level or ambiguous spelling) / archived
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: translations
+    type: alias
+    schema: null
+    meta:
+      collection: countries
+      field: translations
+      special:
+        - translations
+      interface: translations
+      options:
+        languageField: code
+        languageDirectionField: code
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 12
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Land)
+        - language: en-GB
+          translation: Name (Country)
+        - language: nl-NL
+          translation: Naam (Land)
+      note: null
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: destination_id
+    type: integer
+    schema:
+      name: destination_id
+      table: countries
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: destinations
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: countries
+      field: destination_id
+      special:
+        - m2o
+      interface: select-dropdown-m2o
+      options:
+        template: '{{translations.name}}'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 13
+      width: full
+      translations:
+        - language: de-DE
+          translation: Reiseziel
+        - language: en-GB
+          translation: Destination
+        - language: nl-NL
+          translation: Bestemming
+      note: Zugeordnetes Reiseziel.
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: section_iso
+    type: alias
+    schema: null
+    meta:
+      collection: countries
+      field: section_iso
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: closed
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 14
+      width: full
+      translations:
+        - language: de-DE
+          translation: ISO-Codes
+        - language: en-GB
+          translation: ISO Codes
+        - language: nl-NL
+          translation: ISO-codes
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: countries
+    field: ISO
+    type: string
+    schema:
+      name: ISO
+      table: countries
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: ISO
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 15
+      width: full
+      translations:
+        - language: de-DE
+          translation: ISO Alpha-2 (ISO 3166-1)
+        - language: en-GB
+          translation: ISO Alpha-2 (ISO 3166-1)
+        - language: nl-NL
+          translation: ISO Alpha-2 (ISO 3166-1)
+      note: 2-stelliger ISO-Code (als Referenz)
+      conditions: null
+      required: false
+      group: section_iso
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: ISO_alpha_3_code
+    type: string
+    schema:
+      name: ISO_alpha_3_code
+      table: countries
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: ISO_alpha_3_code
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 16
+      width: full
+      translations:
+        - language: de-DE
+          translation: ISO Alpha-3 (ISO 3166-1)
+        - language: en-GB
+          translation: ISO Alpha-3 (ISO 3166-1)
+        - language: nl-NL
+          translation: ISO Alpha-3 (ISO 3166-1)
+      note: 3-stelliger ISO-Code (als Referenz)
+      conditions: null
+      required: false
+      group: section_iso
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: section_media
+    type: alias
+    schema: null
+    meta:
+      collection: countries
+      field: section_media
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 17
+      width: full
+      translations:
+        - language: de-DE
+          translation: 'Medien-DB: Kuerzel'
+        - language: en-GB
+          translation: 'Media DB: Codes'
+        - language: nl-NL
+          translation: 'Media-DB: codes'
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: countries
+    field: media_code
+    type: string
+    schema:
+      name: media_code
+      table: countries
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: media_code
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 18
+      width: half
+      translations:
+        - language: de-DE
+          translation: Medien-Code
+        - language: en-GB
+          translation: Media Code
+        - language: nl-NL
+          translation: Mediacode
+      note: Maßgebliche BOTG-Kürzel für Bild-Benennung.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: media_code_legacy_botg
+    type: string
+    schema:
+      name: media_code_legacy_botg
+      table: countries
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: media_code_legacy_botg
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 19
+      width: half
+      translations:
+        - language: de-DE
+          translation: Alt-Code BOTG
+        - language: en-GB
+          translation: Legacy Code BOTG
+        - language: nl-NL
+          translation: Oude code BOTG
+      note: Alt-Bildcode BOTG. Read-only.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: media_code_legacy_karawane
+    type: string
+    schema:
+      name: media_code_legacy_karawane
+      table: countries
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: media_code_legacy_karawane
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 20
+      width: half
+      translations:
+        - language: de-DE
+          translation: Alt-Code Karawane
+        - language: en-GB
+          translation: Legacy Code Karawane
+        - language: nl-NL
+          translation: Oude code Karawane
+      note: Alt-Bildcode Karawane. Read-only.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: section_legacy
+    type: alias
+    schema: null
+    meta:
+      collection: countries
+      field: section_legacy
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: closed
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 21
+      width: full
+      translations:
+        - language: de-DE
+          translation: Legacy (Primarix)
+        - language: en-GB
+          translation: Legacy (Primarix)
+        - language: nl-NL
+          translation: Legacy (Primarix)
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: countries
+    field: cid_primarix
+    type: integer
+    schema:
+      name: cid_primarix
+      table: countries
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: cid_primarix
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 22
+      width: full
+      translations:
+        - language: de-DE
+          translation: CID Primarix
+        - language: en-GB
+          translation: CID Primarix
+        - language: nl-NL
+          translation: CID Primarix
+      note: Herkunfts-ID (Migration).
+      conditions: null
+      required: false
+      group: section_legacy
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: id_primarix
+    type: integer
+    schema:
+      name: id_primarix
+      table: countries
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: id_primarix
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 23
+      width: full
+      translations:
+        - language: de-DE
+          translation: ID Primarix
+        - language: en-GB
+          translation: ID Primarix
+        - language: nl-NL
+          translation: ID Primarix
+      note: Herkunfts-ID (Migration).
+      conditions: null
+      required: false
+      group: section_legacy
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: cid_px_karawane
+    type: integer
+    schema:
+      name: cid_px_karawane
+      table: countries
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: cid_px_karawane
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 24
+      width: full
+      translations:
+        - language: de-DE
+          translation: CID Karawane
+        - language: en-GB
+          translation: CID Karawane
+        - language: nl-NL
+          translation: CID Karawane
+      note: Herkunfts-ID (Migration).
+      conditions: null
+      required: false
+      group: section_legacy
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries
+    field: id_px_karawane
+    type: integer
+    schema:
+      name: id_px_karawane
+      table: countries
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries
+      field: id_px_karawane
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 25
+      width: full
+      translations:
+        - language: de-DE
+          translation: ID Karawane
+        - language: en-GB
+          translation: ID Karawane
+        - language: nl-NL
+          translation: ID Karawane
+      note: Herkunfts-ID (Migration).
+      conditions: null
+      required: false
+      group: section_legacy
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: id
+    type: integer
+    schema:
+      name: id
+      table: destinations
+      data_type: integer
+      default_value: nextval('destinations_id_seq'::regclass)
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      has_auto_increment: true
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: id
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 1
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: sort
+    type: integer
+    schema:
+      name: sort
+      table: destinations
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: sort
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: true
+      sort: 2
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: user_created
+    type: uuid
+    schema:
+      name: user_created
+      table: destinations
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: destinations
+      field: user_created
+      special:
+        - user-created
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 3
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: date_created
+    type: timestamp
+    schema:
+      name: date_created
+      table: destinations
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: date_created
+      special:
+        - date-created
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 4
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: user_updated
+    type: uuid
+    schema:
+      name: user_updated
+      table: destinations
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: destinations
+      field: user_updated
+      special:
+        - user-updated
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 5
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: date_updated
+    type: timestamp
+    schema:
+      name: date_updated
+      table: destinations
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: date_updated
+      special:
+        - date-updated
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 6
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: section_status_assignment
+    type: alias
+    schema: null
+    meta:
+      collection: destinations
+      field: section_status_assignment
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 10
+      width: full
+      translations:
+        - language: de-DE
+          translation: Status & Zuordnung
+        - language: en-GB
+          translation: Status & Assignment
+        - language: nl-NL
+          translation: Status & toewijzing
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: destinations
+    field: status
+    type: string
+    schema:
+      name: status
+      table: destinations
+      data_type: character varying
+      default_value: active
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: status
+      special: null
+      interface: select-dropdown
+      options: *id001
+      display: labels
+      display_options: *id002
+      readonly: false
+      hidden: false
+      sort: 11
+      width: half
+      translations:
+        - language: de-DE
+          translation: Status
+        - language: en-GB
+          translation: Status
+        - language: nl-NL
+          translation: Status
+      note: active / review (needs triage – wrong level or ambiguous spelling) / archived
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: translations
+    type: alias
+    schema: null
+    meta:
+      collection: destinations
+      field: translations
+      special:
+        - translations
+      interface: translations
+      options:
+        languageField: code
+        languageDirectionField: code
+        userLanguage: true
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 12
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Reiseziel)
+        - language: en-GB
+          translation: Name (Destination)
+        - language: nl-NL
+          translation: Naam (Bestemming)
+      note: null
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: destinations_cluster_id
+    type: integer
+    schema:
+      name: destinations_cluster_id
+      table: destinations
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: destinations_cluster
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: destinations
+      field: destinations_cluster_id
+      special:
+        - m2o
+      interface: select-dropdown-m2o
+      options:
+        template: '{{translations.name}}'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 13
+      width: full
+      translations:
+        - language: de-DE
+          translation: Zielgebietsgruppe
+        - language: en-GB
+          translation: Destination Cluster
+        - language: nl-NL
+          translation: Bestemmingscluster
+      note: Übergeordnete Gruppe (bspw. für Bookmarks / Filter)
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: is_non_geographic
+    type: boolean
+    schema:
+      name: is_non_geographic
+      table: destinations
+      data_type: boolean
+      default_value: false
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: is_non_geographic
+      special:
+        - cast-boolean
+      interface: boolean
+      options:
+        label: Non-geographic
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 14
+      width: half
+      translations:
+        - language: de-DE
+          translation: Keine Geografie
+        - language: en-GB
+          translation: Non-geographic
+        - language: nl-NL
+          translation: Geen geografie
+      note: Markiert nicht-geografische Reiseziele (Kreuzfahrten, Weltweit, Reiseleiter).
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: destinations
+    field: section_media
+    type: alias
+    schema: null
+    meta:
+      collection: destinations
+      field: section_media
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 15
+      width: full
+      translations:
+        - language: de-DE
+          translation: 'Medien-DB: Kuerzel'
+        - language: en-GB
+          translation: 'Media DB: Codes'
+        - language: nl-NL
+          translation: 'Media-DB: codes'
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: destinations
+    field: media_code
+    type: string
+    schema:
+      name: media_code
+      table: destinations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: media_code
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 16
+      width: half
+      translations:
+        - language: de-DE
+          translation: Medien-Code
+        - language: en-GB
+          translation: Media Code
+        - language: nl-NL
+          translation: Mediacode
+      note: Maßgebliche BOTG-Kürzel für Bild-Benennung.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: media_code_legacy_botg
+    type: string
+    schema:
+      name: media_code_legacy_botg
+      table: destinations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: media_code_legacy_botg
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 17
+      width: half
+      translations:
+        - language: de-DE
+          translation: Alt-Code BOTG
+        - language: en-GB
+          translation: Legacy Code BOTG
+        - language: nl-NL
+          translation: Oude code BOTG
+      note: Alt-Bildcode BOTG. Read-only.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations
+    field: media_code_legacy_karawane
+    type: string
+    schema:
+      name: media_code_legacy_karawane
+      table: destinations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations
+      field: media_code_legacy_karawane
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 18
+      width: half
+      translations:
+        - language: de-DE
+          translation: Alt-Code Karawane
+        - language: en-GB
+          translation: Legacy Code Karawane
+        - language: nl-NL
+          translation: Oude code Karawane
+      note: Alt-Bildcode Karawane. Read-only.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: id
+    type: integer
+    schema:
+      name: id
+      table: states
+      data_type: integer
+      default_value: nextval('states_id_seq'::regclass)
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      has_auto_increment: true
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: id
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 1
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: sort
+    type: integer
+    schema:
+      name: sort
+      table: states
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: sort
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: true
+      sort: 2
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: user_created
+    type: uuid
+    schema:
+      name: user_created
+      table: states
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: states
+      field: user_created
+      special:
+        - user-created
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 3
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: date_created
+    type: timestamp
+    schema:
+      name: date_created
+      table: states
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: date_created
+      special:
+        - date-created
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 4
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: user_updated
+    type: uuid
+    schema:
+      name: user_updated
+      table: states
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: states
+      field: user_updated
+      special:
+        - user-updated
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 5
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: date_updated
+    type: timestamp
+    schema:
+      name: date_updated
+      table: states
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: date_updated
+      special:
+        - date-updated
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 6
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: section_status_assignment
+    type: alias
+    schema: null
+    meta:
+      collection: states
+      field: section_status_assignment
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 10
+      width: full
+      translations:
+        - language: de-DE
+          translation: Status & Zuordnung
+        - language: en-GB
+          translation: Status & Assignment
+        - language: nl-NL
+          translation: Status & toewijzing
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: states
+    field: status
+    type: string
+    schema:
+      name: status
+      table: states
+      data_type: character varying
+      default_value: active
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: status
+      special: null
+      interface: select-dropdown
+      options: *id001
+      display: labels
+      display_options: *id002
+      readonly: false
+      hidden: false
+      sort: 11
+      width: half
+      translations:
+        - language: de-DE
+          translation: Status
+        - language: en-GB
+          translation: Status
+        - language: nl-NL
+          translation: Status
+      note: active / review (needs triage – wrong level or ambiguous spelling) / archived
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: translations
+    type: alias
+    schema: null
+    meta:
+      collection: states
+      field: translations
+      special:
+        - translations
+      interface: translations
+      options:
+        languageField: code
+        languageDirectionField: code
+        userLanguage: true
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 12
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Bundesstaat o.ä.)
+        - language: en-GB
+          translation: Name (State or similar)
+        - language: nl-NL
+          translation: Naam (deelstaat o.i.d.)
+      note: null
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: country_id
+    type: integer
+    schema:
+      name: country_id
+      table: states
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: countries
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: states
+      field: country_id
+      special:
+        - m2o
+      interface: select-dropdown-m2o
+      options:
+        template: '{{translations.name}}'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 13
+      width: full
+      translations:
+        - language: de-DE
+          translation: Land
+        - language: en-GB
+          translation: Country
+        - language: nl-NL
+          translation: Land
+      note: Zugeordnetes Land.
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: ISO
+    type: string
+    schema:
+      name: ISO
+      table: states
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: ISO
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 14
+      width: full
+      translations:
+        - language: de-DE
+          translation: ISO 3166-2
+        - language: en-GB
+          translation: ISO 3166-2
+        - language: nl-NL
+          translation: ISO 3166-2
+      note: Subdivision-Code (z. B. NSW).
+      conditions: null
+      required: false
+      group: section_status_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: section_media
+    type: alias
+    schema: null
+    meta:
+      collection: states
+      field: section_media
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 15
+      width: full
+      translations:
+        - language: de-DE
+          translation: 'Medien-DB: Kuerzel'
+        - language: en-GB
+          translation: 'Media DB: Codes'
+        - language: nl-NL
+          translation: 'Media-DB: codes'
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: states
+    field: media_code
+    type: string
+    schema:
+      name: media_code
+      table: states
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: media_code
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 16
+      width: half
+      translations:
+        - language: de-DE
+          translation: Medien-Code
+        - language: en-GB
+          translation: Media Code
+        - language: nl-NL
+          translation: Mediacode
+      note: Maßgebliche BOTG-Kürzel für Bild-Benennung.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: media_code_legacy_botg
+    type: string
+    schema:
+      name: media_code_legacy_botg
+      table: states
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: media_code_legacy_botg
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 17
+      width: half
+      translations:
+        - language: de-DE
+          translation: Alt-Code BOTG
+        - language: en-GB
+          translation: Legacy Code BOTG
+        - language: nl-NL
+          translation: Oude code BOTG
+      note: Alt-Bildcode BOTG. Read-only.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states
+    field: media_code_legacy_karawane
+    type: string
+    schema:
+      name: media_code_legacy_karawane
+      table: states
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states
+      field: media_code_legacy_karawane
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: false
+      sort: 18
+      width: half
+      translations:
+        - language: de-DE
+          translation: Alt-Code Karawane
+        - language: en-GB
+          translation: Legacy Code Karawane
+        - language: nl-NL
+          translation: Oude code Karawane
+      note: Alt-Bildcode Karawane. Read-only.
+      conditions: null
+      required: false
+      group: section_media
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_cluster
+    field: id
+    type: integer
+    schema:
+      name: id
+      table: destinations_cluster
+      data_type: integer
+      default_value: nextval('destinations_cluster_id_seq'::regclass)
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      has_auto_increment: true
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations_cluster
+      field: id
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 1
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_cluster
+    field: sort
+    type: integer
+    schema:
+      name: sort
+      table: destinations_cluster
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations_cluster
+      field: sort
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: true
+      sort: 2
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_cluster
+    field: user_created
+    type: uuid
+    schema:
+      name: user_created
+      table: destinations_cluster
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: destinations_cluster
+      field: user_created
+      special:
+        - user-created
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 3
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_cluster
+    field: date_created
+    type: timestamp
+    schema:
+      name: date_created
+      table: destinations_cluster
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations_cluster
+      field: date_created
+      special:
+        - date-created
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 4
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_cluster
+    field: user_updated
+    type: uuid
+    schema:
+      name: user_updated
+      table: destinations_cluster
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: destinations_cluster
+      field: user_updated
+      special:
+        - user-updated
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 5
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_cluster
+    field: date_updated
+    type: timestamp
+    schema:
+      name: date_updated
+      table: destinations_cluster
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations_cluster
+      field: date_updated
+      special:
+        - date-updated
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 6
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_cluster
+    field: section_name
+    type: alias
+    schema: null
+    meta:
+      collection: destinations_cluster
+      field: section_name
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 10
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name
+        - language: en-GB
+          translation: Name
+        - language: nl-NL
+          translation: Naam
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: destinations_cluster
+    field: translations
+    type: alias
+    schema: null
+    meta:
+      collection: destinations_cluster
+      field: translations
+      special:
+        - translations
+      interface: translations
+      options:
+        languageField: code
+        languageDirectionField: code
+        userLanguage: true
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 11
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Zielgebietscluster)
+        - language: en-GB
+          translation: Name (Destination Cluster)
+        - language: nl-NL
+          translation: Naam (bestemmingscluster)
+      note: null
+      conditions: null
+      required: false
+      group: section_name
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: id
+    type: integer
+    schema:
+      name: id
+      table: regions
+      data_type: integer
+      default_value: nextval('regions_id_seq'::regclass)
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      has_auto_increment: true
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: regions
+      field: id
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 1
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: sort
+    type: integer
+    schema:
+      name: sort
+      table: regions
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: regions
+      field: sort
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: true
+      sort: 2
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: user_created
+    type: uuid
+    schema:
+      name: user_created
+      table: regions
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: regions
+      field: user_created
+      special:
+        - user-created
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 3
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: date_created
+    type: timestamp
+    schema:
+      name: date_created
+      table: regions
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: regions
+      field: date_created
+      special:
+        - date-created
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 4
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: user_updated
+    type: uuid
+    schema:
+      name: user_updated
+      table: regions
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: regions
+      field: user_updated
+      special:
+        - user-updated
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 5
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: date_updated
+    type: timestamp
+    schema:
+      name: date_updated
+      table: regions
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: regions
+      field: date_updated
+      special:
+        - date-updated
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 6
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: section_name_assignment
+    type: alias
+    schema: null
+    meta:
+      collection: regions
+      field: section_name_assignment
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 10
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name & Zuordnung
+        - language: en-GB
+          translation: Name & Assignment
+        - language: nl-NL
+          translation: Naam & toewijzing
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: regions
+    field: status
+    type: string
+    schema:
+      name: status
+      table: regions
+      data_type: character varying
+      default_value: active
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: regions
+      field: status
+      special: null
+      interface: select-dropdown
+      options: *id001
+      display: labels
+      display_options: *id002
+      readonly: false
+      hidden: false
+      sort: 11
+      width: half
+      translations:
+        - language: de-DE
+          translation: Status
+        - language: en-GB
+          translation: Status
+        - language: nl-NL
+          translation: Status
+      note: active / review (needs triage – wrong level or ambiguous spelling) / archived
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: translations
+    type: alias
+    schema: null
+    meta:
+      collection: regions
+      field: translations
+      special:
+        - translations
+      interface: translations
+      options:
+        languageField: code
+        languageDirectionField: code
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 12
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Region)
+        - language: en-GB
+          translation: Name (Region)
+        - language: nl-NL
+          translation: Naam (regio)
+      note: null
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: country_id
+    type: alias
+    schema: null
+    meta:
+      collection: regions
+      field: country_id
+      special:
+        - m2m
+      interface: list-m2m
+      options:
+        template: '{{countries_id.translations.name}}'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 13
+      width: full
+      translations:
+        - language: de-DE
+          translation: Laender
+        - language: en-GB
+          translation: Countries
+        - language: nl-NL
+          translation: Landen
+      note: Zugeordnete Länder
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: section_legacy
+    type: alias
+    schema: null
+    meta:
+      collection: regions
+      field: section_legacy
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: closed
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 14
+      width: full
+      translations:
+        - language: de-DE
+          translation: Legacy (Primarix)
+        - language: en-GB
+          translation: Legacy (Primarix)
+        - language: nl-NL
+          translation: Legacy (Primarix)
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: regions
+    field: cid_primarix
+    type: integer
+    schema:
+      name: cid_primarix
+      table: regions
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: regions
+      field: cid_primarix
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 15
+      width: full
+      translations:
+        - language: de-DE
+          translation: CID Primarix
+        - language: en-GB
+          translation: CID Primarix
+        - language: nl-NL
+          translation: CID Primarix
+      note: Herkunfts-ID (Migration).
+      conditions: null
+      required: false
+      group: section_legacy
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions
+    field: id_primarix
+    type: integer
+    schema:
+      name: id_primarix
+      table: regions
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: regions
+      field: id_primarix
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 16
+      width: full
+      translations:
+        - language: de-DE
+          translation: ID Primarix
+        - language: en-GB
+          translation: ID Primarix
+        - language: nl-NL
+          translation: ID Primarix
+      note: Herkunfts-ID (Migration).
+      conditions: null
+      required: false
+      group: section_legacy
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: id
+    type: integer
+    schema:
+      name: id
+      table: places
+      data_type: integer
+      default_value: nextval('places_id_seq'::regclass)
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      has_auto_increment: true
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: places
+      field: id
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 1
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: sort
+    type: integer
+    schema:
+      name: sort
+      table: places
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: places
+      field: sort
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: true
+      sort: 2
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: user_created
+    type: uuid
+    schema:
+      name: user_created
+      table: places
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: places
+      field: user_created
+      special:
+        - user-created
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 3
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: date_created
+    type: timestamp
+    schema:
+      name: date_created
+      table: places
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: places
+      field: date_created
+      special:
+        - date-created
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 4
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: user_updated
+    type: uuid
+    schema:
+      name: user_updated
+      table: places
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: places
+      field: user_updated
+      special:
+        - user-updated
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 5
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: date_updated
+    type: timestamp
+    schema:
+      name: date_updated
+      table: places
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: places
+      field: date_updated
+      special:
+        - date-updated
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 6
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: section_name_assignment
+    type: alias
+    schema: null
+    meta:
+      collection: places
+      field: section_name_assignment
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 10
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name & Zuordnung
+        - language: en-GB
+          translation: Name & Assignment
+        - language: nl-NL
+          translation: Naam & toewijzing
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: places
+    field: status
+    type: string
+    schema:
+      name: status
+      table: places
+      data_type: character varying
+      default_value: active
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: places
+      field: status
+      special: null
+      interface: select-dropdown
+      options: *id001
+      display: labels
+      display_options: *id002
+      readonly: false
+      hidden: false
+      sort: 11
+      width: half
+      translations:
+        - language: de-DE
+          translation: Status
+        - language: en-GB
+          translation: Status
+        - language: nl-NL
+          translation: Status
+      note: active / review (needs triage – wrong level or ambiguous spelling) / archived
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: translations
+    type: alias
+    schema: null
+    meta:
+      collection: places
+      field: translations
+      special:
+        - translations
+      interface: translations
+      options:
+        languageField: code
+        languageDirectionField: code
+        userLanguage: true
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 12
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Stadt / Ort)
+        - language: en-GB
+          translation: Name (City / Place)
+        - language: nl-NL
+          translation: Naam (stad / plaats)
+      note: null
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: country_id
+    type: integer
+    schema:
+      name: country_id
+      table: places
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: countries
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: places
+      field: country_id
+      special:
+        - m2o
+      interface: select-dropdown-m2o
+      options:
+        template: '{{translations.name}}'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 13
+      width: full
+      translations:
+        - language: de-DE
+          translation: Land
+        - language: en-GB
+          translation: Country
+        - language: nl-NL
+          translation: Land
+      note: Zugeordnetes Land.
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: state_id
+    type: integer
+    schema:
+      name: state_id
+      table: places
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: states
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: places
+      field: state_id
+      special:
+        - m2o
+      interface: select-dropdown-m2o
+      options:
+        template: '{{translations.name}}'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 14
+      width: full
+      translations:
+        - language: de-DE
+          translation: Bundesstaat
+        - language: en-GB
+          translation: State
+        - language: nl-NL
+          translation: Staat
+      note: Zugeordneter Bundesstaat (optional).
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: region_id
+    type: integer
+    schema:
+      name: region_id
+      table: places
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: regions
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: places
+      field: region_id
+      special:
+        - m2o
+      interface: select-dropdown-m2o
+      options:
+        template: '{{translations.name}}'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 15
+      width: full
+      translations:
+        - language: de-DE
+          translation: Region
+        - language: en-GB
+          translation: Region
+        - language: nl-NL
+          translation: Regio
+      note: Zugeordnete Region (optional).
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: location_tour32
+    type: integer
+    schema:
+      name: location_tour32
+      table: places
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: locations_tour32
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: places
+      field: location_tour32
+      special:
+        - m2o
+      interface: select-dropdown-m2o
+      options:
+        template: '{{translations.name}}'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 16
+      width: full
+      translations:
+        - language: de-DE
+          translation: Ort (Tour32)
+        - language: en-GB
+          translation: Location (Tour32)
+        - language: nl-NL
+          translation: Locatie (Tour32)
+      note: Zugeordneter Ort für Tour32-Import (optional).
+      conditions: null
+      required: false
+      group: section_name_assignment
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: section_legacy
+    type: alias
+    schema: null
+    meta:
+      collection: places
+      field: section_legacy
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: closed
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 17
+      width: full
+      translations:
+        - language: de-DE
+          translation: Legacy (Primarix)
+        - language: en-GB
+          translation: Legacy (Primarix)
+        - language: nl-NL
+          translation: Legacy (Primarix)
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: places
+    field: cid_primarix
+    type: integer
+    schema:
+      name: cid_primarix
+      table: places
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: places
+      field: cid_primarix
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 18
+      width: full
+      translations:
+        - language: de-DE
+          translation: CID Primarix
+        - language: en-GB
+          translation: CID Primarix
+        - language: nl-NL
+          translation: CID Primarix
+      note: Herkunfts-ID (Migration).
+      conditions: null
+      required: false
+      group: section_legacy
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places
+    field: id_primarix
+    type: integer
+    schema:
+      name: id_primarix
+      table: places
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: places
+      field: id_primarix
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 19
+      width: full
+      translations:
+        - language: de-DE
+          translation: ID Primarix
+        - language: en-GB
+          translation: ID Primarix
+        - language: nl-NL
+          translation: ID Primarix
+      note: Herkunfts-ID (Migration).
+      conditions: null
+      required: false
+      group: section_legacy
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32
+    field: id
+    type: integer
+    schema:
+      name: id
+      table: locations_tour32
+      data_type: integer
+      default_value: nextval('locations_tour32_id_seq'::regclass)
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      has_auto_increment: true
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: locations_tour32
+      field: id
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 1
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32
+    field: sort
+    type: integer
+    schema:
+      name: sort
+      table: locations_tour32
+      data_type: integer
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: locations_tour32
+      field: sort
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: true
+      sort: 2
+      width: full
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32
+    field: user_created
+    type: uuid
+    schema:
+      name: user_created
+      table: locations_tour32
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: locations_tour32
+      field: user_created
+      special:
+        - user-created
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 3
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32
+    field: date_created
+    type: timestamp
+    schema:
+      name: date_created
+      table: locations_tour32
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: locations_tour32
+      field: date_created
+      special:
+        - date-created
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 4
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32
+    field: user_updated
+    type: uuid
+    schema:
+      name: user_updated
+      table: locations_tour32
+      data_type: uuid
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: public
+      foreign_key_table: directus_users
+      foreign_key_column: id
+      comment: null
+    meta:
+      collection: locations_tour32
+      field: user_updated
+      special:
+        - user-updated
+      interface: select-dropdown-m2o
+      options:
+        template: '{{avatar}} {{first_name}} {{last_name}}'
+      display: user
+      display_options: null
+      readonly: true
+      hidden: true
+      sort: 5
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32
+    field: date_updated
+    type: timestamp
+    schema:
+      name: date_updated
+      table: locations_tour32
+      data_type: timestamp with time zone
+      default_value: null
+      generation_expression: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: locations_tour32
+      field: date_updated
+      special:
+        - date-updated
+      interface: datetime
+      options: null
+      display: datetime
+      display_options:
+        relative: true
+      readonly: true
+      hidden: true
+      sort: 6
+      width: half
+      translations: null
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32
+    field: section_name
+    type: alias
+    schema: null
+    meta:
+      collection: locations_tour32
+      field: section_name
+      special:
+        - alias
+        - no-data
+        - group
+      interface: group-detail
+      options:
+        start: open
+        headerColor: '#008CC0'
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 10
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name
+        - language: en-GB
+          translation: Name
+        - language: nl-NL
+          translation: Naam
+      note: null
+      conditions: null
+      required: false
+      group: null
+      validation: null
+      validation_message: null
+      searchable: false
+  - collection: locations_tour32
+    field: status
+    type: string
+    schema:
+      name: status
+      table: locations_tour32
+      data_type: character varying
+      default_value: active
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: locations_tour32
+      field: status
+      special: null
+      interface: select-dropdown
+      options: *id001
+      display: labels
+      display_options: *id002
+      readonly: false
+      hidden: false
+      sort: 11
+      width: half
+      translations:
+        - language: de-DE
+          translation: Status
+        - language: en-GB
+          translation: Status
+        - language: nl-NL
+          translation: Status
+      note: active / review (needs triage – wrong level or ambiguous spelling) / archived
+      conditions: null
+      required: false
+      group: section_name
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32
+    field: translations
+    type: alias
+    schema: null
+    meta:
+      collection: locations_tour32
+      field: translations
+      special:
+        - translations
+      interface: translations
+      options:
+        languageField: code
+        languageDirectionField: code
+        userLanguage: true
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 12
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Stadt / Ort)
+        - language: en-GB
+          translation: Name (City / Place)
+        - language: nl-NL
+          translation: Naam (stad / plaats)
+      note: null
+      conditions: null
+      required: false
+      group: section_name
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: countries_translations
+    field: name
+    type: string
+    schema:
+      name: name
+      table: countries_translations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: countries_translations
+      field: name
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 4
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Land)
+        - language: en-GB
+          translation: Name (Country)
+        - language: nl-NL
+          translation: Naam (Land)
+      note: null
+      conditions: null
+      required: true
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_translations
+    field: name
+    type: string
+    schema:
+      name: name
+      table: destinations_translations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations_translations
+      field: name
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 4
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Reiseziel)
+        - language: en-GB
+          translation: Name (Destination)
+        - language: nl-NL
+          translation: Naam (Bestemming)
+      note: null
+      conditions: null
+      required: true
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: states_translations
+    field: name
+    type: string
+    schema:
+      name: name
+      table: states_translations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: states_translations
+      field: name
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 4
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Bundesstaat o.ä.)
+        - language: en-GB
+          translation: Name (State or similar)
+        - language: nl-NL
+          translation: Naam (deelstaat o.i.d.)
+      note: Nur offizielle Staaten o.ä. - KEINE Regionen.
+      conditions: null
+      required: true
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: destinations_cluster_translations
+    field: name
+    type: string
+    schema:
+      name: name
+      table: destinations_cluster_translations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: destinations_cluster_translations
+      field: name
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 4
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Zielgebietscluster)
+        - language: en-GB
+          translation: Name (Destination Cluster)
+        - language: nl-NL
+          translation: Naam (bestemmingscluster)
+      note: null
+      conditions: null
+      required: true
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: regions_translations
+    field: name
+    type: string
+    schema:
+      name: name
+      table: regions_translations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: regions_translations
+      field: name
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 4
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Region)
+        - language: en-GB
+          translation: Name (Region)
+        - language: nl-NL
+          translation: Naam (regio)
+      note: Nur Regionen - keine offiziellen Staaten o.ä.
+      conditions: null
+      required: true
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: places_translations
+    field: name
+    type: string
+    schema:
+      name: name
+      table: places_translations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: places_translations
+      field: name
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 4
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Stadt / Ort)
+        - language: en-GB
+          translation: Name (City / Place)
+        - language: nl-NL
+          translation: Naam (stad / plaats)
+      note: null
+      conditions: null
+      required: true
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true
+  - collection: locations_tour32_translations
+    field: name
+    type: string
+    schema:
+      name: name
+      table: locations_tour32_translations
+      data_type: character varying
+      default_value: null
+      generation_expression: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_generated: false
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      has_auto_increment: false
+      foreign_key_schema: null
+      foreign_key_table: null
+      foreign_key_column: null
+      comment: null
+    meta:
+      collection: locations_tour32_translations
+      field: name
+      special: null
+      interface: input
+      options: null
+      display: null
+      display_options: null
+      readonly: false
+      hidden: false
+      sort: 4
+      width: full
+      translations:
+        - language: de-DE
+          translation: Name (Stadt / Ort)
+        - language: en-GB
+          translation: Name (City / Place)
+        - language: nl-NL
+          translation: Naam (stad / plaats)
+      note: Ortsbezeichnung gem. Tour32
+      conditions: null
+      required: true
+      group: null
+      validation: null
+      validation_message: null
+      searchable: true

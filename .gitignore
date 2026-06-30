@@ -57,3 +57,5 @@ Workbook1.csv
 *.zip
 *.gz
 *.tar.gz
+/docs
+/docs
