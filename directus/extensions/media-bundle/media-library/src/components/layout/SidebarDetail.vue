@@ -5,7 +5,10 @@ const props = defineProps<{
   icon: string
   title: string
   startOpen?: boolean
+  badge?: string
 }>()
+
+const emit = defineEmits<{ toggle: [open: boolean] }>()
 
 const isOpen = ref(props.startOpen ?? false)
 const sidebarCollapsed = ref(false)
@@ -53,6 +56,7 @@ function toggle() {
   } else {
     isOpen.value = !isOpen.value
   }
+  emit('toggle', isOpen.value)
 }
 </script>
 
@@ -66,6 +70,7 @@ function toggle() {
     >
       <v-icon class="trigger-icon" :name="icon" small />
       <span class="trigger-title">{{ title }}</span>
+      <span v-if="badge" class="badge">{{ badge }}</span>
       <v-icon class="trigger-chevron" name="chevron_left" small />
     </button>
     <div v-if="isOpen && !sidebarCollapsed" class="detail-content">
@@ -130,6 +135,26 @@ function toggle() {
 
 .detail-trigger.open .trigger-chevron {
   transform: rotate(-90deg);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 1.25rem;
+  min-inline-size: 1.25rem;
+  padding-inline: 0.3125rem;
+  border-radius: 0.625rem;
+  background-color: var(--theme--primary);
+  color: var(--white);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: opacity var(--fast) var(--transition);
+}
+
+.detail-trigger.collapsed .badge {
+  opacity: 0;
 }
 
 .detail-content {

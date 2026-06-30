@@ -137,6 +137,8 @@
           </v-button>
         </div>
       </SidebarDetail>
+      <RevisionsSidebar v-if="file" :file-id="props.id" />
+      <CommentsSidebar v-if="file" :file-id="props.id" />
       </div>
 
     </template>
@@ -314,6 +316,8 @@ import { useMediaSettings } from '../composables/useMediaSettings'
 import { resolveTranslatable } from '../utils/translations'
 import MediaSidebar from '../components/layout/MediaSidebar.vue'
 import SidebarDetail from '../components/layout/SidebarDetail.vue'
+import RevisionsSidebar from '../components/layout/RevisionsSidebar.vue'
+import CommentsSidebar from '../components/layout/CommentsSidebar.vue'
 import FolderDropdown from '../components/upload/FolderDropdown.vue'
 import type { DirectusFile } from '../stores/files.store'
 import { validateItem, clearHiddenEdits } from '../utils/validate-item'
