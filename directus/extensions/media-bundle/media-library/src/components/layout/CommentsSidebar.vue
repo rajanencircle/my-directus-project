@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import { useApi } from '@directus/extensions-sdk'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
@@ -10,8 +10,19 @@ const props = defineProps<{ fileId: string }>()
 const api = useApi()
 const baseUrl = (api.defaults.baseURL ?? '').replace(/\/$/, '')
 
+// Matches @UUID anywhere in a string (no leading-space requirement for extraction)
+const UUID_PATTERN = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+const MENTION_EXTRACT_RE = new RegExp(`@(${UUID_PATTERN})`, 'gi')
+
 interface CommentUser {
   id?: string
+  first_name?: string | null
+  last_name?: string | null
+  avatar?: { id: string } | null
+}
+
+interface MentionUser {
+  id: string
   first_name?: string | null
   last_name?: string | null
   avatar?: { id: string } | null
@@ -30,23 +41,42 @@ interface CommentGroup {
   comments: Comment[]
 }
 
+// ─── Comments ───────────────────────────────────────────────────────────────
 const comments = ref<Comment[] | null>(null)
 const commentsCount = ref(0)
 const loadingCount = ref(false)
 const loading = ref(false)
 const hasLoaded = ref(false)
+const userPreviews = ref<Record<string, string>>({})
 
+// ─── New comment input ───────────────────────────────────────────────────────
 const newComment = ref('')
 const focused = ref(false)
 const posting = ref(false)
+const newCommentRef = ref<HTMLTextAreaElement | null>(null)
 
+// ─── Inline edit ─────────────────────────────────────────────────────────────
 const editingId = ref<string | null>(null)
 const editingText = ref('')
 const saving = ref(false)
+const editCommentRef = ref<HTMLTextAreaElement | null>(null)
 
+// ─── Delete ──────────────────────────────────────────────────────────────────
 const confirmDeleteId = ref<string | null>(null)
 const deleting = ref(false)
 
+// ─── Mention autocomplete ─────────────────────────────────────────────────────
+type MentionCtx = 'new' | 'edit'
+const mentionCtx = ref<MentionCtx>('new')
+const showMentions = ref(false)
+const mentionStart = ref(-1)  // index of the @ character in the text
+const mentionQuery = ref('')
+const mentionUsers = ref<MentionUser[]>([])
+const mentionLoading = ref(false)
+const mentionIdx = ref(0)
+let mentionTimer: ReturnType<typeof setTimeout> | null = null
+
+// ─── Computed ─────────────────────────────────────────────────────────────────
 const showDeleteConfirm = computed({
   get: () => confirmDeleteId.value !== null,
   set: (v) => { if (!v) confirmDeleteId.value = null },
@@ -73,6 +103,7 @@ const groupedComments = computed<CommentGroup[]>(() => {
   return [...map.values()].sort((a, b) => b.date.getTime() - a.date.getTime())
 })
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatGroupDate(d: Date): string {
   const now = new Date()
   const today = new Date(now.toDateString())
@@ -90,16 +121,14 @@ function getUserName(user?: CommentUser | null): string {
   return [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Unknown'
 }
 
-function getAvatarUrl(user?: CommentUser | null): string | null {
+function getAvatarUrl(user?: CommentUser | MentionUser | null): string | null {
   if (!user?.avatar?.id) return null
   return `${baseUrl}/assets/${user.avatar.id}?key=system-small-cover`
 }
 
 function getInitials(user?: CommentUser | null): string {
   if (!user) return '?'
-  const first = user.first_name?.[0] ?? ''
-  const last = user.last_name?.[0] ?? ''
-  return (first + last).toUpperCase() || '?'
+  return ((user.first_name?.[0] ?? '') + (user.last_name?.[0] ?? '')).toUpperCase() || '?'
 }
 
 function formatTime(iso: string): string {
@@ -107,12 +136,165 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
 
+// ─── Mention rendering ────────────────────────────────────────────────────────
 function renderMarkdown(text: string): string {
   if (!text) return ''
-  const raw = marked.parse(text, { async: false }) as string
-  return DOMPurify.sanitize(raw)
+  // 1. Strip any raw HTML the user may have typed (preserves plain text + markdown syntax)
+  const plain = DOMPurify.sanitize(text, { ALLOWED_TAGS: [] })
+  // 2. Replace @UUID with <mark>Name</mark> (same pattern as native Directus)
+  const withMentions = plain.replace(
+    new RegExp(`@(${UUID_PATTERN})`, 'gi'),
+    (_, uuid: string) => `<mark>${userPreviews.value[uuid] ?? uuid}</mark>`,
+  )
+  // 3. Render Markdown (marked passes through HTML tags)
+  const html = marked.parse(withMentions, { async: false }) as string
+  // 4. Sanitize — DOMPurify allows <mark> by default
+  return DOMPurify.sanitize(html)
 }
 
+async function loadUserPreviews(commentsList: Comment[]) {
+  const ids = new Set<string>()
+  for (const c of commentsList) {
+    MENTION_EXTRACT_RE.lastIndex = 0
+    let m: RegExpExecArray | null
+    while ((m = MENTION_EXTRACT_RE.exec(c.comment ?? '')) !== null) ids.add(m[1])
+  }
+  if (ids.size === 0) return
+  try {
+    const res = await api.get('/users', {
+      params: {
+        filter: { id: { _in: [...ids] } },
+        fields: ['id', 'first_name', 'last_name'],
+        limit: -1,
+      },
+    })
+    for (const u of (res.data?.data ?? [])) {
+      userPreviews.value[u.id] = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.id
+    }
+  } catch { /* non-critical */ }
+}
+
+// ─── Mention autocomplete ─────────────────────────────────────────────────────
+function detectMention(text: string, pos: number, ctx: MentionCtx) {
+  // Walk back from cursor: stop at space/newline or find @
+  let atPos = -1
+  for (let i = pos - 1; i >= 0; i--) {
+    if (text[i] === '@') {
+      if (i === 0 || text[i - 1] === ' ' || text[i - 1] === '\n') {
+        atPos = i; break
+      }
+      break
+    }
+    if (text[i] === ' ' || text[i] === '\n') break
+  }
+
+  if (atPos >= 0) {
+    const query = text.slice(atPos + 1, pos)
+    // Don't re-trigger inside an already-completed UUID
+    if (/^[0-9a-f-]{36}$/i.test(query)) { showMentions.value = false; return }
+    mentionCtx.value = ctx
+    mentionStart.value = atPos
+    mentionQuery.value = query
+    mentionIdx.value = 0
+    showMentions.value = true
+    scheduleMentionSearch(query)
+  } else {
+    showMentions.value = false
+  }
+}
+
+function scheduleMentionSearch(query: string) {
+  if (mentionTimer) clearTimeout(mentionTimer)
+  mentionTimer = setTimeout(() => fetchMentionUsers(query), 200)
+}
+
+async function fetchMentionUsers(query: string) {
+  mentionLoading.value = true
+  try {
+    const params: Record<string, any> = {
+      fields: ['id', 'first_name', 'last_name', 'avatar.id'],
+      limit: 8,
+    }
+    if (query) {
+      params.filter = {
+        _or: [
+          { first_name: { _starts_with: query } },
+          { last_name: { _starts_with: query } },
+        ],
+      }
+    }
+    const res = await api.get('/users', { params })
+    mentionUsers.value = res.data?.data ?? []
+  } catch {
+    mentionUsers.value = []
+  } finally {
+    mentionLoading.value = false
+  }
+}
+
+function selectMention(user: MentionUser) {
+  const isEdit = mentionCtx.value === 'edit'
+  const textModel = isEdit ? editingText : newComment
+  const text = textModel.value
+  const before = text.slice(0, mentionStart.value)
+  const after = text.slice(mentionStart.value + 1 + mentionQuery.value.length)
+  textModel.value = `${before}@${user.id} ${after}`
+  showMentions.value = false
+
+  nextTick(() => {
+    const el = (isEdit ? editCommentRef : newCommentRef).value
+    if (el) {
+      const pos = before.length + 1 + user.id.length + 1
+      el.setSelectionRange(pos, pos)
+      el.focus()
+    }
+  })
+}
+
+function closeMentionsOnBlur() {
+  // Give mousedown on mention items time to fire before closing
+  setTimeout(() => { showMentions.value = false }, 150)
+}
+
+// ─── Keyboard handlers ────────────────────────────────────────────────────────
+function handleMentionKeys(e: KeyboardEvent): boolean {
+  if (!showMentions.value) return false
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    mentionIdx.value = Math.min(mentionIdx.value + 1, mentionUsers.value.length - 1)
+    return true
+  }
+  if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    mentionIdx.value = Math.max(mentionIdx.value - 1, 0)
+    return true
+  }
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    const u = mentionUsers.value[mentionIdx.value]
+    if (u) selectMention(u)
+    return true
+  }
+  if (e.key === 'Escape') {
+    showMentions.value = false
+    return true
+  }
+  return false
+}
+
+function onNewKeydown(e: KeyboardEvent) {
+  if (handleMentionKeys(e)) return
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); postComment(); return }
+  if (e.key === 'Escape') cancelNew()
+}
+
+function onEditKeydown(e: KeyboardEvent, id: string) {
+  if (handleMentionKeys(e)) return
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); saveEdit(id); return }
+  if (e.key === 'Escape') cancelEdit()
+}
+
+// ─── API ──────────────────────────────────────────────────────────────────────
 async function loadCount() {
   loadingCount.value = true
   try {
@@ -159,7 +341,9 @@ async function loadComments() {
         limit: -1,
       },
     })
-    comments.value = res.data?.data ?? []
+    const data: Comment[] = res.data?.data ?? []
+    await loadUserPreviews(data)
+    comments.value = data
     hasLoaded.value = true
   } catch {
     comments.value = []
@@ -244,38 +428,59 @@ async function deleteComment() {
   }
 }
 
-function onNewKeydown(e: KeyboardEvent) {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-    e.preventDefault()
-    postComment()
-  }
-  if (e.key === 'Escape') cancelNew()
-}
-
-function onEditKeydown(e: KeyboardEvent, id: string) {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-    e.preventDefault()
-    saveEdit(id)
-  }
-  if (e.key === 'Escape') cancelEdit()
-}
-
 onMounted(loadCount)
 watch(() => props.fileId, reload)
 </script>
 
 <template>
   <SidebarDetail icon="chat_bubble_outline" title="Comments" :badge="badge" @toggle="onToggle">
-    <!-- New comment input -->
-    <div class="comment-input-wrap" :class="{ expanded: focused || newComment.trim() }">
-      <textarea
-        v-model="newComment"
-        class="comment-input"
-        placeholder="Leave a comment…"
-        :rows="focused || newComment.trim() ? 3 : 1"
-        @focus="focused = true"
-        @keydown="onNewKeydown"
-      />
+
+    <!-- ── New comment input ── -->
+    <div class="comment-input-wrap">
+      <div class="mention-anchor">
+        <textarea
+          ref="newCommentRef"
+          v-model="newComment"
+          class="comment-input"
+          placeholder="Leave a comment…"
+          :rows="focused || newComment.trim() ? 3 : 1"
+          @focus="focused = true"
+          @blur="closeMentionsOnBlur"
+          @input="(e) => detectMention((e.target as HTMLTextAreaElement).value, (e.target as HTMLTextAreaElement).selectionStart ?? 0, 'new')"
+          @keydown="onNewKeydown"
+        />
+
+        <!-- Mention dropdown for new comment -->
+        <div
+          v-if="showMentions && mentionCtx === 'new'"
+          class="mention-dropdown"
+          role="listbox"
+        >
+          <div v-if="mentionLoading" class="mention-loading">
+            <v-progress-circular x-small indeterminate />
+          </div>
+          <template v-else-if="mentionUsers.length">
+            <button
+              v-for="(u, i) in mentionUsers"
+              :key="u.id"
+              type="button"
+              role="option"
+              class="mention-item"
+              :class="{ active: i === mentionIdx }"
+              @mousedown.prevent="selectMention(u)"
+              @mousemove="mentionIdx = i"
+            >
+              <v-avatar x-small class="mention-avatar">
+                <img v-if="getAvatarUrl(u)" :src="getAvatarUrl(u)!" :alt="getUserName(u)" />
+                <v-icon v-else name="person_outline" />
+              </v-avatar>
+              <span>{{ getUserName(u) }}</span>
+            </button>
+          </template>
+          <div v-else class="mention-empty">No users found</div>
+        </div>
+      </div>
+
       <div v-if="focused || newComment.trim()" class="input-actions">
         <v-button x-small secondary @click="cancelNew">Cancel</v-button>
         <v-button
@@ -289,10 +494,12 @@ watch(() => props.fileId, reload)
       </div>
     </div>
 
+    <!-- ── Loading / empty ── -->
     <v-progress-linear v-if="loading" indeterminate class="loading-bar" />
 
     <div v-else-if="commentsCount === 0 && !loading" class="empty">No comments</div>
 
+    <!-- ── Comment list ── -->
     <template v-else-if="comments">
       <template v-for="group in groupedComments" :key="group.date.toISOString()">
         <v-divider class="date-divider">{{ group.dateFormatted }}</v-divider>
@@ -312,7 +519,7 @@ watch(() => props.fileId, reload)
 
             <div class="header-right">
               <span class="comment-time">{{ formatTime(c.date_created) }}</span>
-              <v-menu show-arrow placement="bottom-end" class="options-menu">
+              <v-menu show-arrow placement="bottom-end">
                 <template #activator="{ toggle }">
                   <v-icon
                     name="more_horiz"
@@ -336,21 +543,57 @@ watch(() => props.fileId, reload)
             </div>
           </div>
 
-          <!-- Inline edit -->
+          <!-- Inline edit with mention support -->
           <div v-if="editingId === c.id" class="edit-wrap">
-            <textarea
-              v-model="editingText"
-              class="comment-input"
-              rows="3"
-              @keydown="(e) => onEditKeydown(e, c.id)"
-            />
+            <div class="mention-anchor">
+              <textarea
+                ref="editCommentRef"
+                v-model="editingText"
+                class="comment-input"
+                rows="3"
+                @input="(e) => detectMention((e.target as HTMLTextAreaElement).value, (e.target as HTMLTextAreaElement).selectionStart ?? 0, 'edit')"
+                @blur="closeMentionsOnBlur"
+                @keydown="(e) => onEditKeydown(e, c.id)"
+              />
+              <!-- Mention dropdown for edit -->
+              <div
+                v-if="showMentions && mentionCtx === 'edit'"
+                class="mention-dropdown"
+                role="listbox"
+              >
+                <div v-if="mentionLoading" class="mention-loading">
+                  <v-progress-circular x-small indeterminate />
+                </div>
+                <template v-else-if="mentionUsers.length">
+                  <button
+                    v-for="(u, i) in mentionUsers"
+                    :key="u.id"
+                    type="button"
+                    role="option"
+                    class="mention-item"
+                    :class="{ active: i === mentionIdx }"
+                    @mousedown.prevent="selectMention(u)"
+                    @mousemove="mentionIdx = i"
+                  >
+                    <v-avatar x-small class="mention-avatar">
+                      <img v-if="getAvatarUrl(u)" :src="getAvatarUrl(u)!" :alt="getUserName(u)" />
+                      <v-icon v-else name="person_outline" />
+                    </v-avatar>
+                    <span>{{ getUserName(u) }}</span>
+                  </button>
+                </template>
+                <div v-else class="mention-empty">No users found</div>
+              </div>
+            </div>
             <div class="input-actions">
               <v-button x-small secondary @click="cancelEdit">Cancel</v-button>
-              <v-button x-small :loading="saving" :disabled="!editingText.trim()" @click="saveEdit(c.id)">Save</v-button>
+              <v-button x-small :loading="saving" :disabled="!editingText.trim()" @click="saveEdit(c.id)">
+                Save
+              </v-button>
             </div>
           </div>
 
-          <!-- Rendered comment body -->
+          <!-- Rendered Markdown + mentions -->
           <div
             v-else
             class="comment-body"
@@ -360,7 +603,7 @@ watch(() => props.fileId, reload)
       </template>
     </template>
 
-    <!-- Delete confirmation dialog -->
+    <!-- ── Delete confirmation ── -->
     <v-dialog v-model="showDeleteConfirm" @esc="confirmDeleteId = null">
       <v-card>
         <v-card-title>Delete Comment</v-card-title>
@@ -371,13 +614,19 @@ watch(() => props.fileId, reload)
         </v-card-actions>
       </v-card>
     </v-dialog>
+
   </SidebarDetail>
 </template>
 
 <style scoped>
+/* ── Input ──────────────────────────────────────────────────────────────────── */
 .comment-input-wrap {
   padding: 0.5rem 1rem 0.625rem;
   border-block-end: 1px solid var(--theme--border-color-subdued);
+}
+
+.mention-anchor {
+  position: relative;
 }
 
 .comment-input {
@@ -410,6 +659,56 @@ watch(() => props.fileId, reload)
   margin-block-start: 0.375rem;
 }
 
+/* ── Mention dropdown ───────────────────────────────────────────────────────── */
+.mention-dropdown {
+  position: absolute;
+  inset-block-start: calc(100% + 4px);
+  inset-inline: 0;
+  z-index: 100;
+  background: var(--theme--background-normal);
+  border: var(--theme--border-width) solid var(--theme--border-color);
+  border-radius: var(--theme--border-radius);
+  box-shadow: var(--theme--shadow);
+  overflow: hidden;
+  max-block-size: 14rem;
+  overflow-y: auto;
+}
+
+.mention-loading,
+.mention-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--theme--foreground-subdued);
+}
+
+.mention-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  inline-size: 100%;
+  padding: 0.4375rem 0.75rem;
+  font-size: 0.8125rem;
+  text-align: start;
+  background: none;
+  border: none;
+  color: var(--theme--foreground);
+  cursor: pointer;
+  transition: background-color var(--fast) var(--transition);
+}
+
+.mention-item:hover,
+.mention-item.active {
+  background-color: var(--theme--background-accent);
+}
+
+.mention-avatar {
+  flex-shrink: 0;
+}
+
+/* ── Loading / empty ────────────────────────────────────────────────────────── */
 .loading-bar {
   margin-block: 0.5rem;
 }
@@ -421,12 +720,14 @@ watch(() => props.fileId, reload)
   font-style: italic;
 }
 
+/* ── Date dividers ──────────────────────────────────────────────────────────── */
 .date-divider {
   margin-block: 0.5rem;
 }
 
+/* ── Comment items ──────────────────────────────────────────────────────────── */
 .comment-item {
-  padding: 0.5rem 1rem;
+  padding: 0.4375rem 0.75rem;
   border-radius: var(--theme--border-radius);
   transition: background-color var(--fast) var(--transition);
 }
@@ -461,7 +762,6 @@ watch(() => props.fileId, reload)
   align-items: center;
   gap: 0.25rem;
   flex-shrink: 0;
-  position: relative;
 }
 
 .comment-time {
@@ -485,6 +785,7 @@ watch(() => props.fileId, reload)
   opacity: 0;
 }
 
+/* ── Comment body (rendered Markdown) ───────────────────────────────────────── */
 .comment-body {
   font-size: 0.8125rem;
   color: var(--theme--foreground);
@@ -494,19 +795,27 @@ watch(() => props.fileId, reload)
   word-break: break-word;
 }
 
-.comment-body :deep(p) {
-  margin: 0 0 0.5em;
-}
-
-.comment-body :deep(p:last-child) {
-  margin-bottom: 0;
-}
+.comment-body :deep(p) { margin: 0 0 0.5em; }
+.comment-body :deep(p:last-child) { margin-bottom: 0; }
 
 .comment-body :deep(mark) {
-  background-color: var(--theme--primary-background);
+  display: inline-block;
+  padding: 0.125rem 0.25rem;
   color: var(--theme--primary);
-  padding: 0 0.125rem;
-  border-radius: 0.1875rem;
+  line-height: 1;
+  background: var(--theme--primary-background);
+  border-radius: var(--theme--border-radius);
+  pointer-events: none;
+}
+
+.comment-body :deep(a) { color: var(--theme--primary); }
+
+.comment-body :deep(blockquote) {
+  margin: 0.4375rem 0;
+  padding-inline-start: 0.5rem;
+  color: var(--theme--foreground-subdued);
+  font-style: italic;
+  border-inline-start: 2px solid var(--theme--border-color);
 }
 
 .comment-body :deep(code) {
@@ -525,6 +834,7 @@ watch(() => props.fileId, reload)
   font-size: 0.75rem;
 }
 
+/* ── Inline edit ────────────────────────────────────────────────────────────── */
 .edit-wrap {
   margin-block-start: 0.25rem;
 }
