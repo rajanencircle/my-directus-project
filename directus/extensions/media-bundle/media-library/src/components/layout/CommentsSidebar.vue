@@ -4,6 +4,7 @@ import { useApi } from '@directus/extensions-sdk'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import SidebarDetail from './SidebarDetail.vue'
+import EmojiPickerButton from './EmojiPickerButton.vue'
 
 const props = defineProps<{ fileId: string }>()
 
@@ -54,6 +55,8 @@ const newComment = ref('')
 const focused = ref(false)
 const posting = ref(false)
 const newCommentRef = ref<HTMLTextAreaElement | null>(null)
+// Last known caret positions so emoji/@ insertion lands at the right spot
+const lastCaretPos = ref<Record<MentionCtx, number>>({ new: 0, edit: 0 })
 
 // ─── Inline edit ─────────────────────────────────────────────────────────────
 const editingId = ref<string | null>(null)
@@ -251,9 +254,54 @@ function selectMention(user: MentionUser) {
   })
 }
 
-function closeMentionsOnBlur() {
+function closeMentionsOnBlur(ctx: MentionCtx) {
+  // Save caret before focus moves away (for emoji / @ insertion)
+  const el = (ctx === 'new' ? newCommentRef : editCommentRef).value
+  if (el) lastCaretPos.value[ctx] = el.selectionStart ?? 0
   // Give mousedown on mention items time to fire before closing
   setTimeout(() => { showMentions.value = false }, 150)
+}
+
+function trackCaret(e: Event, ctx: MentionCtx) {
+  lastCaretPos.value[ctx] = (e.target as HTMLTextAreaElement).selectionStart ?? 0
+}
+
+// ─── @ and emoji insertion ────────────────────────────────────────────────────
+function insertAtMention(ctx: MentionCtx) {
+  const el = (ctx === 'new' ? newCommentRef : editCommentRef).value
+  const textModel = ctx === 'new' ? newComment : editingText
+  const pos = el ? el.selectionStart ?? lastCaretPos.value[ctx] : lastCaretPos.value[ctx]
+  const before = textModel.value.slice(0, pos)
+  const after = textModel.value.slice(pos)
+  // Add a space before @ when cursor isn't already at a word boundary
+  const needsSpace = before.length > 0 && !/[ \n]$/.test(before)
+  const insert = needsSpace ? ' @' : '@'
+  textModel.value = before + insert + after
+  const newPos = pos + insert.length
+  nextTick(() => {
+    if (el) {
+      el.focus()
+      el.setSelectionRange(newPos, newPos)
+      detectMention(textModel.value, newPos, ctx)
+    }
+  })
+}
+
+function insertText(text: string, ctx: MentionCtx) {
+  const el = (ctx === 'new' ? newCommentRef : editCommentRef).value
+  const textModel = ctx === 'new' ? newComment : editingText
+  const pos = lastCaretPos.value[ctx]
+  const before = textModel.value.slice(0, pos)
+  const after = textModel.value.slice(pos)
+  textModel.value = before + text + after
+  const newPos = pos + text.length
+  lastCaretPos.value[ctx] = newPos
+  nextTick(() => {
+    if (el) {
+      el.focus()
+      el.setSelectionRange(newPos, newPos)
+    }
+  })
 }
 
 // ─── Keyboard handlers ────────────────────────────────────────────────────────
@@ -445,17 +493,16 @@ watch(() => props.fileId, reload)
           placeholder="Leave a comment…"
           :rows="focused || newComment.trim() ? 3 : 1"
           @focus="focused = true"
-          @blur="closeMentionsOnBlur"
-          @input="(e) => detectMention((e.target as HTMLTextAreaElement).value, (e.target as HTMLTextAreaElement).selectionStart ?? 0, 'new')"
+          @blur="closeMentionsOnBlur('new')"
+          @click="(e) => trackCaret(e, 'new')"
+          @keyup="(e) => trackCaret(e, 'new')"
+          @select="(e) => trackCaret(e, 'new')"
+          @input="(e) => { trackCaret(e, 'new'); detectMention((e.target as HTMLTextAreaElement).value, (e.target as HTMLTextAreaElement).selectionStart ?? 0, 'new') }"
           @keydown="onNewKeydown"
         />
 
         <!-- Mention dropdown for new comment -->
-        <div
-          v-if="showMentions && mentionCtx === 'new'"
-          class="mention-dropdown"
-          role="listbox"
-        >
+        <div v-if="showMentions && mentionCtx === 'new'" class="mention-dropdown" role="listbox">
           <div v-if="mentionLoading" class="mention-loading">
             <v-progress-circular x-small indeterminate />
           </div>
@@ -482,15 +529,13 @@ watch(() => props.fileId, reload)
       </div>
 
       <div v-if="focused || newComment.trim()" class="input-actions">
-        <v-button x-small secondary @click="cancelNew">Cancel</v-button>
-        <v-button
-          x-small
-          :loading="posting"
-          :disabled="!newComment.trim()"
-          @click="postComment"
-        >
-          Submit
+        <v-button x-small secondary icon class="action-btn" title="Mention a user" @mousedown.prevent="insertAtMention('new')">
+          <v-icon name="alternate_email" />
         </v-button>
+        <EmojiPickerButton @emoji-selected="insertText($event, 'new')" />
+        <span class="spacer" />
+        <v-button x-small secondary @click="cancelNew">Cancel</v-button>
+        <v-button x-small :loading="posting" :disabled="!newComment.trim()" @click="postComment">Submit</v-button>
       </div>
     </div>
 
@@ -551,16 +596,15 @@ watch(() => props.fileId, reload)
                 v-model="editingText"
                 class="comment-input"
                 rows="3"
-                @input="(e) => detectMention((e.target as HTMLTextAreaElement).value, (e.target as HTMLTextAreaElement).selectionStart ?? 0, 'edit')"
-                @blur="closeMentionsOnBlur"
+                @blur="closeMentionsOnBlur('edit')"
+                @click="(e) => trackCaret(e, 'edit')"
+                @keyup="(e) => trackCaret(e, 'edit')"
+                @select="(e) => trackCaret(e, 'edit')"
+                @input="(e) => { trackCaret(e, 'edit'); detectMention((e.target as HTMLTextAreaElement).value, (e.target as HTMLTextAreaElement).selectionStart ?? 0, 'edit') }"
                 @keydown="(e) => onEditKeydown(e, c.id)"
               />
               <!-- Mention dropdown for edit -->
-              <div
-                v-if="showMentions && mentionCtx === 'edit'"
-                class="mention-dropdown"
-                role="listbox"
-              >
+              <div v-if="showMentions && mentionCtx === 'edit'" class="mention-dropdown" role="listbox">
                 <div v-if="mentionLoading" class="mention-loading">
                   <v-progress-circular x-small indeterminate />
                 </div>
@@ -586,10 +630,13 @@ watch(() => props.fileId, reload)
               </div>
             </div>
             <div class="input-actions">
-              <v-button x-small secondary @click="cancelEdit">Cancel</v-button>
-              <v-button x-small :loading="saving" :disabled="!editingText.trim()" @click="saveEdit(c.id)">
-                Save
+              <v-button x-small secondary icon class="action-btn" title="Mention a user" @mousedown.prevent="insertAtMention('edit')">
+                <v-icon name="alternate_email" />
               </v-button>
+              <EmojiPickerButton @emoji-selected="insertText($event, 'edit')" />
+              <span class="spacer" />
+              <v-button x-small secondary @click="cancelEdit">Cancel</v-button>
+              <v-button x-small :loading="saving" :disabled="!editingText.trim()" @click="saveEdit(c.id)">Save</v-button>
             </div>
           </div>
 
@@ -654,9 +701,20 @@ watch(() => props.fileId, reload)
 
 .input-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.375rem;
+  align-items: center;
+  gap: 0.25rem;
   margin-block-start: 0.375rem;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.action-btn {
+  --v-button-background-color: transparent;
+  --v-button-color: var(--theme--foreground-subdued);
+  --v-button-color-hover: var(--theme--primary);
+  --v-button-background-color-hover: transparent;
 }
 
 /* ── Mention dropdown ───────────────────────────────────────────────────────── */
