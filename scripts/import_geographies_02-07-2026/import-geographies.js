@@ -32,10 +32,13 @@
 const fs = require("fs");
 const path = require("path");
 
+// Never hardcode tokens here — this file is committed to git and leaked
+// Directus tokens have had to be rotated before (see CLAUDE.md rule 4).
+//   local:   export DIRECTUS_URL="http://localhost:8055"
+//   dev:     export DIRECTUS_URL="https://dev.content.botg.cloud"
 const CONFIG = {
-  directusUrl: process.env.DIRECTUS_URL || "http://localhost:8055",
-  directusToken:
-    process.env.DIRECTUS_TOKEN || "1ecR7PLJIpOZZOMUUaOERZWkKv0YT14q",
+  directusUrl: process.env.DIRECTUS_URL || "",
+  directusToken: process.env.DIRECTUS_TOKEN || "",
 };
 
 const DATA_DIR = path.join(

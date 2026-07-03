@@ -1,0 +1,205 @@
+[
+  {
+    "id": 7,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:22:30.421Z",
+    "user_updated": null,
+    "date_updated": null,
+    "is_non_geographic": false,
+    "translations": [
+      {
+        "id": 19,
+        "destinations_cluster_id": 7,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstige"
+      },
+      {
+        "id": 20,
+        "destinations_cluster_id": 7,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Sonstige"
+      },
+      {
+        "id": 21,
+        "destinations_cluster_id": 7,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Overige"
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:22:24.822Z",
+    "user_updated": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_updated": "2026-06-03T11:45:11.144Z",
+    "is_non_geographic": false,
+    "translations": [
+      {
+        "id": 1,
+        "destinations_cluster_id": 1,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Afrika"
+      },
+      {
+        "id": 2,
+        "destinations_cluster_id": 1,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Afrika"
+      },
+      {
+        "id": 3,
+        "destinations_cluster_id": 1,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Afrika"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:22:26.079Z",
+    "user_updated": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_updated": "2026-06-03T11:45:11.596Z",
+    "is_non_geographic": false,
+    "translations": [
+      {
+        "id": 4,
+        "destinations_cluster_id": 2,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Asien"
+      },
+      {
+        "id": 5,
+        "destinations_cluster_id": 2,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Asien"
+      },
+      {
+        "id": 6,
+        "destinations_cluster_id": 2,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Azië"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:22:27.277Z",
+    "user_updated": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_updated": "2026-06-03T11:45:11.903Z",
+    "is_non_geographic": false,
+    "translations": [
+      {
+        "id": 7,
+        "destinations_cluster_id": 3,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Indischer Ozean"
+      },
+      {
+        "id": 8,
+        "destinations_cluster_id": 3,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Indischer Ozean"
+      },
+      {
+        "id": 9,
+        "destinations_cluster_id": 3,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Indische Oceaan"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:22:28.094Z",
+    "user_updated": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_updated": "2026-06-03T11:45:12.219Z",
+    "is_non_geographic": false,
+    "translations": [
+      {
+        "id": 10,
+        "destinations_cluster_id": 4,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Lateinamerika"
+      },
+      {
+        "id": 11,
+        "destinations_cluster_id": 4,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Lateinamerika"
+      },
+      {
+        "id": 12,
+        "destinations_cluster_id": 4,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Latijns-Amerika"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:22:28.861Z",
+    "user_updated": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_updated": "2026-06-03T11:45:12.519Z",
+    "is_non_geographic": false,
+    "translations": [
+      {
+        "id": 13,
+        "destinations_cluster_id": 5,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nordamerika"
+      },
+      {
+        "id": 14,
+        "destinations_cluster_id": 5,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nordamerika"
+      },
+      {
+        "id": 15,
+        "destinations_cluster_id": 5,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Noord-Amerika"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:22:29.661Z",
+    "user_updated": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_updated": "2026-06-03T11:45:13.138Z",
+    "is_non_geographic": false,
+    "translations": [
+      {
+        "id": 16,
+        "destinations_cluster_id": 6,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Ozeanien"
+      },
+      {
+        "id": 17,
+        "destinations_cluster_id": 6,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Ozeanien"
+      },
+      {
+        "id": 18,
+        "destinations_cluster_id": 6,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Oceanië"
+      }
+    ]
+  }
+]
