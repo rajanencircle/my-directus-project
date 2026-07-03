@@ -1,0 +1,223 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,destination_id,status,ISO,ISO_alpha_3_code,media_code,media_code_legacy_botg,media_code_legacy_karawane,cid_primarix,id_primarix,cid_px_karawane,id_px_karawane
+1,Egypt,Ägypten,Ägypten,Egypte,1,active,EG,EGY,EG,,AFR_EG,,,,342
+2,Ethiopia,Äthiopien,Äthiopien,Ethiopië,1,active,ET,ETH,ETH,ETH_,AFR_ET,,346;121823,,
+3,Algeria,Algerien,Algerien,Algerije,1,active,DZ,DZA,DZ,,AFR_DZ,,,,
+4,Benin,Benin,Benin,Benin,1,active,BJ,BEN,BJ,,AFR_BJ,,,,
+5,Botswana,Botswana,Botswana,Botswana,1,active,BW,BWA,BOT,BOT_,AFR_BW,,313;3722,,
+6,Burkina Faso,Burkina Faso,Burkina Faso,Burkina Faso,1,active,BF,BFA,BF,,AFR_BF,,,,
+7,Burundi,Burundi,Burundi,Burundi,1,active,BI,BDI,BI,,AFR_BI,,,,
+8,Djibouti,Dschibuti,Dschibuti,Djibouti,1,active,DJ,DJI,DJ,,AFR_DJ,,,,
+9,Ivory Coast,Elfenbeinküste,Elfenbeinküste,Ivoorkust,1,active,CI,CIV,CI,,AFR_CI,,,,
+10,Eritrea,Eritrea,Eritrea,Eritrea,1,active,ER,ERI,ER,,AFR_ER,,,,
+11,Gabon,Gabun,Gabun,Gabon,1,active,GA,GAB,GA,,AFR_GA,,,,
+12,Gambia,Gambia,Gambia,Gambia,1,active,GM,GMB,GM,,AFR_GM,,,,
+13,Ghana,Ghana,Ghana,Ghana,1,active,GH,GHA,GH,,AFR_GH,,,,
+14,Guinea,Guinea,Guinea,Guinee,1,active,GN,GIN,GN,,AFR_GN,,,,
+15,Cameroon,Kamerun,Kamerun,Kameroen,1,active,CM,CMR,CM,,AFR_CM,,,,
+16,Cape Verde,Kap Verde,Kap Verde,Kaapverdië,1,active,CV,CPV,CV,,AFR_CV,,,,
+17,Kenya,Kenia,Kenia,Kenia,1,active,KE,KEN,KEN,KEN_,AFR_KE,,389;3729,,389
+18,Comoros,Komoren,Komoren,Comoren,1,active,KM,COM,KM,,AFR_KM,,,,
+19,Congo,Kongo,Kongo,Congo,1,active,CG,COG,CG,,AFR_CG,,,,
+20,Lesotho,Lesotho,Lesotho,Lesotho,1,active,LS,LSO,LOS,RSA_LOS,AFR_LS,,,,
+21,Libya,Libyen,Libyen,Libië,1,active,LY,LBY,LY,,AFR_LY,,,,
+22,Madagascar,Madagaskar,Madagaskar,Madagaskar,1,archived,MG,MDG,MG,,AFR_MG,,414;3752,,414
+23,Malawi,Malawi,Malawi,Malawi,1,active,MW,MWI,MAL,MAL_,AFR_MW,,428;3726,,
+24,Mali,Mali,Mali,Mali,1,active,ML,MLI,ML,,AFR_ML,,,,
+25,Morocco,Marokko,Marokko,Marokko,1,active,MA,MAR,MA,,AFR_MA,,,,411
+26,Mauritania,Mauretanien,Mauretanien,Mauritanië,1,active,MR,MRT,MR,,AFR_MR,,,,
+27,Mozambique,Mosambik,Mosambik,Mozambique,1,active,MZ,MOZ,MOZ,MOZ_,AFR_MZ,,431;3725,,
+28,Namibia,Namibia,Namibia,Namibië,1,active,NA,NAM,NA,NA_,AFR_NA,,432;3721,,432
+29,Niger,Niger,Niger,Niger,1,active,NE,NER,NE,,AFR_NE,,,,
+30,Nigeria,Nigeria,Nigeria,Nigeria,1,active,NG,NGA,NG,,AFR_NG,,,,
+31,Rwanda,Ruanda,Ruanda,Rwanda,1,active,RW,RWA,RWA,RWA_,AFR_RW,,463;9192,,463
+32,Senegal,Senegal,Senegal,Senegal,1,active,SN,SEN,SN,,AFR_SN,,,,
+33,Sierra Leone,Sierra Leone,Sierra Leone,Sierra Leone,1,active,SL,SLE,SL,,AFR_SL,,,,
+34,Somalia,Somalia,Somalia,Somalië,1,active,SO,SOM,SO,,AFR_SO,,,,
+35,Sudan,Sudan,Sudan,Soedan,1,active,SD,SDN,SD,,AFR_SD,,,,
+36,Eswatini,Swasiland,Swasiland,Eswatini,1,active,SZ,SWZ,SWA,RSA_SWA,AFR_SZ,,,,
+37,South Africa,Südafrika,Südafrika,Zuid-Afrika,1,active,ZA,ZAF,RSA,RSA_,AFR_ZA,,518;3720,,518
+38,Tanzania,Tansania,Tansania,Tanzania,1,active,TZ,TZA,TAZ,TAZ_,AFR_TZ,,497;3728,,497
+39,Togo,Togo,Togo,Togo,1,active,TG,TGO,TG,,AFR_TG,,,,
+40,Chad,Tschad,Tschad,Tsjaad,1,active,TD,TCD,TD,,AFR_TD,,,,
+41,Tunisia,Tunesien,Tunesien,Tunesië,1,active,TN,TUN,TN,,AFR_TN,,,,490
+42,Uganda,Uganda,Uganda,Oeganda,1,active,UG,UGA,UGA,UGA_,AFR_UG,,499;3727,,499
+43,DR Congo,Kongo (Dem. VR),Kongo (Dem. VR),Congo (DRC),1,active,CD,COD,CD,,AFR_ZR,,,,
+44,Zambia,Zambia,Zambia,Zambia,1,active,ZM,ZMB,ZAM,ZAM_,AFR_ZM,,,,
+45,Central African Republic,Zentralafrikanische Republik,Zentralafrikanische Republik,Centraal-Afrikaanse Republiek,1,active,CF,CAF,CF,,AFR_ZX,,,,
+46,Zimbabwe,Zimbabwe,Zimbabwe,Zimbabwe,1,active,ZW,ZWE,ZIM,ZIM_,AFR_ZW,,521;3723,,
+47,Christmas Island,"Weihnachtsinsel (Christmas Island, Australien)",Weihnachtsinsel,Christmaseiland,2,archived,CX,CXR,CX,,IOZ_CX,,,,
+48,Cocos Islands,Kokosinseln,Kokosinseln,Cocoseilanden,2,archived,CC,CCK,CC,,IOZ_CC,,,,
+49,Réunion,La Réunion,La Réunion,Réunion,2,active,RE,REU,REU,IOZ_REU,IOZ_REU,,460;3751,,722
+50,Maldives,Malediven,Malediven,Malediven,2,active,MV,MDV,MAL,IOZ_MAL,IOZ_MAL,,427;121595,,
+51,Mauritius,Mauritius,Mauritius,Mauritius,2,active,MU,MUS,MAU,IOZ_MAU,IOZ_MAU,,426;3750,,
+52,Seychelles,Seychellen,Seychellen,Seychellen,2,active,SC,SYC,SEY,IOZ_SEY,IOZ_SEY,,466;3749,,466
+53,Azerbaijan,Aserbaidschan,Aserbaidschan,Azerbeidzjan,3,active,AZ,AZE,AZ,ASI_AZE,ASN_AZ,,,,
+54,Bangladesh,Bangladesch,Bangladesch,Bangladesh,3,active,BD,BGD,BD,ASI_BGD,ASN_BD,,,,
+55,Bhutan,Bhutan,Bhutan,Bhutan,3,active,BT,BTN,BT,ASI_BHU,ASN_BT,,3740;119526,,
+56,Brunei,Brunei Darussalam,Brunei Darussalam,Brunei,3,active,BN,BRN,BN,ASI_BWI,ASN_BN,,,,
+57,China,China,China,China,3,active,CN,CHN,CN,ASI_CHI,ASN_CN,,326;3737,,
+58,Hong Kong,Hongkong,Hongkong,Hongkong,3,active,HK,HKG,HKG,ASI_HKG,ASN_HK,,371;8877,,
+59,India,Indien,Indien,India,3,active,IN,IND,IN,ASI_RIN,ASN_IN,,380;3738,,380
+60,Indonesia,Indonesien,Indonesien,Indonesië,3,active,ID,IDN,ID,ASI_IND,ASN_ID,,377;3734,,377
+61,Japan,Japan,Japan,Japan,3,active,JP,JPN,JP,ASI_JAP,ASN_JP,,388;3739,,388
+62,Cambodia,Kambodscha,Kambodscha,Cambodja,3,active,KH,KHM,KH,ASI_KAM,ASN_KH,,391;3731,,
+63,Kazakhstan,Kasachstan,Kasachstan,Kazachstan,3,active,KZ,KAZ,KZ,,ASN_KZ,,,,
+64,Kyrgyzstan,Kirgisistan,Kirgisistan,Kirgizië,3,active,KG,KGZ,KG,ASI_KGZ,ASN_KG,,,,
+65,South Korea,Südkorea,Südkorea,Zuid-Korea,3,active,KR,KOR,KR,,ASN_KR,,,,9075
+66,Laos,Laos,Laos,Laos,3,active,LA,LAO,LA,ASI_LAO,ASN_LA,,400;3732,,
+67,Macau,Macau,Macau,Macau,3,active,MO,MAC,MO,,ASN_MO,,,,
+68,Malaysia,Malaysia,Malaysia,Maleisië,3,active,MY,MYS,MY,ASI_MLY,ASN_MY,,430;3735,,
+69,Mongolia,Mongolei,Mongolei,Mongolië,3,active,MN,MNG,MN,ASI_MON,ASN_MN,,,,419
+70,Myanmar,Myanmar,Myanmar,Myanmar,3,active,MM,MMR,MM,ASI_MYA,ASN_MM,,418;3736,,
+71,Nepal,Nepal,Nepal,Nepal,3,active,NP,NPL,NP,ASI_NEP,ASN_NP,,440;8874,,
+72,East Timor,Ost-Timor,Ost-Timor,Oost-Timor,3,active,TL,TLS,TL,ASI_TLS,ASN_TP,,,,
+73,Pakistan,Pakistan,Pakistan,Pakistan,3,active,PK,PAK,PK,,ASN_PK,,,,
+74,Philippines,Philippinen,Philippinen,Filipijnen,3,active,PH,PHL,PH,ASI_PHI,ASN_PH,,,,
+75,Singapore,Singapur,Singapur,Singapore,3,active,SG,SGP,SIN,ASI_SIN,ASN_SG,,469;8851,,
+76,Sri Lanka,Sri Lanka,Sri Lanka,Sri Lanka,3,active,LK,LKA,SRI,ASI_SRI,ASN_LK,,404;3741,,404
+77,Taiwan,Taiwan,Taiwan,Taiwan,3,active,TW,TWN,TW,,ASN_TW,,,,
+78,Tajikistan,Tadschikistan,Tadschikistan,Tadzjikistan,3,active,TJ,TJK,TJ,,ASN_TJ,,,,
+79,Thailand,Thailand,Thailand,Thailand,3,active,TH,THA,TH,ASI_THA,ASN_TH,,487;3733,,
+80,Turkmenistan,Turkmenistan,Turkmenistan,Turkmenistan,3,active,TM,TKM,TM,,ASN_TM,,,,
+81,Uzbekistan,Usbekistan,Usbekistan,Oezbekistan,3,active,UZ,UZB,UZ,,ASN_UZ,,,,
+82,United Arab Emirates,Vereinigte Arabische Emirate,Vereinigte Arabische Emirate,Verenigde Arabische Emiraten,3,active,AE,ARE,,ARA_AUH,,,283;115244,,
+83,Vietnam,Vietnam,Vietnam,Vietnam,3,active,VN,VNM,VN,ASI_VIE,ASN_VN,,510;3730,,
+84,Bahrain,Bahrain,Bahrain,Bahrein,4,active,BH,BHR,BH,ARA_BAH,NAH_BH,,,,
+85,Iraq,Irak,Irak,Irak,4,active,IQ,IRQ,IQ,,NAH_IQ,,,,
+86,Iran,Iran,Iran,Iran,4,active,IR,IRN,IR,,NAH_IR,,,,
+87,Israel,Israel,Israel,Israël,4,active,IL,ISR,IL,,NAH_IL,,,,
+88,Jordan,Jordanien,Jordanien,Jordanië,4,active,JO,JOR,JO,,NAH_JO,,,,
+89,Kuwait,Kuwait,Kuwait,Koeweit,4,active,KW,KWT,KW,,NAH_KW,,,,
+90,Lebanon,Libanon,Libanon,Libanon,4,active,LB,LBN,LB,,NAH_LB,,,,401
+91,Oman,Oman,Oman,Oman,4,active,OM,OMN,OM,,NAH_OM,,,,444
+92,Qatar,Katar (Qatar),Katar,Qatar,4,active,QA,QAT,QA,,NAH_QA,,,,
+93,Saudi Arabia,Saudi Arabien,Saudi-Arabien,Saoedi-Arabië,4,active,SA,SAU,SA,,NAH_SA,,,,
+94,Syria,Syrien,Syrien,Syrië,4,active,SY,SYR,SY,,NAH_SY,,,,
+95,Yemen,Jemen,Jemen,Jemen,4,active,YE,YEM,YE,,NAH_YE,,,,
+96,Albania,Albanien,Albanien,Albanië,5,active,AL,ALB,AL,,EUR_AL,,,,
+97,Andorra,Andorra,Andorra,Andorra,5,active,AD,AND,AD,,EUR_AD,,,,
+98,Armenia,Armenien,Armenien,Armenië,5,active,AM,ARM,AM,,EUR_AM,,,,
+99,Belarus,Weißrußland,Weissrussland,Belarus,5,active,BY,BLR,BY,,EUR_BY,,,,
+100,Belgium,Belgien,Belgien,België,5,active,BE,BEL,BE,,EUR_BE,,82171,,
+101,Bosnia and Herzegovina,Bosnien-Herzegovina,Bosnien-Herzegowina,Bosnië en Herzegovina,5,active,BA,BIH,BA,,EUR_BA,,,,
+102,Bulgaria,Bulgarien,Bulgarien,Bulgarije,5,active,BG,BGR,BG,,EUR_BG,,,,302
+103,Cyprus,Zypern,Zypern,Cyprus,5,active,CY,CYP,CY,,EUR_CY,,,,332
+104,Denmark,Dänemark,Dänemark,Denemarken,5,active,DK,DNK,DK,,EUR_DK,,,,336
+105,Germany,Deutschland,Deutschland,Duitsland,5,active,DE,DEU,DE,,EUR_DE,,4161;121904,,334
+106,Estonia,Estland,Estland,Estland,5,active,EE,EST,EE,,EUR_EE,,,,
+107,Faroe Islands,Faeroer Inseln,Färöer Inseln,Faeröer,5,active,FO,FRO,FO,,EUR_FO,,,,
+108,Finland,Finnland,Finnland,Finland,5,active,FI,FIN,FI,,EUR_FI,,121910,,348
+109,France,Frankreich,Frankreich,Frankrijk,5,active,FR,FRA,FR,,EUR_FR,,,,353
+110,Georgia,Georgien,Georgien,Georgië,5,active,GE,GEO,GE,,EUR_GE,,,,
+111,Greece,Griechenland,Griechenland,Griekenland,5,active,GR,GRC,GR,,EUR_GR,,121911,,366
+112,Greenland,Grönland,Grönland,Groenland,5,active,GL,GRL,GL,,EUR_GL,,,,361
+113,United Kingdom,Großbritannien,Grossbritannien,Verenigd Koninkrijk,5,active,GB,GBR,GB,,EUR_GB,,60644,,355
+114,Ireland,Irland,Irland,Ierland,5,active,IE,IRL,IE,,EUR_IE,,,,378
+115,Iceland,Island,Island,IJsland,5,active,IS,ISL,IS,,EUR_IS,,121920,,384
+116,Italy,Italien,Italien,Italië,5,active,IT,ITA,IT,,EUR_IT,,,,385
+117,Croatia,Kroatien,Kroatien,Kroatië,5,active,HR,HRV,HR,,EUR_HR,,,,374
+118,Latvia,Lettland,Lettland,Letland,5,active,LV,LVA,LV,,EUR_LV,,,,
+119,Liechtenstein,Liechtenstein,Liechtenstein,Liechtenstein,5,active,LI,LIE,LI,,EUR_LI,,,,
+120,Lithuania,Litauen,Litauen,Litouwen,5,active,LT,LTU,LT,,EUR_LT,,,,
+121,Luxembourg,Luxemburg,Luxemburg,Luxemburg,5,active,LU,LUX,LU,,EUR_LU,,,,408
+122,Malta,Malta,Malta,Malta,5,active,MT,MLT,MT,,EUR_MT,,,,425
+123,North Macedonia,Mazedonien,Mazedonien,Noord-Macedonië,5,active,MK,MKD,MZ,,EUR_MZ,,,,
+124,Moldova,Moldawien,Moldawien,Moldavië,5,active,MD,MDA,MD,,EUR_MD,,,,
+125,Monaco,Monaco,Monaco,Monaco,5,active,MC,MCO,MC,,EUR_MC,,,,412
+126,Montenegro,Montenegro,Montenegro,Montenegro,5,active,ME,MNE,ME,,EUR_ME,,,,
+127,Netherlands,Niederlande,Niederlande,Nederland,5,active,NL,NLD,NL,,EUR_NL,,,,438
+128,Norway,Norwegen,Norwegen,Noorwegen,5,active,NO,NOR,NO,,EUR_NO,,,,439
+129,Austria,Österreich,Österreich,Oostenrijk,5,active,AT,AUT,AT,,EUR_AT,,,,293
+130,Poland,Polen,Polen,Polen,5,active,PL,POL,PL,,EUR_PL,,,,451
+131,Portugal,Portugal,Portugal,Portugal,5,active,PT,PRT,PT,,EUR_PT,,,,456
+132,Romania,Rumänien,Rumänien,Roemenië,5,active,RO,ROU,RO,,EUR_RO,,,,
+133,Russia,Russland,Russland,Rusland,5,active,RU,RUS,RU,,EUR_RU,,121316,,462
+134,San Marino,San Marino,San Marino,San Marino,5,active,SM,SMR,SM,,EUR_SM,,,,
+135,Sweden,Schweden,Schweden,Zweden,5,active,SE,SWE,SE,,EUR_SE,,,,468
+136,Switzerland,Schweiz,Schweiz,Zwitserland,5,active,CH,CHE,CH,,EUR_CH,,121905;121906,,321
+137,Serbia,Serbien,Serbien,Servië,5,active,RS,SRB,RS,,EUR_RS,,,,
+138,Slovakia,Slowakei,Slowakei,Slowakije,5,active,SK,SVK,SK,,EUR_SK,,,,473
+139,Slovenia,Slowenien,Slowenien,Slovenië,5,active,SI,SVN,SI,,EUR_SI,,,,
+140,Spain,Spanien,Spanien,Spanje,5,active,ES,ESP,ES,,EUR_ES,,121914,,345
+141,Czech Republic,Tschechische Republik,Tschechische Republik,Tsjechië,5,active,CZ,CZE,CZ,,EUR_CZ,,,,333
+142,Turkey,Türkei,Türkei,Turkije,5,active,TR,TUR,TR,,EUR_TR,,,,493
+143,Ukraine,Ukraine,Ukraine,Oekraïne,5,active,UA,UKR,UA,,EUR_UA,,,,
+144,Hungary,Ungarn,Ungarn,Hongarije,5,active,HU,HUN,HU,,EUR_HU,,,,
+145,Vatican City,Vatikanstadt,Vatikanstadt,Vaticaanstad,5,active,VA,VAT,VA,,EUR_VA,,,,
+146,Antigua and Barbuda,Antigua und Barbuda,Antigua und Barbuda,Antigua en Barbuda,6,active,AG,ATG,AG,,KRB_AG,,,,
+147,Bahamas,Bahamas,Bahamas,Bahama's,6,active,BS,BHS,BS,,KRB_BS,,,,
+148,Barbados,Barbados,Barbados,Barbados,6,active,BB,BRB,BB,,KRB_BB,,,,
+149,Bermuda,Bermuda,Bermuda,Bermuda,6,active,BM,BMU,BM,,KRB_BM,,,,
+150,Cayman Islands,Cayman Inseln,Cayman Inseln,Kaaimaneilanden,6,active,KY,CYM,KY,,KRB_KY,,,,
+151,Dominican Republic,Dominikanische Republik,Dominikanische Republik,Dominicaanse Republiek,6,active,DO,DOM,DO,,KRB_DO,,,,338
+152,Grenada,Grenada,Grenada,Grenada,6,active,GD,GRD,GD,,KRB_GD,,,,
+153,Guadeloupe,Guadeloupe,Guadeloupe,Guadeloupe,6,active,GP,GLP,GP,,KRB_GP,,,,
+154,Jamaica,Jamaika,Jamaika,Jamaica,6,active,JM,JAM,JM,,KRB_JM,,,,386
+155,Martinique,Martinique,Martinique,Martinique,6,active,MQ,MTQ,MQ,,KRB_MQ,,,,
+156,Niederlaen. Antillen,Niederlaen. Antillen,Niederlaen. Antillen,Niederlaen. Antillen,6,active,BQ,BES,AN,,KRB_AN,,,,
+157,Puerto Rico,Puerto Rico,Puerto Rico,Puerto Rico,6,active,PR,PRI,PR,,KRB_PR,,,,
+158,Trinidad and Tobago,Trinidad und Tobago,Trinidad und Tobago,Trinidad en Tobago,6,active,TT,TTO,TT,,KRB_TT,,,,
+159,British Virgin Islands,Britische Jungferninseln,Britische Jungferninseln,Britse Maagdeneilanden,6,active,VG,VGB,VG,,KRB_VG,,,,
+160,Belize,Belize,Belize,Belize,7,active,BZ,BLZ,BZ,MIT_BZ,MAM_BZ,,122032;122041,,
+161,Costa Rica,Costa Rica,Costa Rica,Costa Rica,7,active,CR,CRI,CRI,MIT_CRI,MAM_CR,,121671;121684,,328
+162,Cuba,Kuba,Kuba,Cuba,7,active,CU,CUB,CU,MIT_CU,MAM_CU,,122008;122009;122031,,329
+163,El Salvador,El Salvador,El Salvador,El Salvador,7,active,SV,SLV,SV,,MAM_SV,,,,
+164,Guatemala,Guatemala,Guatemala,Guatemala,7,active,GT,GTM,GT,,MAM_GT,,,,
+165,Honduras,Honduras,Honduras,Honduras,7,active,HN,HND,HN,,MAM_HN,,,,
+166,Mexico,Mexiko,Mexiko,Mexico,7,active,MX,MEX,MEX,MIT_MEX,MAM_MX,,429;122029,,429
+167,Nicaragua,Nicaragua,Nicaragua,Nicaragua,7,active,NI,NIC,NI,,MAM_NI,,,,437
+168,Panama,Panama,Panama,Panama,7,active,PA,PAN,PAN,MIT_PAN,MAM_PA,,122007;122030,,445
+169,Argentina,Argentinien,Argentinien,Argentinië,8,active,AR,ARG,AR,SAM_AR,SAM_AR,,291;3743,,
+170,Bolivia,Bolivien,Bolivien,Bolivia,8,active,BO,BOL,BO,SAM_BO,SAM_BO,,308;3746,,308
+171,Brazil,Brasilien,Brasilien,Brazilië,8,active,BR,BRA,BR,SAM_BR,SAM_BR,,309;3747,,
+172,Chile,Chile,Chile,Chili,8,active,CL,CHL,CHI,SAM_CHI,SAM_CHI,,324;3742,,324
+173,Ecuador,Ecuador,Ecuador,Ecuador,8,active,EC,ECU,EC,SAM_EC,SAM_EC,,340;3744,,340
+174,Falkland Islands,Falkland Inseln,Falklandinseln,Falklandeilanden,8,active,FK,FLK,FK,SAM_FK,SAM_FK,,,,
+175,French Guiana,Französisch-Guayana,Französisch-Guayana,Frans-Guyana,8,active,GF,GUF,GF,,SAM_GF,,,,
+176,Colombia,Kolumbien,Kolumbien,Colombia,8,active,CO,COL,CO,SAM_CO,SAM_CO,,327;37986,,
+177,Paraguay,Paraguay,Paraguay,Paraguay,8,active,PY,PRY,PY,,SAM_PY,,,,
+178,Peru,Peru,Peru,Peru,8,active,PE,PER,PE,SAM_PE,SAM_PE,,446;3745,,
+179,Suriname,Surinam,Surinam,Suriname,8,active,SR,SUR,SR,,SAM_SR,,,,
+180,Uruguay,Uruguay,Uruguay,Uruguay,8,active,UY,URY,UY,SAM_URU,SAM_UY,,,,
+181,Venezuela,Venezuela,Venezuela,Venezuela,8,active,VE,VEN,VE,,SAM_VE,,121493;121494,,
+182,Canada,Kanada,Kanada,Canada,9,active,,,KAN,KAN_,KAN_,,316;121394,,316
+183,Canada,Kanada,Kanada,Canada,9,active,CA,CAN,KAN,KAN_AL,KAN_AL,,316;121394,,316
+184,USA,USA,USA,VS,9,active,,,US,USA_,USA_,,121393;121395,,502
+185,USA,USA,USA,VS,9,active,US,USA,US,USA_AK,USA_AK,,121393;121395,,502
+186,Australia,Australien,Australien,Australië,10,active,AU,AUS,,AUS_ACT,AUS_ACT,,294;3711,,294
+187,Norfolk Island,Norfolkinsel,Norfolkinsel,Norfolkeiland,10,active,NF,NFK,NFI,AUS_NFI,AUS_NFI,,,,
+188,New Zealand,Neuseeland,Neuseeland,Nieuw-Zeeland,11,active,NZ,NZL,NIS,NZL_NIS,NZL_NIS,,443;3712,,443
+189,American Samoa,Amerikanisch-Samoa,Amerikanisch-Samoa,Amerikaans-Samoa,12,archived,AS,ASM,AS,,PAZ_AS,,115240,,
+190,Cook Islands,Cook Islands,Cook Islands,Cookeilanden,12,active,CK,COK,RAR,SPC_RAR,SPC_RAR,,323;3714,,
+191,Fiji,Fiji,Fiji,Fiji,12,active,FJ,FJI,NAN,SPC_NAN,SPC_NAN,,,,
+192,French Polynesia,Französisch Polynesien,Französisch Polynesien,Frans-Polynesië,12,active,PF,PYF,PPT,SPC_PPT,SPC_PPT,,447;3713,,447
+193,Guam,Guam,Guam,Guam,12,active,GU,GUM,GU,,PAZ_GU,,,,
+194,Kiribati,Kiribati,Kiribati,Kiribati,12,active,KI,KIR,KI,,PAZ_KI,,,,
+195,Micronesia,Mikronesien,Mikronesien,Micronesië,12,active,FM,FSM,FM,,PAZ_FM,,,,
+196,New Caledonia,Neukaledonien,Neukaledonien,Nieuw-Caledonië,12,active,NC,NCL,NCL,SPC_NCL,SPC_NCL,,433;3718,,
+197,Palau,Palau,Palau,Palau,12,active,PW,PLW,PW,,PAZ_PW,,,,
+198,Papua New Guinea,Papua-Neuguinea,Papua-Neuguinea,Papoea-Nieuw-Guinea,12,active,PG,PNG,PNG,PNG_,PNG_,,448;5195,,
+199,Pitcairn Islands,Pitcairninseln,Pitcairninseln,Pitcairneilanden,12,active,PN,PCN,PN,,PAZ_PN,,453,,
+200,Samoa,Samoa,Samoa,Samoa,12,active,WS,WSM,APW,SPC_APW,SPC_APW,,513;3716,,
+201,Solomon Islands,Salomonen,Salomonen,Salomonseilanden,12,active,SB,SLB,SB,,PAZ_SB,,,,
+202,Tonga,Tonga,Tonga,Tonga,12,active,TO,TON,TBU,SPC_TBU,SPC_TBU,,491;3717,,
+203,Tuvalu,Tuvalu,Tuvalu,Tuvalu,12,active,TV,TUV,TV,,PAZ_TV,,,,
+204,Vanuatu,Vanuatu,Vanuatu,Vanuatu,12,active,VU,VUT,VLI,SPC_VLI,SPC_VLI,,511;3719,,
+205,Alaska,Alaska,Alaska,Alaska,,in review,,,,,,,121641;121642,,
+206,Anguilla,Anguilla,Anguilla,Anguilla,,in review,,,,,,,,,
+207,Antarktis,Antarktis,Antarktis,Antarctica,,in review,,,,,,,3748;121800,,514
+208,Aruba,Aruba,Aruba,Aruba,,in review,,,,,,,119561;119565,,
+209,Dominica,Dominica,Dominica,Dominica,,in review,,,,,,,,,
+210,Französische Süd- und Antarktisgebiete,Französische Süd- und Antarktisgebiete,Französische Süd- und Antarktisgebiete,Französische Süd- und Antarktisgebiete,,in review,,,,,,,,,
+211,Galapagos,Galapagos,Galapagos,Galapagos,,in review,,,,,,,121742,,
+212,Gibraltar,Gibraltar,Gibraltar,Gibraltar,,in review,,,,,,,,,
+213,Hawaii,Hawaii,Hawaii,Hawaii,,in review,,,,,,,115763;115764,,
+214,Karibik,Karibik,Karibik,Karibik,,in review,,,,,,,,,
+215,Marshallinseln,Marshallinseln,Marshallinseln,Marshallinseln,,in review,,,,,,,,,
+216,Neuseeland,Neuseeland,Neuseeland,Nieuw-Zeeland,,in review,,,,,,,443;3712,,443
+217,Niue,Niue,Niue,Niue,,in review,,,,,,,442;115247,,
+218,Spitzbergen,Spitzbergen,Spitzbergen,Spitzbergen,,in review,,,,,,,,,
+219,St. Kitts und Nevis,St. Kitts und Nevis,St. Kitts und Nevis,St. Kitts und Nevis,,in review,,,,,,,,,
+220,St. Lucia,St. Lucia,St. Lucia,St. Lucia,,in review,,,,,,,,,
+221,St. Vincent und die Grenadinen,St. Vincent und die Grenadinen,St. Vincent und die Grenadinen,St. Vincent und die Grenadinen,,in review,,,,,,,,,
+222,Wallis und Futuna,Wallis und Futuna,Wallis und Futuna,Wallis und Futuna,,in review,,,,,,,,,

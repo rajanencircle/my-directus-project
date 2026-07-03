@@ -1,0 +1,8 @@
+﻿source_value,match_type,target_id,target_name_de,action,note
+Chang Mai,typo,403,Chiang Mai,remap_to_target,Tippfehler
+Flingers Ranges,typo,665,Flinders Ranges,remap_to_target,Tippfehler
+Paracass,typo,1817,Paracas,remap_to_target,Tippfehler
+Whitehorse,variant,2616,Whitehorse/YT,remap_to_target,CSV nutzt /YT-Suffix
+Langkawi Kedah,variant,1226,Langkawi,remap_to_target,State-Suffix entfernen
+Sydney Airport,variant,2336,Sydney,remap_to_target,feinere Ebene -> auf Sydney mappen (ggf. eigener Eintrag gewuenscht?)
+Iguazu,variant_ambiguous,,Foz do Iguazu (693) ODER Puerto Iguazu (1968),manual_decision,Seite unklar: BR Foz do Iguazu vs AR Puerto Iguazu - redaktionell entscheiden

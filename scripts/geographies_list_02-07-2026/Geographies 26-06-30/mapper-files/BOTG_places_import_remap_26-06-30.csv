@@ -1,0 +1,64 @@
+﻿source_value,match_type,target_value,target_level_or_proposal,action,note
+Abel Tasman National Park,spelling,Abel Tasman Nationalpark,,remap_to_target,Schreibvariante -> kanonisch
+Auckland,reclassify,,region (= Auckland),move_level,kein Place: region (= Auckland)
+"Auckland Airport, Mangere",spelling,Auckland Airport (Mangere),,remap_to_target,Schreibvariante -> kanonisch
+"Auckland, Mangere",spelling,Auckland-Mangere,,remap_to_target,Schreibvariante -> kanonisch
+Boca Tapada,reclassify,,region (= Boca Tapada),move_level,kein Place: region (= Boca Tapada)
+"Burnside, Christchurch",spelling,Burnside (Christchurch),,remap_to_target,Schreibvariante -> kanonisch
+"Cairns, Portsmith",spelling,Cairns-Portsmith,,remap_to_target,Schreibvariante -> kanonisch
+Darwin-Winnellie,spelling,"Darwin, Winnellie",,remap_to_target,Schreibvariante -> kanonisch
+Deutschland,reclassify,,country (= Deutschland),move_level,kein Place: country (= Deutschland)
+Drakensberge,reclassify,,region (= Drakensberge),move_level,kein Place: region (= Drakensberge)
+Erongo,reclassify,,state (= Erongo) – ggf. auch gleichnamige Stadt,move_level,kein Place: state (= Erongo) – ggf. auch gleichnamige Stadt
+Etosha Nationalpark,reclassify,,region (= Etosha Nationalpark),move_level,kein Place: region (= Etosha Nationalpark)
+Fish River Canyon,reclassify,,region (= Fish River Canyon),move_level,kein Place: region (= Fish River Canyon)
+Galapagos,reclassify,,region (= Galapagos),move_level,kein Place: region (= Galapagos)
+Gisborne,reclassify,,region (= Gisborne),move_level,kein Place: region (= Gisborne)
+Hawkes Bay,reclassify,,region (= Hawkes Bay),move_level,kein Place: region (= Hawkes Bay)
+Haapai,spelling,Ha’apai,,remap_to_target,Schreibvariante -> kanonisch
+"Hobart, Cambridge",spelling,Hobart-Cambridge,,remap_to_target,Schreibvariante -> kanonisch
+"Hong Kong, Kowloon",spelling,Hong Kong (Kowloon),,remap_to_target,Schreibvariante -> kanonisch
+Hongkong (Kowloon),spelling,Hong Kong (Kowloon),,remap_to_target,Schreibvariante -> kanonisch
+"Hongkong, Kowloon",spelling,Hong Kong (Kowloon),,remap_to_target,Schreibvariante -> kanonisch
+Hong Kong,spelling,Hongkong,,remap_to_target,Schreibvariante -> kanonisch
+Hongkong,reclassify,,"country (= Hongkong) – Stadtstaat, ggf. auch place",move_level,"kein Place: country (= Hongkong) – Stadtstaat, ggf. auch place"
+Hwange Nationalpark,reclassify,,region (= Hwange Nationalpark),move_level,kein Place: region (= Hwange Nationalpark)
+Kewdale (Perth),spelling,"Kewdale, Perth",,remap_to_target,Schreibvariante -> kanonisch
+Khwai,reclassify,,region (= Khwai),move_level,kein Place: region (= Khwai)
+"Kimbe, Cannonvale",spelling,Kimbe Cannonvale,,remap_to_target,Schreibvariante -> kanonisch
+Kimberleys,reclassify,,region (= Kimberleys),move_level,kein Place: region (= Kimberleys)
+Koh Samui,reclassify,,region (= Koh Samui),move_level,kein Place: region (= Koh Samui)
+La Réunion,reclassify,,country (= La Réunion),move_level,kein Place: country (= La Réunion)
+Linyanti,reclassify,,region (= Linyanti),move_level,kein Place: region (= Linyanti)
+Lower Zambezi Nationalpark,reclassify,,region (= Lower Zambezi Nationalpark),move_level,kein Place: region (= Lower Zambezi Nationalpark)
+Makgadikgadi Pans,reclassify,,region (= Makgadikgadi Pans),move_level,kein Place: region (= Makgadikgadi Pans)
+Mauritius,reclassify,,"country (= Mauritius) – Stadtstaat, ggf. auch place",move_level,"kein Place: country (= Mauritius) – Stadtstaat, ggf. auch place"
+Mexico-City,spelling,Mexico City,,remap_to_target,Schreibvariante -> kanonisch
+Motu Ome’e,spelling,Motu Omee,,remap_to_target,Schreibvariante -> kanonisch
+Nelson,reclassify,,region (= Nelson),move_level,kein Place: region (= Nelson)
+New York,reclassify,,state (= New York) – ggf. auch gleichnamige Stadt,move_level,kein Place: state (= New York) – ggf. auch gleichnamige Stadt
+Nyanga Nationalpark,reclassify,,region (= Nyanga Nationalpark),move_level,kein Place: region (= Nyanga Nationalpark)
+Okavango Delta,reclassify,,region (= Okavango Delta),move_level,kein Place: region (= Okavango Delta)
+Osterinsel,reclassify,,country (= Osterinsel),move_level,kein Place: country (= Osterinsel)
+Ostküste,reclassify,,region (= Ostküste),move_level,kein Place: region (= Ostküste)
+Panama-City,spelling,Panama City,,remap_to_target,Schreibvariante -> kanonisch
+Perth-Redcliffe,spelling,"Perth, Redcliffe",,remap_to_target,Schreibvariante -> kanonisch
+Phu Quoc,reclassify,,region (= Phu Quoc),move_level,kein Place: region (= Phu Quoc)
+Phuket,reclassify,,region (= Phuket),move_level,kein Place: region (= Phuket)
+Rio de Janeiro,reclassify,,state (= Rio de Janeiro) – ggf. auch gleichnamige Stadt,move_level,kein Place: state (= Rio de Janeiro) – ggf. auch gleichnamige Stadt
+Savuti,reclassify,,region (= Savuti),move_level,kein Place: region (= Savuti)
+Schweiz,reclassify,,country (= Schweiz),move_level,kein Place: country (= Schweiz)
+Singapur,reclassify,,"country (= Singapur) – Stadtstaat, ggf. auch place",move_level,"kein Place: country (= Singapur) – Stadtstaat, ggf. auch place"
+"Sydney, Botany",spelling,Sydney-Botany,,remap_to_target,Schreibvariante -> kanonisch
+Tonga,reclassify,,"country (= Tonga) – Stadtstaat, ggf. auch place",move_level,"kein Place: country (= Tonga) – Stadtstaat, ggf. auch place"
+Trou-aux-Biches,spelling,Trou aux Biches,,remap_to_target,Schreibvariante -> kanonisch
+Trou d? Eau Douce,spelling,Trou d'Eau Douce,,remap_to_target,Schreibvariante -> kanonisch
+Trou d´Eau Douce,spelling,Trou d'Eau Douce,,remap_to_target,Schreibvariante -> kanonisch
+Urangan (Hervey Bay),spelling,Urangan Hervey Bay,,remap_to_target,Schreibvariante -> kanonisch
+Victoria,reclassify,,state (= Victoria) – ggf. auch gleichnamige Stadt,move_level,kein Place: state (= Victoria) – ggf. auch gleichnamige Stadt
+Victoria Falls,reclassify,,region (= Victoria Falls),move_level,kein Place: region (= Victoria Falls)
+Wanganui,reclassify,,region (= Wanganui),move_level,kein Place: region (= Wanganui)
+Wellington,reclassify,,region (= Wellington),move_level,kein Place: region (= Wellington)
+Westküste,reclassify,,region (= Westküste),move_level,kein Place: region (= Westküste)
+"Windhoek, Klein Windhoek",spelling,"Windhoek, Klein-Windhoek",,remap_to_target,Schreibvariante -> kanonisch
+Yasawas,reclassify,,region (= Yasawas),move_level,kein Place: region (= Yasawas)

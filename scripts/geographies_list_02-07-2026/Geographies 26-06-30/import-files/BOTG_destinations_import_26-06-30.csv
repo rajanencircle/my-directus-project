@@ -1,0 +1,19 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,destinations_cluster_id,status,media_code,media_code_legacy_botg,media_code_legacy_karawane,is_non_geographic
+1,Africa,Afrika,Afrika,Afrika,1,active,AFR,,,false
+2,Indian Ocean,Indischer Ozean,Indischer Ozean,Indische Oceaan,1,active,IOZ,,,false
+3,Asia,Asien,Asien,Azië,2,active,ASI,,,false
+4,Middle East,Naher Osten,Naher Osten,Midden-Oosten,2,active,NAH,,,false
+5,Europe,Europa,Europa,Europa,3,active,EUR,,,false
+6,Caribbean,Karibik,Karibik,Caraïben,4,active,KRB,,,false
+7,Central America,Mittelamerika,Mittelamerika,Midden-Amerika,4,active,MAM,,,false
+8,South America,Südamerika,Südamerika,Zuid-Amerika,4,active,SAM,,,false
+9,North America,Nordamerika,Nordamerika,Noord-Amerika,5,active,NA,,,false
+10,Australia,Australien,Australien,Australië,6,active,AUS,,,false
+11,New Zealand,Neuseeland,Neuseeland,Nieuw-Zeeland,6,active,NZL,,,false
+12,South Pacific,Südpazifik,Südpazifik,Stille Zuidzee,6,active,SPC,,,false
+13,Antarctica,Antarktis,Antarktis,Antarctica,7,active,ANT,,,false
+14,Arctic,Arktis,Arktis,Arctisch,7,active,ARK,,,false
+15,Cruises,Kreuzfahrten,Kreuzfahrten,Cruises,8,active,SON_KFT,,,true
+16,Tour Guide,Reiseleiter,Reiseleiter,Reisleider,8,active,SON_RL,,,true
+17,Other,Sonstiges,Sonstiges,Overige,8,active,SON,,,true
+18,Worldwide,Weltweit,Weltweit,Wereldwijd,8,active,SON_RTW,,,true

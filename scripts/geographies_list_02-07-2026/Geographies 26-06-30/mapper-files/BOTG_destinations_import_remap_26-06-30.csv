@@ -1,0 +1,16 @@
+﻿source_value,match_type,target_destination,target_id,action,note
+AUSTRALIEN/OZEANIEN,split,Australien,10,remap_to_target,Cluster Ozeanien + Destination Australien; Cluster-Anteil separat
+Australien,normalize,Australien,10,keep,
+AFRIKA,normalize,Afrika,1,remap_to_target,Groß->Titlecase
+ASIEN,normalize,Asien,3,remap_to_target,Groß->Titlecase
+EUROPA,normalize,Europa,5,remap_to_target,Groß->Titlecase
+NORDAMERIKA,normalize,Nordamerika,9,remap_to_target,Groß->Titlecase
+SÜDAMERIKA,normalize,Südamerika,8,remap_to_target,Groß->Titlecase
+MITTELAMERIKA,merge_ids,Mittelamerika,7,remap_to_target,zwei Legacy-IDs: BOTG 121683 + Karawane 8829
+Mittelamerika,merge_ids,Mittelamerika,7,remap_to_target,zwei Legacy-IDs: BOTG 121683 + Karawane 8829
+Orient,rename,Naher Osten,4,remap_to_target,"Karawane ""Orient"" -> Schema ""Naher Osten"""
+SÜDSEE,rename,Südpazifik,12,remap_to_target,"Karawane ""Südsee"" -> Schema ""Südpazifik"""
+Neuseeland,normalize,Neuseeland,11,keep,
+Antarktis,normalize,Antarktis,13,keep,
+Arktis,normalize,Arktis,14,keep,
+- bitte wählen,drop,,,drop,Platzhalter

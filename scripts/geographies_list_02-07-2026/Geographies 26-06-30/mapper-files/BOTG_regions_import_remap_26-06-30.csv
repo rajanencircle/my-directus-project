@@ -1,0 +1,62 @@
+﻿source_value,match_type,target_value,target_level_or_proposal,action,note
+Aitutaki,reclassify,,place/Insel – parent Cookinseln,move_level,keine Region: place/Insel – parent Cookinseln
+Atiu,reclassify,,place/Insel – parent Cookinseln,move_level,keine Region: place/Insel – parent Cookinseln
+Bangkok,reclassify,,place (Stadt) – parent Thailand,move_level,keine Region: place (Stadt) – parent Thailand
+Big Island,reclassify,,place/Insel – parent USA (Hawaii),move_level,keine Region: place/Insel – parent USA (Hawaii)
+—Boca Tapada,spelling,Boca Tapada,,remap_to_target,Schreibvariante -> kanonisch
+Bogota,reclassify,,place (Stadt) – parent Kolumbien,move_level,keine Region: place (Stadt) – parent Kolumbien
+Bora Bora,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Brasilien,reclassify,,country,move_level,keine Region: country
+Buenos Aires,reclassify,,place (Stadt) – parent Argentinien,move_level,keine Region: place (Stadt) – parent Argentinien
+—Cahuita Nationalpark,spelling,Cahuita Nationalpark,,remap_to_target,Schreibvariante -> kanonisch
+Canberra,reclassify,,place (Stadt) – parent Australien (ACT),move_level,keine Region: place (Stadt) – parent Australien (ACT)
+Costa Rica,reclassify,,country,move_level,keine Region: country
+Ecuador,reclassify,,country,move_level,keine Region: country
+Eswatini,reclassify,,country,move_level,keine Region: country
+Fakarava,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Fiji Inseln,reclassify,,country (= Fidschi),move_level,keine Region: country (= Fidschi)
+Französisch Polynesien,reclassify,,country/Territorium,move_level,keine Region: country/Territorium
+Guayaquil,reclassify,,place (Stadt) – parent Ecuador,move_level,keine Region: place (Stadt) – parent Ecuador
+Huahine,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Kangaroo Island,reclassify,,place/Insel – parent Australien (SA),move_level,keine Region: place/Insel – parent Australien (SA)
+Kauai,reclassify,,place/Insel – parent USA (Hawaii),move_level,keine Region: place/Insel – parent USA (Hawaii)
+Kolumbien,reclassify,,country,move_level,keine Region: country
+Kuba,reclassify,,country,move_level,keine Region: country
+La Paz,reclassify,,place (Stadt) – parent Bolivien,move_level,keine Region: place (Stadt) – parent Bolivien
+Lanai,reclassify,,place/Insel – parent USA (Hawaii),move_level,keine Region: place/Insel – parent USA (Hawaii)
+Lord Howe Island,reclassify,,place/Insel – parent Australien,move_level,keine Region: place/Insel – parent Australien
+Malaysia,reclassify,,country,move_level,keine Region: country
+Mangaia,reclassify,,place/Insel – parent Cookinseln,move_level,keine Region: place/Insel – parent Cookinseln
+Maui,reclassify,,place/Insel – parent USA (Hawaii),move_level,keine Region: place/Insel – parent USA (Hawaii)
+Medellin,reclassify,,place (Stadt) – parent Kolumbien,move_level,keine Region: place (Stadt) – parent Kolumbien
+Mexiko City,reclassify,,place (Stadt) – parent Mexiko,move_level,keine Region: place (Stadt) – parent Mexiko
+Molokai,reclassify,,place/Insel – parent USA (Hawaii),move_level,keine Region: place/Insel – parent USA (Hawaii)
+Moorea,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Neuseeland,reclassify,,"country (auch Destination, Cluster Ozeanien)",move_level,"keine Region: country (auch Destination, Cluster Ozeanien)"
+—Nicoja Halbinsel,spelling,Nicoja Halbinsel,,remap_to_target,Schreibvariante -> kanonisch
+Norfolk Island,reclassify,,place/Insel – parent Australien,move_level,keine Region: place/Insel – parent Australien
+North West Provinz & Limpopo,reclassify,,states – aufteilen: North West + Limpopo (parent Südafrika),move_level,keine Region: states – aufteilen: North West + Limpopo (parent Südafrika)
+Northern Cape,reclassify,,state – parent Südafrika (ZA-NC),move_level,keine Region: state – parent Südafrika (ZA-NC)
+Oahu,reclassify,,place/Insel – parent USA (Hawaii),move_level,keine Region: place/Insel – parent USA (Hawaii)
+Osterinsel,reclassify,,place/Insel – parent Chile,move_level,keine Region: place/Insel – parent Chile
+—Ostkuba,spelling,Ostkuba,,remap_to_target,Schreibvariante -> kanonisch
+Panama,reclassify,,country,move_level,keine Region: country
+Quito,reclassify,,place (Stadt) – parent Ecuador,move_level,keine Region: place (Stadt) – parent Ecuador
+Raiatea,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Rangiroa,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Rarotonga,reclassify,,place/Insel – parent Cookinseln,move_level,keine Region: place/Insel – parent Cookinseln
+Stewart Island,reclassify,,place/Insel – parent Neuseeland,move_level,keine Region: place/Insel – parent Neuseeland
+Südsee,reclassify,,destination/Cluster Ozeanien,move_level,keine Region: destination/Cluster Ozeanien
+Tahaá,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Tahiti,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Taveuni,reclassify,,place/Insel – parent Fidschi,move_level,keine Region: place/Insel – parent Fidschi
+Tikehau,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,keine Region: place/Insel – parent Französisch-Polynesien
+Vanua Levu,reclassify,,place/Insel – parent Fidschi,move_level,keine Region: place/Insel – parent Fidschi
+Vietnam,reclassify,,country,move_level,keine Region: country
+Viti Levu,reclassify,,place/Insel – parent Fidschi,move_level,keine Region: place/Insel – parent Fidschi
+—Vulkan Arenal Nationalpark,spelling,Vulkan Arenal Nationalpark,,remap_to_target,Schreibvariante -> kanonisch
+—Westkuba,spelling,Westkuba,,remap_to_target,Schreibvariante -> kanonisch
+—Yucatan,spelling,Yucatan,,remap_to_target,Schreibvariante -> kanonisch
+Zambia,reclassify,,country (= Sambia),move_level,keine Region: country (= Sambia)
+—Zentraltal,spelling,Zentraltal,,remap_to_target,Schreibvariante -> kanonisch
+Zimbabwe,reclassify,,country,move_level,keine Region: country

@@ -1,0 +1,103 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,country_id,status,ISO,media_code,media_code_legacy_botg,media_code_legacy_karawane
+1,Aitutaki,Aitutaki,Aitutaki,Aitutaki,,in review,,,,
+2,Alberta,Alberta,Alberta,Alberta,183,active,CA-AB,AL,KAN_AL,KAN_AL
+3,Australian Capital Territory,Australian Capital Territory,Australian Capital Territory,Australian Capital Territory,186,active,AU-ACT,ACT,AUS_ACT,AUS_ACT
+4,Bali,Bali,Bali,Bali,,in review,,,,
+5,Bayern,Bayern,Bayern,Bayern,105,active,DE-BY,,,
+6,Bora Bora,Bora Bora,Bora Bora,Bora Bora,,in review,,,,
+7,Britisch-Kolumbien,Britisch-Kolumbien,Britisch-Kolumbien,Britisch-Kolumbien,183,active,CA-BC,,,
+8,Bundesland des Depots,Bundesland des Depots,Bundesland des Depots,Bundesland des Depots,,in review,,,,
+9,Colorado,Colorado,Colorado,Colorado,185,active,US-CO,CO,USA_CO,USA_CO
+10,Eastern Cape,Eastern Cape,Eastern Cape,Eastern Cape,37,active,ZA-EC,EAC,RSA_EAC,
+11,Efate,Efate,Efate,Efate,,in review,,,,
+12,Erongo,Erongo,Erongo,Erongo,28,active,NA-ER,,,
+13,Espiritu Santo,Espiritu Santo,Espiritu Santo,Espiritu Santo,,in review,,,,
+14,Eswatini,Eswatini,Eswatini,Eswatini,,in review,,,,
+15,Fakarava,Fakarava,Fakarava,Fakarava,,in review,,,,
+16,Florida,Florida,Florida,Florida,185,active,US-FL,FL,USA_FL,USA_FL
+17,Galapagos,Galapagos,Galapagos,Galapagos,,in review,,,,
+18,Gauteng,Gauteng,Gauteng,Gauteng,37,active,ZA-GP,GAU,RSA_GAU,
+19,Grande Terre,Grande Terre,Grande Terre,Grande Terre,,in review,,,,
+20,Guanacaste,Guanacaste,Guanacaste,Guanacaste,161,active,CR-G,,,
+21,Guayas,Guayas,Guayas,Guayas,173,active,EC-G,,,
+22,Haapai,Haapai,Haapai,Haapai,,in review,,,,
+23,Hawaii,Hawaii,Hawaii,Hawaii,185,active,US-HI,HI,USA_HI,USA_HI
+24,Hessen,Hessen,Hessen,Hessen,105,active,DE-HE,,,
+25,Hiva Oa,Hiva Oa,Hiva Oa,Hiva Oa,,in review,,,,
+26,HoanKiem Dist,HoanKiem Dist,HoanKiem Dist,HoanKiem Dist,,in review,,,,
+27,Hongkong,Hongkong,Hongkong,Hongkong,,in review,,,,
+28,Huahine,Huahine,Huahine,Huahine,,in review,,,,
+29,Iles Loyaute,Iles Loyaute,Iles Loyaute,Iles Loyaute,,in review,,,,
+30,Ilot Maître,Ilot Maître,Ilot Maître,Ilot Maître,,in review,,,,
+31,Kalifornien,Kalifornien,Kalifornien,Kalifornien,185,active,US-CA,CA,USA_CA,"USA_CA, USA_LAX, USA_SFO"
+32,Kedah,Kedah,Kedah,Kedah,68,active,MY-02,,,
+33,KwaZulu Natal,KwaZulu-Natal,KwaZulu Natal,KwaZulu Natal,37,active,ZA-KZN,KZN,RSA_KZN,
+34,La Digue,La Digue,La Digue,La Digue,,in review,,,,
+35,Limpopo,Limpopo,Limpopo,Limpopo,37,active,ZA-LP,LIM,RSA_LIM,
+36,Limpopo & Mpumalanga,Limpopo & Mpumalanga,Limpopo & Mpumalanga,Limpopo & Mpumalanga,,in review,,,,
+37,Mahé,Mahé,Mahé,Mahé,,in review,,,,
+38,Mamanuca Inseln,Mamanuca Inseln,Mamanuca Inseln,Mamanuca Inseln,,in review,,,,
+39,Mangaia,Mangaia,Mangaia,Mangaia,,in review,,,,
+40,Maputo Province,Maputo Province,Maputo Province,Maputo Province,27,active,MZ-L,,,
+41,Matangi,Matangi,Matangi,Matangi,,in review,,,,
+42,Maupiti,Maupiti,Maupiti,Maupiti,,in review,,,,
+43,MG – 36.140,MG – 36.140,MG – 36.140,MG – 36.140,,in review,,,,
+44,Moorea,Moorea,Moorea,Moorea,,in review,,,,
+45,Mpumalanga,Mpumalanga,Mpumalanga,Mpumalanga,37,active,ZA-MP,MPL,RSA_MPL,
+46,Nadi,Nadi,Nadi,Nadi,,in review,,,,
+47,Nevada,Nevada,Nevada,Nevada,185,active,US-NV,NV,USA_NV,USA_NV
+48,New Jersey,New Jersey,New Jersey,New Jersey,185,active,US-NJ,,,
+49,New South Wales,New South Wales,New South Wales,New South Wales,186,active,AU-NSW,NSW,AUS_NSW,AUS_NSW
+50,NY,New York,NY,NY,185,active,US-NY,NY,USA_NY,USA_NY
+51,Nordinsel,Nordinsel,Nordinsel,Nordinsel,,in review,,,,
+52,North Carolina,North Carolina,North Carolina,North Carolina,185,active,US-NC,NC,USA_NC,USA_NC
+53,North West,North West,North West,North West,37,active,ZA-NW,NOW,RSA_NOW,
+54,Northern Cape,Northern Cape,Northern Cape,Northern Cape,37,active,ZA-NC,NOC,RSA_NOC,
+55,Northern Territory,Northern Territory,Northern Territory,Northern Territory,186,active,AU-NT,NT,AUS_NT,AUS_NT
+56,Nova Scotia,Nova Scotia,Nova Scotia,Nova Scotia,183,active,CA-NS,NS,KAN_NS,KAN_NS
+57,Nuku Hiva,Nuku Hiva,Nuku Hiva,Nuku Hiva,,in review,,,,
+58,oder Bundesstaat/Provinz,oder Bundesstaat/Provinz,oder Bundesstaat/Provinz,oder Bundesstaat/Provinz,,in review,,,,
+59,Ontario,Ontario,Ontario,Ontario,183,active,CA-ON,,,
+60,Pisco,Pisco,Pisco,Pisco,,in review,,,,
+61,Quang Nam Province,Quang Nam Province,Quang Nam Province,Quang Nam Province,83,active,VN-27,,,
+62,Quebec,Quebec,Quebec,Quebec,183,active,CA-QC,PQ,KAN_PQ,KAN_PQ
+63,Queensland,Queensland,Queensland,Queensland,186,active,AU-QLD,QLD,AUS_QLD,AUS_QLD
+64,Raiatea,Raiatea,Raiatea,Raiatea,,in review,,,,
+65,Rangiroa,Rangiroa,Rangiroa,Rangiroa,,in review,,,,
+66,Rarotonga,Rarotonga,Rarotonga,Rarotonga,,in review,,,,
+67,Republic of Maldives,Republic of Maldives,Republic of Maldives,Republic of Maldives,,in review,,,,
+68,Rio de Janeiro,Rio de Janeiro,Rio de Janeiro,Rio de Janeiro,171,active,BR-RJ,,,
+69,Rurutu,Rurutu,Rurutu,Rurutu,,in review,,,,
+70,San José,San José,San José,San José,,in review,,,,
+71,Santa Marta,Santa Marta,Santa Marta,Santa Marta,,in review,,,,
+72,Sarawak,Sarawak,Sarawak,Sarawak,68,active,MY-13,,,
+73,Savaii,Savaii,Savaii,Savaii,,in review,,,,
+74,Schleswig-Holstein,Schleswig-Holstein,Schleswig-Holstein,Schleswig-Holstein,105,active,DE-SH,,,
+75,Selous,Selous,Selous,Selous,,in review,,,,
+76,South Ari Atoll,South Ari Atoll,South Ari Atoll,South Ari Atoll,,in review,,,,
+77,South Australia,South Australia,South Australia,South Australia,186,active,AU-SA,SA,AUS_SA,AUS_SA
+78,South Carolina,South Carolina,South Carolina,South Carolina,185,active,US-SC,SC,USA_SC,USA_SC
+79,Sumatra,Sumatra,Sumatra,Sumatra,,in review,,,,
+80,Suratthanee,Surat Thani,Suratthanee,Suratthanee,79,active,TH-84,,,
+81,Südinsel,Südinsel,Südinsel,Südinsel,,in review,,,,
+82,Tahaa,Tahaa,Tahaa,Tahaa,,in review,,,,
+83,Tahiti,Tahiti,Tahiti,Tahiti,,in review,,,,
+84,Tanna,Tanna,Tanna,Tanna,,in review,,,,
+85,Tasmania,Tasmania,Tasmania,Tasmania,186,active,AU-TAS,TAS,AUS_TAS,AUS_TAS
+86,Taveuni,Taveuni,Taveuni,Taveuni,,in review,,,,
+87,Tetiaroa,Tetiaroa,Tetiaroa,Tetiaroa,,in review,,,,
+88,Tikehau,Tikehau,Tikehau,Tikehau,,in review,,,,
+89,Tongatapu,Tongatapu,Tongatapu,Tongatapu,,in review,,,,
+90,Tsimshatsui,Tsimshatsui,Tsimshatsui,Tsimshatsui,,in review,,,,
+91,Tuamotu,Tuamotu,Tuamotu,Tuamotu,,in review,,,,
+92,Upolu,Upolu,Upolu,Upolu,,in review,,,,
+93,Vanua Levu,Vanua Levu,Vanua Levu,Vanua Levu,,in review,,,,
+94,Vavau,Vavau,Vavau,Vavau,,in review,,,,
+95,Victoria,Victoria,Victoria,Victoria,186,active,AU-VIC,VIC,AUS_VIC,AUS_VIC
+96,Viti Levu,Viti Levu,Viti Levu,Viti Levu,,in review,,,,
+97,Washington,Washington,Washington,Washington,185,active,US-WA,DC,USA_DC,USA_DC
+98,Western Australia,Western Australia,Western Australia,Western Australia,186,active,AU-WA,WA,AUS_WA,AUS_WA
+99,Western Cape,Western Cape,Western Cape,Western Cape,37,active,ZA-WC,WEC,RSA_WEC,
+100,Yasawa Inseln,Yasawa Inseln,Yasawa Inseln,Yasawa Inseln,,in review,,,,
+101,Yukon,Yukon,Yukon,Yukon,183,active,CA-YT,YT,KAN_YT,KAN_YT
+102,Zanzibar,Zanzibar,Zanzibar,Zanzibar,,in review,,,,

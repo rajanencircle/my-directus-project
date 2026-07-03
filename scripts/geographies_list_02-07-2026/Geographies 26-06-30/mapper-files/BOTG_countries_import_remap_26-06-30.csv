@@ -1,0 +1,32 @@
+﻿source_value,match_type,target_value,target_level_or_proposal,action,note
+Alaska,reclassify,,state – parent USA,move_level,kein Land: state – parent USA
+Amerikanisch Samoa,spelling,Amerikanisch-Samoa,,remap_to_target,Schreibvariante -> kanonisch
+Anguilla,add,,country,add_in_review,"echtes Land, fehlt im Master: Land/Territorium ergänzen (brit.)"
+Antarktis,reclassify,,destination – Cluster Polarregionen,move_level,kein Land: destination – Cluster Polarregionen
+Aruba,add,,country,add_in_review,"echtes Land, fehlt im Master: Land/Territorium ergänzen (Königreich NL)"
+Dominica,add,,country,add_in_review,"echtes Land, fehlt im Master: Land ergänzen (≠ Dominikanische Republik)"
+Falkland Inseln,spelling,Falklandinseln,,remap_to_target,Schreibvariante -> kanonisch
+Fiji,spelling,Fidschi,,remap_to_target,Schreibvariante -> kanonisch
+Fiji Inseln,spelling,Fidschi,,remap_to_target,Schreibvariante -> kanonisch
+Französisch Polynesien,spelling,Französisch-Polynesien,,remap_to_target,Schreibvariante -> kanonisch
+Französische Süd- und Antarktisgebiete,reclassify,,destination – Cluster Polarregionen (Territorium),move_level,kein Land: destination – Cluster Polarregionen (Territorium)
+Galapagos,reclassify,,region – parent Ecuador,move_level,kein Land: region – parent Ecuador
+Gibraltar,add,,country,add_in_review,"echtes Land, fehlt im Master: Land/Territorium ergänzen (brit.)"
+Hawaii,reclassify,,state – parent USA,move_level,kein Land: state – parent USA
+Hong Kong,spelling,Hongkong,,remap_to_target,Schreibvariante -> kanonisch
+Karibik,reclassify,,destination – Cluster Lateinamerika,move_level,kein Land: destination – Cluster Lateinamerika
+Katar (Qatar),spelling,Katar,,remap_to_target,Schreibvariante -> kanonisch
+Réunion,spelling,La Réunion,,remap_to_target,Schreibvariante -> kanonisch
+Marshallinseln,add,,country,add_in_review,"echtes Land, fehlt im Master: Land ergänzen"
+Neuseeland,add,,country,add_in_review,"echtes Land, fehlt im Master: Land ergänzen — AUCH Destination (Cluster Ozeanien)"
+Niue,add,,country,add_in_review,"echtes Land, fehlt im Master: Land ergänzen (alt.: Destination Südpazifik)"
+Pitcairn Island,spelling,Pitcairninseln,,remap_to_target,Schreibvariante -> kanonisch
+Zambia,spelling,Sambia,,remap_to_target,Schreibvariante -> kanonisch
+West-Samoa,spelling,Samoa,,remap_to_target,Schreibvariante -> kanonisch
+Spitzbergen,reclassify,,region – parent Norwegen (Svalbard); destination Arktis,move_level,kein Land: region – parent Norwegen (Svalbard); destination Arktis
+St. Kitts und Nevis,add,,country,add_in_review,"echtes Land, fehlt im Master: Land ergänzen"
+St. Lucia,add,,country,add_in_review,"echtes Land, fehlt im Master: Land ergänzen"
+St. Vincent und die Grenadinen,add,,country,add_in_review,"echtes Land, fehlt im Master: Land ergänzen"
+Tschechische Republik,spelling,Tschechien,,remap_to_target,Schreibvariante -> kanonisch
+U.S.A.,spelling,USA,,remap_to_target,Schreibvariante -> kanonisch
+Wallis und Futuna,add,,country,add_in_review,"echtes Land, fehlt im Master: Land/Territorium ergänzen (frz.)"

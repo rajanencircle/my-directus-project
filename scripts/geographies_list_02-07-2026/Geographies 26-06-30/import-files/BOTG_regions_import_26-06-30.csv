@@ -1,0 +1,170 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,country_id,status,cid_primarix,id_primarix
+1,,Abel Tasman,Abel Tasman,Abel Tasman,216,active,,3165
+2,Aitutaki,Aitutaki,Aitutaki,Aitutaki,190,in review,,3151
+3,Amazon Rainforest,Amazonas Regenwald,Amazonas Regenwald,Amazon Rainforest,178;170,active,,121765
+4,andes highlands,Andenhochland,Andenhochland,andes highlands,170,active,,121768
+5,Atacama Desert,Atacama Wüste,Atacama Wüste,Atacama Desert,172,active,,121746
+6,Atiu,Atiu,Atiu,Atiu,190,in review,,121371
+7,,Auckland,Auckland,Auckland,216,active,,121374
+8,Bangkok,Bangkok,Bangkok,Bangkok,79,in review,,4147
+9,,Bay of Plenty,Bay Of Plenty,Bay Of Plenty,216,active,,121360
+10,,Big Island,Big Island,Big Island,185,in review,,121380
+11,Blue Mountains,Blue Mountains,Blue Mountains,Blue Mountains,186,active,,3204
+12,—Boca Tapada,Boca Tapada,—Boca Tapada,—Boca Tapada,161,active,,121990
+13,Bogota,Bogota,Bogota,Bogota,176,in review,,121787
+14,Bora Bora,Bora Bora,,Bora Bora,192,in review,,22183
+15,Brazil,Brasilien,Brasilien,Brazilië,171,in review,,121777
+16,Buenos Aires,Buenos Aires,Buenos Aires,Buenos Aires,169,in review,,121755
+17,—Cahuita Nationalpark,Cahuita Nationalpark,—Cahuita Nationalpark,—Cahuita Nationalpark,161,active,,121985
+18,Canberra,Canberra,Canberra,Canberra,186,in review,,3203
+19,,Canterbury,Canterbury,Canterbury,216,active,,121367
+20,Chiang Mai / Chiang Rai,Chiang Mai / Chiang Rai,Chiang Mai / Chiang Rai,Chiang Mai / Chiang Rai,79,active,,4149
+21,Chobe River,Chobe Fluss,Chobe Fluss,Chobe rivier,5,active,,3168
+22,,Coromandel-Waikato,Coromandel-Waikato,Coromandel-Waikato,216,active,,121359
+23,Costa Rica,Costa Rica,Costa Rica,Costa Rica,161,in review,,121983
+24,Cradle Mountain Lake St Clair National Park,Cradle Mountain Lake St. Clair Nationalpark,Cradle Mountain Lake St. Clair Nationalpark,Cradle Mountain Lake St. Clair National Park,186,active,,3180
+25,Cusco Sacred Valley,Cusco / Heiliges Tal,Cusco / Heiliges Tal,Cusco Sacred Valley,178,active,,121764
+26,Damaraland & Kaokoveld,Damaraland & Kaokoveld,Damaraland & Kaokoveld,Damaraland & Kaokoveld,28,active,,3195
+27,Drakensberg Mountains,Drakensberge,Drakensberge,Drakensbergen,37,active,,3191
+28,Ecuador,Ecuador,Ecuador,Ecuador,173,in review,,121770
+29,Eswatini,Eswatini,Eswatini,Eswatini,37,in review,,121798
+30,Etosha National Park,Etosha Nationalpark,Etosha Nationalpark,Etosha National Park,28,active,,3201
+31,Fakarava,Fakarava,,Fakarava,192,in review,,22187
+32,,Feuerland,Feuerland,Vuurland,169,active,,121759
+33,Fiji Islands,Fiji Inseln,Fiji Inseln,Fiji,191,in review,,3153
+34,Fish River Canyon,Fish River Canyon,,Fish River Canyon,28,active,,3194
+35,Flinders Ranges,Flinders Ranges,Flinders Ranges,Flinders Ranges,186,active,,3121
+36,French Polynesia,Französisch Polynesien,Französisch Polynesien,Frans-Polynesië,192,in review,,22192
+37,Freycinet National Park,Freycinet Nationalpark,Freycinet Nationalpark,Freycinet National Park,186,active,,3181
+38,Galapagos,Galapagos,Galapagos,Galapagos,211,active,,121773
+39,Garden Route & Eastern Cape,Garden Route & Eastern Cape,Garden Route & Eastern Cape,Garden Route & Eastern Cape,37,active,,3185
+40,,Gisborne,Gisborne,Gisborne,216,active,,121362
+41,Grampians,Grampians,Grampians,Grampians,186,active,,3118
+42,Great Barrier Reef Islands,Great Barrier Reef Inseln,Great Barrier Reef Inseln,Great Barrier Reef Islands,186,active,,3161
+43,Great Ocean Road,Great Ocean Road,Great Ocean Road,Great Ocean Road,186,active,,3119
+44,Guayaquil,Guayaquil,Guayaquil,Guayaquil,173,in review,,121772
+45,,Hawkes Bay,Hawkes Bay,Hawkes Bay,216,active,,3164
+46,Hoi An / Quy Nhon / Danang,Hoi An / Quy Nhon / Danang,Hoi An / Quy Nhon / Danang,Hoi An / Quy Nhon / Danang,83,active,,4157
+47,Hua Hin / Koh Chang / Koh Samet,Hua Hin / Koh Chang / Koh Samet,Hua Hin / Koh Chang / Koh Samet,Hua Hin / Koh Chang / Koh Samet,79,active,,4154
+48,Huahine,Huahine,,Huahine,192,in review,,22182
+49,Hwange Nationalpark,Hwange Nationalpark,Hwange Nationalpark,Hwange National Park,46,active,,101903
+50,Iguacu,Iguacu,Iguacu,Iguacu,171,active,,121783
+51,Inland,Inland,Inland,Binnenland,160,active,,122063
+52,Kalahari,Kalahari,Kalahari,Kalahari,28;5,active,,3172;3193
+53,Kangaroo Island,Kangaroo Island,Kangaroo Island,Kangaroo Island,186,in review,,3122
+54,Kaoh Lak / Koh Phi Phi / Koh Yao Noi,Kaoh Lak / Koh Phi Phi / Koh Yao Noi,Kaoh Lak / Koh Phi Phi / Koh Yao Noi,Kaoh Lak / Koh Phi Phi / Koh Yao Noi,79,active,,4152
+55,Cape Peninsula,Kaphalbinsel,Kaphalbinsel,Kaaps Schiereiland,37,active,,121856
+56,Caribbean Coast,Karibikküste,Karibikküste,Caribbean Coast,176;160,active,,121791;122064
+57,,Kauai,Kauai,Kauai,185,in review,,121379
+58,,Khwai,,Khwai,5,active,,82179
+59,Kimberleys,Kimberleys,Kimberleys,Kimberleys,186,active,,3126
+60,Koh Phangan / Koh Tao,Koh Phangan / Koh Tao,Koh Phangan / Koh Tao,Koh Phangan / Koh Tao,79,active,,22191
+61,Koh Samui,Koh Samui,Koh Samui,Koh Samui,79,active,,4150
+62,Columbia,Kolumbien,Kolumbien,Colombia,176,in review,,121786
+63,Krabi / Koh Lanta,Krabi / Koh Lanta,Krabi / Koh Lanta,Krabi / Koh Lanta,79,active,,22190
+64,Kruger National Park & Private Game Reserves,Krüger Nationalpark & private Wildreservate,Krüger Nationalpark & private Wildreservate,Krüger National Park & private Game Reserves,37,active,,3187
+65,Cuba,Kuba,Kuba,Cuba,162,in review,,122002
+66,Coast,Küste,,Kust,28,active,,3200
+67,La Paz,La Paz,La Paz,La Paz,170,in review,,121767
+68,,Lanai,Lanai,Lanai,185,in review,,121382
+69,Linyanti,Linyanti,Linyanti,Linyanti,5,active,,3169
+70,Lord Howe Island,Lord Howe Island,Lord Howe Island,Lord Howe Island,186,in review,,3206
+71,Lower Zambezi National Park,Lower Zambezi Nationalpark,Lower Zambezi Nationalpark,Lower Zambezi National Park,44,active,,3178
+72,Madikwe,Madikwe,Madikwe,Madikwe,37,active,,3186
+73,Makgadikgadi Pans,Makgadikgadi Pans,Makgadikgadi Pans,Makgadikgadi Pan,5,active,,3171
+74,Lake Malawi,Malawisee,Malawisee,Lake Malawi,23,active,,121859
+75,Malaysia,Malaysia,Malaysia,Maleisië,68,in review,,4142
+76,Mamanuca,Mamanuca,Mamanuca,Mamanuca,191,active,,3155
+77,,Mangaia,Mangaia,Mangaia,190,in review,,121373
+78,,Marlborough,Marlborough,Marlborough,216,active,,3166
+79,Marquesas,Marquesas,Marquesas,Marquesas,192,active,,3141
+80,,Maui,Maui,Maui,185,in review,,121378
+81,Medellin,Medellin,Medellin,Medellin,176,in review,,121866
+82,Mexiko City,Mexiko City,Mexiko City,Mexiko City,166,in review,,122061
+83,,Molokai,Molokai,Molokai,185,in review,,121381
+84,Moorea,Moorea,,Moorea,192,in review,,22181
+85,Moremi Game Reserve,Moremi Wildreservat,Moremi Wildreservat,Moremi Game Reserve,5,active,,3174
+86,Namib Naukluft Park,Namib Naukluft Park,,Namib Naukluft Park,28,active,,24568
+87,,Nelson,Nelson,Nelson,216,active,,121364
+88,New Zealand,Neuseeland,Neuseeland,Nieuw-Zeeland,216,in review,,3136
+89,Nha Trang / Phan Thiet,Nha Trang / Phan Thiet,Nha Trang / Phan Thiet,Nha Trang / Phan Thiet,83,active,,4158
+90,—Nicoja Halbinsel,Nicoja Halbinsel,—Nicoja Halbinsel,—Nicoja Halbinsel,161,active,,121986
+91,,Nordküste,Nordküste,Noordkust,51,active,,121385
+92,Northeast,Nordosten,Nordosten,Northeast,171,active,,121781
+93,North Peru,Nordperu,Nordperu,North Peru,178,active,,121761
+94,Northwest,Nordwesten,Nordwesten,Northwest,169,active,,121754
+95,,Nordwestküste,Nordwestküste,Noordwestkust,51,active,,121386
+96,Norfolk Island,Norfolk Island,,Norfolk Island,186,in review,,60630
+97,North West Provinz & Limpopo,North West Provinz & Limpopo,North West Provinz & Limpopo,North West Provinz & Limpopo,37,in review,,121857
+98,Northern Cape,Northern Cape,Northern Cape,Northern Cape,37,in review,,121860
+99,,Northland,Northland,Northland,216,active,,121358
+100,Nyanga National Park,Nyanga Nationalpark,Nyanga Nationalpark,Nyanga National Park,46,active,,101909
+101,,Oahu,Oahu,Oahu,185,in review,,121377
+102,Okavango Delta,Okavango Delta,Okavango Delta,Okavango Delta,5,active,,3183
+103,Easter Island,Osterinsel,Osterinsel,Easter Island,172,in review,,121749
+104,—Ostkuba,Ostkuba,—Ostkuba,—Ostkuba,162,active,,122003
+105,East Coast,Ostküste,Ostküste,Oostkust,51;68,active,,4143;121388
+106,,Otago,Otago,Otago,216,active,,121368
+107,Outback QLD,Outback QLD,Outback QLD,Outback QLD,186,active,,3134
+108,Panama,Panama,Panama,Panama,168,in review,,121994
+109,Panorama Route,Panorama Route,Panorama Route,Panorama Route,37,active,,3190
+110,Pantanal,Pantanal,Pantanal,Pantanal,171,active,,121785
+111,Patagonia,Patagonien,Patagonien,Patagonia,172;169,active,,121751
+112,Phu Quoc,Phu Quoc,Phu Quoc,Phu Quoc,83,active,,4159
+113,Phuket,Phuket,Phuket,Phuket,79,active,,4148
+114,Quito,Quito,Quito,Quito,173,in review,,121771
+115,Raiatea,Raiatea,,Raiatea,192,in review,,22185
+116,Rangiroa,Rangiroa,,Rangiroa,192,in review,,22186
+117,Rarotonga,Rarotonga,Rarotonga,Rarotonga,190,in review,,3150
+118,Rio de Janeiro / Buzios,Rio de Janeiro / Buzios,Rio de Janeiro / Buzios,Rio de Janeiro / Buzios,171,active,,121778
+119,Red Centre,Rotes Zentrum,Rotes Zentrum,Red Centre,186,active,,3128
+120,Saigon / Hanoi,Saigon / Hanoi,Saigon / Hanoi,Saigon / Hanoi,83,active,,4156
+121,Santiago / Central Chile,Santiago / Zentral-Chile,Santiago / Zentral-Chile,Santiago / Central Chile,172,active,,121748
+122,Savuti,Savuti,Savuti,Savuti,5,active,,3170
+123,Lakes District,Seenregion,Seenregion,Lakes District,172,active,,121750
+124,,Sonstiges Botswana,,Botswana overig,5,active,,101918
+125,,Sonstiges Fiji,Fiji,Fiji,191,active,,121365
+126,Malaysia - Other,Sonstiges Malaysia,,Maleisië overig,68,active,,4145
+127,Namibia - Other,Sonstiges Namibia,,Namibië overig,28,active,,3199
+128,NSW - Other,Sonstiges NSW,,NSW overig,186,active,,3205
+129,NT - Other,Sonstiges NT,,NT overig,186,active,,3130
+130,QLD - Other,Sonstiges QLD,,QLD overig,186,active,,3131
+131,SA - Other,Sonstiges SA,,SA overig,186,active,,3123
+132,South Africa - Other,Sonstiges Südafrika,,Zuid-Afrika overig,37,active,,3189
+133,TAS - Other,Sonstiges TAS,,TAS overig,186,active,,3132
+134,VIC - Other,Sonstiges VIC,,VIC overig,186,active,,3120
+135,WA - Other,Sonstiges WA,,WA overig,186,active,,3127
+136,South Luangwa,South Luangwa,South Luangwa,South Luangwa,44,active,,3176
+137,,Southland,Southland,Southland,216,active,,121369
+138,Stewart Island,Stewart Island,Stewart Island,Stewart Island,216,in review,,3160
+139,,Südküste,Südküste,Zuidkust,51,active,,121389
+140,South Peru,Südperu,Südperu,South Peru,178,active,,121762
+141,South Sea,Südsee,Südsee,Pacific,200;196,in review,,22180
+142,South West,Südwesten,Südwesten,South West,186,active,,3124
+143,Tahaá,Tahaá,,Tahaá,192,in review,,22184
+144,Tahiti,Tahiti,,Tahiti,192,in review,,22179
+145,,Taranaki,Taranaki,Taranaki,216,active,,121361
+146,Taveuni,Taveuni,Taveuni,Taveuni,191,in review,,115287
+147,Tikehau,Tikehau,,Tikehau,192,in review,,22188
+148,Lake Titicaca,Titicaca-See,Titicaca-See,Lake Titicaca,178,active,,121763
+149,Top End,Top End,Top End,Top End,186,active,,3129
+150,,Tropisches QLD,Tropical Queensland,Tropical Queensland,186,active,,3133
+151,Vanua Levu,Vanua Levu,Vanua Levu,Vanua Levu,191,in review,,3158
+152,Victoria Falls,Victoria Falls,Victoria Falls,Victoria Falls,46;44,active,,3179
+153,Vietnam,Vietnam,Vietnam,Vietnam,83,in review,,4155
+154,Viti Levu,Viti Levu,Viti Levu,Viti Levu,191,in review,,3154
+155,—Vulkan Arenal Nationalpark,Vulkan Arenal Nationalpark,—Vulkan Arenal Nationalpark,—Vulkan Arenal Nationalpark,161,active,,121993
+156,,Wanganui,Wanganui,Wanganui,216,active,,121363
+157,Wine Growing Areas,Weinanbaugebiete,Weinanbaugebiete,Wijngaarden,37,active,,22195
+158,Wine Region,Weinregion,Weinregion,Wine Region,169,active,,121756
+159,,Wellington,Wellington,Wellington,216,active,,121375
+160,,West Coast,West Coast,West Coast,216,active,,121366
+161,—Westkuba,Westkuba,—Westkuba,—Westkuba,162,active,,122004
+162,West Coast,Westküste,Westküste,West Coast,186;51;68,active,,3125;4144;121387
+163,Yasawas,Yasawas,Yasawas,Yasawas,191,active,,3156
+164,—Yucatan,Yucatan,—Yucatan,—Yucatan,166,active,,121999
+165,Zambezi Region,Zambezi Region,Zambezi Region,Zambezi Region,28,active,,4860
+166,Zambia,Zambia,Zambia,Zambia,44,in review,,3175
+167,—Zentraltal,Zentraltal,—Zentraltal,—Zentraltal,161,active,,121989
+168,Zimbabwe,Zimbabwe,Zimbabwe,Zimbabwe,46,in review,,101902
+169,Zululand,Zululand,Zululand,Zululand,37,active,,3188

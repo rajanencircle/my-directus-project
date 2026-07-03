@@ -1,0 +1,9 @@
+﻿id,name_en-GB,name_de-DE,name_ch-DE,name_nl-NL,is_non_geographic
+1,Africa,Afrika,Afrika,Afrika,false
+2,Asia,Asien,Asien,Azië,false
+3,Europe,Europa,Europa,Europa,false
+4,Latin America,Lateinamerika,Lateinamerika,Latijns-Amerika,false
+5,North America,Nordamerika,Nordamerika,Noord-Amerika,false
+6,Oceania,Ozeanien,Ozeanien,Oceanië,false
+7,Polar Regions,Polarregionen,Polarregionen,Poolgebieden,false
+8,Other,Sonstiges,Sonstiges,Overige,true

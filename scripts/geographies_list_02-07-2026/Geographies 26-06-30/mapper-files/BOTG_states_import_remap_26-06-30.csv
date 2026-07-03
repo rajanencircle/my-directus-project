@@ -1,0 +1,77 @@
+﻿source_value,match_type,target_value,target_level_or_proposal,action,note
+Aitutaki,reclassify,,place/Insel – parent Cookinseln,move_level,kein State: place/Insel – parent Cookinseln
+Bali,reclassify,,region/Insel – parent Indonesien (offiziell Provinz),move_level,kein State: region/Insel – parent Indonesien (offiziell Provinz)
+Bora Bora,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Bundesland des Depots,reclassify,,Platzhalter – entfernen,move_level,kein State: Platzhalter – entfernen
+Efate,reclassify,,Insel – parent Vanuatu,move_level,kein State: Insel – parent Vanuatu
+Espiritu Santo,reclassify,,Insel – parent Vanuatu,move_level,kein State: Insel – parent Vanuatu
+Eswatini,reclassify,,country – kein State,move_level,kein State: country – kein State
+Fakarava,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Galapagos,reclassify,,region – parent Ecuador (offiziell Provinz),move_level,kein State: region – parent Ecuador (offiziell Provinz)
+Grande Terre,reclassify,,Insel – parent Neukaledonien,move_level,kein State: Insel – parent Neukaledonien
+Haapai,reclassify,,Inselgruppe – parent Tonga,move_level,kein State: Inselgruppe – parent Tonga
+Hiva Oa,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+HoanKiem Dist,reclassify,,"place (Distrikt, Hanoi) – parent Vietnam",move_level,"kein State: place (Distrikt, Hanoi) – parent Vietnam"
+Hongkong,reclassify,,country/SAR – eigenes Land bzw. parent China,move_level,kein State: country/SAR – eigenes Land bzw. parent China
+Huahine,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Iles Loyaute,reclassify,,Inselgruppe – parent Neukaledonien,move_level,kein State: Inselgruppe – parent Neukaledonien
+Ilot Maître,reclassify,,Insel – parent Neukaledonien,move_level,kein State: Insel – parent Neukaledonien
+CA,spelling,Kalifornien,,remap_to_target,Schreibvariante -> kanonisch
+California,spelling,Kalifornien,,remap_to_target,Schreibvariante -> kanonisch
+KwaZulu Natal,spelling,KwaZulu-Natal,,remap_to_target,Schreibvariante -> kanonisch
+La Digue,reclassify,,Insel – parent Seychellen,move_level,kein State: Insel – parent Seychellen
+Limpopo & Mpumalanga,reclassify,,Doppelwert – aufteilen in Limpopo + Mpumalanga,move_level,kein State: Doppelwert – aufteilen in Limpopo + Mpumalanga
+Mahé,reclassify,,Insel – parent Seychellen,move_level,kein State: Insel – parent Seychellen
+Mamanuca Inseln,reclassify,,region/Inselgruppe – parent Fidschi,move_level,kein State: region/Inselgruppe – parent Fidschi
+Mangaia,reclassify,,place/Insel – parent Cookinseln,move_level,kein State: place/Insel – parent Cookinseln
+Matangi,reclassify,,Insel – parent Fidschi,move_level,kein State: Insel – parent Fidschi
+Maupiti,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+MG – 36.140,reclassify,,Junk/ungültig – entfernen,move_level,kein State: Junk/ungültig – entfernen
+Moorea,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Nadi,reclassify,,place (Stadt) – parent Fidschi,move_level,kein State: place (Stadt) – parent Fidschi
+NSW,spelling,New South Wales,,remap_to_target,Schreibvariante -> kanonisch
+NY,spelling,New York,,remap_to_target,Schreibvariante -> kanonisch
+Nordinsel,reclassify,,region – parent Neuseeland,move_level,kein State: region – parent Neuseeland
+North West Province,spelling,North West,,remap_to_target,Schreibvariante -> kanonisch
+NT,spelling,Northern Territory,,remap_to_target,Schreibvariante -> kanonisch
+Nortern Territory,spelling,Northern Territory,,remap_to_target,Schreibvariante -> kanonisch
+Nuku Hiva,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+oder Bundesstaat/Provinz,reclassify,,Platzhalter – entfernen,move_level,kein State: Platzhalter – entfernen
+Pisco,reclassify,,place (Stadt) – parent Peru,move_level,kein State: place (Stadt) – parent Peru
+QLD,spelling,Queensland,,remap_to_target,Schreibvariante -> kanonisch
+QLD.,spelling,Queensland,,remap_to_target,Schreibvariante -> kanonisch
+Raiatea,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Rangiroa,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Rarotonga,reclassify,,place/Insel – parent Cookinseln,move_level,kein State: place/Insel – parent Cookinseln
+Republic of Maldives,reclassify,,country (Malediven) – kein State,move_level,kein State: country (Malediven) – kein State
+Rurutu,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+San José,reclassify,,place/Provinz – parent Costa Rica (ggf. Stadt),move_level,kein State: place/Provinz – parent Costa Rica (ggf. Stadt)
+Santa Marta,reclassify,,place (Stadt) – parent Kolumbien,move_level,kein State: place (Stadt) – parent Kolumbien
+Savaii,reclassify,,Insel – parent Samoa,move_level,kein State: Insel – parent Samoa
+Selous,reclassify,,region/Schutzgebiet – parent Tansania,move_level,kein State: region/Schutzgebiet – parent Tansania
+South Ari Atoll,reclassify,,Atoll/region – parent Malediven,move_level,kein State: Atoll/region – parent Malediven
+SA,spelling,South Australia,,remap_to_target,Schreibvariante -> kanonisch
+Sumatra,reclassify,,Insel – parent Indonesien,move_level,kein State: Insel – parent Indonesien
+Suratthanee,spelling,Surat Thani,,remap_to_target,Schreibvariante -> kanonisch
+Suratthani,spelling,Surat Thani,,remap_to_target,Schreibvariante -> kanonisch
+Südinsel,reclassify,,region – parent Neuseeland,move_level,kein State: region – parent Neuseeland
+Tahaa,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Tahiti,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Tanna,reclassify,,Insel – parent Vanuatu,move_level,kein State: Insel – parent Vanuatu
+TAS,spelling,Tasmania,,remap_to_target,Schreibvariante -> kanonisch
+Taveuni,reclassify,,Insel – parent Fidschi,move_level,kein State: Insel – parent Fidschi
+Tetiaroa,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Tikehau,reclassify,,place/Insel – parent Französisch-Polynesien,move_level,kein State: place/Insel – parent Französisch-Polynesien
+Tongatapu,reclassify,,Insel – parent Tonga,move_level,kein State: Insel – parent Tonga
+Tsimshatsui,reclassify,,place (Stadtteil) – parent Hongkong,move_level,kein State: place (Stadtteil) – parent Hongkong
+Tuamotu,reclassify,,region/Archipel – parent Französisch-Polynesien,move_level,kein State: region/Archipel – parent Französisch-Polynesien
+Upolu,reclassify,,Insel – parent Samoa,move_level,kein State: Insel – parent Samoa
+Vanua Levu,reclassify,,Insel – parent Fidschi,move_level,kein State: Insel – parent Fidschi
+Vavau,reclassify,,Inselgruppe – parent Tonga,move_level,kein State: Inselgruppe – parent Tonga
+VIC,spelling,Victoria,,remap_to_target,Schreibvariante -> kanonisch
+Viti Levu,reclassify,,Insel – parent Fidschi,move_level,kein State: Insel – parent Fidschi
+WA,spelling,Western Australia,,remap_to_target,Schreibvariante -> kanonisch
+Westaustralien,spelling,Western Australia,,remap_to_target,Schreibvariante -> kanonisch
+Yasawa Islands,spelling,Yasawa Inseln,,remap_to_target,Schreibvariante -> kanonisch
+Yasawa Inseln,reclassify,,region/Inselgruppe – parent Fidschi,move_level,kein State: region/Inselgruppe – parent Fidschi
+Zanzibar,reclassify,,region/Insel – parent Tansania,move_level,kein State: region/Insel – parent Tansania
