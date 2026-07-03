@@ -1,0 +1,6319 @@
+[
+  {
+    "id": 1,
+    "sort": 1,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.781Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3165,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 192,
+        "regions_id": 1,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 561,
+        "regions_id": 1,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Abel Tasman"
+      },
+      {
+        "id": 562,
+        "regions_id": 1,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Abel Tasman"
+      },
+      {
+        "id": 563,
+        "regions_id": 1,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Abel Tasman"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "sort": 2,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.789Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3151,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 193,
+        "regions_id": 2,
+        "countries_id": 190
+      }
+    ],
+    "translations": [
+      {
+        "id": 564,
+        "regions_id": 2,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Aitutaki"
+      },
+      {
+        "id": 565,
+        "regions_id": 2,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Aitutaki"
+      },
+      {
+        "id": 566,
+        "regions_id": 2,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Aitutaki"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "sort": 3,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.798Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121765,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 194,
+        "regions_id": 3,
+        "countries_id": 178
+      },
+      {
+        "id": 195,
+        "regions_id": 3,
+        "countries_id": 170
+      }
+    ],
+    "translations": [
+      {
+        "id": 567,
+        "regions_id": 3,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Amazonas Regenwald"
+      },
+      {
+        "id": 568,
+        "regions_id": 3,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Amazonas Regenwald"
+      },
+      {
+        "id": 569,
+        "regions_id": 3,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Amazon Rainforest"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "sort": 4,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.807Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121768,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 196,
+        "regions_id": 4,
+        "countries_id": 170
+      }
+    ],
+    "translations": [
+      {
+        "id": 570,
+        "regions_id": 4,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Andenhochland"
+      },
+      {
+        "id": 571,
+        "regions_id": 4,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Andenhochland"
+      },
+      {
+        "id": 572,
+        "regions_id": 4,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "andes highlands"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "sort": 5,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.812Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121746,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 197,
+        "regions_id": 5,
+        "countries_id": 172
+      }
+    ],
+    "translations": [
+      {
+        "id": 573,
+        "regions_id": 5,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Atacama Wüste"
+      },
+      {
+        "id": 574,
+        "regions_id": 5,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Atacama Wüste"
+      },
+      {
+        "id": 575,
+        "regions_id": 5,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Atacama Desert"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "sort": 6,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.817Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121371,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 198,
+        "regions_id": 6,
+        "countries_id": 190
+      }
+    ],
+    "translations": [
+      {
+        "id": 576,
+        "regions_id": 6,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Atiu"
+      },
+      {
+        "id": 577,
+        "regions_id": 6,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Atiu"
+      },
+      {
+        "id": 578,
+        "regions_id": 6,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Atiu"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "sort": 7,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.821Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121374,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 199,
+        "regions_id": 7,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 579,
+        "regions_id": 7,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Auckland"
+      },
+      {
+        "id": 580,
+        "regions_id": 7,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Auckland"
+      },
+      {
+        "id": 581,
+        "regions_id": 7,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Auckland"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "sort": 8,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.825Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4147,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 200,
+        "regions_id": 8,
+        "countries_id": 79
+      }
+    ],
+    "translations": [
+      {
+        "id": 582,
+        "regions_id": 8,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Bangkok"
+      },
+      {
+        "id": 583,
+        "regions_id": 8,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Bangkok"
+      },
+      {
+        "id": 584,
+        "regions_id": 8,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Bangkok"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "sort": 9,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.830Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121360,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 201,
+        "regions_id": 9,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 585,
+        "regions_id": 9,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Bay of Plenty"
+      },
+      {
+        "id": 586,
+        "regions_id": 9,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Bay Of Plenty"
+      },
+      {
+        "id": 587,
+        "regions_id": 9,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Bay Of Plenty"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "sort": 10,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.834Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121380,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 202,
+        "regions_id": 10,
+        "countries_id": 185
+      }
+    ],
+    "translations": [
+      {
+        "id": 588,
+        "regions_id": 10,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Big Island"
+      },
+      {
+        "id": 589,
+        "regions_id": 10,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Big Island"
+      },
+      {
+        "id": 590,
+        "regions_id": 10,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Big Island"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "sort": 11,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.839Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3204,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 203,
+        "regions_id": 11,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 591,
+        "regions_id": 11,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Blue Mountains"
+      },
+      {
+        "id": 592,
+        "regions_id": 11,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Blue Mountains"
+      },
+      {
+        "id": 593,
+        "regions_id": 11,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Blue Mountains"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "sort": 12,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.843Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121990,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 204,
+        "regions_id": 12,
+        "countries_id": 161
+      }
+    ],
+    "translations": [
+      {
+        "id": 594,
+        "regions_id": 12,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Boca Tapada"
+      },
+      {
+        "id": 595,
+        "regions_id": 12,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "—Boca Tapada"
+      },
+      {
+        "id": 596,
+        "regions_id": 12,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "—Boca Tapada"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "sort": 13,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.847Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121787,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 205,
+        "regions_id": 13,
+        "countries_id": 176
+      }
+    ],
+    "translations": [
+      {
+        "id": 597,
+        "regions_id": 13,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Bogota"
+      },
+      {
+        "id": 598,
+        "regions_id": 13,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Bogota"
+      },
+      {
+        "id": 599,
+        "regions_id": 13,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Bogota"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "sort": 14,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.850Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22183,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 206,
+        "regions_id": 14,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 600,
+        "regions_id": 14,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Bora Bora"
+      },
+      {
+        "id": 601,
+        "regions_id": 14,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Bora Bora"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "sort": 15,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.854Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121777,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 207,
+        "regions_id": 15,
+        "countries_id": 171
+      }
+    ],
+    "translations": [
+      {
+        "id": 602,
+        "regions_id": 15,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Brasilien"
+      },
+      {
+        "id": 603,
+        "regions_id": 15,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Brasilien"
+      },
+      {
+        "id": 604,
+        "regions_id": 15,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Brazilië"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "sort": 16,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.858Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121755,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 208,
+        "regions_id": 16,
+        "countries_id": 169
+      }
+    ],
+    "translations": [
+      {
+        "id": 605,
+        "regions_id": 16,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Buenos Aires"
+      },
+      {
+        "id": 606,
+        "regions_id": 16,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Buenos Aires"
+      },
+      {
+        "id": 607,
+        "regions_id": 16,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Buenos Aires"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "sort": 17,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.862Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121985,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 209,
+        "regions_id": 17,
+        "countries_id": 161
+      }
+    ],
+    "translations": [
+      {
+        "id": 608,
+        "regions_id": 17,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Cahuita Nationalpark"
+      },
+      {
+        "id": 609,
+        "regions_id": 17,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "—Cahuita Nationalpark"
+      },
+      {
+        "id": 610,
+        "regions_id": 17,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "—Cahuita Nationalpark"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "sort": 18,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.865Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3203,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 210,
+        "regions_id": 18,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 611,
+        "regions_id": 18,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Canberra"
+      },
+      {
+        "id": 612,
+        "regions_id": 18,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Canberra"
+      },
+      {
+        "id": 613,
+        "regions_id": 18,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Canberra"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "sort": 19,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.869Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121367,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 211,
+        "regions_id": 19,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 614,
+        "regions_id": 19,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Canterbury"
+      },
+      {
+        "id": 615,
+        "regions_id": 19,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Canterbury"
+      },
+      {
+        "id": 616,
+        "regions_id": 19,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Canterbury"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "sort": 20,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.873Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4149,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 212,
+        "regions_id": 20,
+        "countries_id": 79
+      }
+    ],
+    "translations": [
+      {
+        "id": 617,
+        "regions_id": 20,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Chiang Mai / Chiang Rai"
+      },
+      {
+        "id": 618,
+        "regions_id": 20,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Chiang Mai / Chiang Rai"
+      },
+      {
+        "id": 619,
+        "regions_id": 20,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Chiang Mai / Chiang Rai"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "sort": 21,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.877Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3168,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 213,
+        "regions_id": 21,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 620,
+        "regions_id": 21,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Chobe Fluss"
+      },
+      {
+        "id": 621,
+        "regions_id": 21,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Chobe Fluss"
+      },
+      {
+        "id": 622,
+        "regions_id": 21,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Chobe rivier"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "sort": 22,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.880Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121359,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 214,
+        "regions_id": 22,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 623,
+        "regions_id": 22,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Coromandel-Waikato"
+      },
+      {
+        "id": 624,
+        "regions_id": 22,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Coromandel-Waikato"
+      },
+      {
+        "id": 625,
+        "regions_id": 22,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Coromandel-Waikato"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "sort": 23,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.884Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121983,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 215,
+        "regions_id": 23,
+        "countries_id": 161
+      }
+    ],
+    "translations": [
+      {
+        "id": 626,
+        "regions_id": 23,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Costa Rica"
+      },
+      {
+        "id": 627,
+        "regions_id": 23,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Costa Rica"
+      },
+      {
+        "id": 628,
+        "regions_id": 23,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Costa Rica"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "sort": 24,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.888Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3180,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 216,
+        "regions_id": 24,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 629,
+        "regions_id": 24,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Cradle Mountain Lake St. Clair Nationalpark"
+      },
+      {
+        "id": 630,
+        "regions_id": 24,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Cradle Mountain Lake St. Clair Nationalpark"
+      },
+      {
+        "id": 631,
+        "regions_id": 24,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Cradle Mountain Lake St. Clair National Park"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "sort": 25,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.892Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121764,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 217,
+        "regions_id": 25,
+        "countries_id": 178
+      }
+    ],
+    "translations": [
+      {
+        "id": 632,
+        "regions_id": 25,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Cusco / Heiliges Tal"
+      },
+      {
+        "id": 633,
+        "regions_id": 25,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Cusco / Heiliges Tal"
+      },
+      {
+        "id": 634,
+        "regions_id": 25,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Cusco Sacred Valley"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "sort": 26,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.896Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3195,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 218,
+        "regions_id": 26,
+        "countries_id": 28
+      }
+    ],
+    "translations": [
+      {
+        "id": 635,
+        "regions_id": 26,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Damaraland & Kaokoveld"
+      },
+      {
+        "id": 636,
+        "regions_id": 26,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Damaraland & Kaokoveld"
+      },
+      {
+        "id": 637,
+        "regions_id": 26,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Damaraland & Kaokoveld"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "sort": 27,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.899Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3191,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 219,
+        "regions_id": 27,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 638,
+        "regions_id": 27,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Drakensberge"
+      },
+      {
+        "id": 639,
+        "regions_id": 27,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Drakensberge"
+      },
+      {
+        "id": 640,
+        "regions_id": 27,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Drakensbergen"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "sort": 28,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.904Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121770,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 220,
+        "regions_id": 28,
+        "countries_id": 173
+      }
+    ],
+    "translations": [
+      {
+        "id": 641,
+        "regions_id": 28,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Ecuador"
+      },
+      {
+        "id": 642,
+        "regions_id": 28,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Ecuador"
+      },
+      {
+        "id": 643,
+        "regions_id": 28,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Ecuador"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "sort": 29,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.908Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121798,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 221,
+        "regions_id": 29,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 644,
+        "regions_id": 29,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Eswatini"
+      },
+      {
+        "id": 645,
+        "regions_id": 29,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Eswatini"
+      },
+      {
+        "id": 646,
+        "regions_id": 29,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Eswatini"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "sort": 30,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.912Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3201,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 222,
+        "regions_id": 30,
+        "countries_id": 28
+      }
+    ],
+    "translations": [
+      {
+        "id": 647,
+        "regions_id": 30,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Etosha Nationalpark"
+      },
+      {
+        "id": 648,
+        "regions_id": 30,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Etosha Nationalpark"
+      },
+      {
+        "id": 649,
+        "regions_id": 30,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Etosha National Park"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "sort": 31,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.916Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22187,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 223,
+        "regions_id": 31,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 650,
+        "regions_id": 31,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Fakarava"
+      },
+      {
+        "id": 651,
+        "regions_id": 31,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Fakarava"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "sort": 32,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.920Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121759,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 224,
+        "regions_id": 32,
+        "countries_id": 169
+      }
+    ],
+    "translations": [
+      {
+        "id": 652,
+        "regions_id": 32,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Feuerland"
+      },
+      {
+        "id": 653,
+        "regions_id": 32,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Feuerland"
+      },
+      {
+        "id": 654,
+        "regions_id": 32,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Vuurland"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "sort": 33,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.923Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3153,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 225,
+        "regions_id": 33,
+        "countries_id": 191
+      }
+    ],
+    "translations": [
+      {
+        "id": 655,
+        "regions_id": 33,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Fiji Inseln"
+      },
+      {
+        "id": 656,
+        "regions_id": 33,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Fiji Inseln"
+      },
+      {
+        "id": 657,
+        "regions_id": 33,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Fiji"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "sort": 34,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.927Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3194,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 226,
+        "regions_id": 34,
+        "countries_id": 28
+      }
+    ],
+    "translations": [
+      {
+        "id": 658,
+        "regions_id": 34,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Fish River Canyon"
+      },
+      {
+        "id": 659,
+        "regions_id": 34,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Fish River Canyon"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "sort": 35,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.932Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3121,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 227,
+        "regions_id": 35,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 660,
+        "regions_id": 35,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Flinders Ranges"
+      },
+      {
+        "id": 661,
+        "regions_id": 35,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Flinders Ranges"
+      },
+      {
+        "id": 662,
+        "regions_id": 35,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Flinders Ranges"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "sort": 36,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.937Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22192,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 228,
+        "regions_id": 36,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 663,
+        "regions_id": 36,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Französisch Polynesien"
+      },
+      {
+        "id": 664,
+        "regions_id": 36,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Französisch Polynesien"
+      },
+      {
+        "id": 665,
+        "regions_id": 36,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Frans-Polynesië"
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "sort": 37,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.941Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3181,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 229,
+        "regions_id": 37,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 666,
+        "regions_id": 37,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Freycinet Nationalpark"
+      },
+      {
+        "id": 667,
+        "regions_id": 37,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Freycinet Nationalpark"
+      },
+      {
+        "id": 668,
+        "regions_id": 37,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Freycinet National Park"
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "sort": 38,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.944Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121773,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 230,
+        "regions_id": 38,
+        "countries_id": 211
+      }
+    ],
+    "translations": [
+      {
+        "id": 669,
+        "regions_id": 38,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Galapagos"
+      },
+      {
+        "id": 670,
+        "regions_id": 38,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Galapagos"
+      },
+      {
+        "id": 671,
+        "regions_id": 38,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Galapagos"
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "sort": 39,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.948Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3185,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 231,
+        "regions_id": 39,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 672,
+        "regions_id": 39,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Garden Route & Eastern Cape"
+      },
+      {
+        "id": 673,
+        "regions_id": 39,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Garden Route & Eastern Cape"
+      },
+      {
+        "id": 674,
+        "regions_id": 39,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Garden Route & Eastern Cape"
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "sort": 40,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.953Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121362,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 232,
+        "regions_id": 40,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 675,
+        "regions_id": 40,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Gisborne"
+      },
+      {
+        "id": 676,
+        "regions_id": 40,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Gisborne"
+      },
+      {
+        "id": 677,
+        "regions_id": 40,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Gisborne"
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "sort": 41,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.956Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3118,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 233,
+        "regions_id": 41,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 678,
+        "regions_id": 41,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Grampians"
+      },
+      {
+        "id": 679,
+        "regions_id": 41,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Grampians"
+      },
+      {
+        "id": 680,
+        "regions_id": 41,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Grampians"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "sort": 42,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.960Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3161,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 234,
+        "regions_id": 42,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 681,
+        "regions_id": 42,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Great Barrier Reef Inseln"
+      },
+      {
+        "id": 682,
+        "regions_id": 42,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Great Barrier Reef Inseln"
+      },
+      {
+        "id": 683,
+        "regions_id": 42,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Great Barrier Reef Islands"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "sort": 43,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.963Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3119,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 235,
+        "regions_id": 43,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 684,
+        "regions_id": 43,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Great Ocean Road"
+      },
+      {
+        "id": 685,
+        "regions_id": 43,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Great Ocean Road"
+      },
+      {
+        "id": 686,
+        "regions_id": 43,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Great Ocean Road"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "sort": 44,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.968Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121772,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 236,
+        "regions_id": 44,
+        "countries_id": 173
+      }
+    ],
+    "translations": [
+      {
+        "id": 687,
+        "regions_id": 44,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Guayaquil"
+      },
+      {
+        "id": 688,
+        "regions_id": 44,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Guayaquil"
+      },
+      {
+        "id": 689,
+        "regions_id": 44,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Guayaquil"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "sort": 45,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.971Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3164,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 237,
+        "regions_id": 45,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 690,
+        "regions_id": 45,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Hawkes Bay"
+      },
+      {
+        "id": 691,
+        "regions_id": 45,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Hawkes Bay"
+      },
+      {
+        "id": 692,
+        "regions_id": 45,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Hawkes Bay"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "sort": 46,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.975Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4157,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 238,
+        "regions_id": 46,
+        "countries_id": 83
+      }
+    ],
+    "translations": [
+      {
+        "id": 693,
+        "regions_id": 46,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Hoi An / Quy Nhon / Danang"
+      },
+      {
+        "id": 694,
+        "regions_id": 46,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Hoi An / Quy Nhon / Danang"
+      },
+      {
+        "id": 695,
+        "regions_id": 46,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Hoi An / Quy Nhon / Danang"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "sort": 47,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.979Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4154,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 239,
+        "regions_id": 47,
+        "countries_id": 79
+      }
+    ],
+    "translations": [
+      {
+        "id": 696,
+        "regions_id": 47,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Hua Hin / Koh Chang / Koh Samet"
+      },
+      {
+        "id": 697,
+        "regions_id": 47,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Hua Hin / Koh Chang / Koh Samet"
+      },
+      {
+        "id": 698,
+        "regions_id": 47,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Hua Hin / Koh Chang / Koh Samet"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "sort": 48,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.983Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22182,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 240,
+        "regions_id": 48,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 699,
+        "regions_id": 48,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Huahine"
+      },
+      {
+        "id": 700,
+        "regions_id": 48,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Huahine"
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "sort": 49,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.986Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 101903,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 241,
+        "regions_id": 49,
+        "countries_id": 46
+      }
+    ],
+    "translations": [
+      {
+        "id": 701,
+        "regions_id": 49,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Hwange Nationalpark"
+      },
+      {
+        "id": 702,
+        "regions_id": 49,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Hwange Nationalpark"
+      },
+      {
+        "id": 703,
+        "regions_id": 49,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Hwange National Park"
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "sort": 50,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.989Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121783,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 242,
+        "regions_id": 50,
+        "countries_id": 171
+      }
+    ],
+    "translations": [
+      {
+        "id": 704,
+        "regions_id": 50,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Iguacu"
+      },
+      {
+        "id": 705,
+        "regions_id": 50,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Iguacu"
+      },
+      {
+        "id": 706,
+        "regions_id": 50,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Iguacu"
+      }
+    ]
+  },
+  {
+    "id": 51,
+    "sort": 51,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.007Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 122063,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 243,
+        "regions_id": 51,
+        "countries_id": 160
+      }
+    ],
+    "translations": [
+      {
+        "id": 707,
+        "regions_id": 51,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Inland"
+      },
+      {
+        "id": 708,
+        "regions_id": 51,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Inland"
+      },
+      {
+        "id": 709,
+        "regions_id": 51,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Binnenland"
+      }
+    ]
+  },
+  {
+    "id": 52,
+    "sort": 52,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.012Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3172,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 244,
+        "regions_id": 52,
+        "countries_id": 28
+      },
+      {
+        "id": 245,
+        "regions_id": 52,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 710,
+        "regions_id": 52,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kalahari"
+      },
+      {
+        "id": 711,
+        "regions_id": 52,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kalahari"
+      },
+      {
+        "id": 712,
+        "regions_id": 52,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kalahari"
+      }
+    ]
+  },
+  {
+    "id": 53,
+    "sort": 53,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.018Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3122,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 246,
+        "regions_id": 53,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 713,
+        "regions_id": 53,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kangaroo Island"
+      },
+      {
+        "id": 714,
+        "regions_id": 53,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kangaroo Island"
+      },
+      {
+        "id": 715,
+        "regions_id": 53,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kangaroo Island"
+      }
+    ]
+  },
+  {
+    "id": 54,
+    "sort": 54,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.021Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4152,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 247,
+        "regions_id": 54,
+        "countries_id": 79
+      }
+    ],
+    "translations": [
+      {
+        "id": 716,
+        "regions_id": 54,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kaoh Lak / Koh Phi Phi / Koh Yao Noi"
+      },
+      {
+        "id": 717,
+        "regions_id": 54,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kaoh Lak / Koh Phi Phi / Koh Yao Noi"
+      },
+      {
+        "id": 718,
+        "regions_id": 54,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kaoh Lak / Koh Phi Phi / Koh Yao Noi"
+      }
+    ]
+  },
+  {
+    "id": 55,
+    "sort": 55,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.025Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121856,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 248,
+        "regions_id": 55,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 719,
+        "regions_id": 55,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kaphalbinsel"
+      },
+      {
+        "id": 720,
+        "regions_id": 55,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kaphalbinsel"
+      },
+      {
+        "id": 721,
+        "regions_id": 55,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kaaps Schiereiland"
+      }
+    ]
+  },
+  {
+    "id": 56,
+    "sort": 56,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.029Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121791,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 249,
+        "regions_id": 56,
+        "countries_id": 176
+      },
+      {
+        "id": 250,
+        "regions_id": 56,
+        "countries_id": 160
+      }
+    ],
+    "translations": [
+      {
+        "id": 722,
+        "regions_id": 56,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Karibikküste"
+      },
+      {
+        "id": 723,
+        "regions_id": 56,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Karibikküste"
+      },
+      {
+        "id": 724,
+        "regions_id": 56,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Caribbean Coast"
+      }
+    ]
+  },
+  {
+    "id": 57,
+    "sort": 57,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.034Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121379,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 251,
+        "regions_id": 57,
+        "countries_id": 185
+      }
+    ],
+    "translations": [
+      {
+        "id": 725,
+        "regions_id": 57,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kauai"
+      },
+      {
+        "id": 726,
+        "regions_id": 57,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kauai"
+      },
+      {
+        "id": 727,
+        "regions_id": 57,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kauai"
+      }
+    ]
+  },
+  {
+    "id": 58,
+    "sort": 58,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.038Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 82179,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 252,
+        "regions_id": 58,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 728,
+        "regions_id": 58,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Khwai"
+      },
+      {
+        "id": 729,
+        "regions_id": 58,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Khwai"
+      }
+    ]
+  },
+  {
+    "id": 59,
+    "sort": 59,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.041Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3126,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 253,
+        "regions_id": 59,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 730,
+        "regions_id": 59,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kimberleys"
+      },
+      {
+        "id": 731,
+        "regions_id": 59,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kimberleys"
+      },
+      {
+        "id": 732,
+        "regions_id": 59,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kimberleys"
+      }
+    ]
+  },
+  {
+    "id": 60,
+    "sort": 60,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.045Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22191,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 254,
+        "regions_id": 60,
+        "countries_id": 79
+      }
+    ],
+    "translations": [
+      {
+        "id": 733,
+        "regions_id": 60,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Koh Phangan / Koh Tao"
+      },
+      {
+        "id": 734,
+        "regions_id": 60,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Koh Phangan / Koh Tao"
+      },
+      {
+        "id": 735,
+        "regions_id": 60,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Koh Phangan / Koh Tao"
+      }
+    ]
+  },
+  {
+    "id": 61,
+    "sort": 61,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.049Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4150,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 255,
+        "regions_id": 61,
+        "countries_id": 79
+      }
+    ],
+    "translations": [
+      {
+        "id": 736,
+        "regions_id": 61,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Koh Samui"
+      },
+      {
+        "id": 737,
+        "regions_id": 61,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Koh Samui"
+      },
+      {
+        "id": 738,
+        "regions_id": 61,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Koh Samui"
+      }
+    ]
+  },
+  {
+    "id": 62,
+    "sort": 62,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.053Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121786,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 256,
+        "regions_id": 62,
+        "countries_id": 176
+      }
+    ],
+    "translations": [
+      {
+        "id": 739,
+        "regions_id": 62,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kolumbien"
+      },
+      {
+        "id": 740,
+        "regions_id": 62,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kolumbien"
+      },
+      {
+        "id": 741,
+        "regions_id": 62,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Colombia"
+      }
+    ]
+  },
+  {
+    "id": 63,
+    "sort": 63,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.057Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22190,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 257,
+        "regions_id": 63,
+        "countries_id": 79
+      }
+    ],
+    "translations": [
+      {
+        "id": 742,
+        "regions_id": 63,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Krabi / Koh Lanta"
+      },
+      {
+        "id": 743,
+        "regions_id": 63,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Krabi / Koh Lanta"
+      },
+      {
+        "id": 744,
+        "regions_id": 63,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Krabi / Koh Lanta"
+      }
+    ]
+  },
+  {
+    "id": 64,
+    "sort": 64,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.061Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3187,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 258,
+        "regions_id": 64,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 745,
+        "regions_id": 64,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Krüger Nationalpark & private Wildreservate"
+      },
+      {
+        "id": 746,
+        "regions_id": 64,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Krüger Nationalpark & private Wildreservate"
+      },
+      {
+        "id": 747,
+        "regions_id": 64,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Krüger National Park & private Game Reserves"
+      }
+    ]
+  },
+  {
+    "id": 65,
+    "sort": 65,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.065Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 122002,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 259,
+        "regions_id": 65,
+        "countries_id": 162
+      }
+    ],
+    "translations": [
+      {
+        "id": 748,
+        "regions_id": 65,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kuba"
+      },
+      {
+        "id": 749,
+        "regions_id": 65,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kuba"
+      },
+      {
+        "id": 750,
+        "regions_id": 65,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Cuba"
+      }
+    ]
+  },
+  {
+    "id": 66,
+    "sort": 66,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.069Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3200,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 260,
+        "regions_id": 66,
+        "countries_id": 28
+      }
+    ],
+    "translations": [
+      {
+        "id": 751,
+        "regions_id": 66,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Küste"
+      },
+      {
+        "id": 752,
+        "regions_id": 66,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kust"
+      }
+    ]
+  },
+  {
+    "id": 67,
+    "sort": 67,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.071Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121767,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 261,
+        "regions_id": 67,
+        "countries_id": 170
+      }
+    ],
+    "translations": [
+      {
+        "id": 753,
+        "regions_id": 67,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "La Paz"
+      },
+      {
+        "id": 754,
+        "regions_id": 67,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "La Paz"
+      },
+      {
+        "id": 755,
+        "regions_id": 67,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "La Paz"
+      }
+    ]
+  },
+  {
+    "id": 68,
+    "sort": 68,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.075Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121382,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 262,
+        "regions_id": 68,
+        "countries_id": 185
+      }
+    ],
+    "translations": [
+      {
+        "id": 756,
+        "regions_id": 68,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Lanai"
+      },
+      {
+        "id": 757,
+        "regions_id": 68,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Lanai"
+      },
+      {
+        "id": 758,
+        "regions_id": 68,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Lanai"
+      }
+    ]
+  },
+  {
+    "id": 69,
+    "sort": 69,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.078Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3169,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 263,
+        "regions_id": 69,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 759,
+        "regions_id": 69,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Linyanti"
+      },
+      {
+        "id": 760,
+        "regions_id": 69,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Linyanti"
+      },
+      {
+        "id": 761,
+        "regions_id": 69,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Linyanti"
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "sort": 70,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.084Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3206,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 264,
+        "regions_id": 70,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 762,
+        "regions_id": 70,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Lord Howe Island"
+      },
+      {
+        "id": 763,
+        "regions_id": 70,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Lord Howe Island"
+      },
+      {
+        "id": 764,
+        "regions_id": 70,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Lord Howe Island"
+      }
+    ]
+  },
+  {
+    "id": 71,
+    "sort": 71,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.089Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3178,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 265,
+        "regions_id": 71,
+        "countries_id": 44
+      }
+    ],
+    "translations": [
+      {
+        "id": 765,
+        "regions_id": 71,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Lower Zambezi Nationalpark"
+      },
+      {
+        "id": 766,
+        "regions_id": 71,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Lower Zambezi Nationalpark"
+      },
+      {
+        "id": 767,
+        "regions_id": 71,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Lower Zambezi National Park"
+      }
+    ]
+  },
+  {
+    "id": 72,
+    "sort": 72,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.094Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3186,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 266,
+        "regions_id": 72,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 768,
+        "regions_id": 72,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Madikwe"
+      },
+      {
+        "id": 769,
+        "regions_id": 72,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Madikwe"
+      },
+      {
+        "id": 770,
+        "regions_id": 72,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Madikwe"
+      }
+    ]
+  },
+  {
+    "id": 73,
+    "sort": 73,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.099Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3171,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 267,
+        "regions_id": 73,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 771,
+        "regions_id": 73,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Makgadikgadi Pans"
+      },
+      {
+        "id": 772,
+        "regions_id": 73,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Makgadikgadi Pans"
+      },
+      {
+        "id": 773,
+        "regions_id": 73,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Makgadikgadi Pan"
+      }
+    ]
+  },
+  {
+    "id": 74,
+    "sort": 74,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.108Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121859,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 268,
+        "regions_id": 74,
+        "countries_id": 23
+      }
+    ],
+    "translations": [
+      {
+        "id": 774,
+        "regions_id": 74,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Malawisee"
+      },
+      {
+        "id": 775,
+        "regions_id": 74,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Malawisee"
+      },
+      {
+        "id": 776,
+        "regions_id": 74,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Lake Malawi"
+      }
+    ]
+  },
+  {
+    "id": 75,
+    "sort": 75,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.112Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4142,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 269,
+        "regions_id": 75,
+        "countries_id": 68
+      }
+    ],
+    "translations": [
+      {
+        "id": 777,
+        "regions_id": 75,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Malaysia"
+      },
+      {
+        "id": 778,
+        "regions_id": 75,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Malaysia"
+      },
+      {
+        "id": 779,
+        "regions_id": 75,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Maleisië"
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "sort": 76,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.115Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3155,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 270,
+        "regions_id": 76,
+        "countries_id": 191
+      }
+    ],
+    "translations": [
+      {
+        "id": 780,
+        "regions_id": 76,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Mamanuca"
+      },
+      {
+        "id": 781,
+        "regions_id": 76,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Mamanuca"
+      },
+      {
+        "id": 782,
+        "regions_id": 76,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Mamanuca"
+      }
+    ]
+  },
+  {
+    "id": 77,
+    "sort": 77,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.119Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121373,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 271,
+        "regions_id": 77,
+        "countries_id": 190
+      }
+    ],
+    "translations": [
+      {
+        "id": 783,
+        "regions_id": 77,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Mangaia"
+      },
+      {
+        "id": 784,
+        "regions_id": 77,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Mangaia"
+      },
+      {
+        "id": 785,
+        "regions_id": 77,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Mangaia"
+      }
+    ]
+  },
+  {
+    "id": 78,
+    "sort": 78,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.124Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3166,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 272,
+        "regions_id": 78,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 786,
+        "regions_id": 78,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Marlborough"
+      },
+      {
+        "id": 787,
+        "regions_id": 78,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Marlborough"
+      },
+      {
+        "id": 788,
+        "regions_id": 78,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Marlborough"
+      }
+    ]
+  },
+  {
+    "id": 79,
+    "sort": 79,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.128Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3141,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 273,
+        "regions_id": 79,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 789,
+        "regions_id": 79,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Marquesas"
+      },
+      {
+        "id": 790,
+        "regions_id": 79,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Marquesas"
+      },
+      {
+        "id": 791,
+        "regions_id": 79,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Marquesas"
+      }
+    ]
+  },
+  {
+    "id": 80,
+    "sort": 80,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.132Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121378,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 274,
+        "regions_id": 80,
+        "countries_id": 185
+      }
+    ],
+    "translations": [
+      {
+        "id": 792,
+        "regions_id": 80,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Maui"
+      },
+      {
+        "id": 793,
+        "regions_id": 80,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Maui"
+      },
+      {
+        "id": 794,
+        "regions_id": 80,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Maui"
+      }
+    ]
+  },
+  {
+    "id": 81,
+    "sort": 81,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.136Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121866,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 275,
+        "regions_id": 81,
+        "countries_id": 176
+      }
+    ],
+    "translations": [
+      {
+        "id": 795,
+        "regions_id": 81,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Medellin"
+      },
+      {
+        "id": 796,
+        "regions_id": 81,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Medellin"
+      },
+      {
+        "id": 797,
+        "regions_id": 81,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Medellin"
+      }
+    ]
+  },
+  {
+    "id": 82,
+    "sort": 82,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.141Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 122061,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 276,
+        "regions_id": 82,
+        "countries_id": 166
+      }
+    ],
+    "translations": [
+      {
+        "id": 798,
+        "regions_id": 82,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Mexiko City"
+      },
+      {
+        "id": 799,
+        "regions_id": 82,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Mexiko City"
+      },
+      {
+        "id": 800,
+        "regions_id": 82,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Mexiko City"
+      }
+    ]
+  },
+  {
+    "id": 83,
+    "sort": 83,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.145Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121381,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 277,
+        "regions_id": 83,
+        "countries_id": 185
+      }
+    ],
+    "translations": [
+      {
+        "id": 801,
+        "regions_id": 83,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Molokai"
+      },
+      {
+        "id": 802,
+        "regions_id": 83,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Molokai"
+      },
+      {
+        "id": 803,
+        "regions_id": 83,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Molokai"
+      }
+    ]
+  },
+  {
+    "id": 84,
+    "sort": 84,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.149Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22181,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 278,
+        "regions_id": 84,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 804,
+        "regions_id": 84,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Moorea"
+      },
+      {
+        "id": 805,
+        "regions_id": 84,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Moorea"
+      }
+    ]
+  },
+  {
+    "id": 85,
+    "sort": 85,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.152Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3174,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 279,
+        "regions_id": 85,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 806,
+        "regions_id": 85,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Moremi Wildreservat"
+      },
+      {
+        "id": 807,
+        "regions_id": 85,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Moremi Wildreservat"
+      },
+      {
+        "id": 808,
+        "regions_id": 85,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Moremi Game Reserve"
+      }
+    ]
+  },
+  {
+    "id": 86,
+    "sort": 86,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.156Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 24568,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 280,
+        "regions_id": 86,
+        "countries_id": 28
+      }
+    ],
+    "translations": [
+      {
+        "id": 809,
+        "regions_id": 86,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Namib Naukluft Park"
+      },
+      {
+        "id": 810,
+        "regions_id": 86,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Namib Naukluft Park"
+      }
+    ]
+  },
+  {
+    "id": 87,
+    "sort": 87,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.159Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121364,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 281,
+        "regions_id": 87,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 811,
+        "regions_id": 87,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nelson"
+      },
+      {
+        "id": 812,
+        "regions_id": 87,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nelson"
+      },
+      {
+        "id": 813,
+        "regions_id": 87,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nelson"
+      }
+    ]
+  },
+  {
+    "id": 88,
+    "sort": 88,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.163Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3136,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 282,
+        "regions_id": 88,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 814,
+        "regions_id": 88,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Neuseeland"
+      },
+      {
+        "id": 815,
+        "regions_id": 88,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Neuseeland"
+      },
+      {
+        "id": 816,
+        "regions_id": 88,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nieuw-Zeeland"
+      }
+    ]
+  },
+  {
+    "id": 89,
+    "sort": 89,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.166Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4158,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 283,
+        "regions_id": 89,
+        "countries_id": 83
+      }
+    ],
+    "translations": [
+      {
+        "id": 817,
+        "regions_id": 89,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nha Trang / Phan Thiet"
+      },
+      {
+        "id": 818,
+        "regions_id": 89,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nha Trang / Phan Thiet"
+      },
+      {
+        "id": 819,
+        "regions_id": 89,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nha Trang / Phan Thiet"
+      }
+    ]
+  },
+  {
+    "id": 90,
+    "sort": 90,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.172Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121986,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 284,
+        "regions_id": 90,
+        "countries_id": 161
+      }
+    ],
+    "translations": [
+      {
+        "id": 820,
+        "regions_id": 90,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nicoja Halbinsel"
+      },
+      {
+        "id": 821,
+        "regions_id": 90,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "—Nicoja Halbinsel"
+      },
+      {
+        "id": 822,
+        "regions_id": 90,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "—Nicoja Halbinsel"
+      }
+    ]
+  },
+  {
+    "id": 91,
+    "sort": 91,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.183Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121385,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 285,
+        "regions_id": 91,
+        "countries_id": 51
+      }
+    ],
+    "translations": [
+      {
+        "id": 823,
+        "regions_id": 91,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nordküste"
+      },
+      {
+        "id": 824,
+        "regions_id": 91,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nordküste"
+      },
+      {
+        "id": 825,
+        "regions_id": 91,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Noordkust"
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "sort": 92,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.194Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121781,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 286,
+        "regions_id": 92,
+        "countries_id": 171
+      }
+    ],
+    "translations": [
+      {
+        "id": 826,
+        "regions_id": 92,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nordosten"
+      },
+      {
+        "id": 827,
+        "regions_id": 92,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nordosten"
+      },
+      {
+        "id": 828,
+        "regions_id": 92,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Northeast"
+      }
+    ]
+  },
+  {
+    "id": 93,
+    "sort": 93,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.203Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121761,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 287,
+        "regions_id": 93,
+        "countries_id": 178
+      }
+    ],
+    "translations": [
+      {
+        "id": 829,
+        "regions_id": 93,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nordperu"
+      },
+      {
+        "id": 830,
+        "regions_id": 93,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nordperu"
+      },
+      {
+        "id": 831,
+        "regions_id": 93,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "North Peru"
+      }
+    ]
+  },
+  {
+    "id": 94,
+    "sort": 94,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.211Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121754,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 288,
+        "regions_id": 94,
+        "countries_id": 169
+      }
+    ],
+    "translations": [
+      {
+        "id": 832,
+        "regions_id": 94,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nordwesten"
+      },
+      {
+        "id": 833,
+        "regions_id": 94,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nordwesten"
+      },
+      {
+        "id": 834,
+        "regions_id": 94,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Northwest"
+      }
+    ]
+  },
+  {
+    "id": 95,
+    "sort": 95,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.217Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121386,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 289,
+        "regions_id": 95,
+        "countries_id": 51
+      }
+    ],
+    "translations": [
+      {
+        "id": 835,
+        "regions_id": 95,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nordwestküste"
+      },
+      {
+        "id": 836,
+        "regions_id": 95,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nordwestküste"
+      },
+      {
+        "id": 837,
+        "regions_id": 95,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Noordwestkust"
+      }
+    ]
+  },
+  {
+    "id": 96,
+    "sort": 96,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.223Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 60630,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 290,
+        "regions_id": 96,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 838,
+        "regions_id": 96,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Norfolk Island"
+      },
+      {
+        "id": 839,
+        "regions_id": 96,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Norfolk Island"
+      }
+    ]
+  },
+  {
+    "id": 97,
+    "sort": 97,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.235Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121857,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 291,
+        "regions_id": 97,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 840,
+        "regions_id": 97,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "North West Provinz & Limpopo"
+      },
+      {
+        "id": 841,
+        "regions_id": 97,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "North West Provinz & Limpopo"
+      },
+      {
+        "id": 842,
+        "regions_id": 97,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "North West Provinz & Limpopo"
+      }
+    ]
+  },
+  {
+    "id": 98,
+    "sort": 98,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.239Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121860,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 292,
+        "regions_id": 98,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 843,
+        "regions_id": 98,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Northern Cape"
+      },
+      {
+        "id": 844,
+        "regions_id": 98,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Northern Cape"
+      },
+      {
+        "id": 845,
+        "regions_id": 98,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Northern Cape"
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "sort": 99,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.245Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121358,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 293,
+        "regions_id": 99,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 846,
+        "regions_id": 99,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Northland"
+      },
+      {
+        "id": 847,
+        "regions_id": 99,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Northland"
+      },
+      {
+        "id": 848,
+        "regions_id": 99,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Northland"
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "sort": 100,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.249Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 101909,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 294,
+        "regions_id": 100,
+        "countries_id": 46
+      }
+    ],
+    "translations": [
+      {
+        "id": 849,
+        "regions_id": 100,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nyanga Nationalpark"
+      },
+      {
+        "id": 850,
+        "regions_id": 100,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nyanga Nationalpark"
+      },
+      {
+        "id": 851,
+        "regions_id": 100,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nyanga National Park"
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "sort": 101,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.267Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121377,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 295,
+        "regions_id": 101,
+        "countries_id": 185
+      }
+    ],
+    "translations": [
+      {
+        "id": 852,
+        "regions_id": 101,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Oahu"
+      },
+      {
+        "id": 853,
+        "regions_id": 101,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Oahu"
+      },
+      {
+        "id": 854,
+        "regions_id": 101,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Oahu"
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "sort": 102,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.272Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3183,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 296,
+        "regions_id": 102,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 855,
+        "regions_id": 102,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Okavango Delta"
+      },
+      {
+        "id": 856,
+        "regions_id": 102,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Okavango Delta"
+      },
+      {
+        "id": 857,
+        "regions_id": 102,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Okavango Delta"
+      }
+    ]
+  },
+  {
+    "id": 103,
+    "sort": 103,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.276Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121749,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 297,
+        "regions_id": 103,
+        "countries_id": 172
+      }
+    ],
+    "translations": [
+      {
+        "id": 858,
+        "regions_id": 103,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Osterinsel"
+      },
+      {
+        "id": 859,
+        "regions_id": 103,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Osterinsel"
+      },
+      {
+        "id": 860,
+        "regions_id": 103,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Easter Island"
+      }
+    ]
+  },
+  {
+    "id": 104,
+    "sort": 104,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.281Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 122003,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 298,
+        "regions_id": 104,
+        "countries_id": 162
+      }
+    ],
+    "translations": [
+      {
+        "id": 861,
+        "regions_id": 104,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Ostkuba"
+      },
+      {
+        "id": 862,
+        "regions_id": 104,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "—Ostkuba"
+      },
+      {
+        "id": 863,
+        "regions_id": 104,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "—Ostkuba"
+      }
+    ]
+  },
+  {
+    "id": 105,
+    "sort": 105,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.285Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4143,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 299,
+        "regions_id": 105,
+        "countries_id": 51
+      },
+      {
+        "id": 300,
+        "regions_id": 105,
+        "countries_id": 68
+      }
+    ],
+    "translations": [
+      {
+        "id": 864,
+        "regions_id": 105,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Ostküste"
+      },
+      {
+        "id": 865,
+        "regions_id": 105,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Ostküste"
+      },
+      {
+        "id": 866,
+        "regions_id": 105,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Oostkust"
+      }
+    ]
+  },
+  {
+    "id": 106,
+    "sort": 106,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.290Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121368,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 301,
+        "regions_id": 106,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 867,
+        "regions_id": 106,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Otago"
+      },
+      {
+        "id": 868,
+        "regions_id": 106,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Otago"
+      },
+      {
+        "id": 869,
+        "regions_id": 106,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Otago"
+      }
+    ]
+  },
+  {
+    "id": 107,
+    "sort": 107,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.294Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3134,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 302,
+        "regions_id": 107,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 870,
+        "regions_id": 107,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Outback QLD"
+      },
+      {
+        "id": 871,
+        "regions_id": 107,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Outback QLD"
+      },
+      {
+        "id": 872,
+        "regions_id": 107,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Outback QLD"
+      }
+    ]
+  },
+  {
+    "id": 108,
+    "sort": 108,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.298Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121994,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 303,
+        "regions_id": 108,
+        "countries_id": 168
+      }
+    ],
+    "translations": [
+      {
+        "id": 873,
+        "regions_id": 108,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Panama"
+      },
+      {
+        "id": 874,
+        "regions_id": 108,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Panama"
+      },
+      {
+        "id": 875,
+        "regions_id": 108,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Panama"
+      }
+    ]
+  },
+  {
+    "id": 109,
+    "sort": 109,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.302Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3190,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 304,
+        "regions_id": 109,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 876,
+        "regions_id": 109,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Panorama Route"
+      },
+      {
+        "id": 877,
+        "regions_id": 109,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Panorama Route"
+      },
+      {
+        "id": 878,
+        "regions_id": 109,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Panorama Route"
+      }
+    ]
+  },
+  {
+    "id": 110,
+    "sort": 110,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.305Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121785,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 305,
+        "regions_id": 110,
+        "countries_id": 171
+      }
+    ],
+    "translations": [
+      {
+        "id": 879,
+        "regions_id": 110,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Pantanal"
+      },
+      {
+        "id": 880,
+        "regions_id": 110,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Pantanal"
+      },
+      {
+        "id": 881,
+        "regions_id": 110,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Pantanal"
+      }
+    ]
+  },
+  {
+    "id": 111,
+    "sort": 111,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.310Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121751,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 306,
+        "regions_id": 111,
+        "countries_id": 172
+      },
+      {
+        "id": 307,
+        "regions_id": 111,
+        "countries_id": 169
+      }
+    ],
+    "translations": [
+      {
+        "id": 882,
+        "regions_id": 111,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Patagonien"
+      },
+      {
+        "id": 883,
+        "regions_id": 111,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Patagonien"
+      },
+      {
+        "id": 884,
+        "regions_id": 111,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Patagonia"
+      }
+    ]
+  },
+  {
+    "id": 112,
+    "sort": 112,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.314Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4159,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 308,
+        "regions_id": 112,
+        "countries_id": 83
+      }
+    ],
+    "translations": [
+      {
+        "id": 885,
+        "regions_id": 112,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Phu Quoc"
+      },
+      {
+        "id": 886,
+        "regions_id": 112,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Phu Quoc"
+      },
+      {
+        "id": 887,
+        "regions_id": 112,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Phu Quoc"
+      }
+    ]
+  },
+  {
+    "id": 113,
+    "sort": 113,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.317Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4148,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 309,
+        "regions_id": 113,
+        "countries_id": 79
+      }
+    ],
+    "translations": [
+      {
+        "id": 888,
+        "regions_id": 113,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Phuket"
+      },
+      {
+        "id": 889,
+        "regions_id": 113,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Phuket"
+      },
+      {
+        "id": 890,
+        "regions_id": 113,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Phuket"
+      }
+    ]
+  },
+  {
+    "id": 114,
+    "sort": 114,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.321Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121771,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 310,
+        "regions_id": 114,
+        "countries_id": 173
+      }
+    ],
+    "translations": [
+      {
+        "id": 891,
+        "regions_id": 114,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Quito"
+      },
+      {
+        "id": 892,
+        "regions_id": 114,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Quito"
+      },
+      {
+        "id": 893,
+        "regions_id": 114,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Quito"
+      }
+    ]
+  },
+  {
+    "id": 115,
+    "sort": 115,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.325Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22185,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 311,
+        "regions_id": 115,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 894,
+        "regions_id": 115,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Raiatea"
+      },
+      {
+        "id": 895,
+        "regions_id": 115,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Raiatea"
+      }
+    ]
+  },
+  {
+    "id": 116,
+    "sort": 116,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.328Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22186,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 312,
+        "regions_id": 116,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 896,
+        "regions_id": 116,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Rangiroa"
+      },
+      {
+        "id": 897,
+        "regions_id": 116,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Rangiroa"
+      }
+    ]
+  },
+  {
+    "id": 117,
+    "sort": 117,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.331Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3150,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 313,
+        "regions_id": 117,
+        "countries_id": 190
+      }
+    ],
+    "translations": [
+      {
+        "id": 898,
+        "regions_id": 117,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Rarotonga"
+      },
+      {
+        "id": 899,
+        "regions_id": 117,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Rarotonga"
+      },
+      {
+        "id": 900,
+        "regions_id": 117,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Rarotonga"
+      }
+    ]
+  },
+  {
+    "id": 118,
+    "sort": 118,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.334Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121778,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 314,
+        "regions_id": 118,
+        "countries_id": 171
+      }
+    ],
+    "translations": [
+      {
+        "id": 901,
+        "regions_id": 118,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Rio de Janeiro / Buzios"
+      },
+      {
+        "id": 902,
+        "regions_id": 118,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Rio de Janeiro / Buzios"
+      },
+      {
+        "id": 903,
+        "regions_id": 118,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Rio de Janeiro / Buzios"
+      }
+    ]
+  },
+  {
+    "id": 119,
+    "sort": 119,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.339Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3128,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 315,
+        "regions_id": 119,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 904,
+        "regions_id": 119,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Rotes Zentrum"
+      },
+      {
+        "id": 905,
+        "regions_id": 119,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Rotes Zentrum"
+      },
+      {
+        "id": 906,
+        "regions_id": 119,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Red Centre"
+      }
+    ]
+  },
+  {
+    "id": 120,
+    "sort": 120,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.343Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4156,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 316,
+        "regions_id": 120,
+        "countries_id": 83
+      }
+    ],
+    "translations": [
+      {
+        "id": 907,
+        "regions_id": 120,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Saigon / Hanoi"
+      },
+      {
+        "id": 908,
+        "regions_id": 120,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Saigon / Hanoi"
+      },
+      {
+        "id": 909,
+        "regions_id": 120,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Saigon / Hanoi"
+      }
+    ]
+  },
+  {
+    "id": 121,
+    "sort": 121,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.346Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121748,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 317,
+        "regions_id": 121,
+        "countries_id": 172
+      }
+    ],
+    "translations": [
+      {
+        "id": 910,
+        "regions_id": 121,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Santiago / Zentral-Chile"
+      },
+      {
+        "id": 911,
+        "regions_id": 121,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Santiago / Zentral-Chile"
+      },
+      {
+        "id": 912,
+        "regions_id": 121,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Santiago / Central Chile"
+      }
+    ]
+  },
+  {
+    "id": 122,
+    "sort": 122,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.349Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3170,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 318,
+        "regions_id": 122,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 913,
+        "regions_id": 122,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Savuti"
+      },
+      {
+        "id": 914,
+        "regions_id": 122,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Savuti"
+      },
+      {
+        "id": 915,
+        "regions_id": 122,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Savuti"
+      }
+    ]
+  },
+  {
+    "id": 123,
+    "sort": 123,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.353Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121750,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 319,
+        "regions_id": 123,
+        "countries_id": 172
+      }
+    ],
+    "translations": [
+      {
+        "id": 916,
+        "regions_id": 123,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Seenregion"
+      },
+      {
+        "id": 917,
+        "regions_id": 123,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Seenregion"
+      },
+      {
+        "id": 918,
+        "regions_id": 123,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Lakes District"
+      }
+    ]
+  },
+  {
+    "id": 124,
+    "sort": 124,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.358Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 101918,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 320,
+        "regions_id": 124,
+        "countries_id": 5
+      }
+    ],
+    "translations": [
+      {
+        "id": 919,
+        "regions_id": 124,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges Botswana"
+      },
+      {
+        "id": 920,
+        "regions_id": 124,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Botswana overig"
+      }
+    ]
+  },
+  {
+    "id": 125,
+    "sort": 125,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.361Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121365,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 321,
+        "regions_id": 125,
+        "countries_id": 191
+      }
+    ],
+    "translations": [
+      {
+        "id": 921,
+        "regions_id": 125,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges Fiji"
+      },
+      {
+        "id": 922,
+        "regions_id": 125,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Fiji"
+      },
+      {
+        "id": 923,
+        "regions_id": 125,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Fiji"
+      }
+    ]
+  },
+  {
+    "id": 126,
+    "sort": 126,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.365Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4145,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 322,
+        "regions_id": 126,
+        "countries_id": 68
+      }
+    ],
+    "translations": [
+      {
+        "id": 924,
+        "regions_id": 126,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges Malaysia"
+      },
+      {
+        "id": 925,
+        "regions_id": 126,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Maleisië overig"
+      }
+    ]
+  },
+  {
+    "id": 127,
+    "sort": 127,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.368Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3199,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 323,
+        "regions_id": 127,
+        "countries_id": 28
+      }
+    ],
+    "translations": [
+      {
+        "id": 926,
+        "regions_id": 127,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges Namibia"
+      },
+      {
+        "id": 927,
+        "regions_id": 127,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Namibië overig"
+      }
+    ]
+  },
+  {
+    "id": 128,
+    "sort": 128,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.372Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3205,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 324,
+        "regions_id": 128,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 928,
+        "regions_id": 128,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges NSW"
+      },
+      {
+        "id": 929,
+        "regions_id": 128,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "NSW overig"
+      }
+    ]
+  },
+  {
+    "id": 129,
+    "sort": 129,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.375Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3130,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 325,
+        "regions_id": 129,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 930,
+        "regions_id": 129,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges NT"
+      },
+      {
+        "id": 931,
+        "regions_id": 129,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "NT overig"
+      }
+    ]
+  },
+  {
+    "id": 130,
+    "sort": 130,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.378Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3131,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 326,
+        "regions_id": 130,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 932,
+        "regions_id": 130,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges QLD"
+      },
+      {
+        "id": 933,
+        "regions_id": 130,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "QLD overig"
+      }
+    ]
+  },
+  {
+    "id": 131,
+    "sort": 131,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.382Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3123,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 327,
+        "regions_id": 131,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 934,
+        "regions_id": 131,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges SA"
+      },
+      {
+        "id": 935,
+        "regions_id": 131,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "SA overig"
+      }
+    ]
+  },
+  {
+    "id": 132,
+    "sort": 132,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.385Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3189,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 328,
+        "regions_id": 132,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 936,
+        "regions_id": 132,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges Südafrika"
+      },
+      {
+        "id": 937,
+        "regions_id": 132,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Zuid-Afrika overig"
+      }
+    ]
+  },
+  {
+    "id": 133,
+    "sort": 133,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.389Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3132,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 329,
+        "regions_id": 133,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 938,
+        "regions_id": 133,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges TAS"
+      },
+      {
+        "id": 939,
+        "regions_id": 133,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "TAS overig"
+      }
+    ]
+  },
+  {
+    "id": 134,
+    "sort": 134,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.392Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3120,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 330,
+        "regions_id": 134,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 940,
+        "regions_id": 134,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges VIC"
+      },
+      {
+        "id": 941,
+        "regions_id": 134,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "VIC overig"
+      }
+    ]
+  },
+  {
+    "id": 135,
+    "sort": 135,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.395Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3127,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 331,
+        "regions_id": 135,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 942,
+        "regions_id": 135,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sonstiges WA"
+      },
+      {
+        "id": 943,
+        "regions_id": 135,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "WA overig"
+      }
+    ]
+  },
+  {
+    "id": 136,
+    "sort": 136,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.398Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3176,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 332,
+        "regions_id": 136,
+        "countries_id": 44
+      }
+    ],
+    "translations": [
+      {
+        "id": 944,
+        "regions_id": 136,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "South Luangwa"
+      },
+      {
+        "id": 945,
+        "regions_id": 136,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "South Luangwa"
+      },
+      {
+        "id": 946,
+        "regions_id": 136,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "South Luangwa"
+      }
+    ]
+  },
+  {
+    "id": 137,
+    "sort": 137,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.402Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121369,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 333,
+        "regions_id": 137,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 947,
+        "regions_id": 137,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Southland"
+      },
+      {
+        "id": 948,
+        "regions_id": 137,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Southland"
+      },
+      {
+        "id": 949,
+        "regions_id": 137,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Southland"
+      }
+    ]
+  },
+  {
+    "id": 138,
+    "sort": 138,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.407Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3160,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 334,
+        "regions_id": 138,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 950,
+        "regions_id": 138,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Stewart Island"
+      },
+      {
+        "id": 951,
+        "regions_id": 138,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Stewart Island"
+      },
+      {
+        "id": 952,
+        "regions_id": 138,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Stewart Island"
+      }
+    ]
+  },
+  {
+    "id": 139,
+    "sort": 139,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.411Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121389,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 335,
+        "regions_id": 139,
+        "countries_id": 51
+      }
+    ],
+    "translations": [
+      {
+        "id": 953,
+        "regions_id": 139,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Südküste"
+      },
+      {
+        "id": 954,
+        "regions_id": 139,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Südküste"
+      },
+      {
+        "id": 955,
+        "regions_id": 139,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Zuidkust"
+      }
+    ]
+  },
+  {
+    "id": 140,
+    "sort": 140,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.415Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121762,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 336,
+        "regions_id": 140,
+        "countries_id": 178
+      }
+    ],
+    "translations": [
+      {
+        "id": 956,
+        "regions_id": 140,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Südperu"
+      },
+      {
+        "id": 957,
+        "regions_id": 140,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Südperu"
+      },
+      {
+        "id": 958,
+        "regions_id": 140,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "South Peru"
+      }
+    ]
+  },
+  {
+    "id": 141,
+    "sort": 141,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.419Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22180,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 337,
+        "regions_id": 141,
+        "countries_id": 200
+      },
+      {
+        "id": 338,
+        "regions_id": 141,
+        "countries_id": 196
+      }
+    ],
+    "translations": [
+      {
+        "id": 959,
+        "regions_id": 141,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Südsee"
+      },
+      {
+        "id": 960,
+        "regions_id": 141,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Südsee"
+      },
+      {
+        "id": 961,
+        "regions_id": 141,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Pacific"
+      }
+    ]
+  },
+  {
+    "id": 142,
+    "sort": 142,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.425Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3124,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 339,
+        "regions_id": 142,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 962,
+        "regions_id": 142,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Südwesten"
+      },
+      {
+        "id": 963,
+        "regions_id": 142,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Südwesten"
+      },
+      {
+        "id": 964,
+        "regions_id": 142,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "South West"
+      }
+    ]
+  },
+  {
+    "id": 143,
+    "sort": 143,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.429Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22184,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 340,
+        "regions_id": 143,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 965,
+        "regions_id": 143,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tahaá"
+      },
+      {
+        "id": 966,
+        "regions_id": 143,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tahaá"
+      }
+    ]
+  },
+  {
+    "id": 144,
+    "sort": 144,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.433Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22179,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 341,
+        "regions_id": 144,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 967,
+        "regions_id": 144,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tahiti"
+      },
+      {
+        "id": 968,
+        "regions_id": 144,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tahiti"
+      }
+    ]
+  },
+  {
+    "id": 145,
+    "sort": 145,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.437Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121361,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 342,
+        "regions_id": 145,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 969,
+        "regions_id": 145,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Taranaki"
+      },
+      {
+        "id": 970,
+        "regions_id": 145,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Taranaki"
+      },
+      {
+        "id": 971,
+        "regions_id": 145,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Taranaki"
+      }
+    ]
+  },
+  {
+    "id": 146,
+    "sort": 146,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.456Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 115287,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 343,
+        "regions_id": 146,
+        "countries_id": 191
+      }
+    ],
+    "translations": [
+      {
+        "id": 972,
+        "regions_id": 146,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Taveuni"
+      },
+      {
+        "id": 973,
+        "regions_id": 146,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Taveuni"
+      },
+      {
+        "id": 974,
+        "regions_id": 146,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Taveuni"
+      }
+    ]
+  },
+  {
+    "id": 147,
+    "sort": 147,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.460Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22188,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 344,
+        "regions_id": 147,
+        "countries_id": 192
+      }
+    ],
+    "translations": [
+      {
+        "id": 975,
+        "regions_id": 147,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tikehau"
+      },
+      {
+        "id": 976,
+        "regions_id": 147,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tikehau"
+      }
+    ]
+  },
+  {
+    "id": 148,
+    "sort": 148,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.464Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121763,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 345,
+        "regions_id": 148,
+        "countries_id": 178
+      }
+    ],
+    "translations": [
+      {
+        "id": 977,
+        "regions_id": 148,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Titicaca-See"
+      },
+      {
+        "id": 978,
+        "regions_id": 148,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Titicaca-See"
+      },
+      {
+        "id": 979,
+        "regions_id": 148,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Lake Titicaca"
+      }
+    ]
+  },
+  {
+    "id": 149,
+    "sort": 149,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.469Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3129,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 346,
+        "regions_id": 149,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 980,
+        "regions_id": 149,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Top End"
+      },
+      {
+        "id": 981,
+        "regions_id": 149,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Top End"
+      },
+      {
+        "id": 982,
+        "regions_id": 149,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Top End"
+      }
+    ]
+  },
+  {
+    "id": 150,
+    "sort": 150,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.480Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3133,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 347,
+        "regions_id": 150,
+        "countries_id": 186
+      }
+    ],
+    "translations": [
+      {
+        "id": 983,
+        "regions_id": 150,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tropisches QLD"
+      },
+      {
+        "id": 984,
+        "regions_id": 150,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tropical Queensland"
+      },
+      {
+        "id": 985,
+        "regions_id": 150,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tropical Queensland"
+      }
+    ]
+  },
+  {
+    "id": 151,
+    "sort": 151,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.502Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3158,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 348,
+        "regions_id": 151,
+        "countries_id": 191
+      }
+    ],
+    "translations": [
+      {
+        "id": 986,
+        "regions_id": 151,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Vanua Levu"
+      },
+      {
+        "id": 987,
+        "regions_id": 151,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Vanua Levu"
+      },
+      {
+        "id": 988,
+        "regions_id": 151,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Vanua Levu"
+      }
+    ]
+  },
+  {
+    "id": 152,
+    "sort": 152,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.507Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3179,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 349,
+        "regions_id": 152,
+        "countries_id": 46
+      },
+      {
+        "id": 350,
+        "regions_id": 152,
+        "countries_id": 44
+      }
+    ],
+    "translations": [
+      {
+        "id": 989,
+        "regions_id": 152,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Victoria Falls"
+      },
+      {
+        "id": 990,
+        "regions_id": 152,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Victoria Falls"
+      },
+      {
+        "id": 991,
+        "regions_id": 152,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Victoria Falls"
+      }
+    ]
+  },
+  {
+    "id": 153,
+    "sort": 153,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.511Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4155,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 351,
+        "regions_id": 153,
+        "countries_id": 83
+      }
+    ],
+    "translations": [
+      {
+        "id": 992,
+        "regions_id": 153,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Vietnam"
+      },
+      {
+        "id": 993,
+        "regions_id": 153,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Vietnam"
+      },
+      {
+        "id": 994,
+        "regions_id": 153,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Vietnam"
+      }
+    ]
+  },
+  {
+    "id": 154,
+    "sort": 154,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.516Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3154,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 352,
+        "regions_id": 154,
+        "countries_id": 191
+      }
+    ],
+    "translations": [
+      {
+        "id": 995,
+        "regions_id": 154,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Viti Levu"
+      },
+      {
+        "id": 996,
+        "regions_id": 154,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Viti Levu"
+      },
+      {
+        "id": 997,
+        "regions_id": 154,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Viti Levu"
+      }
+    ]
+  },
+  {
+    "id": 155,
+    "sort": 155,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.521Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121993,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 353,
+        "regions_id": 155,
+        "countries_id": 161
+      }
+    ],
+    "translations": [
+      {
+        "id": 998,
+        "regions_id": 155,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Vulkan Arenal Nationalpark"
+      },
+      {
+        "id": 999,
+        "regions_id": 155,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "—Vulkan Arenal Nationalpark"
+      },
+      {
+        "id": 1000,
+        "regions_id": 155,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "—Vulkan Arenal Nationalpark"
+      }
+    ]
+  },
+  {
+    "id": 156,
+    "sort": 156,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.524Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121363,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 354,
+        "regions_id": 156,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 1001,
+        "regions_id": 156,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Wanganui"
+      },
+      {
+        "id": 1002,
+        "regions_id": 156,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Wanganui"
+      },
+      {
+        "id": 1003,
+        "regions_id": 156,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Wanganui"
+      }
+    ]
+  },
+  {
+    "id": 157,
+    "sort": 157,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.528Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 22195,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 355,
+        "regions_id": 157,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 1004,
+        "regions_id": 157,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Weinanbaugebiete"
+      },
+      {
+        "id": 1005,
+        "regions_id": 157,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Weinanbaugebiete"
+      },
+      {
+        "id": 1006,
+        "regions_id": 157,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Wijngaarden"
+      }
+    ]
+  },
+  {
+    "id": 158,
+    "sort": 158,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.532Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121756,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 356,
+        "regions_id": 158,
+        "countries_id": 169
+      }
+    ],
+    "translations": [
+      {
+        "id": 1007,
+        "regions_id": 158,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Weinregion"
+      },
+      {
+        "id": 1008,
+        "regions_id": 158,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Weinregion"
+      },
+      {
+        "id": 1009,
+        "regions_id": 158,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Wine Region"
+      }
+    ]
+  },
+  {
+    "id": 159,
+    "sort": 159,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.536Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121375,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 357,
+        "regions_id": 159,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 1010,
+        "regions_id": 159,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Wellington"
+      },
+      {
+        "id": 1011,
+        "regions_id": 159,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Wellington"
+      },
+      {
+        "id": 1012,
+        "regions_id": 159,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Wellington"
+      }
+    ]
+  },
+  {
+    "id": 160,
+    "sort": 160,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.540Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121366,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 358,
+        "regions_id": 160,
+        "countries_id": 216
+      }
+    ],
+    "translations": [
+      {
+        "id": 1013,
+        "regions_id": 160,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "West Coast"
+      },
+      {
+        "id": 1014,
+        "regions_id": 160,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "West Coast"
+      },
+      {
+        "id": 1015,
+        "regions_id": 160,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "West Coast"
+      }
+    ]
+  },
+  {
+    "id": 161,
+    "sort": 161,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.543Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 122004,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 359,
+        "regions_id": 161,
+        "countries_id": 162
+      }
+    ],
+    "translations": [
+      {
+        "id": 1016,
+        "regions_id": 161,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Westkuba"
+      },
+      {
+        "id": 1017,
+        "regions_id": 161,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "—Westkuba"
+      },
+      {
+        "id": 1018,
+        "regions_id": 161,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "—Westkuba"
+      }
+    ]
+  },
+  {
+    "id": 162,
+    "sort": 162,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.547Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3125,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 360,
+        "regions_id": 162,
+        "countries_id": 186
+      },
+      {
+        "id": 361,
+        "regions_id": 162,
+        "countries_id": 51
+      },
+      {
+        "id": 362,
+        "regions_id": 162,
+        "countries_id": 68
+      }
+    ],
+    "translations": [
+      {
+        "id": 1019,
+        "regions_id": 162,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Westküste"
+      },
+      {
+        "id": 1020,
+        "regions_id": 162,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Westküste"
+      },
+      {
+        "id": 1021,
+        "regions_id": 162,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "West Coast"
+      }
+    ]
+  },
+  {
+    "id": 163,
+    "sort": 163,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.553Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3156,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 363,
+        "regions_id": 163,
+        "countries_id": 191
+      }
+    ],
+    "translations": [
+      {
+        "id": 1022,
+        "regions_id": 163,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Yasawas"
+      },
+      {
+        "id": 1023,
+        "regions_id": 163,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Yasawas"
+      },
+      {
+        "id": 1024,
+        "regions_id": 163,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Yasawas"
+      }
+    ]
+  },
+  {
+    "id": 164,
+    "sort": 164,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.557Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121999,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 364,
+        "regions_id": 164,
+        "countries_id": 166
+      }
+    ],
+    "translations": [
+      {
+        "id": 1025,
+        "regions_id": 164,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Yucatan"
+      },
+      {
+        "id": 1026,
+        "regions_id": 164,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "—Yucatan"
+      },
+      {
+        "id": 1027,
+        "regions_id": 164,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "—Yucatan"
+      }
+    ]
+  },
+  {
+    "id": 165,
+    "sort": 165,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.560Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 4860,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 365,
+        "regions_id": 165,
+        "countries_id": 28
+      }
+    ],
+    "translations": [
+      {
+        "id": 1028,
+        "regions_id": 165,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Zambezi Region"
+      },
+      {
+        "id": 1029,
+        "regions_id": 165,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Zambezi Region"
+      },
+      {
+        "id": 1030,
+        "regions_id": 165,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Zambezi Region"
+      }
+    ]
+  },
+  {
+    "id": 166,
+    "sort": 166,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.564Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3175,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 366,
+        "regions_id": 166,
+        "countries_id": 44
+      }
+    ],
+    "translations": [
+      {
+        "id": 1031,
+        "regions_id": 166,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Zambia"
+      },
+      {
+        "id": 1032,
+        "regions_id": 166,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Zambia"
+      },
+      {
+        "id": 1033,
+        "regions_id": 166,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Zambia"
+      }
+    ]
+  },
+  {
+    "id": 167,
+    "sort": 167,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.568Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 121989,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 367,
+        "regions_id": 167,
+        "countries_id": 161
+      }
+    ],
+    "translations": [
+      {
+        "id": 1034,
+        "regions_id": 167,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Zentraltal"
+      },
+      {
+        "id": 1035,
+        "regions_id": 167,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "—Zentraltal"
+      },
+      {
+        "id": 1036,
+        "regions_id": 167,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "—Zentraltal"
+      }
+    ]
+  },
+  {
+    "id": 168,
+    "sort": 168,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.572Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 101902,
+    "status": "in review",
+    "country_id": [
+      {
+        "id": 368,
+        "regions_id": 168,
+        "countries_id": 46
+      }
+    ],
+    "translations": [
+      {
+        "id": 1037,
+        "regions_id": 168,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Zimbabwe"
+      },
+      {
+        "id": 1038,
+        "regions_id": 168,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Zimbabwe"
+      },
+      {
+        "id": 1039,
+        "regions_id": 168,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Zimbabwe"
+      }
+    ]
+  },
+  {
+    "id": 169,
+    "sort": 169,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:59.575Z",
+    "user_updated": null,
+    "date_updated": null,
+    "cid_primarix": null,
+    "id_primarix": 3188,
+    "status": "active",
+    "country_id": [
+      {
+        "id": 369,
+        "regions_id": 169,
+        "countries_id": 37
+      }
+    ],
+    "translations": [
+      {
+        "id": 1040,
+        "regions_id": 169,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Zululand"
+      },
+      {
+        "id": 1041,
+        "regions_id": 169,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Zululand"
+      },
+      {
+        "id": 1042,
+        "regions_id": 169,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Zululand"
+      }
+    ]
+  }
+]

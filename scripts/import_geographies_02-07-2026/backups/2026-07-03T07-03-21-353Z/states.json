@@ -1,0 +1,3470 @@
+[
+  {
+    "id": 1,
+    "sort": 1,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.428Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 166,
+        "states_id": 1,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Aitutaki"
+      },
+      {
+        "id": 167,
+        "states_id": 1,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Aitutaki"
+      },
+      {
+        "id": 168,
+        "states_id": 1,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Aitutaki"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "sort": 2,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.435Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 183,
+    "ISO": "CA-AB",
+    "status": "active",
+    "media_code": "AL",
+    "media_code_legacy_botg": "KAN_AL",
+    "media_code_legacy_karawane": "KAN_AL",
+    "translations": [
+      {
+        "id": 169,
+        "states_id": 2,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Alberta"
+      },
+      {
+        "id": 170,
+        "states_id": 2,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Alberta"
+      },
+      {
+        "id": 171,
+        "states_id": 2,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Alberta"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "sort": 3,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.438Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 186,
+    "ISO": "AU-ACT",
+    "status": "active",
+    "media_code": "ACT",
+    "media_code_legacy_botg": "AUS_ACT",
+    "media_code_legacy_karawane": "AUS_ACT",
+    "translations": [
+      {
+        "id": 172,
+        "states_id": 3,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Australian Capital Territory"
+      },
+      {
+        "id": 173,
+        "states_id": 3,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Australian Capital Territory"
+      },
+      {
+        "id": 174,
+        "states_id": 3,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Australian Capital Territory"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "sort": 4,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.441Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 175,
+        "states_id": 4,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Bali"
+      },
+      {
+        "id": 176,
+        "states_id": 4,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Bali"
+      },
+      {
+        "id": 177,
+        "states_id": 4,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Bali"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "sort": 5,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.444Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 105,
+    "ISO": "DE-BY",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 178,
+        "states_id": 5,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Bayern"
+      },
+      {
+        "id": 179,
+        "states_id": 5,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Bayern"
+      },
+      {
+        "id": 180,
+        "states_id": 5,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Bayern"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "sort": 6,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.448Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 181,
+        "states_id": 6,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Bora Bora"
+      },
+      {
+        "id": 182,
+        "states_id": 6,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Bora Bora"
+      },
+      {
+        "id": 183,
+        "states_id": 6,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Bora Bora"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "sort": 7,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.453Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 183,
+    "ISO": "CA-BC",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 184,
+        "states_id": 7,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Britisch-Kolumbien"
+      },
+      {
+        "id": 185,
+        "states_id": 7,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Britisch-Kolumbien"
+      },
+      {
+        "id": 186,
+        "states_id": 7,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Britisch-Kolumbien"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "sort": 8,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.456Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 187,
+        "states_id": 8,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Bundesland des Depots"
+      },
+      {
+        "id": 188,
+        "states_id": 8,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Bundesland des Depots"
+      },
+      {
+        "id": 189,
+        "states_id": 8,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Bundesland des Depots"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "sort": 9,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.459Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-CO",
+    "status": "active",
+    "media_code": "CO",
+    "media_code_legacy_botg": "USA_CO",
+    "media_code_legacy_karawane": "USA_CO",
+    "translations": [
+      {
+        "id": 190,
+        "states_id": 9,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Colorado"
+      },
+      {
+        "id": 191,
+        "states_id": 9,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Colorado"
+      },
+      {
+        "id": 192,
+        "states_id": 9,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Colorado"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "sort": 10,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.462Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 37,
+    "ISO": "ZA-EC",
+    "status": "active",
+    "media_code": "EAC",
+    "media_code_legacy_botg": "RSA_EAC",
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 193,
+        "states_id": 10,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Eastern Cape"
+      },
+      {
+        "id": 194,
+        "states_id": 10,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Eastern Cape"
+      },
+      {
+        "id": 195,
+        "states_id": 10,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Eastern Cape"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "sort": 11,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.466Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 196,
+        "states_id": 11,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Efate"
+      },
+      {
+        "id": 197,
+        "states_id": 11,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Efate"
+      },
+      {
+        "id": 198,
+        "states_id": 11,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Efate"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "sort": 12,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.470Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 28,
+    "ISO": "NA-ER",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 199,
+        "states_id": 12,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Erongo"
+      },
+      {
+        "id": 200,
+        "states_id": 12,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Erongo"
+      },
+      {
+        "id": 201,
+        "states_id": 12,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Erongo"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "sort": 13,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.473Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 202,
+        "states_id": 13,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Espiritu Santo"
+      },
+      {
+        "id": 203,
+        "states_id": 13,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Espiritu Santo"
+      },
+      {
+        "id": 204,
+        "states_id": 13,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Espiritu Santo"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "sort": 14,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.476Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 205,
+        "states_id": 14,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Eswatini"
+      },
+      {
+        "id": 206,
+        "states_id": 14,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Eswatini"
+      },
+      {
+        "id": 207,
+        "states_id": 14,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Eswatini"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "sort": 15,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.478Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 208,
+        "states_id": 15,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Fakarava"
+      },
+      {
+        "id": 209,
+        "states_id": 15,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Fakarava"
+      },
+      {
+        "id": 210,
+        "states_id": 15,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Fakarava"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "sort": 16,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.481Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-FL",
+    "status": "active",
+    "media_code": "FL",
+    "media_code_legacy_botg": "USA_FL",
+    "media_code_legacy_karawane": "USA_FL",
+    "translations": [
+      {
+        "id": 211,
+        "states_id": 16,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Florida"
+      },
+      {
+        "id": 212,
+        "states_id": 16,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Florida"
+      },
+      {
+        "id": 213,
+        "states_id": 16,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Florida"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "sort": 17,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.485Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 214,
+        "states_id": 17,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Galapagos"
+      },
+      {
+        "id": 215,
+        "states_id": 17,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Galapagos"
+      },
+      {
+        "id": 216,
+        "states_id": 17,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Galapagos"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "sort": 18,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.488Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 37,
+    "ISO": "ZA-GP",
+    "status": "active",
+    "media_code": "GAU",
+    "media_code_legacy_botg": "RSA_GAU",
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 217,
+        "states_id": 18,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Gauteng"
+      },
+      {
+        "id": 218,
+        "states_id": 18,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Gauteng"
+      },
+      {
+        "id": 219,
+        "states_id": 18,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Gauteng"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "sort": 19,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.491Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 220,
+        "states_id": 19,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Grande Terre"
+      },
+      {
+        "id": 221,
+        "states_id": 19,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Grande Terre"
+      },
+      {
+        "id": 222,
+        "states_id": 19,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Grande Terre"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "sort": 20,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.493Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 161,
+    "ISO": "CR-G",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 223,
+        "states_id": 20,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Guanacaste"
+      },
+      {
+        "id": 224,
+        "states_id": 20,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Guanacaste"
+      },
+      {
+        "id": 225,
+        "states_id": 20,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Guanacaste"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "sort": 21,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.496Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 173,
+    "ISO": "EC-G",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 226,
+        "states_id": 21,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Guayas"
+      },
+      {
+        "id": 227,
+        "states_id": 21,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Guayas"
+      },
+      {
+        "id": 228,
+        "states_id": 21,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Guayas"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "sort": 22,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.499Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 229,
+        "states_id": 22,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Haapai"
+      },
+      {
+        "id": 230,
+        "states_id": 22,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Haapai"
+      },
+      {
+        "id": 231,
+        "states_id": 22,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Haapai"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "sort": 23,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.502Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-HI",
+    "status": "active",
+    "media_code": "HI",
+    "media_code_legacy_botg": "USA_HI",
+    "media_code_legacy_karawane": "USA_HI",
+    "translations": [
+      {
+        "id": 232,
+        "states_id": 23,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Hawaii"
+      },
+      {
+        "id": 233,
+        "states_id": 23,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Hawaii"
+      },
+      {
+        "id": 234,
+        "states_id": 23,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Hawaii"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "sort": 24,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.505Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 105,
+    "ISO": "DE-HE",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 235,
+        "states_id": 24,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Hessen"
+      },
+      {
+        "id": 236,
+        "states_id": 24,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Hessen"
+      },
+      {
+        "id": 237,
+        "states_id": 24,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Hessen"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "sort": 25,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.508Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 238,
+        "states_id": 25,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Hiva Oa"
+      },
+      {
+        "id": 239,
+        "states_id": 25,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Hiva Oa"
+      },
+      {
+        "id": 240,
+        "states_id": 25,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Hiva Oa"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "sort": 26,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.510Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 241,
+        "states_id": 26,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "HoanKiem Dist"
+      },
+      {
+        "id": 242,
+        "states_id": 26,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "HoanKiem Dist"
+      },
+      {
+        "id": 243,
+        "states_id": 26,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "HoanKiem Dist"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "sort": 27,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.513Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 244,
+        "states_id": 27,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Hongkong"
+      },
+      {
+        "id": 245,
+        "states_id": 27,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Hongkong"
+      },
+      {
+        "id": 246,
+        "states_id": 27,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Hongkong"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "sort": 28,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.517Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 247,
+        "states_id": 28,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Huahine"
+      },
+      {
+        "id": 248,
+        "states_id": 28,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Huahine"
+      },
+      {
+        "id": 249,
+        "states_id": 28,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Huahine"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "sort": 29,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.519Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 250,
+        "states_id": 29,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Iles Loyaute"
+      },
+      {
+        "id": 251,
+        "states_id": 29,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Iles Loyaute"
+      },
+      {
+        "id": 252,
+        "states_id": 29,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Iles Loyaute"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "sort": 30,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.522Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 253,
+        "states_id": 30,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Ilot Maître"
+      },
+      {
+        "id": 254,
+        "states_id": 30,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Ilot Maître"
+      },
+      {
+        "id": 255,
+        "states_id": 30,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Ilot Maître"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "sort": 31,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.525Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-CA",
+    "status": "active",
+    "media_code": "CA",
+    "media_code_legacy_botg": "USA_CA",
+    "media_code_legacy_karawane": "USA_CA, USA_LAX, USA_SFO",
+    "translations": [
+      {
+        "id": 256,
+        "states_id": 31,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kalifornien"
+      },
+      {
+        "id": 257,
+        "states_id": 31,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kalifornien"
+      },
+      {
+        "id": 258,
+        "states_id": 31,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kalifornien"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "sort": 32,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.528Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 68,
+    "ISO": "MY-02",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 259,
+        "states_id": 32,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Kedah"
+      },
+      {
+        "id": 260,
+        "states_id": 32,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Kedah"
+      },
+      {
+        "id": 261,
+        "states_id": 32,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Kedah"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "sort": 33,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.532Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 37,
+    "ISO": "ZA-KZN",
+    "status": "active",
+    "media_code": "KZN",
+    "media_code_legacy_botg": "RSA_KZN",
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 262,
+        "states_id": 33,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "KwaZulu-Natal"
+      },
+      {
+        "id": 263,
+        "states_id": 33,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "KwaZulu Natal"
+      },
+      {
+        "id": 264,
+        "states_id": 33,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "KwaZulu Natal"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "sort": 34,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.534Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 265,
+        "states_id": 34,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "La Digue"
+      },
+      {
+        "id": 266,
+        "states_id": 34,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "La Digue"
+      },
+      {
+        "id": 267,
+        "states_id": 34,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "La Digue"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "sort": 35,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.537Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 37,
+    "ISO": "ZA-LP",
+    "status": "active",
+    "media_code": "LIM",
+    "media_code_legacy_botg": "RSA_LIM",
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 268,
+        "states_id": 35,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Limpopo"
+      },
+      {
+        "id": 269,
+        "states_id": 35,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Limpopo"
+      },
+      {
+        "id": 270,
+        "states_id": 35,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Limpopo"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "sort": 36,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.540Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 271,
+        "states_id": 36,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Limpopo & Mpumalanga"
+      },
+      {
+        "id": 272,
+        "states_id": 36,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Limpopo & Mpumalanga"
+      },
+      {
+        "id": 273,
+        "states_id": 36,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Limpopo & Mpumalanga"
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "sort": 37,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.542Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 274,
+        "states_id": 37,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Mahé"
+      },
+      {
+        "id": 275,
+        "states_id": 37,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Mahé"
+      },
+      {
+        "id": 276,
+        "states_id": 37,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Mahé"
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "sort": 38,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.546Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 277,
+        "states_id": 38,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Mamanuca Inseln"
+      },
+      {
+        "id": 278,
+        "states_id": 38,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Mamanuca Inseln"
+      },
+      {
+        "id": 279,
+        "states_id": 38,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Mamanuca Inseln"
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "sort": 39,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.549Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 280,
+        "states_id": 39,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Mangaia"
+      },
+      {
+        "id": 281,
+        "states_id": 39,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Mangaia"
+      },
+      {
+        "id": 282,
+        "states_id": 39,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Mangaia"
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "sort": 40,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.552Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 27,
+    "ISO": "MZ-L",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 283,
+        "states_id": 40,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Maputo Province"
+      },
+      {
+        "id": 284,
+        "states_id": 40,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Maputo Province"
+      },
+      {
+        "id": 285,
+        "states_id": 40,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Maputo Province"
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "sort": 41,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.554Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 286,
+        "states_id": 41,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Matangi"
+      },
+      {
+        "id": 287,
+        "states_id": 41,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Matangi"
+      },
+      {
+        "id": 288,
+        "states_id": 41,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Matangi"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "sort": 42,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.557Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 289,
+        "states_id": 42,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Maupiti"
+      },
+      {
+        "id": 290,
+        "states_id": 42,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Maupiti"
+      },
+      {
+        "id": 291,
+        "states_id": 42,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Maupiti"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "sort": 43,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.561Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 292,
+        "states_id": 43,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "MG – 36.140"
+      },
+      {
+        "id": 293,
+        "states_id": 43,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "MG – 36.140"
+      },
+      {
+        "id": 294,
+        "states_id": 43,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "MG – 36.140"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "sort": 44,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.564Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 295,
+        "states_id": 44,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Moorea"
+      },
+      {
+        "id": 296,
+        "states_id": 44,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Moorea"
+      },
+      {
+        "id": 297,
+        "states_id": 44,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Moorea"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "sort": 45,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.567Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 37,
+    "ISO": "ZA-MP",
+    "status": "active",
+    "media_code": "MPL",
+    "media_code_legacy_botg": "RSA_MPL",
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 298,
+        "states_id": 45,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Mpumalanga"
+      },
+      {
+        "id": 299,
+        "states_id": 45,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Mpumalanga"
+      },
+      {
+        "id": 300,
+        "states_id": 45,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Mpumalanga"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "sort": 46,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.570Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 301,
+        "states_id": 46,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nadi"
+      },
+      {
+        "id": 302,
+        "states_id": 46,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nadi"
+      },
+      {
+        "id": 303,
+        "states_id": 46,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nadi"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "sort": 47,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.572Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-NV",
+    "status": "active",
+    "media_code": "NV",
+    "media_code_legacy_botg": "USA_NV",
+    "media_code_legacy_karawane": "USA_NV",
+    "translations": [
+      {
+        "id": 304,
+        "states_id": 47,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nevada"
+      },
+      {
+        "id": 305,
+        "states_id": 47,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nevada"
+      },
+      {
+        "id": 306,
+        "states_id": 47,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nevada"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "sort": 48,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.576Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-NJ",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 307,
+        "states_id": 48,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "New Jersey"
+      },
+      {
+        "id": 308,
+        "states_id": 48,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "New Jersey"
+      },
+      {
+        "id": 309,
+        "states_id": 48,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "New Jersey"
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "sort": 49,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.578Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 186,
+    "ISO": "AU-NSW",
+    "status": "active",
+    "media_code": "NSW",
+    "media_code_legacy_botg": "AUS_NSW",
+    "media_code_legacy_karawane": "AUS_NSW",
+    "translations": [
+      {
+        "id": 310,
+        "states_id": 49,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "New South Wales"
+      },
+      {
+        "id": 311,
+        "states_id": 49,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "New South Wales"
+      },
+      {
+        "id": 312,
+        "states_id": 49,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "New South Wales"
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "sort": 50,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.581Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-NY",
+    "status": "active",
+    "media_code": "NY",
+    "media_code_legacy_botg": "USA_NY",
+    "media_code_legacy_karawane": "USA_NY",
+    "translations": [
+      {
+        "id": 313,
+        "states_id": 50,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "New York"
+      },
+      {
+        "id": 314,
+        "states_id": 50,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "NY"
+      },
+      {
+        "id": 315,
+        "states_id": 50,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "NY"
+      }
+    ]
+  },
+  {
+    "id": 51,
+    "sort": 51,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.597Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 316,
+        "states_id": 51,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nordinsel"
+      },
+      {
+        "id": 317,
+        "states_id": 51,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nordinsel"
+      },
+      {
+        "id": 318,
+        "states_id": 51,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nordinsel"
+      }
+    ]
+  },
+  {
+    "id": 52,
+    "sort": 52,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.601Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-NC",
+    "status": "active",
+    "media_code": "NC",
+    "media_code_legacy_botg": "USA_NC",
+    "media_code_legacy_karawane": "USA_NC",
+    "translations": [
+      {
+        "id": 319,
+        "states_id": 52,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "North Carolina"
+      },
+      {
+        "id": 320,
+        "states_id": 52,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "North Carolina"
+      },
+      {
+        "id": 321,
+        "states_id": 52,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "North Carolina"
+      }
+    ]
+  },
+  {
+    "id": 53,
+    "sort": 53,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.604Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 37,
+    "ISO": "ZA-NW",
+    "status": "active",
+    "media_code": "NOW",
+    "media_code_legacy_botg": "RSA_NOW",
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 322,
+        "states_id": 53,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "North West"
+      },
+      {
+        "id": 323,
+        "states_id": 53,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "North West"
+      },
+      {
+        "id": 324,
+        "states_id": 53,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "North West"
+      }
+    ]
+  },
+  {
+    "id": 54,
+    "sort": 54,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.607Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 37,
+    "ISO": "ZA-NC",
+    "status": "active",
+    "media_code": "NOC",
+    "media_code_legacy_botg": "RSA_NOC",
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 325,
+        "states_id": 54,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Northern Cape"
+      },
+      {
+        "id": 326,
+        "states_id": 54,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Northern Cape"
+      },
+      {
+        "id": 327,
+        "states_id": 54,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Northern Cape"
+      }
+    ]
+  },
+  {
+    "id": 55,
+    "sort": 55,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.610Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 186,
+    "ISO": "AU-NT",
+    "status": "active",
+    "media_code": "NT",
+    "media_code_legacy_botg": "AUS_NT",
+    "media_code_legacy_karawane": "AUS_NT",
+    "translations": [
+      {
+        "id": 328,
+        "states_id": 55,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Northern Territory"
+      },
+      {
+        "id": 329,
+        "states_id": 55,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Northern Territory"
+      },
+      {
+        "id": 330,
+        "states_id": 55,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Northern Territory"
+      }
+    ]
+  },
+  {
+    "id": 56,
+    "sort": 56,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.614Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 183,
+    "ISO": "CA-NS",
+    "status": "active",
+    "media_code": "NS",
+    "media_code_legacy_botg": "KAN_NS",
+    "media_code_legacy_karawane": "KAN_NS",
+    "translations": [
+      {
+        "id": 331,
+        "states_id": 56,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nova Scotia"
+      },
+      {
+        "id": 332,
+        "states_id": 56,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nova Scotia"
+      },
+      {
+        "id": 333,
+        "states_id": 56,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nova Scotia"
+      }
+    ]
+  },
+  {
+    "id": 57,
+    "sort": 57,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.617Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 334,
+        "states_id": 57,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nuku Hiva"
+      },
+      {
+        "id": 335,
+        "states_id": 57,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nuku Hiva"
+      },
+      {
+        "id": 336,
+        "states_id": 57,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nuku Hiva"
+      }
+    ]
+  },
+  {
+    "id": 58,
+    "sort": 58,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.620Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 337,
+        "states_id": 58,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "oder Bundesstaat/Provinz"
+      },
+      {
+        "id": 338,
+        "states_id": 58,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "oder Bundesstaat/Provinz"
+      },
+      {
+        "id": 339,
+        "states_id": 58,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "oder Bundesstaat/Provinz"
+      }
+    ]
+  },
+  {
+    "id": 59,
+    "sort": 59,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.623Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 183,
+    "ISO": "CA-ON",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 340,
+        "states_id": 59,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Ontario"
+      },
+      {
+        "id": 341,
+        "states_id": 59,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Ontario"
+      },
+      {
+        "id": 342,
+        "states_id": 59,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Ontario"
+      }
+    ]
+  },
+  {
+    "id": 60,
+    "sort": 60,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.626Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 343,
+        "states_id": 60,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Pisco"
+      },
+      {
+        "id": 344,
+        "states_id": 60,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Pisco"
+      },
+      {
+        "id": 345,
+        "states_id": 60,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Pisco"
+      }
+    ]
+  },
+  {
+    "id": 61,
+    "sort": 61,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.630Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 83,
+    "ISO": "VN-27",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 346,
+        "states_id": 61,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Quang Nam Province"
+      },
+      {
+        "id": 347,
+        "states_id": 61,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Quang Nam Province"
+      },
+      {
+        "id": 348,
+        "states_id": 61,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Quang Nam Province"
+      }
+    ]
+  },
+  {
+    "id": 62,
+    "sort": 62,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.633Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 183,
+    "ISO": "CA-QC",
+    "status": "active",
+    "media_code": "PQ",
+    "media_code_legacy_botg": "KAN_PQ",
+    "media_code_legacy_karawane": "KAN_PQ",
+    "translations": [
+      {
+        "id": 349,
+        "states_id": 62,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Quebec"
+      },
+      {
+        "id": 350,
+        "states_id": 62,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Quebec"
+      },
+      {
+        "id": 351,
+        "states_id": 62,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Quebec"
+      }
+    ]
+  },
+  {
+    "id": 63,
+    "sort": 63,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.635Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 186,
+    "ISO": "AU-QLD",
+    "status": "active",
+    "media_code": "QLD",
+    "media_code_legacy_botg": "AUS_QLD",
+    "media_code_legacy_karawane": "AUS_QLD",
+    "translations": [
+      {
+        "id": 352,
+        "states_id": 63,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Queensland"
+      },
+      {
+        "id": 353,
+        "states_id": 63,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Queensland"
+      },
+      {
+        "id": 354,
+        "states_id": 63,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Queensland"
+      }
+    ]
+  },
+  {
+    "id": 64,
+    "sort": 64,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.638Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 355,
+        "states_id": 64,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Raiatea"
+      },
+      {
+        "id": 356,
+        "states_id": 64,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Raiatea"
+      },
+      {
+        "id": 357,
+        "states_id": 64,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Raiatea"
+      }
+    ]
+  },
+  {
+    "id": 65,
+    "sort": 65,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.640Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 358,
+        "states_id": 65,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Rangiroa"
+      },
+      {
+        "id": 359,
+        "states_id": 65,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Rangiroa"
+      },
+      {
+        "id": 360,
+        "states_id": 65,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Rangiroa"
+      }
+    ]
+  },
+  {
+    "id": 66,
+    "sort": 66,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.645Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 361,
+        "states_id": 66,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Rarotonga"
+      },
+      {
+        "id": 362,
+        "states_id": 66,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Rarotonga"
+      },
+      {
+        "id": 363,
+        "states_id": 66,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Rarotonga"
+      }
+    ]
+  },
+  {
+    "id": 67,
+    "sort": 67,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.647Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 364,
+        "states_id": 67,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Republic of Maldives"
+      },
+      {
+        "id": 365,
+        "states_id": 67,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Republic of Maldives"
+      },
+      {
+        "id": 366,
+        "states_id": 67,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Republic of Maldives"
+      }
+    ]
+  },
+  {
+    "id": 68,
+    "sort": 68,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.651Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 171,
+    "ISO": "BR-RJ",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 367,
+        "states_id": 68,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Rio de Janeiro"
+      },
+      {
+        "id": 368,
+        "states_id": 68,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Rio de Janeiro"
+      },
+      {
+        "id": 369,
+        "states_id": 68,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Rio de Janeiro"
+      }
+    ]
+  },
+  {
+    "id": 69,
+    "sort": 69,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.653Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 370,
+        "states_id": 69,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Rurutu"
+      },
+      {
+        "id": 371,
+        "states_id": 69,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Rurutu"
+      },
+      {
+        "id": 372,
+        "states_id": 69,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Rurutu"
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "sort": 70,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.656Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 373,
+        "states_id": 70,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "San José"
+      },
+      {
+        "id": 374,
+        "states_id": 70,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "San José"
+      },
+      {
+        "id": 375,
+        "states_id": 70,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "San José"
+      }
+    ]
+  },
+  {
+    "id": 71,
+    "sort": 71,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.660Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 376,
+        "states_id": 71,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Santa Marta"
+      },
+      {
+        "id": 377,
+        "states_id": 71,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Santa Marta"
+      },
+      {
+        "id": 378,
+        "states_id": 71,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Santa Marta"
+      }
+    ]
+  },
+  {
+    "id": 72,
+    "sort": 72,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.662Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 68,
+    "ISO": "MY-13",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 379,
+        "states_id": 72,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sarawak"
+      },
+      {
+        "id": 380,
+        "states_id": 72,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Sarawak"
+      },
+      {
+        "id": 381,
+        "states_id": 72,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Sarawak"
+      }
+    ]
+  },
+  {
+    "id": 73,
+    "sort": 73,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.665Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 382,
+        "states_id": 73,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Savaii"
+      },
+      {
+        "id": 383,
+        "states_id": 73,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Savaii"
+      },
+      {
+        "id": 384,
+        "states_id": 73,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Savaii"
+      }
+    ]
+  },
+  {
+    "id": 74,
+    "sort": 74,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.668Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 105,
+    "ISO": "DE-SH",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 385,
+        "states_id": 74,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Schleswig-Holstein"
+      },
+      {
+        "id": 386,
+        "states_id": 74,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Schleswig-Holstein"
+      },
+      {
+        "id": 387,
+        "states_id": 74,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Schleswig-Holstein"
+      }
+    ]
+  },
+  {
+    "id": 75,
+    "sort": 75,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.670Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 388,
+        "states_id": 75,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Selous"
+      },
+      {
+        "id": 389,
+        "states_id": 75,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Selous"
+      },
+      {
+        "id": 390,
+        "states_id": 75,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Selous"
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "sort": 76,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.673Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 391,
+        "states_id": 76,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "South Ari Atoll"
+      },
+      {
+        "id": 392,
+        "states_id": 76,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "South Ari Atoll"
+      },
+      {
+        "id": 393,
+        "states_id": 76,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "South Ari Atoll"
+      }
+    ]
+  },
+  {
+    "id": 77,
+    "sort": 77,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.677Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 186,
+    "ISO": "AU-SA",
+    "status": "active",
+    "media_code": "SA",
+    "media_code_legacy_botg": "AUS_SA",
+    "media_code_legacy_karawane": "AUS_SA",
+    "translations": [
+      {
+        "id": 394,
+        "states_id": 77,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "South Australia"
+      },
+      {
+        "id": 395,
+        "states_id": 77,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "South Australia"
+      },
+      {
+        "id": 396,
+        "states_id": 77,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "South Australia"
+      }
+    ]
+  },
+  {
+    "id": 78,
+    "sort": 78,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.679Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-SC",
+    "status": "active",
+    "media_code": "SC",
+    "media_code_legacy_botg": "USA_SC",
+    "media_code_legacy_karawane": "USA_SC",
+    "translations": [
+      {
+        "id": 397,
+        "states_id": 78,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "South Carolina"
+      },
+      {
+        "id": 398,
+        "states_id": 78,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "South Carolina"
+      },
+      {
+        "id": 399,
+        "states_id": 78,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "South Carolina"
+      }
+    ]
+  },
+  {
+    "id": 79,
+    "sort": 79,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.682Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 400,
+        "states_id": 79,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Sumatra"
+      },
+      {
+        "id": 401,
+        "states_id": 79,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Sumatra"
+      },
+      {
+        "id": 402,
+        "states_id": 79,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Sumatra"
+      }
+    ]
+  },
+  {
+    "id": 80,
+    "sort": 80,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.685Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 79,
+    "ISO": "TH-84",
+    "status": "active",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 403,
+        "states_id": 80,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Surat Thani"
+      },
+      {
+        "id": 404,
+        "states_id": 80,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Suratthanee"
+      },
+      {
+        "id": 405,
+        "states_id": 80,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Suratthanee"
+      }
+    ]
+  },
+  {
+    "id": 81,
+    "sort": 81,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.688Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 406,
+        "states_id": 81,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Südinsel"
+      },
+      {
+        "id": 407,
+        "states_id": 81,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Südinsel"
+      },
+      {
+        "id": 408,
+        "states_id": 81,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Südinsel"
+      }
+    ]
+  },
+  {
+    "id": 82,
+    "sort": 82,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.692Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 409,
+        "states_id": 82,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tahaa"
+      },
+      {
+        "id": 410,
+        "states_id": 82,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tahaa"
+      },
+      {
+        "id": 411,
+        "states_id": 82,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tahaa"
+      }
+    ]
+  },
+  {
+    "id": 83,
+    "sort": 83,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.695Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 412,
+        "states_id": 83,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tahiti"
+      },
+      {
+        "id": 413,
+        "states_id": 83,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tahiti"
+      },
+      {
+        "id": 414,
+        "states_id": 83,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tahiti"
+      }
+    ]
+  },
+  {
+    "id": 84,
+    "sort": 84,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.698Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 415,
+        "states_id": 84,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tanna"
+      },
+      {
+        "id": 416,
+        "states_id": 84,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tanna"
+      },
+      {
+        "id": 417,
+        "states_id": 84,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tanna"
+      }
+    ]
+  },
+  {
+    "id": 85,
+    "sort": 85,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.701Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 186,
+    "ISO": "AU-TAS",
+    "status": "active",
+    "media_code": "TAS",
+    "media_code_legacy_botg": "AUS_TAS",
+    "media_code_legacy_karawane": "AUS_TAS",
+    "translations": [
+      {
+        "id": 418,
+        "states_id": 85,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tasmania"
+      },
+      {
+        "id": 419,
+        "states_id": 85,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tasmania"
+      },
+      {
+        "id": 420,
+        "states_id": 85,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tasmania"
+      }
+    ]
+  },
+  {
+    "id": 86,
+    "sort": 86,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.704Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 421,
+        "states_id": 86,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Taveuni"
+      },
+      {
+        "id": 422,
+        "states_id": 86,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Taveuni"
+      },
+      {
+        "id": 423,
+        "states_id": 86,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Taveuni"
+      }
+    ]
+  },
+  {
+    "id": 87,
+    "sort": 87,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.708Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 424,
+        "states_id": 87,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tetiaroa"
+      },
+      {
+        "id": 425,
+        "states_id": 87,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tetiaroa"
+      },
+      {
+        "id": 426,
+        "states_id": 87,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tetiaroa"
+      }
+    ]
+  },
+  {
+    "id": 88,
+    "sort": 88,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.711Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 427,
+        "states_id": 88,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tikehau"
+      },
+      {
+        "id": 428,
+        "states_id": 88,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tikehau"
+      },
+      {
+        "id": 429,
+        "states_id": 88,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tikehau"
+      }
+    ]
+  },
+  {
+    "id": 89,
+    "sort": 89,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.716Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 430,
+        "states_id": 89,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tongatapu"
+      },
+      {
+        "id": 431,
+        "states_id": 89,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tongatapu"
+      },
+      {
+        "id": 432,
+        "states_id": 89,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tongatapu"
+      }
+    ]
+  },
+  {
+    "id": 90,
+    "sort": 90,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.719Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 433,
+        "states_id": 90,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tsimshatsui"
+      },
+      {
+        "id": 434,
+        "states_id": 90,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tsimshatsui"
+      },
+      {
+        "id": 435,
+        "states_id": 90,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tsimshatsui"
+      }
+    ]
+  },
+  {
+    "id": 91,
+    "sort": 91,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.721Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 436,
+        "states_id": 91,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Tuamotu"
+      },
+      {
+        "id": 437,
+        "states_id": 91,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Tuamotu"
+      },
+      {
+        "id": 438,
+        "states_id": 91,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Tuamotu"
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "sort": 92,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.725Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 439,
+        "states_id": 92,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Upolu"
+      },
+      {
+        "id": 440,
+        "states_id": 92,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Upolu"
+      },
+      {
+        "id": 441,
+        "states_id": 92,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Upolu"
+      }
+    ]
+  },
+  {
+    "id": 93,
+    "sort": 93,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.728Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 442,
+        "states_id": 93,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Vanua Levu"
+      },
+      {
+        "id": 443,
+        "states_id": 93,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Vanua Levu"
+      },
+      {
+        "id": 444,
+        "states_id": 93,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Vanua Levu"
+      }
+    ]
+  },
+  {
+    "id": 94,
+    "sort": 94,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.731Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 445,
+        "states_id": 94,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Vavau"
+      },
+      {
+        "id": 446,
+        "states_id": 94,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Vavau"
+      },
+      {
+        "id": 447,
+        "states_id": 94,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Vavau"
+      }
+    ]
+  },
+  {
+    "id": 95,
+    "sort": 95,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.734Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 186,
+    "ISO": "AU-VIC",
+    "status": "active",
+    "media_code": "VIC",
+    "media_code_legacy_botg": "AUS_VIC",
+    "media_code_legacy_karawane": "AUS_VIC",
+    "translations": [
+      {
+        "id": 448,
+        "states_id": 95,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Victoria"
+      },
+      {
+        "id": 449,
+        "states_id": 95,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Victoria"
+      },
+      {
+        "id": 450,
+        "states_id": 95,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Victoria"
+      }
+    ]
+  },
+  {
+    "id": 96,
+    "sort": 96,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.737Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 451,
+        "states_id": 96,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Viti Levu"
+      },
+      {
+        "id": 452,
+        "states_id": 96,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Viti Levu"
+      },
+      {
+        "id": 453,
+        "states_id": 96,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Viti Levu"
+      }
+    ]
+  },
+  {
+    "id": 97,
+    "sort": 97,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.740Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 185,
+    "ISO": "US-WA",
+    "status": "active",
+    "media_code": "DC",
+    "media_code_legacy_botg": "USA_DC",
+    "media_code_legacy_karawane": "USA_DC",
+    "translations": [
+      {
+        "id": 454,
+        "states_id": 97,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Washington"
+      },
+      {
+        "id": 455,
+        "states_id": 97,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Washington"
+      },
+      {
+        "id": 456,
+        "states_id": 97,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Washington"
+      }
+    ]
+  },
+  {
+    "id": 98,
+    "sort": 98,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.743Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 186,
+    "ISO": "AU-WA",
+    "status": "active",
+    "media_code": "WA",
+    "media_code_legacy_botg": "AUS_WA",
+    "media_code_legacy_karawane": "AUS_WA",
+    "translations": [
+      {
+        "id": 457,
+        "states_id": 98,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Western Australia"
+      },
+      {
+        "id": 458,
+        "states_id": 98,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Western Australia"
+      },
+      {
+        "id": 459,
+        "states_id": 98,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Western Australia"
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "sort": 99,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.746Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 37,
+    "ISO": "ZA-WC",
+    "status": "active",
+    "media_code": "WEC",
+    "media_code_legacy_botg": "RSA_WEC",
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 460,
+        "states_id": 99,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Western Cape"
+      },
+      {
+        "id": 461,
+        "states_id": 99,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Western Cape"
+      },
+      {
+        "id": 462,
+        "states_id": 99,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Western Cape"
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "sort": 100,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.749Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 463,
+        "states_id": 100,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Yasawa Inseln"
+      },
+      {
+        "id": 464,
+        "states_id": 100,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Yasawa Inseln"
+      },
+      {
+        "id": 465,
+        "states_id": 100,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Yasawa Inseln"
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "sort": 101,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.764Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": 183,
+    "ISO": "CA-YT",
+    "status": "active",
+    "media_code": "YT",
+    "media_code_legacy_botg": "KAN_YT",
+    "media_code_legacy_karawane": "KAN_YT",
+    "translations": [
+      {
+        "id": 466,
+        "states_id": 101,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Yukon"
+      },
+      {
+        "id": 467,
+        "states_id": 101,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Yukon"
+      },
+      {
+        "id": 468,
+        "states_id": 101,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Yukon"
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "sort": 102,
+    "user_created": "c5040fc3-0ef7-4450-afb7-a85b1543d7a6",
+    "date_created": "2026-07-03T06:50:58.767Z",
+    "user_updated": null,
+    "date_updated": null,
+    "country_id": null,
+    "ISO": null,
+    "status": "in review",
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "media_code_legacy_karawane": null,
+    "translations": [
+      {
+        "id": 469,
+        "states_id": 102,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Zanzibar"
+      },
+      {
+        "id": 470,
+        "states_id": 102,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Zanzibar"
+      },
+      {
+        "id": 471,
+        "states_id": 102,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Zanzibar"
+      }
+    ]
+  }
+]

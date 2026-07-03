@@ -31,7 +31,7 @@ Successor of `scripts/import-csv.js` (which imported the 26-04-10 list from
   already applied them when producing the import files (that's where the
   `in review` statuses come from).
 
-**Schema on dev (verified via MCP, 03-07-2026):**
+**Schema on dev AND local (both verified via MCP, 03-07-2026 — identical):**
 
 - `status` (new/active/in review/archived, default `new`) on all 6 levels below
   destinations_cluster; `is_non_geographic` on destinations_cluster +
@@ -44,9 +44,13 @@ Successor of `scripts/import-csv.js` (which imported the 26-04-10 list from
   translations junction was removed) + `status`.
 - Translation junctions unchanged: `<collection>_translations` with
   `<collection>_id` + `translations_id` + `name`.
-- Locales on dev: `de-DE`, `de-CH`, `nl-NL` — **no `en-GB`**, so the
+- Locales on dev and local: `de-DE`, `de-CH`, `nl-NL` — **no `en-GB`**, so the
   `name_en-GB` columns are skipped (the script imports them automatically if
   the locale is ever added).
+- Write path live-tested on directus-local (03-07-2026): batch POST with
+  explicit id + nested `translations` + nested `country_id: [{countries_id}]`
+  M2M creates all rows correctly; DELETE with an id array works and cascades
+  clean up junction/translation rows.
 
 ## Usage
 

@@ -33,8 +33,9 @@ const fs = require("fs");
 const path = require("path");
 
 const CONFIG = {
-  directusUrl: process.env.DIRECTUS_URL || "",
-  directusToken: process.env.DIRECTUS_TOKEN || "",
+  directusUrl: process.env.DIRECTUS_URL || "http://localhost:8055",
+  directusToken:
+    process.env.DIRECTUS_TOKEN || "1ecR7PLJIpOZZOMUUaOERZWkKv0YT14q",
 };
 
 const DATA_DIR = path.join(
@@ -71,7 +72,9 @@ const SPECS = {
   },
   destinations_cluster: {
     csvFile: "BOTG_destinations_cluster_import_26-06-30.csv",
-    directFields: { is_non_geographic: { field: "is_non_geographic", type: "boolean" } },
+    directFields: {
+      is_non_geographic: { field: "is_non_geographic", type: "boolean" },
+    },
     translations: "destinations_cluster_translations",
     hasStatus: false, // no status field/column on cluster level
     dummy: {},
@@ -79,10 +82,20 @@ const SPECS = {
   destinations: {
     csvFile: "BOTG_destinations_import_26-06-30.csv",
     directFields: {
-      destinations_cluster_id: { field: "destinations_cluster_id", type: "fk", target: "destinations_cluster" },
+      destinations_cluster_id: {
+        field: "destinations_cluster_id",
+        type: "fk",
+        target: "destinations_cluster",
+      },
       media_code: { field: "media_code", type: "string" },
-      media_code_legacy_botg: { field: "media_code_legacy_botg", type: "string" },
-      media_code_legacy_karawane: { field: "media_code_legacy_karawane", type: "string" },
+      media_code_legacy_botg: {
+        field: "media_code_legacy_botg",
+        type: "string",
+      },
+      media_code_legacy_karawane: {
+        field: "media_code_legacy_karawane",
+        type: "string",
+      },
       is_non_geographic: { field: "is_non_geographic", type: "boolean" },
     },
     translations: "destinations_translations",
@@ -91,12 +104,22 @@ const SPECS = {
   countries: {
     csvFile: "BOTG_countries_import_26-06-30.csv",
     directFields: {
-      destination_id: { field: "destination_id", type: "fk", target: "destinations" },
+      destination_id: {
+        field: "destination_id",
+        type: "fk",
+        target: "destinations",
+      },
       ISO: { field: "ISO", type: "string" },
       ISO_alpha_3_code: { field: "ISO_alpha_3_code", type: "string" },
       media_code: { field: "media_code", type: "string" },
-      media_code_legacy_botg: { field: "media_code_legacy_botg", type: "string" },
-      media_code_legacy_karawane: { field: "media_code_legacy_karawane", type: "string" },
+      media_code_legacy_botg: {
+        field: "media_code_legacy_botg",
+        type: "string",
+      },
+      media_code_legacy_karawane: {
+        field: "media_code_legacy_karawane",
+        type: "string",
+      },
       cid_primarix: { field: "cid_primarix", type: "integer" },
       id_primarix: { field: "id_primarix", type: "integer" },
       cid_px_karawane: { field: "cid_px_karawane", type: "integer" },
@@ -111,8 +134,14 @@ const SPECS = {
       country_id: { field: "country_id", type: "fk", target: "countries" },
       ISO: { field: "ISO", type: "string" },
       media_code: { field: "media_code", type: "string" },
-      media_code_legacy_botg: { field: "media_code_legacy_botg", type: "string" },
-      media_code_legacy_karawane: { field: "media_code_legacy_karawane", type: "string" },
+      media_code_legacy_botg: {
+        field: "media_code_legacy_botg",
+        type: "string",
+      },
+      media_code_legacy_karawane: {
+        field: "media_code_legacy_karawane",
+        type: "string",
+      },
     },
     translations: "states_translations",
     dummy: {},
@@ -124,7 +153,12 @@ const SPECS = {
       id_primarix: { field: "id_primarix", type: "integer" },
     },
     // regions ↔ countries M2M via regions_countries junction (junction field: countries_id)
-    m2m: { csvColumn: "country_id", field: "country_id", junctionField: "countries_id", target: "countries" },
+    m2m: {
+      csvColumn: "country_id",
+      field: "country_id",
+      junctionField: "countries_id",
+      target: "countries",
+    },
     translations: "regions_translations",
     dummy: {},
   },
@@ -134,7 +168,11 @@ const SPECS = {
       country_id: { field: "country_id", type: "fk", target: "countries" },
       state_id: { field: "state_id", type: "fk", target: "states" },
       region_id: { field: "region_id", type: "fk", target: "regions" },
-      location_tour32: { field: "location_tour32", type: "fk", target: "locations_tour32" },
+      location_tour32: {
+        field: "location_tour32",
+        type: "fk",
+        target: "locations_tour32",
+      },
       cid_primarix: { field: "cid_primarix", type: "integer" },
       id_primarix: { field: "id_primarix", type: "integer" },
     },
@@ -172,10 +210,7 @@ const DELETE_BATCH = 100;
 // CSV parsing (BOM-safe, quote-aware)
 // =============================================================================
 function parseCSV(filePath) {
-  const raw = fs
-    .readFileSync(filePath, "utf-8")
-    .replace(/^﻿/, "")
-    .trim();
+  const raw = fs.readFileSync(filePath, "utf-8").replace(/^﻿/, "").trim();
   const lines = raw.split(/\r?\n/);
   const headers = splitCSVLine(lines[0]);
   return lines.slice(1).map((line) => {
@@ -294,7 +329,9 @@ function validateAll(data) {
         const val = row[csvCol];
         if (val === undefined || val === "") continue;
         if (def.type === "boolean" && val !== "true" && val !== "false") {
-          errors.push(`${key} id ${row.id}: ${csvCol} not a boolean ("${val}")`);
+          errors.push(
+            `${key} id ${row.id}: ${csvCol} not a boolean ("${val}")`,
+          );
         }
         if (def.type === "integer" && !/^\d+$/.test(val)) {
           if (/^\d+(;\d+)+$/.test(val)) {
@@ -302,11 +339,15 @@ function validateAll(data) {
               `${key} id ${row.id}: ${csvCol}="${val}" is multi-valued — importing first value only`,
             );
           } else {
-            errors.push(`${key} id ${row.id}: ${csvCol} not an integer ("${val}")`);
+            errors.push(
+              `${key} id ${row.id}: ${csvCol} not an integer ("${val}")`,
+            );
           }
         }
         if (def.type === "fk" && !/^\d+$/.test(val)) {
-          errors.push(`${key} id ${row.id}: ${csvCol} not a single integer FK ("${val}")`);
+          errors.push(
+            `${key} id ${row.id}: ${csvCol} not a single integer FK ("${val}")`,
+          );
         }
       }
 
@@ -314,7 +355,9 @@ function validateAll(data) {
       if (spec.m2m) {
         const val = row[spec.m2m.csvColumn];
         if (val && !/^\d+(;\d+)*$/.test(val)) {
-          errors.push(`${key} id ${row.id}: ${spec.m2m.csvColumn} malformed ("${val}")`);
+          errors.push(
+            `${key} id ${row.id}: ${spec.m2m.csvColumn} malformed ("${val}")`,
+          );
         }
       }
 
@@ -337,7 +380,9 @@ function validateAll(data) {
       for (const row of rows) {
         const val = row[csvCol];
         if (val && !idSets[def.target].has(val)) {
-          errors.push(`${key} id ${row.id}: ${csvCol}=${val} not found in ${def.target} CSV`);
+          errors.push(
+            `${key} id ${row.id}: ${csvCol}=${val} not found in ${def.target} CSV`,
+          );
         }
       }
     }
@@ -380,7 +425,9 @@ function buildPayloads(key, rows, localeMap, warnings) {
         payload[def.field] = val === "true";
       } else if (def.type === "integer" || def.type === "fk") {
         if (val.includes(";")) {
-          warnings.push(`${key} id ${row.id}: ${csvCol}="${val}" → imported first value only`);
+          warnings.push(
+            `${key} id ${row.id}: ${csvCol}="${val}" → imported first value only`,
+          );
           val = val.split(";")[0];
         }
         payload[def.field] = Number(val);
@@ -426,7 +473,10 @@ function buildPayloads(key, rows, localeMap, warnings) {
 // Server operations
 // =============================================================================
 async function fetchLocaleMap() {
-  const result = await directusRequest("GET", "/items/translations?fields=id,code&limit=-1");
+  const result = await directusRequest(
+    "GET",
+    "/items/translations?fields=id,code&limit=-1",
+  );
   const map = {};
   for (const item of result.data || []) map[item.code] = item.id;
   return map;
@@ -441,7 +491,10 @@ async function fetchCount(collection) {
 }
 
 async function fetchAllIds(collection) {
-  const result = await directusRequest("GET", `/items/${collection}?fields=id&limit=-1`);
+  const result = await directusRequest(
+    "GET",
+    `/items/${collection}?fields=id&limit=-1`,
+  );
   return (result.data || []).map((r) => r.id);
 }
 
@@ -454,7 +507,10 @@ async function backupCollection(key, backupDir) {
     `/items/${key}?fields=${fields}${extra}&limit=-1`,
   );
   const rows = result.data || [];
-  fs.writeFileSync(path.join(backupDir, `${key}.json`), JSON.stringify(rows, null, 2));
+  fs.writeFileSync(
+    path.join(backupDir, `${key}.json`),
+    JSON.stringify(rows, null, 2),
+  );
   return rows.length;
 }
 
@@ -465,7 +521,11 @@ async function clearCollection(key) {
     return 0;
   }
   for (let i = 0; i < ids.length; i += DELETE_BATCH) {
-    await directusRequest("DELETE", `/items/${key}`, ids.slice(i, i + DELETE_BATCH));
+    await directusRequest(
+      "DELETE",
+      `/items/${key}`,
+      ids.slice(i, i + DELETE_BATCH),
+    );
     process.stdout.write(
       `\r  ${key}: deleted ${Math.min(i + DELETE_BATCH, ids.length)}/${ids.length}`,
     );
@@ -519,9 +579,13 @@ async function fixSequence(key, maxId) {
   }
   const last = dummies[dummies.length - 1];
   if (last > maxId) {
-    console.log(`  ${key}: sequence now past ${maxId} (next id ≥ ${last + 1}), ${attempts} probe(s)`);
+    console.log(
+      `  ${key}: sequence now past ${maxId} (next id ≥ ${last + 1}), ${attempts} probe(s)`,
+    );
   } else {
-    console.log(`  ${key}: WARNING — could not confirm sequence position after ${attempts} attempts`);
+    console.log(
+      `  ${key}: WARNING — could not confirm sequence position after ${attempts} attempts`,
+    );
   }
 }
 
@@ -539,7 +603,9 @@ async function main() {
 
   const known = [...IMPORT_ORDER, "all", "validate"];
   if (!target || !known.includes(target)) {
-    console.log("Usage: node import-geographies.js <target> [--dry-run] [--clear] [--fix-sequences]");
+    console.log(
+      "Usage: node import-geographies.js <target> [--dry-run] [--clear] [--fix-sequences]",
+    );
     console.log(`Targets: ${known.join(", ")}`);
     console.log("Env: DIRECTUS_URL, DIRECTUS_TOKEN");
     process.exit(target ? 1 : 0);
@@ -557,7 +623,8 @@ async function main() {
   if (warnings.length) {
     console.log(`\n${warnings.length} warning(s):`);
     warnings.slice(0, 30).forEach((w) => console.log(`  ⚠ ${w}`));
-    if (warnings.length > 30) console.log(`  ... +${warnings.length - 30} more`);
+    if (warnings.length > 30)
+      console.log(`  ... +${warnings.length - 30} more`);
   }
   if (errors.length) {
     console.log(`\n${errors.length} ERROR(s):`);
@@ -571,20 +638,28 @@ async function main() {
 
   // ---- 2. Server checks ----
   if (!CONFIG.directusUrl || !CONFIG.directusToken) {
-    console.error("\nDIRECTUS_URL / DIRECTUS_TOKEN env vars are required for server operations.");
+    console.error(
+      "\nDIRECTUS_URL / DIRECTUS_TOKEN env vars are required for server operations.",
+    );
     console.error("(Use the 'validate' target for offline checks.)");
     process.exit(1);
   }
 
   if (clear && target !== "all") {
-    console.error("\n--clear is only allowed with target 'all' (cascades affect child collections).");
+    console.error(
+      "\n--clear is only allowed with target 'all' (cascades affect child collections).",
+    );
     process.exit(1);
   }
 
-  console.log(`\nTarget instance: ${CONFIG.directusUrl}${dryRun ? "  [DRY RUN]" : ""}`);
+  console.log(
+    `\nTarget instance: ${CONFIG.directusUrl}${dryRun ? "  [DRY RUN]" : ""}`,
+  );
 
   const localeMap = await fetchLocaleMap();
-  console.log(`Locales on instance: ${Object.keys(localeMap).join(", ") || "(none!)"}`);
+  console.log(
+    `Locales on instance: ${Object.keys(localeMap).join(", ") || "(none!)"}`,
+  );
   if (!localeMap["de-DE"]) {
     console.error("Locale de-DE missing on instance — aborting.");
     process.exit(1);
@@ -595,7 +670,8 @@ async function main() {
   const counts = {};
   for (const key of CLEAR_ORDER) counts[key] = await fetchCount(key);
   console.log("\nCurrent row counts on instance:");
-  for (const key of IMPORT_ORDER) console.log(`  ${key.padEnd(22)} ${String(counts[key]).padStart(5)}`);
+  for (const key of IMPORT_ORDER)
+    console.log(`  ${key.padEnd(22)} ${String(counts[key]).padStart(5)}`);
 
   const nonEmpty = keys.filter((k) => counts[k] > 0);
   if (nonEmpty.length > 0 && !clear) {
@@ -611,7 +687,8 @@ async function main() {
     console.log("\n=== DRY RUN — no writes ===");
     if (clear) {
       console.log("Would clear (child-first):");
-      for (const key of CLEAR_ORDER) console.log(`  ${key}: ${counts[key]} row(s)`);
+      for (const key of CLEAR_ORDER)
+        console.log(`  ${key}: ${counts[key]} row(s)`);
       console.log(
         "  NOTE: product references (hotels/tours/excursions/... .country etc.) are SET NULL," +
           "\n        product↔geo junction rows (tours_countries, cruises_destinations, ...) are CASCADE-deleted.",
@@ -621,16 +698,21 @@ async function main() {
     for (const key of keys) {
       const payloads = buildPayloads(key, data[key], localeMap, runWarnings);
       const withTrans = payloads.filter((p) => p.translations).length;
-      const withM2m = SPECS[key].m2m ? payloads.filter((p) => p[SPECS[key].m2m.field]).length : 0;
+      const withM2m = SPECS[key].m2m
+        ? payloads.filter((p) => p[SPECS[key].m2m.field]).length
+        : 0;
       console.log(
         `Would create ${key}: ${payloads.length} item(s)` +
-          (SPECS[key].translations ? `, ${withTrans} with nested translations` : "") +
+          (SPECS[key].translations
+            ? `, ${withTrans} with nested translations`
+            : "") +
           (SPECS[key].m2m ? `, ${withM2m} with country M2M` : ""),
       );
       console.log(`  sample payload: ${JSON.stringify(payloads[0])}`);
     }
     runWarnings.slice(0, 10).forEach((w) => console.log(`  ⚠ ${w}`));
-    if (fixSequences) console.log("Would fix autoincrement sequences afterwards.");
+    if (fixSequences)
+      console.log("Would fix autoincrement sequences afterwards.");
     return;
   }
 
@@ -645,7 +727,9 @@ async function main() {
       console.log(`  ${key}: ${n} row(s) backed up`);
     }
 
-    console.log("\n=== Clearing (child-first, cascades handle translations/junctions) ===");
+    console.log(
+      "\n=== Clearing (child-first, cascades handle translations/junctions) ===",
+    );
     for (const key of CLEAR_ORDER) {
       await clearCollection(key);
     }
@@ -677,7 +761,8 @@ async function main() {
   if (runWarnings.length) {
     console.log(`\n${runWarnings.length} warning(s):`);
     runWarnings.slice(0, 40).forEach((w) => console.log(`  ⚠ ${w}`));
-    if (runWarnings.length > 40) console.log(`  ... +${runWarnings.length - 40} more`);
+    if (runWarnings.length > 40)
+      console.log(`  ... +${runWarnings.length - 40} more`);
     const logFile = path.join(__dirname, `import-warnings-${Date.now()}.log`);
     fs.writeFileSync(logFile, runWarnings.join("\n"));
     console.log(`  Full list: ${logFile}`);
