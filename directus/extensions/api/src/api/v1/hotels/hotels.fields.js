@@ -138,7 +138,7 @@ export const DETAIL_FIELDS = [
   "hotel_group.label",
   "hotel_classification.id",
   "hotel_classification.label",
-  "booking.booking_partner",
+  "booking.name_agency",
   // M2M relations
   "accommodation_type.accommodation_types_id.id",
   "accommodation_type.accommodation_types_id.label",

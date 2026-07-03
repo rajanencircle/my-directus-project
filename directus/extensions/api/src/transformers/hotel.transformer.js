@@ -353,7 +353,7 @@ export function shapeHotelDetail(hotel, lang) {
       type: SUPPLIER_TYPE_MAP[hotel.booking_partner] ?? null,
       id_tour_user: hotel.id_tour_user ?? null,
       haupt_id_tour_user: hotel.haupt_id_tour_user ?? null,
-      booking_partner: hotel.booking?.booking_partner ?? null,
+      booking_partner: hotel.booking?.name_agency ?? null,
       booking_email: hotel.booking_email ?? null,
       booking_info: hotel.booking_info ?? null,
     },

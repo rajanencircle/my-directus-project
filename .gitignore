@@ -59,3 +59,6 @@ Workbook1.csv
 *.tar.gz
 /docs
 /docs
+
+# Script backups (per-user data snapshots, not for git)
+/scripts/backups/

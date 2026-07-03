@@ -3,25 +3,35 @@ const axios = require('axios');
 
 /**
  * Hotel Migration Script: MySQL (botg.hotels) -> Directus (hotels)
- * 
+ *
  * Logic:
  * 1. Find all hotels in MySQL hotels table.
  * 2. Group by 'oid' (hotels with same oid are different locales of the same hotel).
  * 3. Use the record with language 'D' as the source of truth (base).
  * 4. Map MySQL fields to Directus fields with aggressive sanitation.
+ *
+ * Usage:
+ *   export DIRECTUS_URL="http://localhost:8055"
+ *   export DIRECTUS_TOKEN="..."
+ *
+ *   node migrate-hotels-mysql.js              # live run
+ *   node migrate-hotels-mysql.js --dry-run    # log intended changes, no writes
  */
 
 // ------------------------------------------
 // CONFIGURATION
 // ------------------------------------------
 
-const env = {
-  DIRECTUS_URL: "http://localhost:8055",
-  DIRECTUS_TOKEN: "8oKgOHTOk6NHs5T9fYJpEvODt-2cLcJ5", // Token for admin@gmail.com
-};
+// Never hardcode tokens here — this file is committed to git and leaked
+// Directus tokens have had to be rotated before (see CLAUDE.md rule 4).
+const DIRECTUS_URL = process.env.DIRECTUS_URL || "http://localhost:8055";
+const DIRECTUS_TOKEN = process.env.DIRECTUS_TOKEN || "";
+const DRY_RUN = process.argv.includes("--dry-run");
 
-const DIRECTUS_URL = env.DIRECTUS_URL;
-const DIRECTUS_TOKEN = env.DIRECTUS_TOKEN;
+if (!DIRECTUS_TOKEN) {
+  console.error("Missing DIRECTUS_TOKEN env var. Set it before running this script.");
+  process.exit(1);
+}
 
 // =============================================================================
 // Sanitation Helpers
@@ -88,10 +98,27 @@ async function directusRequest(method, path, body) {
   }
 }
 
+// =============================================================================
+// Agencies OID lookup (not yet wired into the sync loop below)
+// =============================================================================
+// The legacy hotel field that used to drive the "booking partner" dropdown
+// (botg.hotels.field_365_1 / field_id_365) references Primarix's px_feldlisten
+// value-list (cid=35), NOT botg.agencies.oid — there is currently no field on
+// the legacy hotel row that carries the real agencies.object_id. Once the
+// client provides a px_feldlisten-id -> agencies.object_id crosswalk (or
+// confirms the ~6 name mismatches found during analysis), resolve each
+// hotel's agency like this and set payload.booking = agencyIdByObjectId.get(oid).
+async function buildAgencyOidMap() {
+    const result = await directusRequest("GET", "/items/agencies?fields=id,object_id&limit=-1");
+    const agencies = result.data || [];
+    return new Map(agencies.filter(a => a.object_id != null).map(a => [a.object_id, a.id]));
+}
+
 async function migrateHotels() {
     try {
         console.log('=== Starting Hotel Migration (Aggressive Sanitation) ===');
-        
+        if (DRY_RUN) console.log('(dry run — no writes will be made)');
+
         console.log('\nStep 1: Fetching hotels from MySQL (Source of Truth: language="D")...');
         const mysqlCommand = `mysql -u root -N -B -e "SELECT oid, field_41_1, field_26_1, field_27_1, field_29_1, field_42_1, field_31_1, field_218_1, field_36_1 FROM botg.hotels WHERE language = 'D'"`;
         const mysqlOutput = execSync(mysqlCommand).toString();
@@ -144,16 +171,18 @@ async function migrateHotels() {
 
                 if (objectIdToId.has(hotel.object_id)) {
                     const id = objectIdToId.get(hotel.object_id);
-                    if (Object.keys(payload).length > 0) {
+                    if (Object.keys(payload).length > 0 && !DRY_RUN) {
                         await directusRequest("PATCH", `/items/hotels/${id}`, payload);
                     }
                     updatedCount++;
                 } else {
-                    await directusRequest("POST", "/items/hotels", {
-                        ...payload,
-                        object_id: hotel.object_id,
-                        status: 'published'
-                    });
+                    if (!DRY_RUN) {
+                        await directusRequest("POST", "/items/hotels", {
+                            ...payload,
+                            object_id: hotel.object_id,
+                            status: 'published'
+                        });
+                    }
                     createdCount++;
                 }
 
