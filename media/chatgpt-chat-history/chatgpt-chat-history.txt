@@ -1,0 +1,1359 @@
+D:\>Get-Service "FotoWeb MongoDB Server" | Select-Object *
+Der Befehl "Get-Service" ist entweder falsch geschrieben oder
+konnte nicht gefunden werden.
+
+D:\>
+
+You're running that command in **Command Prompt (cmd.exe)**, but `Get-Service` is a **PowerShell** cmdlet, so CMD doesn't recognize it.
+
+You have two options:
+
+### Option 1: Open PowerShell (Recommended)
+
+Run:
+
+```cmd
+powershell
+```
+
+Your prompt will change to something like:
+
+```powershell
+PS D:\>
+```
+
+Then run:
+
+```powershell
+Get-Service "FotoWeb MongoDB Server" | Select-Object *
+```
+
+Or simply:
+
+```powershell
+Get-Service *Mongo*
+```
+
+---
+
+### Option 2: Run PowerShell from CMD without entering PowerShell
+
+From your current CMD prompt, run:
+
+```cmd
+powershell -Command "Get-Service 'FotoWeb MongoDB Server' | Select-Object *"
+```
+
+or
+
+```cmd
+powershell -Command "Get-Service *Mongo*"
+```
+
+---
+
+### If you only want to check the service from CMD
+
+You can use:
+
+```cmd
+sc query "FotoWeb MongoDB Server"
+```
+
+or list all MongoDB-related services:
+
+```cmd
+sc query type= service state= all | findstr /I Mongo
+```
+
+Let me know which of the following you're trying to do:
+
+* Check if the MongoDB service is running
+* Start/stop the service
+* Troubleshoot why the service won't start
+
+
+Copyright (C) 2016 Microsoft Corporation. Alle Rechte vorbehalten.
+
+PS C:\Users\Administrator> Get-Service "FotoWeb MongoDB Server" | Select-Object \*
+
+Name                : FWMongoDB
+RequiredServices    : {}
+CanPauseAndContinue : False
+CanShutdown         : False
+CanStop             : True
+DisplayName         : FotoWeb MongoDB Server
+DependentServices   : {FotoWeb, FWWorkflow, FWService}
+MachineName         : .
+ServiceName         : FWMongoDB
+ServicesDependedOn  : {}
+ServiceHandle       : SafeServiceHandle
+Status              : Running
+ServiceType         : Win32OwnProcess
+StartType           : Automatic
+Site                :
+Container           :
+
+
+
+PS C:\Users\Administrator> mongod
+mongod : Die Benennung "mongod" wurde nicht als Name eines Cmdlet, einer Funktion, einer Skriptdatei oder eines
+ausführbaren Programms erkannt. Überprüfen Sie die Schreibweise des Namens, oder ob der Pfad korrekt ist (sofern
+enthalten), und wiederholen Sie den Vorgang.
+In Zeile:1 Zeichen:1
+
+- mongod
+-
+  ```
+    + CategoryInfo          : ObjectNotFound: (mongod:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+  ```
+
+PS C:\Users\Administrator> mongod ßßversion
+mongod : Die Benennung "mongod" wurde nicht als Name eines Cmdlet, einer Funktion, einer Skriptdatei oder eines
+ausführbaren Programms erkannt. Überprüfen Sie die Schreibweise des Namens, oder ob der Pfad korrekt ist (sofern
+enthalten), und wiederholen Sie den Vorgang.
+In Zeile:1 Zeichen:1
+
+- mongod ßßversion
+-
+  ```
+    + CategoryInfo          : ObjectNotFound: (mongod:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+  ```
+
+PS C:\Users\Administrator>
+
+The good news is that **MongoDB is already running as a Windows service**:
+
+```
+DisplayName : FotoWeb MongoDB Server
+Status      : Running
+StartType   : Automatic
+```
+
+The reason `mongod` isn't recognized is simply that the **MongoDB executable isn't in your PATH** (or FotoWeb bundles MongoDB internally without exposing it globally).
+
+Let's locate the executable.
+
+### 1. Find the executable path
+
+Run:
+
+```powershell
+(Get-WmiObject Win32_Service -Filter "Name='FWMongoDB'").PathName
+```
+
+or on newer PowerShell:
+
+```powershell
+Get-CimInstance Win32_Service -Filter "Name='FWMongoDB'" | Select-Object Name, PathName
+```
+
+Paste the output here.
+
+---
+
+### 2. Find the MongoDB installation folder
+
+If the above doesn't help, run:
+
+```powershell
+Get-ChildItem "C:\" -Filter mongod.exe -Recurse -ErrorAction SilentlyContinue
+```
+
+or the faster CMD equivalent:
+
+```cmd
+where /R C:\ mongod.exe
+```
+
+---
+
+### 3. Check the MongoDB version
+
+Once you know where `mongod.exe` is, for example if it's located at:
+
+```
+C:\Program Files\FotoWare\MongoDB\bin\mongod.exe
+```
+
+run:
+
+```powershell
+& "C:\Program Files\FotoWare\MongoDB\bin\mongod.exe" --version
+```
+
+or
+
+```powershell
+& "C:\Program Files\FotoWare\MongoDB\bin\mongod.exe" --help
+```
+
+---
+
+### 4. If your goal is to connect to the database
+
+You don't need `mongod` (that's the server). You need the client:
+
+```
+mongosh
+```
+
+or the older:
+
+```
+mongo
+```
+
+If neither is installed, we can still connect by locating the binaries or installing the MongoDB Shell.
+
+**Please run this command and paste the output:**
+
+```powershell
+Get-CimInstance Win32_Service -Filter "Name='FWMongoDB'" | Select-Object Name, PathName
+```
+
+That will tell us exactly where FotoWeb's MongoDB server executable is located.
+
+
+PS C:\Users\Administrator> mongo
+mongo : Die Benennung "mongo" wurd
+ausführbaren Programms erkannt. Üb
+enthalten), und wiederholen Sie de
+In Zeile:1 Zeichen:1
+
+- mongo
+-
+  ```
+    + CategoryInfo          : Obje
+    + FullyQualifiedErrorId : Comm
+  ```
+
+PS C:\Users\Administrator> Get-Cim
+
+Name      PathName
+
+---
+
+FWMongoDB "C:\Program Files (x86)
+
+
+PS C:\Users\Administrator> Get-Cim
+
+Name      PathName
+
+---
+
+FWMongoDB "C:\Program Files (x86)
+
+
+PS C:\Users\Administrator>
+
+
+The output is being truncated because PowerShell is formatting it for the console.
+
+Run one of these commands to display the **full path**:
+
+```powershell
+(Get-CimInstance Win32_Service -Filter "Name='FWMongoDB'").PathName
+```
+
+or
+
+```powershell
+Get-CimInstance Win32_Service -Filter "Name='FWMongoDB'" | Format-List Name,PathName
+```
+
+or
+
+```powershell
+Get-CimInstance Win32_Service -Filter "Name='FWMongoDB'" | Select-Object -ExpandProperty PathName
+```
+
+This should return something like:
+
+```text
+"C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\bin\mongod.exe" --config "C:\ProgramData\..."
+```
+
+Once you have the full path:
+
+1. Paste it here.
+2. We can extract the `mongod.exe` location.
+3. Then run:
+
+```powershell
+& "C:\path\to\mongod.exe" --version
+```
+
+or locate `mongosh.exe`/`mongo.exe` in the same `bin` folder.
+
+From what you've shown so far:
+
+* ✅ The **FotoWeb MongoDB service is running**.
+* ❌ `mongo`, `mongod`, and `mongosh` are **not in your PATH**, which is normal for many bundled MongoDB installations like FotoWeb's.
+
+
+"C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongod.exe" "--config=C:\ProgramData\FotoWare\FotoWeb\Server Settings\C
+onfiguration\mongodb.conf" --service
+PS C:\Users\Administrator> mongo
+mongo : Die Benennung "mongo" wurde nicht als Name eines Cmdlet, einer Funktion, einer Skriptdatei oder eines
+ausführbaren Programms erkannt. Überprüfen Sie die Schreibweise des Namens, oder ob der Pfad korrekt ist (sofern
+enthalten), und wiederholen Sie den Vorgang.
+In Zeile:1 Zeichen:1
+
+- mongo
+-
+  ```
+    + CategoryInfo          : ObjectNotFound: (mongo:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+  ```
+
+PS C:\Users\Administrator> Get-CimInstance Win32\_Service -Filter "Name='FWMongoDB'" | Select-Object Name, PathName
+
+Name      PathName
+
+---
+
+FWMongoDB "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongod.exe" "--config=C:\ProgramData\FotoWare\FotoWeb\Ser...
+
+PS C:\Users\Administrator> Get-CimInstance Win32\_Service -Filter "Name='FWMongoDB'" | Select-Object Name, PathName
+
+Name      PathName
+
+---
+
+FWMongoDB "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongod.exe" "--config=C:\ProgramData\FotoWare\FotoWeb\Server Settings\Configuration\mongodb.conf" --service
+
+PS C:\Users\Administrator>
+
+
+Perfect. We now know exactly where the MongoDB server executable is:
+
+```text
+C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongod.exe
+```
+
+The reason `mongo` doesn't work is that **the MongoDB shell (`mongo.exe`) is not installed**. `mongod.exe` is the database server, while `mongo.exe` (legacy) or `mongosh.exe` (current) is the client used to connect.
+
+### Check what files are in the MongoDB folder
+
+Run:
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB"
+```
+
+or
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse
+```
+
+Look for any of these files:
+
+* `mongosh.exe`
+* `mongo.exe`
+* `mongod.exe`
+
+### Check the MongoDB server version
+
+You can also verify the server version directly:
+
+```powershell
+& "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongod.exe" --version
+```
+
+### If your goal is to access the database
+
+If the folder contains only `mongod.exe`, then FotoWeb did **not** install the MongoDB shell. In that case you have two options:
+
+1. Install the standalone **MongoDB Shell (`mongosh`)** and connect to the running server.
+2. Use another MongoDB client such as MongoDB Compass.
+
+Could you tell me **what you're trying to accomplish**? For example:
+
+* Check the MongoDB version?
+* Browse the FotoWeb database?
+* Back up or restore the database?
+* Run queries?
+* Troubleshoot FotoWeb?
+
+That will determine the best next step.
+
+
+
+PS C:\Users\Administrator> & "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongod.exe" --version
+db version v4.4.13
+Build Info: {
+    "version": "4.4.13",
+    "gitVersion": "df25c71b8674a78e17468f48bcda5285decb9246",
+    "modules": [],
+    "allocator": "tcmalloc",
+    "environment": {
+        "distmod": "windows",
+        "distarch": "x86_64",
+        "target_arch": "x86_64"
+    }
+}
+PS C:\Users\Administrator>
+
+
+Great, you've confirmed the MongoDB server version.
+
+```text
+MongoDB Server Version: 4.4.13
+Status: Running
+Service: FotoWeb MongoDB Server (FWMongoDB)
+```
+
+So your FotoWeb installation is using **MongoDB 4.4.13**, and the service is running correctly.
+
+### If you want to connect to the database
+
+The server (`mongod.exe`) is installed, but the shell (`mongo.exe` or `mongosh.exe`) is not included with FotoWeb. You'll need a client such as:
+
+* **MongoDB Shell (`mongosh`)** (recommended)
+* **MongoDB Compass** (GUI)
+
+You can then connect to the local server, typically using:
+
+```bash
+mongosh mongodb://localhost:27017
+```
+
+or, if authentication is enabled, using the appropriate username and password.
+
+### If your goal is to upgrade MongoDB
+
+Be careful **not** to upgrade the MongoDB binaries independently. Since this MongoDB instance is bundled with FotoWeb, the supported way to upgrade MongoDB is by upgrading **FotoWeb** itself. Replacing `mongod.exe` manually can make FotoWeb incompatible with its database.
+
+If you tell me your objective (for example, a security scan is reporting MongoDB 4.4.13 as outdated, you need to migrate the database, or you're troubleshooting FotoWeb), I can recommend the safest next steps.
+
+
+I wnat. to check the db mongo or sql and find the connection and than find the db and than take the dump
+
+
+From what you've shown, this server is running **both SQL Server and MongoDB**.
+
+* ✅ **MongoDB**: `FotoWeb MongoDB Server` (v4.4.13) – Running
+* ✅ **SQL Server**: `SQL Server (FOTOWARE)` – Running
+* ✅ Also running: `SQL Server (SQLEXPRESS)` and `SQLEXPRESS01`
+
+For FotoWeb, **both databases are typically used**:
+
+* **MongoDB** stores search indexes, metadata, and some application data.
+* **SQL Server** stores configuration, users, workflows, permissions, licensing, etc.
+
+## Step 1: Find the MongoDB database location
+
+Run:
+
+```powershell
+Get-Content "C:\ProgramData\FotoWare\FotoWeb\Server Settings\Configuration\mongodb.conf"
+```
+
+You should see something like:
+
+```yaml
+storage:
+  dbPath: D:\FotoWeb\MongoDB\data
+```
+
+The `dbPath` is where the MongoDB database files are stored.
+
+---
+
+## Step 2: Find the SQL Server database files
+
+Connect to SQL Server or run:
+
+```powershell
+sqlcmd -S localhost\FOTOWARE -Q "SELECT name, physical_name FROM sys.master_files"
+```
+
+If `sqlcmd` isn't installed, locate the databases directly:
+
+```powershell
+Get-ChildItem "C:\Program Files\Microsoft SQL Server" -Recurse -Include *.mdf,*.ldf
+```
+
+---
+
+## Step 3: Find the connection strings
+
+Search the FotoWeb configuration directory:
+
+```powershell
+Get-ChildItem "C:\ProgramData\FotoWare" -Recurse |
+Select-String -Pattern "Server=|Data Source=|mongodb|ConnectionString|Initial Catalog|Database="
+```
+
+Also search the installation folder:
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare" -Recurse |
+Select-String -Pattern "Server=|mongodb|ConnectionString"
+```
+
+---
+
+## Step 4: List MongoDB databases
+
+Since `mongo.exe` isn't installed, first check if `mongosh.exe` exists:
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse -Include mongosh.exe,mongo.exe
+```
+
+If neither exists, we'll either install `mongosh` or inspect the data directory directly.
+
+---
+
+## Step 5: Take a MongoDB dump
+
+If `mongodump.exe` exists:
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse -Include mongodump.exe
+```
+
+Then:
+
+```powershell
+mongodump --out D:\MongoBackup
+```
+
+If `mongodump.exe` isn't present, we'll use the MongoDB Database Tools package.
+
+---
+
+## Step 6: Take a SQL Server backup
+
+If the database instance is `FOTOWARE`:
+
+```sql
+BACKUP DATABASE [DatabaseName]
+TO DISK='D:\Backup\DatabaseName.bak'
+WITH INIT, COMPRESSION;
+```
+
+---
+
+### I recommend we first identify everything.
+
+Please run these **four commands** and paste the output:
+
+```powershell
+Get-Content "C:\ProgramData\FotoWare\FotoWeb\Server Settings\Configuration\mongodb.conf"
+```
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse
+```
+
+```powershell
+Get-Service *SQL*
+```
+
+```powershell
+Get-ChildItem "C:\ProgramData\FotoWare" -Recurse | Select-String "Server=|Data Source=|mongodb|ConnectionString|Database="
+```
+
+From those outputs, we can determine:
+
+1. The MongoDB data directory.
+2. The SQL Server instance and databases.
+3. The exact connection strings.
+4. The correct procedure to create both the MongoDB and SQL Server backups.
+
+
+PS C:\Users\Administrator> sqlcmd -S localhost -E
+Sqlcmd: Fehler: Microsoft ODBC Driver 17 for SQL Server : Named Pipes Provider: Could not open a connection to SQL Serve
+r [2]. .
+Sqlcmd: Fehler: Microsoft ODBC Driver 17 for SQL Server : Login timeout expired.
+Sqlcmd: Fehler: Microsoft ODBC Driver 17 for SQL Server : A network-related or instance-specific error has occurred whil
+e establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and
+if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online..
+PS C:\Users\Administrator> Get-Service *SQL*
+
+Status   Name               DisplayName
+
+---
+
+Running  MSSQL$FOTOWARE     SQL Server (FOTOWARE)
+Stopped  MSSQL$SQLEXPRESS   SQL Server (SQLEXPRESS)
+Stopped  MSSQL$SQLEXPRESS01 SQL Server (SQLEXPRESS01)
+Running  SchneiderUPSMySQL  SchneiderUPSMySQL
+Stopped  SQLAgent$FOTOWARE  SQL Server-Agent (FOTOWARE)
+Stopped  SQLAgent$SQLEXP... SQL Server-Agent (SQLEXPRESS)
+Stopped  SQLAgent$SQLEXP... SQL Server-Agent (SQLEXPRESS01)
+Stopped  SQLBrowser         SQL Server-Browser
+Running  SQLTELEMETRY$FO... SQL Server-CEIP-Dienst (FOTOWARE)
+Stopped  SQLTELEMETRY$SQ... SQL Server-CEIP-Dienst (SQLEXPRESS)
+Stopped  SQLTELEMETRY$SQ... SQL Server-CEIP-Dienst (SQLEXPRESS01)
+Running  SQLWriter          SQL Server VSS Writer
+
+PS C:\Users\Administrator> sqlcmd -S .\FOTOWARE -E
+1>
+
+You're very close. The SQL Server connection failed the first time because you tried the default instance (`localhost`). Your SQL Server is a **named instance** called **FOTOWARE**, and you successfully connected:
+
+```text
+PS C:\Users\Administrator> sqlcmd -S .\FOTOWARE -E
+1>
+```
+
+The `1>` prompt means **you are connected to SQL Server**.
+
+## 1. Find all SQL databases
+
+At the `1>` prompt, run:
+
+```sql
+SELECT name FROM sys.databases;
+GO
+```
+
+Then list the physical database files:
+
+```sql
+SELECT
+    name,
+    physical_name
+FROM sys.master_files;
+GO
+```
+
+---
+
+## 2. Find the FotoWare database
+
+Once you know the database name (for example `FotoWeb`, `FOTOWARE`, etc.), switch to it:
+
+```sql
+USE DatabaseName;
+GO
+```
+
+Then list all tables:
+
+```sql
+SELECT TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+ORDER BY TABLE_NAME;
+GO
+```
+
+---
+
+## 3. Find the MongoDB database path
+
+Outside of `sqlcmd` (type `EXIT` to leave), run:
+
+```powershell
+Get-Content "C:\ProgramData\FotoWare\FotoWeb\Server Settings\Configuration\mongodb.conf"
+```
+
+You're looking for something like:
+
+```yaml
+storage:
+  dbPath: D:\FotoWare\MongoDB\data
+```
+
+That is where the MongoDB database files live.
+
+---
+
+## 4. Find the connection strings used by FotoWeb
+
+Run:
+
+```powershell
+Get-ChildItem "C:\ProgramData\FotoWare" -Recurse |
+Select-String "Server=|Data Source=|Initial Catalog|Database=|mongodb"
+```
+
+This will tell you exactly which SQL database and MongoDB configuration FotoWeb is using.
+
+---
+
+## 5. Create the backups
+
+### SQL Server
+
+Inside `sqlcmd`:
+
+```sql
+BACKUP DATABASE [DatabaseName]
+TO DISK = 'D:\Backup\DatabaseName.bak'
+WITH INIT, COMPRESSION;
+GO
+```
+
+### MongoDB
+
+First check if `mongodump.exe` exists:
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse -Filter mongodump.exe
+```
+
+If it exists:
+
+```powershell
+& "C:\path\to\mongodump.exe" --out D:\MongoBackup
+```
+
+If it doesn't exist, you'll need the **MongoDB Database Tools** installed, since FotoWare only ships `mongod.exe`.
+
+---
+
+### Interesting observation
+
+From the documentation you uploaded, there are several references that **Primarix exports data via SQL**, for example the "Partner ID Filter" is explicitly described as being used for **data export via SQL**.  This strongly suggests that the **business data is stored in SQL Server**, while MongoDB is primarily used internally by FotoWeb (indexing/search and application services).
+
+**Next step:** While you're at the `1>` prompt, run:
+
+```sql
+SELECT name FROM sys.databases;
+GO
+
+SELECT name, physical_name FROM sys.master_files;
+GO
+```
+
+Paste the output here, and I'll tell you exactly which database(s) you should back up and whether MongoDB contains business data or just FotoWeb indexing data.
+
+
+
+
+PS C:\Users\Administrator> sqlcmd -S .\FOTOWARE -E
+1>
+Sqlcmd: Warnung: Der letzte Vorgang wurde vom Benutzer durch Drücken von Strg+C abgebrochen.
+PS C:\Users\Administrator> sqlcmd -S .\FOTOWARE -E
+1> SELECT name FROM sys.databases;
+2> GO
+name
+
+---
+
+---
+
+master
+
+tempdb
+
+model
+
+msdb
+
+FW-MEDIABOTG
+
+(5 Zeilen betroffen)
+1> SELECT
+2>     name,
+3>     physical\_name
+4> FROM sys.master\_files;
+5> GO
+name
+physical\_name
+
+---
+
+---
+
+---
+
+---
+
+master
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\master.mdf
+
+mastlog
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\mastlog.ldf
+
+tempdev
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\tempdb.mdf
+
+templog
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\templog.ldf
+
+modeldev
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\model.mdf
+
+modellog
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\modellog.ldf
+
+MSDBData
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\MSDBData.mdf
+
+MSDBLog
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\MSDBLog.ldf
+
+FW-MEDIABOTG
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\FW-MEDIABOTG.mdf
+
+FW-MEDIABOTG\_log
+C:\Program Files\Microsoft SQL Server\MSSQL15.FOTOWARE\MSSQL\DATA\FW-MEDIABOTG\_log.ldf
+
+
+
+(10 Zeilen betroffen)
+1> USE DatabaseName;
+2> GO
+Meldung "911", Ebene "16", Status "1", Server "FW-SERVER-2018\FOTOWARE", Zeile 1
+"Die DatabaseName-Datenbank ist nicht vorhanden. Stellen Sie sicher, dass der Name richtig eingegeben wurde."
+1>
+
+
+Excellent! We've now identified the SQL database.
+
+## SQL Server
+
+The only application database is:
+
+```text
+FW-MEDIABOTG
+```
+
+The others (`master`, `model`, `msdb`, `tempdb`) are SQL Server system databases.
+
+The reason this failed:
+
+```sql
+USE DatabaseName;
+```
+
+is because `DatabaseName` was just a placeholder. Use the real name:
+
+```sql
+USE [FW-MEDIABOTG];
+GO
+```
+
+---
+
+## Now inspect the database
+
+List all tables:
+
+```sql
+SELECT TABLE_SCHEMA, TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+ORDER BY TABLE_SCHEMA, TABLE_NAME;
+GO
+```
+
+Check the size of the database:
+
+```sql
+EXEC sp_spaceused;
+GO
+```
+
+---
+
+## Create a SQL backup
+
+If `D:\Backup` exists:
+
+```sql
+BACKUP DATABASE [FW-MEDIABOTG]
+TO DISK='D:\Backup\FW-MEDIABOTG.bak'
+WITH INIT, COMPRESSION;
+GO
+```
+
+If the folder doesn't exist, first create it in PowerShell:
+
+```powershell
+New-Item -ItemType Directory D:\Backup
+```
+
+---
+
+# Now let's identify the MongoDB database
+
+Run this in PowerShell:
+
+```powershell
+Get-Content "C:\ProgramData\FotoWare\FotoWeb\Server Settings\Configuration\mongodb.conf"
+```
+
+We're looking for something like:
+
+```yaml
+storage:
+  dbPath: D:\Mongo\data
+```
+
+---
+
+Then list what's inside that folder, for example:
+
+```powershell
+Get-ChildItem "D:\Mongo\data"
+```
+
+(or whatever `dbPath` is).
+
+---
+
+## Also check whether the MongoDB dump tool exists
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse -Filter mongodump.exe
+```
+
+---
+
+### At this point we know
+
+✅ SQL Server instance: `FOTOWARE`
+
+✅ SQL database:
+
+```
+FW-MEDIABOTG
+```
+
+✅ MongoDB server:
+
+```
+MongoDB 4.4.13
+```
+
+The last remaining pieces are:
+
+1. **Where the MongoDB data files are stored (`dbPath`)**.
+2. **Whether `mongodump.exe` is available**, so we can create a proper MongoDB backup.
+
+Once you paste the output of the three PowerShell commands above, I'll give you the exact commands to back up **both** the SQL Server database and the MongoDB database.
+
+
+
+
+(10 Zeilen betroffen)
+1> USE DatabaseName;
+2> GO
+Meldung "911", Ebene "16", Status "1", Server "FW-SERVER-2018\FOTOWARE", Zeile 1
+"Die DatabaseName-Datenbank ist nicht vorhanden. Stellen Sie sicher, dass der Name richtig eingegeben wurde."
+1> USE [FW-MEDIABOTG];
+2> GO
+Der Datenbankkontext wurde in "FW-MEDIABOTG" geändert.
+1> SELECT TABLE\_SCHEMA, TABLE\_NAME
+2> FROM INFORMATION\_SCHEMA.TABLES
+3> ORDER BY TABLE\_SCHEMA, TABLE\_NAME;
+4> GO
+TABLE\_SCHEMA                                                                                                                     TABLE\_NAME
+
+---
+
+dbo                                                                                                                              Actions
+dbo                                                                                                                              Activity
+dbo                                                                                                                              AlbumAccessLists
+dbo                                                                                                                              AlbumEntries
+dbo                                                                                                                              AlbumEvents
+dbo                                                                                                                              AlbumInvitations
+dbo                                                                                                                              AlbumKeywords
+dbo                                                                                                                              Albums
+dbo                                                                                                                              ALEventLog
+dbo                                                                                                                              ALEventLogIptc
+dbo                                                                                                                              ALSearchLog
+dbo                                                                                                                              ALSearchWords
+dbo                                                                                                                              Archive
+dbo                                                                                                                              CustomName
+dbo                                                                                                                              CustomSort
+dbo                                                                                                                              DBProperties
+dbo                                                                                                                              Destination
+dbo                                                                                                                              EventLogReport
+dbo                                                                                                                              EventLogReportIptc
+dbo                                                                                                                              EventLogReportMembership
+dbo                                                                                                                              EventLogReportView
+dbo                                                                                                                              Group
+dbo                                                                                                                              IptcField
+dbo                                                                                                                              ProcessingProfile
+dbo                                                                                                                              Report
+dbo                                                                                                                              ReportArchive
+dbo                                                                                                                              ReportChart
+dbo                                                                                                                              ReportEvent
+dbo                                                                                                                              ReportField
+dbo                                                                                                                              ReportFilter
+dbo                                                                                                                              ReportGroup
+dbo                                                                                                                              ReportGroupDescriptor
+dbo                                                                                                                              ReportHistory
+dbo                                                                                                                              ReportMail
+dbo                                                                                                                              ReportSortDescriptor
+dbo                                                                                                                              TimeDimension
+dbo                                                                                                                              User
+dbo                                                                                                                              UserMembership
+
+(38 Zeilen betroffen)
+1> EXEC sp\_spaceused;
+2> GO
+database\_name                                                                                                                    database\_size      unallocated space
+
+---
+
+FW-MEDIABOTG                                                                                                                     720.00 MB          66.16 MB
+reserved           data               index\_size         unused
+
+---
+
+399192 KB          277728 KB          29112 KB           92352 KB
+1>
+
+
+Great, this confirms what this server is using.
+
+## SQL Server
+
+The application database is:
+
+```text
+FW-MEDIABOTG
+```
+
+Size:
+
+* Database: **720 MB**
+* Data: **~278 MB**
+* Indexes: **~29 MB**
+
+The tables you listed (`Albums`, `AlbumEntries`, `User`, `Group`, `Archive`, `ProcessingProfile`, etc.) are **FotoWare FotoWeb tables**, not your BOTG business data. They store FotoWeb configuration, albums, users, reports, permissions, and indexing metadata.
+
+## MongoDB
+
+You also have a running MongoDB service (`FotoWeb MongoDB Server` v4.4.13). FotoWeb uses MongoDB alongside SQL Server.
+
+## To take a complete backup you should back up BOTH:
+
+### 1. SQL Server
+
+From `sqlcmd`:
+
+```sql
+BACKUP DATABASE [FW-MEDIABOTG]
+TO DISK='D:\Backup\FW-MEDIABOTG.bak'
+WITH INIT, COMPRESSION;
+GO
+```
+
+If `D:\Backup` doesn't exist, create it first:
+
+```powershell
+New-Item -ItemType Directory D:\Backup
+```
+
+---
+
+### 2. Find the MongoDB data location
+
+Exit `sqlcmd`:
+
+```sql
+EXIT
+```
+
+Then in PowerShell run:
+
+```powershell
+Get-Content "C:\ProgramData\FotoWare\FotoWeb\Server Settings\Configuration\mongodb.conf"
+```
+
+That will show something like:
+
+```yaml
+storage:
+  dbPath: D:\FotoWeb\MongoDB\data
+```
+
+---
+
+### 3. Check if `mongodump` is installed
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse -Filter mongodump.exe
+```
+
+If it exists, we can create a logical MongoDB backup.
+
+If it doesn't exist, we'll either:
+
+* install the MongoDB Database Tools, or
+* take a filesystem backup of the `dbPath` after stopping the MongoDB service.
+
+## One observation
+
+The SQL database contains only **38 tables**, all of which are standard FotoWeb tables. I don't see any custom BOTG or Directus application tables. That suggests this SQL Server is used **only by FotoWeb**.
+
+The remaining piece is to inspect the MongoDB configuration and data path to determine what is stored there and how best to back it up.
+
+Please run these two PowerShell commands and paste the output:
+
+```powershell
+Get-Content "C:\ProgramData\FotoWare\FotoWeb\Server Settings\Configuration\mongodb.conf"
+```
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse -Filter mongodump.exe
+```
+
+Once we have those, I can give you the exact MongoDB backup command.
+
+
+PS C:\Users\Administrator> Get-Content "C:\ProgramData\FotoWare\FotoWeb\Server Settings\Configuration\mongodb.conf"
+systemLog:
+    destination: "file"
+    path: "C:\\ProgramData\\FotoWare\\FotoWeb\\Operations\\Logs\\MongoDB\\mongod.log"
+    logAppend: true
+net:
+    port: 7200
+    bindIp: ::,0.0.0.0
+storage:
+    dbPath: "C:\\ProgramData\\FotoWare\\FotoWeb\\Operations\\MongoDBData"
+    engine: wiredTiger
+    journal:
+        enabled: true
+PS C:\Users\Administrator>
+
+
+Perfect. We now have the complete picture.
+
+## Database Architecture
+
+### SQL Server
+
+* **Instance:** `FOTOWARE`
+* **Database:** `FW-MEDIABOTG`
+* **Size:** ~720 MB
+* **Purpose:** FotoWeb configuration, albums, users, permissions, reports, etc.
+
+### MongoDB
+
+* **Version:** 4.4.13
+* **Port:** `7200` (not the default 27017)
+* **Data path:**
+
+  ```text
+  C:\ProgramData\FotoWare\FotoWeb\Operations\MongoDBData
+  ```
+* **Log file:**
+
+  ```text
+  C:\ProgramData\FotoWare\FotoWeb\Operations\Logs\MongoDB\mongod.log
+  ```
+
+This is an important finding: **FotoWeb's MongoDB is listening on port 7200**, so any MongoDB client must connect to that port.
+
+---
+
+# Check whether the MongoDB backup tool exists
+
+Run:
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse | Where-Object Name -match "mongodump|mongorestore|mongosh|mongo.exe"
+```
+
+If you see `mongodump.exe`, you can back up MongoDB without stopping the service.
+
+---
+
+# If `mongodump.exe` exists
+
+The backup command will be:
+
+```powershell
+& "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongodump.exe" `
+    --host localhost `
+    --port 7200 `
+    --out D:\MongoBackup
+```
+
+---
+
+# If `mongodump.exe` does NOT exist
+
+You have two options:
+
+### Option 1 (Recommended)
+
+Install the **MongoDB Database Tools** (contains `mongodump.exe`) matching MongoDB 4.4.x or newer.
+
+Then run:
+
+```powershell
+mongodump --host localhost --port 7200 --out D:\MongoBackup
+```
+
+### Option 2
+
+Stop the `FotoWeb MongoDB Server` service and make a filesystem copy of:
+
+```text
+C:\ProgramData\FotoWare\FotoWeb\Operations\MongoDBData
+```
+
+This is a physical backup and should only be done while the service is stopped to ensure consistency.
+
+---
+
+# SQL Server Backup
+
+You can create the SQL backup with:
+
+```sql
+BACKUP DATABASE [FW-MEDIABOTG]
+TO DISK='D:\Backup\FW-MEDIABOTG.bak'
+WITH INIT, COMPRESSION;
+GO
+```
+
+---
+
+# Recommended Final Backup
+
+To fully back up the FotoWeb installation, I recommend collecting:
+
+1. ✅ SQL Server backup (`FW-MEDIABOTG.bak`)
+2. ✅ MongoDB logical backup (`mongodump`) or physical copy of `MongoDBData`
+3. ✅ FotoWeb configuration:
+
+   ```
+   C:\ProgramData\FotoWare\FotoWeb\Server Settings\
+   ```
+4. ✅ License/configuration files (if present in the FotoWare configuration directories)
+
+This gives you everything needed to restore the FotoWeb environment.
+
+**Next step:** Please run:
+
+```powershell
+Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse | Where-Object Name -match "mongodump|mongorestore|mongosh|mongo.exe"
+```
+
+That will tell us whether the backup tools are already included or whether you'll need to install the MongoDB Database Tools.
+
+
+
+PS C:\Users\Administrator> Get-ChildItem "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB" -Recurse | Where-Object Name -match "mongodump|mongorestore|mongosh|mongo.exe"
+
+```
+Verzeichnis: C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB
+```
+
+Mode                LastWriteTime         Length Name
+
+---
+
+-a----       05.05.2023     15:48       21531960 mongo.exe
+-a----       05.05.2023     15:48       22924024 mongodump.exe
+-a----       05.05.2023     15:48       23391456 mongorestore.exe
+
+PS C:\Users\Administrator>
+
+
+
+
+Excellent! You have everything you need to create **both backups**.
+
+## 1. MongoDB Backup
+
+Since FotoWeb's MongoDB runs on **port 7200**, use `mongodump.exe` with that port.
+
+Create a backup folder first:
+
+```powershell
+New-Item -ItemType Directory -Path D:\MongoBackup -Force
+```
+
+Then run:
+
+```powershell
+& "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongodump.exe" `
+  --host localhost `
+  --port 7200 `
+  --out D:\MongoBackup
+```
+
+If authentication is enabled, `mongodump` will tell you. In many FotoWeb installations, no authentication is configured for the local service.
+
+---
+
+## 2. Verify the backup
+
+After it completes:
+
+```powershell
+Get-ChildItem D:\MongoBackup -Recurse
+```
+
+You should see folders and `.bson` / `.metadata.json` files.
+
+---
+
+## 3. SQL Server Backup
+
+From `sqlcmd`:
+
+```sql
+BACKUP DATABASE [FW-MEDIABOTG]
+TO DISK='D:\Backup\FW-MEDIABOTG.bak'
+WITH INIT, COMPRESSION;
+GO
+```
+
+Verify it exists:
+
+```powershell
+Get-ChildItem D:\Backup
+```
+
+---
+
+## 4. Optional: See what's inside MongoDB before backing up
+
+Since you also have `mongo.exe`, you can connect to the running server:
+
+```powershell
+& "C:\Program Files (x86)\FotoWare\FotoWeb\MongoDB\mongo.exe" --host localhost --port 7200
+```
+
+Once connected, run:
+
+```javascript
+show dbs
+```
+
+Then:
+
+```javascript
+use admin
+show collections
+```
+
+or for another database:
+
+```javascript
+use <database_name>
+show collections
+```
+
+This lets you inspect the databases before or after taking the dump.
+
+---
+
+### At this point you've identified everything:
+
+* ✅ SQL Server instance: `FOTOWARE`
+* ✅ SQL database: `FW-MEDIABOTG`
+* ✅ MongoDB version: `4.4.13`
+* ✅ MongoDB port: `7200`
+* ✅ MongoDB data path: `C:\ProgramData\FotoWare\FotoWeb\Operations\MongoDBData`
+* ✅ `mongo.exe`, `mongodump.exe`, and `mongorestore.exe` are all available.
+
+You're now ready to create complete backups of both the SQL Server and MongoDB data.
