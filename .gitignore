@@ -17,9 +17,11 @@ yarn-error.log*
 # Environment Variables
 .env
 .env.*
+.env-*
 !.env.example
 !.env.test
 # Note: .env.*.local (from Next.js) is covered by .env.*
+# Note: .env-* catches hyphenated variants (e.g. .env-2) that .env.* misses
 
 # Build Output (General)
 # Framework specific build outputs (like .next/, .nuxt/, dist/, .output/, .svelte-kit/, build/) should be in their respective framework .gitignore files.
