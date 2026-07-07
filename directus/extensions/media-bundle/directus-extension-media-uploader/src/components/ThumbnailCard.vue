@@ -21,6 +21,7 @@ interface DirectusFile {
   height: number | null;
   expiry_date?: string | null;
   draft_status?: string | null;
+  modified_on?: string | null;
 }
 
 interface JunctionRow {
@@ -147,6 +148,7 @@ async function downloadDirect() {
         :filename="file.filename_download"
         :alt="displayName"
         :size="thumbnailSize"
+        :modified-on="file.modified_on"
       />
 
       <!-- Kebab menu (Directus-like actions) -->

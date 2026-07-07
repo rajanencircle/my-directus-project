@@ -28,6 +28,7 @@ interface DirectusFile {
   type: string | null;
   expiry_date?: string | null;
   draft_status?: string | null;
+  modified_on?: string | null;
 }
 
 const props = withDefaults(
@@ -281,7 +282,7 @@ async function fetchPage() {
     else if (filterClauses.length > 1) filter = { _and: filterClauses };
 
     const params: Record<string, unknown> = {
-      fields: ["id", "title", "filename_download", "type", "expiry_date", "draft_status"],
+      fields: ["id", "title", "filename_download", "type", "expiry_date", "draft_status", "modified_on"],
       sort: ["-uploaded_on"],
       limit: perPage.value,
       offset: offset.value,
@@ -500,6 +501,7 @@ onMounted(() => {
                   :filename="file.filename_download"
                   :alt="displayName(file)"
                   :size="thumbnailSize"
+                  :modified-on="file.modified_on"
                 />
                 <div class="badges-row">
                   <div class="badges-left">

@@ -15,6 +15,10 @@ const props = withDefaults(
     alt?: string;
     size?: number;
     showKindBadge?: boolean;
+    // File's modified_on, appended as a v= cache-buster (same param the native
+    // Directus app uses) — assets carry a 30-day browser cache, so without this
+    // a replaced file's old thumbnail keeps being shown.
+    modifiedOn?: string | null;
   }>(),
   {
     mimeType: null,
@@ -22,6 +26,7 @@ const props = withDefaults(
     alt: '',
     size: 250,
     showKindBadge: true,
+    modifiedOn: null,
   }
 );
 
@@ -36,12 +41,20 @@ const showVideo = computed(() => mediaKind.value === 'video' && !videoFailed.val
 const iconName = computed(() => mimeToIcon(props.mimeType, props.filename));
 const kindLabel = computed(() => mimeToKindLabel(props.mimeType, props.filename));
 
+const cacheBuster = computed(() =>
+  props.modifiedOn ? `&v=${encodeURIComponent(props.modifiedOn)}` : ''
+);
+
 const thumbnailUrl = computed(() => {
   const s = props.size;
-  return `/assets/${props.fileId}?width=${s}&height=${s}&fit=cover`;
+  return `/assets/${props.fileId}?width=${s}&height=${s}&fit=cover${cacheBuster.value}`;
 });
 
-const videoUrl = computed(() => `/assets/${props.fileId}`);
+const videoUrl = computed(() =>
+  props.modifiedOn
+    ? `/assets/${props.fileId}?v=${encodeURIComponent(props.modifiedOn)}`
+    : `/assets/${props.fileId}`
+);
 
 function onImageError() {
   imageFailed.value = true;

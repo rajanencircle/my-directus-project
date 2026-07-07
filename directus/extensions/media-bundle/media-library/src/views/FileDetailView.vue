@@ -381,8 +381,8 @@ const editableFields = computed(() => {
 })
 
 
-const previewUrl = computed(() => file.value ? getPreviewUrl(file.value.id) : '')
-const videoUrl = computed(() => file.value ? getAssetUrl(file.value.id) : '')
+const previewUrl = computed(() => file.value ? getPreviewUrl(file.value.id, file.value.modified_on) : '')
+const videoUrl = computed(() => file.value ? getAssetUrl(file.value.id, { cacheBuster: file.value.modified_on }) : '')
 
 function getFieldLabel(fieldName: string, fallback: string): string {
   const field = fieldsStore.getField('directus_files', fieldName)

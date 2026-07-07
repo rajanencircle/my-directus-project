@@ -132,7 +132,7 @@
             <div class="thumb-cell">
               <img
                 v-if="isImageType(item.type) && !failedImages.has(item.id)"
-                :src="getThumbnailUrl(item.id)"
+                :src="getThumbnailUrl(item.id, 48, item.modified_on)"
                 :alt="item.title ?? item.filename_disk"
                 class="thumb-img"
                 loading="lazy"
@@ -276,7 +276,7 @@
             </div>
             <img
               v-if="isImageType(file.type) && !failedImages.has(file.id)"
-              :src="getThumbnailUrl(file.id, 200)"
+              :src="getThumbnailUrl(file.id, 200, file.modified_on)"
               :alt="file.title ?? file.filename_disk"
               class="grid-img"
               loading="lazy"

@@ -402,7 +402,7 @@ async function fetchFilesByIds(fileIds: string[]) {
   const res = await api.get('/files', {
     params: {
       filter: { id: { _in: ids } },
-      fields: ['id', 'type', 'title', 'filename_download', 'expiry_date', 'draft_status'],
+      fields: ['id', 'type', 'title', 'filename_download', 'expiry_date', 'draft_status', 'modified_on'],
       limit: -1,
     },
   });
@@ -414,6 +414,7 @@ async function fetchFilesByIds(fileIds: string[]) {
     filename_download: f.filename_download ?? '',
     expiry_date: f.expiry_date ?? null,
     draft_status: f.draft_status ?? null,
+    modified_on: f.modified_on ?? null,
   }));
 }
 
