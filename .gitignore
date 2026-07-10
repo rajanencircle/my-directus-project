@@ -59,13 +59,7 @@ Workbook1.csv
 *.zip
 *.gz
 *.tar.gz
-/docs
-/docs
+
 
 # Script backups (per-user data snapshots, not for git)
 /scripts/backups/
-*.bak
-/media/MongoBackup
-# Allow these specific ZIP files
-!media/MongoBackup.zip
-!media/fw-mediabotg.zip
