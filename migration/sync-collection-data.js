@@ -62,10 +62,10 @@ const CONFIG = {
   SOURCE_ENV: "dev",
 
   // Which environment to write data TO: "local" | "dev" | "staging" | "main"
-  TARGET_ENV: "staging",
+  TARGET_ENV: "main",
 
   // Collection name, e.g. "hotels"
-  COLLECTION: "agencies",
+  COLLECTION: "field_dictionary",
 
   // Field names to copy from source to target (item `id` is always the match key).
   // Set to "*" to copy ALL writable fields on the collection — this is auto-resolved
@@ -90,7 +90,7 @@ const CONFIG = {
 
   // Must be set to true in addition to SOURCE_ENV/TARGET_ENV being "main"
   // before this script will touch the main (production) environment.
-  CONFIRM_MAIN: false,
+  CONFIRM_MAIN: true,
 };
 
 // ============================================================================
@@ -167,21 +167,40 @@ async function resolveFields(envConfig, collection, fields) {
   return writableFields;
 }
 
+// Query strings with too many ids crammed into filter[id][_in] blow past the
+// server's header/URL size limit (HTTP 431). Batch large id lists instead.
+const ID_BATCH_SIZE = 100;
+
+function chunk(array, size) {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+}
+
 async function getExistingIds(envConfig, collection, ids) {
   if (ids.length === 0) return new Set();
 
-  const path = `/items/${collection}?fields=id&limit=-1&filter[id][_in]=${ids.join(",")}`;
-  const response = await directusRequest(envConfig, "GET", path);
-  const found = response.data || [];
+  const existing = new Set();
 
-  return new Set(found.map((item) => String(item.id)));
+  for (const batch of chunk(ids, ID_BATCH_SIZE)) {
+    const path = `/items/${collection}?fields=id&limit=-1&filter[id][_in]=${batch.join(",")}`;
+    const response = await directusRequest(envConfig, "GET", path);
+    const found = response.data || [];
+    found.forEach((item) => existing.add(String(item.id)));
+  }
+
+  return existing;
 }
 
-function buildItemsPath(collection, fields, selector) {
+function buildItemsPath(collection, fields, selector, idsOverride) {
   const fieldList = ["id", ...fields].join(",");
   let path = `/items/${collection}?fields=${fieldList}&limit=-1&sort=id`;
 
-  if (selector.mode === "ids") {
+  if (idsOverride) {
+    path += `&filter[id][_in]=${idsOverride.join(",")}`;
+  } else if (selector.mode === "ids") {
     path += `&filter[id][_in]=${selector.ids.join(",")}`;
   } else if (selector.mode === "range") {
     path += `&filter[id][_gte]=${selector.start}&filter[id][_lte]=${selector.end}`;
@@ -192,6 +211,22 @@ function buildItemsPath(collection, fields, selector) {
   }
 
   return path;
+}
+
+async function fetchSourceItems(sourceConfig, collection, fields, selector) {
+  if (selector.mode === "ids" && selector.ids.length > ID_BATCH_SIZE) {
+    const items = [];
+    for (const batch of chunk(selector.ids, ID_BATCH_SIZE)) {
+      const path = buildItemsPath(collection, fields, selector, batch);
+      const response = await directusRequest(sourceConfig, "GET", path);
+      items.push(...(response.data || []));
+    }
+    return items;
+  }
+
+  const path = buildItemsPath(collection, fields, selector);
+  const response = await directusRequest(sourceConfig, "GET", path);
+  return response.data || [];
 }
 
 // ============================================================================
@@ -223,14 +258,21 @@ async function syncCollectionData({
   );
   console.log("Selector:", selector, dryRun ? "(dry run)" : "");
 
-  const path = buildItemsPath(collection, fields, selector);
-  const response = await directusRequest(sourceConfig, "GET", path);
-  const items = response.data || [];
+  const items = await fetchSourceItems(
+    sourceConfig,
+    collection,
+    fields,
+    selector,
+  );
 
   console.log(`Fetched ${items.length} item(s) from source.`);
 
   const existingIds = createIfMissing
-    ? await getExistingIds(targetConfig, collection, items.map((item) => item.id))
+    ? await getExistingIds(
+        targetConfig,
+        collection,
+        items.map((item) => item.id),
+      )
     : null;
 
   if (existingIds) {
@@ -275,14 +317,18 @@ async function syncCollectionData({
           `/items/${collection}/${item.id}`,
           patchBody,
         );
-        console.log(`[SUCCESS] Updated item ID ${item.id} in "${targetEnvName}"`);
+        console.log(
+          `[SUCCESS] Updated item ID ${item.id} in "${targetEnvName}"`,
+        );
         updatedCount++;
       } else {
         await directusRequest(targetConfig, "POST", `/items/${collection}`, {
           id: item.id,
           ...patchBody,
         });
-        console.log(`[SUCCESS] Created item ID ${item.id} in "${targetEnvName}"`);
+        console.log(
+          `[SUCCESS] Created item ID ${item.id} in "${targetEnvName}"`,
+        );
         createdCount++;
       }
     } catch (error) {
