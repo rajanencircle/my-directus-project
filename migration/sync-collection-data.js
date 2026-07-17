@@ -80,7 +80,12 @@ const CONFIG = {
   //   { mode: "range", start: 1, end: 200 }
   SELECTOR: { mode: "all" },
 
-  // If true, logs what would be written without actually PATCHing the target
+  // If true, creates the item in the target (via POST, preserving the source
+  // item's id) when it doesn't already exist there. If false, only existing
+  // target items are updated — missing ones are skipped (old behavior).
+  CREATE_IF_MISSING: true,
+
+  // If true, logs what would be written without actually PATCHing/POSTing the target
   DRY_RUN: false,
 
   // Must be set to true in addition to SOURCE_ENV/TARGET_ENV being "main"
@@ -162,6 +167,16 @@ async function resolveFields(envConfig, collection, fields) {
   return writableFields;
 }
 
+async function getExistingIds(envConfig, collection, ids) {
+  if (ids.length === 0) return new Set();
+
+  const path = `/items/${collection}?fields=id&limit=-1&filter[id][_in]=${ids.join(",")}`;
+  const response = await directusRequest(envConfig, "GET", path);
+  const found = response.data || [];
+
+  return new Set(found.map((item) => String(item.id)));
+}
+
 function buildItemsPath(collection, fields, selector) {
   const fieldList = ["id", ...fields].join(",");
   let path = `/items/${collection}?fields=${fieldList}&limit=-1&sort=id`;
@@ -190,6 +205,7 @@ async function syncCollectionData({
   selector,
   dryRun,
   confirmMain,
+  createIfMissing,
 }) {
   if ((sourceEnvName === "main" || targetEnvName === "main") && !confirmMain) {
     throw new Error(
@@ -213,7 +229,18 @@ async function syncCollectionData({
 
   console.log(`Fetched ${items.length} item(s) from source.`);
 
+  const existingIds = createIfMissing
+    ? await getExistingIds(targetConfig, collection, items.map((item) => item.id))
+    : null;
+
+  if (existingIds) {
+    console.log(
+      `${existingIds.size} of ${items.length} item(s) already exist in "${targetEnvName}" — the rest will be created.`,
+    );
+  }
+
   let updatedCount = 0;
+  let createdCount = 0;
   let skippedCount = 0;
 
   for (const item of items) {
@@ -222,20 +249,42 @@ async function syncCollectionData({
       patchBody[field] = item[field];
     }
 
+    const itemExists = existingIds ? existingIds.has(String(item.id)) : true;
+
+    if (!itemExists && !createIfMissing) {
+      console.log(
+        `[SKIPPED] Item ID ${item.id} does not exist in "${targetEnvName}" and CREATE_IF_MISSING is false`,
+      );
+      skippedCount++;
+      continue;
+    }
+
     if (dryRun) {
-      console.log(`[DRY RUN] Would update item ID ${item.id} with`, patchBody);
+      console.log(
+        `[DRY RUN] Would ${itemExists ? "update" : "create"} item ID ${item.id} with`,
+        itemExists ? patchBody : { id: item.id, ...patchBody },
+      );
       continue;
     }
 
     try {
-      await directusRequest(
-        targetConfig,
-        "PATCH",
-        `/items/${collection}/${item.id}`,
-        patchBody,
-      );
-      console.log(`[SUCCESS] Updated item ID ${item.id} in "${targetEnvName}"`);
-      updatedCount++;
+      if (itemExists) {
+        await directusRequest(
+          targetConfig,
+          "PATCH",
+          `/items/${collection}/${item.id}`,
+          patchBody,
+        );
+        console.log(`[SUCCESS] Updated item ID ${item.id} in "${targetEnvName}"`);
+        updatedCount++;
+      } else {
+        await directusRequest(targetConfig, "POST", `/items/${collection}`, {
+          id: item.id,
+          ...patchBody,
+        });
+        console.log(`[SUCCESS] Created item ID ${item.id} in "${targetEnvName}"`);
+        createdCount++;
+      }
     } catch (error) {
       console.error(`[FAILED] Item ID ${item.id}:`, error.message || error);
       skippedCount++;
@@ -243,7 +292,7 @@ async function syncCollectionData({
   }
 
   console.log(
-    `\nSync complete! Updated ${updatedCount} item(s), skipped ${skippedCount} item(s) out of ${items.length} fetched.`,
+    `\nSync complete! Updated ${updatedCount}, created ${createdCount}, skipped ${skippedCount} out of ${items.length} fetched.`,
   );
 }
 
@@ -260,6 +309,7 @@ async function syncCollectionData({
       selector: CONFIG.SELECTOR,
       dryRun: CONFIG.DRY_RUN,
       confirmMain: CONFIG.CONFIRM_MAIN,
+      createIfMissing: CONFIG.CREATE_IF_MISSING,
     });
   } catch (error) {
     console.error("Error:", error.message || error);
