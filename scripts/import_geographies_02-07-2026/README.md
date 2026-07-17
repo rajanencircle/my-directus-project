@@ -54,23 +54,51 @@ Successor of `scripts/import-csv.js` (which imported the 26-04-10 list from
 
 ## Usage
 
-```bash
-export DIRECTUS_URL="https://dev.content.botg.cloud"
-export DIRECTUS_TOKEN="<admin token>"   # never hardcode
+Environment selection follows `migration/sync-collection-data.js`: credentials
+come from `DIRECTUS_<ENV>_URL` / `DIRECTUS_<ENV>_TOKEN` in the **repo-root
+`.env`** (loaded via dotenv), picked with `--env local|dev|staging|main`.
+Alternatively set `DIRECTUS_URL`/`DIRECTUS_TOKEN` directly and omit `--env`.
+Tokens are never hardcoded. Targeting `main` additionally requires
+`--confirm-main` — only when explicitly instructed.
 
+```bash
 # offline CSV validation only (no server access needed)
 node import-geographies.js validate
 
-# full dry run against the instance (read-only)
-node import-geographies.js all --dry-run --clear --fix-sequences
+# --- mode create (default): first/clean load ---
+# dry run, then real: JSON backup → wipe → import → fix sequences
+node import-geographies.js all --env local --clear --dry-run
+node import-geographies.js all --env local --clear --fix-sequences
 
-# real import: JSON backup → wipe → import → fix sequences
-node import-geographies.js all --clear --fix-sequences
+# --- mode upsert: update-or-create for smooth follow-up migrations ---
+# requires the target to already carry the SAME id numbering (after a clean load)
+node import-geographies.js all --env dev --mode upsert --dry-run
+node import-geographies.js all --env dev --mode upsert
+node import-geographies.js countries --env dev --mode upsert   # single collection
 ```
 
 Import order: locations_tour32 → destinations_cluster → destinations →
-countries → states → regions → places. Translations and the regions↔countries
-M2M are created nested in the same batched POST (50 items/request).
+countries → states → regions → places. In create mode, translations and the
+regions↔countries M2M are created nested in the same batched POST
+(50 items/request).
+
+### Upsert mode semantics
+
+- Row id missing on target → **created** (with explicit id, nested relations).
+- Row exists → field-level diff; only changed items are PATCHed, identical
+  rows are **skipped** (idempotent re-runs).
+- Translations are matched per locale via the junction collection: changed
+  names are renamed, missing locale rows are added (e.g. backfilling en-GB
+  after the language is added), extra locales are left alone.
+- regions↔countries links are set-diffed: additions/removals go directly to
+  the `regions_countries` junction — deterministic, no alias-PATCH surprises.
+- **Empty CSV cells never overwrite existing values**, and `sort` is only set
+  on create (manual reordering is not fought).
+- Safety: if >25% of existing target ids are absent from the CSVs, the target
+  probably still carries the OLD id numbering — the run aborts unless
+  `--force` (use create + `--clear` for a first clean load instead).
+- A full JSON backup of all 7 collections is written before ANY write run
+  (create or upsert).
 
 ## ⚠ Consequences of `--clear` on dev
 

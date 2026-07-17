@@ -1,48 +1,115 @@
 #!/usr/bin/env node
 /**
- * Geographies Import 26-06-30 → Directus (dev)
+ * Geographies Import 26-06-30 → Directus
  *
  * Imports the NEW geographies flat-list CSVs
  * (scripts/geographies_list_02-07-2026/Geographies 26-06-30/import-files/)
  * into the updated geo collections (status / media_code / is_non_geographic /
  * ISO_alpha_3_code fields, regions_countries M2M, locations_tour32.name direct field).
  *
- * Successor of scripts/import-csv.js. Key differences:
- *  - Explicit ids: CSV ids are written as Directus PKs (data is sequential 1..N,
- *    FK columns reference those same ids — no sort-based FK remapping needed)
- *  - Translations nested in the create payload (1 request per batch, not per row)
- *  - BOM-safe CSV parsing, --dry-run, env-based credentials
- *  - Clear + full reimport (new list uses a NEW id numbering — upsert is impossible)
+ * Environment selection follows migration/sync-collection-data.js:
+ * credentials come from DIRECTUS_<ENV>_URL / DIRECTUS_<ENV>_TOKEN env vars
+ * (repo-root .env is loaded via dotenv), picked with --env. Touching "main"
+ * additionally requires --confirm-main.
+ *
+ * Modes:
+ *   create (default)  First/clean load. Target collections must be empty,
+ *                     or pass --clear ('all' only) to backup + wipe first.
+ *                     Items are batch-POSTed with explicit CSV ids and nested
+ *                     translations / regions↔countries M2M.
+ *   upsert            Update-or-create against a target that already carries
+ *                     the SAME id numbering (i.e. after an initial clean load).
+ *                     Per row: create if the id is missing, update changed
+ *                     fields if it exists, skip if identical. Translations and
+ *                     M2M links are diffed and written deterministically via
+ *                     their junction collections. Empty CSV cells never
+ *                     overwrite existing values; `sort` is only set on create.
  *
  * Usage:
- *   export DIRECTUS_URL="https://dev.content.botg.cloud"
- *   export DIRECTUS_TOKEN="..."
+ *   node import-geographies.js validate                          # offline CSV checks
+ *   node import-geographies.js all --env local --mode create --clear --fix-sequences
+ *   node import-geographies.js all --env dev --mode upsert --dry-run
+ *   node import-geographies.js countries --env dev --mode upsert
+ *   node import-geographies.js all --env main --mode upsert --confirm-main   # only when instructed!
  *
- *   node import-geographies.js validate              # offline CSV checks only
- *   node import-geographies.js all --dry-run         # + server checks, no writes
- *   node import-geographies.js all --clear           # backup, wipe, import everything
- *   node import-geographies.js all --clear --fix-sequences
- *   node import-geographies.js countries             # single collection (target must be empty)
+ * Flags:
+ *   --env <local|dev|staging|main>   target environment (or set DIRECTUS_URL/
+ *                                    DIRECTUS_TOKEN directly and omit --env)
+ *   --mode <create|upsert>           default: create
+ *   --clear                          create mode + 'all' only: backup + wipe first
+ *   --dry-run                        read-only preview of every action
+ *   --fix-sequences                  bump Postgres autoincrement sequences after import
+ *   --confirm-main                   required in addition to --env main
+ *   --force                          upsert: proceed even if the target id
+ *                                    numbering looks different from the CSVs
  *
- * Requirements: Node.js >= 18 (built-in fetch). No dependencies.
+ * Requirements: Node.js >= 18 (built-in fetch), dotenv (repo dependency).
  */
 
 "use strict";
 
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config({
-  path: path.join(__dirname, "../.env"),
-});
 
-// Never hardcode tokens here — this file is committed to git and leaked
-// Directus tokens have had to be rotated before (see CLAUDE.md rule 4).
-//   local:   export DIRECTUS_URL="http://localhost:8055"
-//   dev:     export DIRECTUS_URL="https://dev.content.botg.cloud"
-const CONFIG = {
-  directusUrl: process.env.DIRECTUS_URL || "",
-  directusToken: process.env.DIRECTUS_TOKEN || "",
+// Repo-root .env carries the per-environment credentials (same convention as
+// migration/sync-collection-data.js); scripts/.env may carry the generic
+// DIRECTUS_URL/DIRECTUS_TOKEN override. dotenv never overwrites already-set vars.
+require("dotenv").config({ path: path.join(__dirname, "../../.env") });
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
+
+// ------------------------------------------
+// ENVIRONMENT CREDENTIALS (never hardcoded — see CLAUDE.md rule 4)
+// ------------------------------------------
+const ENVIRONMENTS = {
+  local: {
+    url: process.env.DIRECTUS_LOCAL_URL,
+    token: process.env.DIRECTUS_LOCAL_TOKEN,
+  },
+  dev: {
+    url: process.env.DIRECTUS_DEV_URL,
+    token: process.env.DIRECTUS_DEV_TOKEN,
+  },
+  staging: {
+    url: process.env.DIRECTUS_STAGING_URL,
+    token: process.env.DIRECTUS_STAGING_TOKEN,
+  },
+  main: {
+    url: process.env.DIRECTUS_MAIN_URL,
+    token: process.env.DIRECTUS_MAIN_TOKEN,
+  },
 };
+
+// Resolved at startup from --env (or generic DIRECTUS_URL/DIRECTUS_TOKEN).
+const ENV = { name: "", url: "", token: "" };
+
+function resolveEnv(name) {
+  if (!name) {
+    if (process.env.DIRECTUS_URL && process.env.DIRECTUS_TOKEN) {
+      return {
+        name: "custom (DIRECTUS_URL)",
+        url: process.env.DIRECTUS_URL,
+        token: process.env.DIRECTUS_TOKEN,
+      };
+    }
+    throw new Error(
+      "No target environment. Pass --env <local|dev|staging|main> " +
+        "(reads DIRECTUS_<ENV>_URL / DIRECTUS_<ENV>_TOKEN from the repo-root .env), " +
+        "or set DIRECTUS_URL and DIRECTUS_TOKEN directly.",
+    );
+  }
+  const config = ENVIRONMENTS[name];
+  if (!config) {
+    throw new Error(
+      `Unknown environment "${name}". Valid options: ${Object.keys(ENVIRONMENTS).join(", ")}`,
+    );
+  }
+  if (!config.url || !config.token) {
+    throw new Error(
+      `Missing credentials for "${name}". Set DIRECTUS_${name.toUpperCase()}_URL and DIRECTUS_${name.toUpperCase()}_TOKEN env vars (repo-root .env).`,
+    );
+  }
+  return { name, url: config.url, token: config.token };
+}
 
 const DATA_DIR = path.join(
   __dirname,
@@ -57,7 +124,7 @@ const BACKUP_DIR = path.join(__dirname, "backups");
 const STATUS_VALUES = ["new", "active", "in review", "archived"];
 
 // Locale columns → translations.code (en-GB only imported if the locale exists
-// on the target instance — dev currently has de-DE, de-CH, nl-NL only)
+// on the target instance — currently all environments have de-DE, de-CH, nl-NL only)
 const TRANSLATION_COLUMNS = [
   { csvColumn: "name_de-DE", localeCode: "de-DE" },
   { csvColumn: "name_ch-DE", localeCode: "de-CH" },
@@ -71,7 +138,7 @@ const TRANSLATION_COLUMNS = [
 const SPECS = {
   locations_tour32: {
     csvFile: "BOTG_locations_tour32_26-06-30.csv",
-    // name is a direct field now (translations junction was removed on dev)
+    // name is a direct field now (translations junction was removed)
     directFields: { name_de: { field: "name", type: "string" } },
     translations: false,
     dummy: { name: "__SEQ_FIX__" },
@@ -158,11 +225,13 @@ const SPECS = {
       cid_primarix: { field: "cid_primarix", type: "integer" },
       id_primarix: { field: "id_primarix", type: "integer" },
     },
-    // regions ↔ countries M2M via regions_countries junction (junction field: countries_id)
+    // regions ↔ countries M2M via regions_countries junction
     m2m: {
       csvColumn: "country_id",
       field: "country_id",
+      junctionCollection: "regions_countries",
       junctionField: "countries_id",
+      parentField: "regions_id",
       target: "countries",
     },
     translations: "regions_translations",
@@ -210,6 +279,7 @@ const CLEAR_ORDER = [
 ];
 
 const CREATE_BATCH = 50;
+const UPDATE_BATCH = 50;
 const DELETE_BATCH = 100;
 
 // =============================================================================
@@ -261,17 +331,24 @@ function splitCSVLine(line) {
 // Directus API helper
 // =============================================================================
 async function directusRequest(method, apiPath, body) {
-  const url = `${CONFIG.directusUrl}${apiPath}`;
+  const url = `${ENV.url}${apiPath}`;
   const options = {
     method,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${CONFIG.directusToken}`,
+      Authorization: `Bearer ${ENV.token}`,
     },
   };
   if (body !== undefined) options.body = JSON.stringify(body);
 
-  const res = await fetch(url, options);
+  let res;
+  try {
+    res = await fetch(url, options);
+  } catch (err) {
+    throw new Error(
+      `${method} ${url} → network error (${err.cause?.code || err.message}). Is the instance running/reachable?`,
+    );
+  }
   if (!res.ok) {
     const text = await res.text();
     const err = new Error(`${method} ${apiPath} → HTTP ${res.status}: ${text}`);
@@ -281,6 +358,14 @@ async function directusRequest(method, apiPath, body) {
   }
   if (res.status === 204) return null;
   return res.json();
+}
+
+function chunk(array, size) {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
 }
 
 // =============================================================================
@@ -310,7 +395,6 @@ function validateAll(data) {
       continue;
     }
 
-    // ids: present, numeric, unique
     const seen = new Set();
     for (const row of rows) {
       if (!/^\d+$/.test(row.id || "")) {
@@ -323,21 +407,17 @@ function validateAll(data) {
     idSets[key] = seen;
 
     for (const row of rows) {
-      // status enum
       if (spec.hasStatus !== false && "status" in row && row.status !== "") {
         if (!STATUS_VALUES.includes(row.status)) {
           errors.push(`${key} id ${row.id}: unknown status "${row.status}"`);
         }
       }
 
-      // typed direct fields
       for (const [csvCol, def] of Object.entries(spec.directFields || {})) {
         const val = row[csvCol];
         if (val === undefined || val === "") continue;
         if (def.type === "boolean" && val !== "true" && val !== "false") {
-          errors.push(
-            `${key} id ${row.id}: ${csvCol} not a boolean ("${val}")`,
-          );
+          errors.push(`${key} id ${row.id}: ${csvCol} not a boolean ("${val}")`);
         }
         if (def.type === "integer" && !/^\d+$/.test(val)) {
           if (/^\d+(;\d+)+$/.test(val)) {
@@ -345,29 +425,21 @@ function validateAll(data) {
               `${key} id ${row.id}: ${csvCol}="${val}" is multi-valued — importing first value only`,
             );
           } else {
-            errors.push(
-              `${key} id ${row.id}: ${csvCol} not an integer ("${val}")`,
-            );
+            errors.push(`${key} id ${row.id}: ${csvCol} not an integer ("${val}")`);
           }
         }
         if (def.type === "fk" && !/^\d+$/.test(val)) {
-          errors.push(
-            `${key} id ${row.id}: ${csvCol} not a single integer FK ("${val}")`,
-          );
+          errors.push(`${key} id ${row.id}: ${csvCol} not a single integer FK ("${val}")`);
         }
       }
 
-      // m2m column
       if (spec.m2m) {
         const val = row[spec.m2m.csvColumn];
         if (val && !/^\d+(;\d+)*$/.test(val)) {
-          errors.push(
-            `${key} id ${row.id}: ${spec.m2m.csvColumn} malformed ("${val}")`,
-          );
+          errors.push(`${key} id ${row.id}: ${spec.m2m.csvColumn} malformed ("${val}")`);
         }
       }
 
-      // de-DE name should always exist (primary content language)
       if (spec.translations && row["name_de-DE"] === "") {
         warnings.push(`${key} id ${row.id}: empty name_de-DE`);
       }
@@ -386,9 +458,7 @@ function validateAll(data) {
       for (const row of rows) {
         const val = row[csvCol];
         if (val && !idSets[def.target].has(val)) {
-          errors.push(
-            `${key} id ${row.id}: ${csvCol}=${val} not found in ${def.target} CSV`,
-          );
+          errors.push(`${key} id ${row.id}: ${csvCol}=${val} not found in ${def.target} CSV`);
         }
       }
     }
@@ -431,9 +501,7 @@ function buildPayloads(key, rows, localeMap, warnings) {
         payload[def.field] = val === "true";
       } else if (def.type === "integer" || def.type === "fk") {
         if (val.includes(";")) {
-          warnings.push(
-            `${key} id ${row.id}: ${csvCol}="${val}" → imported first value only`,
-          );
+          warnings.push(`${key} id ${row.id}: ${csvCol}="${val}" → imported first value only`);
           val = val.split(";")[0];
         }
         payload[def.field] = Number(val);
@@ -476,13 +544,10 @@ function buildPayloads(key, rows, localeMap, warnings) {
 }
 
 // =============================================================================
-// Server operations
+// Server operations (shared)
 // =============================================================================
 async function fetchLocaleMap() {
-  const result = await directusRequest(
-    "GET",
-    "/items/translations?fields=id,code&limit=-1",
-  );
+  const result = await directusRequest("GET", "/items/translations?fields=id,code&limit=-1");
   const map = {};
   for (const item of result.data || []) map[item.code] = item.id;
   return map;
@@ -497,10 +562,7 @@ async function fetchCount(collection) {
 }
 
 async function fetchAllIds(collection) {
-  const result = await directusRequest(
-    "GET",
-    `/items/${collection}?fields=id&limit=-1`,
-  );
+  const result = await directusRequest("GET", `/items/${collection}?fields=id&limit=-1`);
   return (result.data || []).map((r) => r.id);
 }
 
@@ -513,11 +575,19 @@ async function backupCollection(key, backupDir) {
     `/items/${key}?fields=${fields}${extra}&limit=-1`,
   );
   const rows = result.data || [];
-  fs.writeFileSync(
-    path.join(backupDir, `${key}.json`),
-    JSON.stringify(rows, null, 2),
-  );
+  fs.writeFileSync(path.join(backupDir, `${key}.json`), JSON.stringify(rows, null, 2));
   return rows.length;
+}
+
+async function writeBackups(keys) {
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const backupDir = path.join(BACKUP_DIR, stamp);
+  fs.mkdirSync(backupDir, { recursive: true });
+  console.log(`\n=== Backup → ${backupDir} ===`);
+  for (const key of keys) {
+    const n = await backupCollection(key, backupDir);
+    console.log(`  ${key}: ${n} row(s) backed up`);
+  }
 }
 
 async function clearCollection(key) {
@@ -526,30 +596,202 @@ async function clearCollection(key) {
     console.log(`  ${key}: already empty`);
     return 0;
   }
-  for (let i = 0; i < ids.length; i += DELETE_BATCH) {
-    await directusRequest(
-      "DELETE",
-      `/items/${key}`,
-      ids.slice(i, i + DELETE_BATCH),
-    );
-    process.stdout.write(
-      `\r  ${key}: deleted ${Math.min(i + DELETE_BATCH, ids.length)}/${ids.length}`,
-    );
+  for (const batch of chunk(ids, DELETE_BATCH)) {
+    await directusRequest("DELETE", `/items/${key}`, batch);
   }
-  console.log("");
+  console.log(`  ${key}: deleted ${ids.length}`);
   return ids.length;
 }
 
 async function importCollection(key, payloads) {
   let created = 0;
-  for (let i = 0; i < payloads.length; i += CREATE_BATCH) {
-    const batch = payloads.slice(i, i + CREATE_BATCH);
+  for (const batch of chunk(payloads, CREATE_BATCH)) {
     await directusRequest("POST", `/items/${key}`, batch);
     created += batch.length;
     process.stdout.write(`\r  ${key}: created ${created}/${payloads.length}`);
   }
   console.log("");
   return created;
+}
+
+// =============================================================================
+// Upsert (update-or-create) — sync-collection-data.js CREATE_IF_MISSING logic,
+// extended with change detection and deterministic junction handling.
+// =============================================================================
+async function fetchExistingForUpsert(key) {
+  const spec = SPECS[key];
+  const fields = ["id"];
+  if (spec.hasStatus !== false) fields.push("status");
+  for (const def of Object.values(spec.directFields || {})) fields.push(def.field);
+  if (spec.translations) {
+    fields.push("translations.id", "translations.translations_id", "translations.name");
+  }
+  if (spec.m2m) {
+    fields.push(`${spec.m2m.field}.id`, `${spec.m2m.field}.${spec.m2m.junctionField}`);
+  }
+  const result = await directusRequest(
+    "GET",
+    `/items/${key}?fields=${fields.join(",")}&limit=-1`,
+  );
+  const map = new Map();
+  for (const item of result.data || []) map.set(Number(item.id), item);
+  return map;
+}
+
+/** Diff one CSV payload against the existing target item. */
+function diffItem(key, payload, existing) {
+  const spec = SPECS[key];
+  const parentPatch = {};
+  const transPatches = []; // [{id, name}] on the translations junction
+  const transCreates = []; // [{<parent>_id, translations_id, name}]
+  const linkAdds = []; // [{regions_id, countries_id}]
+  const linkRemovals = []; // junction row ids
+
+  // Direct scalar fields — `sort` is create-only (don't fight manual ordering),
+  // and empty CSV cells (absent keys) never overwrite existing values.
+  for (const [field, value] of Object.entries(payload)) {
+    if (field === "id" || field === "sort" || field === "translations") continue;
+    if (spec.m2m && field === spec.m2m.field) continue;
+    if ((existing[field] ?? null) !== (value ?? null)) parentPatch[field] = value;
+  }
+
+  // Translations: match by locale uuid; update changed names, create missing rows.
+  if (spec.translations) {
+    const existingByLocale = new Map(
+      (existing.translations || []).map((t) => [t.translations_id, t]),
+    );
+    for (const t of payload.translations || []) {
+      const current = existingByLocale.get(t.translations_id);
+      if (!current) {
+        transCreates.push({
+          [`${key}_id`]: payload.id,
+          translations_id: t.translations_id,
+          name: t.name,
+        });
+      } else if (current.name !== t.name) {
+        transPatches.push({ id: current.id, name: t.name });
+      }
+    }
+  }
+
+  // M2M links: set-diff on country ids; adds/removals via the junction collection.
+  if (spec.m2m) {
+    const desired = new Set(
+      (payload[spec.m2m.field] || []).map((l) => l[spec.m2m.junctionField]),
+    );
+    const existingLinks = existing[spec.m2m.field] || [];
+    const existingSet = new Set(existingLinks.map((l) => Number(l[spec.m2m.junctionField])));
+    for (const countryId of desired) {
+      if (!existingSet.has(countryId)) {
+        linkAdds.push({
+          [spec.m2m.parentField]: payload.id,
+          [spec.m2m.junctionField]: countryId,
+        });
+      }
+    }
+    for (const link of existingLinks) {
+      if (!desired.has(Number(link[spec.m2m.junctionField]))) {
+        linkRemovals.push(link.id);
+      }
+    }
+  }
+
+  const changed =
+    Object.keys(parentPatch).length > 0 ||
+    transPatches.length > 0 ||
+    transCreates.length > 0 ||
+    linkAdds.length > 0 ||
+    linkRemovals.length > 0;
+
+  return { changed, parentPatch, transPatches, transCreates, linkAdds, linkRemovals };
+}
+
+async function upsertCollection(key, payloads, { dryRun, force }) {
+  const spec = SPECS[key];
+  const existing = await fetchExistingForUpsert(key);
+
+  const csvIds = new Set(payloads.map((p) => p.id));
+  const stale = [...existing.keys()].filter((id) => !csvIds.has(id));
+  if (stale.length > 0) {
+    console.log(
+      `  ${key}: ${stale.length} existing item(s) not in the CSV — left untouched (ids: ${stale.slice(0, 10).join(",")}${stale.length > 10 ? "…" : ""})`,
+    );
+    if (existing.size > 0 && stale.length / existing.size > 0.25 && !force) {
+      throw new Error(
+        `${key}: ${stale.length}/${existing.size} existing ids are not in the CSV — the target ` +
+          `probably still carries a DIFFERENT id numbering (old dataset). Upserting on top would ` +
+          `mix datasets. Use mode create with --clear for a clean load, or pass --force if this is intended.`,
+      );
+    }
+  }
+
+  const toCreate = [];
+  const parentPatches = [];
+  const transPatches = [];
+  const transCreates = [];
+  const linkAdds = [];
+  const linkRemovals = [];
+  let unchanged = 0;
+
+  for (const payload of payloads) {
+    const current = existing.get(payload.id);
+    if (!current) {
+      toCreate.push(payload);
+      continue;
+    }
+    const diff = diffItem(key, payload, current);
+    if (!diff.changed) {
+      unchanged++;
+      continue;
+    }
+    if (Object.keys(diff.parentPatch).length > 0) {
+      parentPatches.push({ id: payload.id, ...diff.parentPatch });
+    }
+    transPatches.push(...diff.transPatches);
+    transCreates.push(...diff.transCreates);
+    linkAdds.push(...diff.linkAdds);
+    linkRemovals.push(...diff.linkRemovals);
+  }
+
+  const updatedItems = payloads.length - toCreate.length - unchanged;
+  console.log(
+    `  ${key}: ${toCreate.length} to create, ${updatedItems} to update, ${unchanged} unchanged` +
+      (spec.translations ? ` | translations: ${transPatches.length} rename, ${transCreates.length} add` : "") +
+      (spec.m2m ? ` | links: +${linkAdds.length} / -${linkRemovals.length}` : ""),
+  );
+
+  if (dryRun) {
+    if (parentPatches[0]) console.log(`    sample update: ${JSON.stringify(parentPatches[0])}`);
+    if (toCreate[0]) console.log(`    sample create: ${JSON.stringify(toCreate[0])}`);
+    return { created: 0, updated: 0, unchanged };
+  }
+
+  // Order: parent creates first (targets for junction rows), then parent
+  // patches, then junction ops.
+  for (const batch of chunk(toCreate, CREATE_BATCH)) {
+    await directusRequest("POST", `/items/${key}`, batch);
+  }
+  for (const batch of chunk(parentPatches, UPDATE_BATCH)) {
+    await directusRequest("PATCH", `/items/${key}`, batch);
+  }
+  if (spec.translations) {
+    for (const batch of chunk(transPatches, UPDATE_BATCH)) {
+      await directusRequest("PATCH", `/items/${spec.translations}`, batch);
+    }
+    for (const batch of chunk(transCreates, CREATE_BATCH)) {
+      await directusRequest("POST", `/items/${spec.translations}`, batch);
+    }
+  }
+  if (spec.m2m) {
+    for (const batch of chunk(linkRemovals, DELETE_BATCH)) {
+      await directusRequest("DELETE", `/items/${spec.m2m.junctionCollection}`, batch);
+    }
+    for (const batch of chunk(linkAdds, CREATE_BATCH)) {
+      await directusRequest("POST", `/items/${spec.m2m.junctionCollection}`, batch);
+    }
+  }
+
+  return { created: toCreate.length, updated: updatedItems, unchanged };
 }
 
 /**
@@ -585,36 +827,54 @@ async function fixSequence(key, maxId) {
   }
   const last = dummies[dummies.length - 1];
   if (last > maxId) {
-    console.log(
-      `  ${key}: sequence now past ${maxId} (next id ≥ ${last + 1}), ${attempts} probe(s)`,
-    );
+    console.log(`  ${key}: sequence now past ${maxId} (next id ≥ ${last + 1}), ${attempts} probe(s)`);
   } else {
-    console.log(
-      `  ${key}: WARNING — could not confirm sequence position after ${attempts} attempts`,
-    );
+    console.log(`  ${key}: WARNING — could not confirm sequence position after ${attempts} attempts`);
   }
 }
 
 // =============================================================================
 // Main
 // =============================================================================
+function parseArgs(argv) {
+  const flags = new Set();
+  const options = {};
+  let target;
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === "--env" || arg === "--mode") {
+      options[arg.slice(2)] = argv[++i];
+    } else if (arg.startsWith("--")) {
+      flags.add(arg);
+    } else if (!target) {
+      target = arg;
+    }
+  }
+  return { target, flags, options };
+}
+
 async function main() {
-  const args = process.argv.slice(2);
-  const flags = new Set(args.filter((a) => a.startsWith("--")));
-  const target = args.find((a) => !a.startsWith("--"));
+  const { target, flags, options } = parseArgs(process.argv.slice(2));
 
   const dryRun = flags.has("--dry-run");
   const clear = flags.has("--clear");
   const fixSequences = flags.has("--fix-sequences");
+  const confirmMain = flags.has("--confirm-main");
+  const force = flags.has("--force");
+  const mode = options.mode || "create";
 
   const known = [...IMPORT_ORDER, "all", "validate"];
   if (!target || !known.includes(target)) {
     console.log(
-      "Usage: node import-geographies.js <target> [--dry-run] [--clear] [--fix-sequences]",
+      "Usage: node import-geographies.js <target> [--env <local|dev|staging|main>] [--mode <create|upsert>]",
     );
+    console.log("       [--clear] [--dry-run] [--fix-sequences] [--confirm-main] [--force]");
     console.log(`Targets: ${known.join(", ")}`);
-    console.log("Env: DIRECTUS_URL, DIRECTUS_TOKEN");
     process.exit(target ? 1 : 0);
+  }
+  if (!["create", "upsert"].includes(mode)) {
+    console.error(`Unknown --mode "${mode}". Use "create" or "upsert".`);
+    process.exit(1);
   }
 
   // ---- 1. Load + offline validation (always) ----
@@ -629,8 +889,7 @@ async function main() {
   if (warnings.length) {
     console.log(`\n${warnings.length} warning(s):`);
     warnings.slice(0, 30).forEach((w) => console.log(`  ⚠ ${w}`));
-    if (warnings.length > 30)
-      console.log(`  ... +${warnings.length - 30} more`);
+    if (warnings.length > 30) console.log(`  ... +${warnings.length - 30} more`);
   }
   if (errors.length) {
     console.log(`\n${errors.length} ERROR(s):`);
@@ -642,30 +901,31 @@ async function main() {
 
   if (target === "validate") return;
 
-  // ---- 2. Server checks ----
-  if (!CONFIG.directusUrl || !CONFIG.directusToken) {
+  // ---- 2. Environment resolution + guards ----
+  Object.assign(ENV, resolveEnv(options.env));
+
+  if (ENV.name === "main" && !confirmMain) {
     console.error(
-      "\nDIRECTUS_URL / DIRECTUS_TOKEN env vars are required for server operations.",
+      '\nRefusing to touch "main" (production) without --confirm-main. ' +
+        "Only pass that flag when you have been explicitly instructed to modify production.",
     );
-    console.error("(Use the 'validate' target for offline checks.)");
     process.exit(1);
   }
-
+  if (clear && mode !== "create") {
+    console.error("\n--clear only applies to --mode create.");
+    process.exit(1);
+  }
   if (clear && target !== "all") {
-    console.error(
-      "\n--clear is only allowed with target 'all' (cascades affect child collections).",
-    );
+    console.error("\n--clear is only allowed with target 'all' (cascades affect child collections).");
     process.exit(1);
   }
 
   console.log(
-    `\nTarget instance: ${CONFIG.directusUrl}${dryRun ? "  [DRY RUN]" : ""}`,
+    `\nTarget environment: ${ENV.name} (${ENV.url})  mode: ${mode}${dryRun ? "  [DRY RUN]" : ""}`,
   );
 
   const localeMap = await fetchLocaleMap();
-  console.log(
-    `Locales on instance: ${Object.keys(localeMap).join(", ") || "(none!)"}`,
-  );
+  console.log(`Locales on instance: ${Object.keys(localeMap).join(", ") || "(none!)"}`);
   if (!localeMap["de-DE"]) {
     console.error("Locale de-DE missing on instance — aborting.");
     process.exit(1);
@@ -676,81 +936,77 @@ async function main() {
   const counts = {};
   for (const key of CLEAR_ORDER) counts[key] = await fetchCount(key);
   console.log("\nCurrent row counts on instance:");
-  for (const key of IMPORT_ORDER)
-    console.log(`  ${key.padEnd(22)} ${String(counts[key]).padStart(5)}`);
+  for (const key of IMPORT_ORDER) console.log(`  ${key.padEnd(22)} ${String(counts[key]).padStart(5)}`);
 
-  const nonEmpty = keys.filter((k) => counts[k] > 0);
-  if (nonEmpty.length > 0 && !clear) {
-    console.error(
-      `\nNon-empty target collection(s): ${nonEmpty.join(", ")}.` +
-        `\nThe new list uses a NEW id numbering — importing on top of old data is not possible.` +
-        `\nRe-run with 'all --clear' to wipe and reimport (a JSON backup is written first).`,
-    );
-    process.exit(1);
+  if (mode === "create") {
+    const nonEmpty = keys.filter((k) => counts[k] > 0);
+    if (nonEmpty.length > 0 && !clear) {
+      console.error(
+        `\nNon-empty target collection(s): ${nonEmpty.join(", ")}.` +
+          `\nMode create needs empty collections. Options:` +
+          `\n  - 'all --clear' to backup + wipe + reimport (first clean load), or` +
+          `\n  - '--mode upsert' to update-or-create against an existing load with the same id numbering.`,
+      );
+      process.exit(1);
+    }
   }
 
+  // ---- 3. Dry run ----
   if (dryRun) {
     console.log("\n=== DRY RUN — no writes ===");
-    if (clear) {
+    const runWarnings = [];
+    if (mode === "create" && clear) {
       console.log("Would clear (child-first):");
-      for (const key of CLEAR_ORDER)
-        console.log(`  ${key}: ${counts[key]} row(s)`);
+      for (const key of CLEAR_ORDER) console.log(`  ${key}: ${counts[key]} row(s)`);
       console.log(
         "  NOTE: product references (hotels/tours/excursions/... .country etc.) are SET NULL," +
           "\n        product↔geo junction rows (tours_countries, cruises_destinations, ...) are CASCADE-deleted.",
       );
     }
-    const runWarnings = [];
     for (const key of keys) {
       const payloads = buildPayloads(key, data[key], localeMap, runWarnings);
-      const withTrans = payloads.filter((p) => p.translations).length;
-      const withM2m = SPECS[key].m2m
-        ? payloads.filter((p) => p[SPECS[key].m2m.field]).length
-        : 0;
-      console.log(
-        `Would create ${key}: ${payloads.length} item(s)` +
-          (SPECS[key].translations
-            ? `, ${withTrans} with nested translations`
-            : "") +
-          (SPECS[key].m2m ? `, ${withM2m} with country M2M` : ""),
-      );
-      console.log(`  sample payload: ${JSON.stringify(payloads[0])}`);
+      if (mode === "upsert") {
+        await upsertCollection(key, payloads, { dryRun: true, force });
+      } else {
+        const withTrans = payloads.filter((p) => p.translations).length;
+        const withM2m = SPECS[key].m2m ? payloads.filter((p) => p[SPECS[key].m2m.field]).length : 0;
+        console.log(
+          `Would create ${key}: ${payloads.length} item(s)` +
+            (SPECS[key].translations ? `, ${withTrans} with nested translations` : "") +
+            (SPECS[key].m2m ? `, ${withM2m} with country M2M` : ""),
+        );
+        console.log(`  sample payload: ${JSON.stringify(payloads[0])}`);
+      }
     }
     runWarnings.slice(0, 10).forEach((w) => console.log(`  ⚠ ${w}`));
-    if (fixSequences)
-      console.log("Would fix autoincrement sequences afterwards.");
+    if (fixSequences) console.log("Would fix autoincrement sequences afterwards.");
     return;
   }
 
-  // ---- 3. Backup + clear ----
-  if (clear) {
-    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const backupDir = path.join(BACKUP_DIR, stamp);
-    fs.mkdirSync(backupDir, { recursive: true });
-    console.log(`\n=== Backup → ${backupDir} ===`);
-    for (const key of IMPORT_ORDER) {
-      const n = await backupCollection(key, backupDir);
-      console.log(`  ${key}: ${n} row(s) backed up`);
-    }
+  // ---- 4. Backup (before ANY write run), then clear if requested ----
+  await writeBackups(IMPORT_ORDER);
 
-    console.log(
-      "\n=== Clearing (child-first, cascades handle translations/junctions) ===",
-    );
+  if (clear) {
+    console.log("\n=== Clearing (child-first, cascades handle translations/junctions) ===");
     for (const key of CLEAR_ORDER) {
       await clearCollection(key);
     }
   }
 
-  // ---- 4. Import ----
-  console.log("\n=== Importing ===");
+  // ---- 5. Import / upsert ----
+  console.log(`\n=== ${mode === "upsert" ? "Upserting" : "Importing"} ===`);
   const runWarnings = [];
   const summary = {};
   for (const key of keys) {
     const payloads = buildPayloads(key, data[key], localeMap, runWarnings);
-    summary[key] = await importCollection(key, payloads);
+    if (mode === "upsert") {
+      summary[key] = await upsertCollection(key, payloads, { dryRun: false, force });
+    } else {
+      summary[key] = { created: await importCollection(key, payloads), updated: 0, unchanged: 0 };
+    }
   }
 
-  // ---- 5. Sequences ----
+  // ---- 6. Sequences ----
   if (fixSequences) {
     console.log("\n=== Fixing autoincrement sequences ===");
     for (const key of keys) {
@@ -759,21 +1015,22 @@ async function main() {
     }
   }
 
-  // ---- 6. Summary ----
+  // ---- 7. Summary ----
   console.log("\n=== Summary ===");
-  for (const [key, n] of Object.entries(summary)) {
-    console.log(`  ${key.padEnd(22)} ${String(n).padStart(5)} created`);
+  for (const [key, s] of Object.entries(summary)) {
+    console.log(
+      `  ${key.padEnd(22)} created ${String(s.created).padStart(5)}   updated ${String(s.updated).padStart(5)}   unchanged ${String(s.unchanged).padStart(5)}`,
+    );
   }
   if (runWarnings.length) {
     console.log(`\n${runWarnings.length} warning(s):`);
     runWarnings.slice(0, 40).forEach((w) => console.log(`  ⚠ ${w}`));
-    if (runWarnings.length > 40)
-      console.log(`  ... +${runWarnings.length - 40} more`);
+    if (runWarnings.length > 40) console.log(`  ... +${runWarnings.length - 40} more`);
     const logFile = path.join(__dirname, `import-warnings-${Date.now()}.log`);
     fs.writeFileSync(logFile, runWarnings.join("\n"));
     console.log(`  Full list: ${logFile}`);
   }
-  if (!fixSequences) {
+  if (!fixSequences && Object.values(summary).some((s) => s.created > 0)) {
     console.log(
       "\nNOTE: explicit-id import does not advance Postgres sequences." +
         "\nRun again with --fix-sequences (or setval via DB) before anyone creates geo items in the UI.",

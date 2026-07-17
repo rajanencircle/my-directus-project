@@ -1,0 +1,478 @@
+[
+  {
+    "id": 1,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:23:58.434Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 1,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 43,
+        "destinations_id": 1,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Afrika"
+      },
+      {
+        "id": 44,
+        "destinations_id": 1,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Afrika"
+      },
+      {
+        "id": 45,
+        "destinations_id": 1,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Afrika"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:23:59.382Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 7,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 46,
+        "destinations_id": 2,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Antarktis"
+      },
+      {
+        "id": 47,
+        "destinations_id": 2,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Antarktis"
+      },
+      {
+        "id": 48,
+        "destinations_id": 2,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Antarctica"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:00.157Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 7,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 49,
+        "destinations_id": 3,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Arktis"
+      },
+      {
+        "id": 50,
+        "destinations_id": 3,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Arktis"
+      },
+      {
+        "id": 51,
+        "destinations_id": 3,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Arctisch"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:00.979Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 2,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 52,
+        "destinations_id": 4,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Asien"
+      },
+      {
+        "id": 53,
+        "destinations_id": 4,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Asien"
+      },
+      {
+        "id": 54,
+        "destinations_id": 4,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Azië"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:02.066Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 6,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 55,
+        "destinations_id": 5,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Australien"
+      },
+      {
+        "id": 56,
+        "destinations_id": 5,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Australien"
+      },
+      {
+        "id": 57,
+        "destinations_id": 5,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Australië"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:02.853Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 4,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 58,
+        "destinations_id": 6,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Karibik"
+      },
+      {
+        "id": 59,
+        "destinations_id": 6,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Karibik"
+      },
+      {
+        "id": 60,
+        "destinations_id": 6,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Caraïben"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:03.626Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 4,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 61,
+        "destinations_id": 7,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Mittelamerika"
+      },
+      {
+        "id": 62,
+        "destinations_id": 7,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Mittelamerika"
+      },
+      {
+        "id": 63,
+        "destinations_id": 7,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Midden-Amerika"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:04.351Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 7,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 64,
+        "destinations_id": 8,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Europa"
+      },
+      {
+        "id": 65,
+        "destinations_id": 8,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Europa"
+      },
+      {
+        "id": 66,
+        "destinations_id": 8,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Europa"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:05.077Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 3,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 67,
+        "destinations_id": 9,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Indischer Ozean"
+      },
+      {
+        "id": 68,
+        "destinations_id": 9,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Indischer Ozean"
+      },
+      {
+        "id": 69,
+        "destinations_id": 9,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Indische Oceaan"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:05.843Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 2,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 70,
+        "destinations_id": 10,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Orient"
+      },
+      {
+        "id": 71,
+        "destinations_id": 10,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Orient"
+      },
+      {
+        "id": 72,
+        "destinations_id": 10,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Midden-Oosten"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:06.694Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 6,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 73,
+        "destinations_id": 11,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Neuseeland"
+      },
+      {
+        "id": 74,
+        "destinations_id": 11,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Neuseeland"
+      },
+      {
+        "id": 75,
+        "destinations_id": 11,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Nieuw-Zeeland"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:07.452Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 5,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 76,
+        "destinations_id": 12,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Nordamerika"
+      },
+      {
+        "id": 77,
+        "destinations_id": 12,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Nordamerika"
+      },
+      {
+        "id": 78,
+        "destinations_id": 12,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Noord-Amerika"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:08.206Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 4,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 79,
+        "destinations_id": 13,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Südamerika"
+      },
+      {
+        "id": 80,
+        "destinations_id": 13,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Südamerika"
+      },
+      {
+        "id": 81,
+        "destinations_id": 13,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Zuid-Amerika"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "sort": null,
+    "user_created": "72562bae-d44b-4fcb-aa9a-629c37731372",
+    "date_created": "2026-04-21T11:24:09.075Z",
+    "user_updated": null,
+    "date_updated": null,
+    "destinations_cluster_id": 6,
+    "media_code": null,
+    "media_code_legacy_botg": null,
+    "is_non_geographic": false,
+    "media_code_legacy_karawane": null,
+    "status": "new",
+    "translations": [
+      {
+        "id": 82,
+        "destinations_id": 14,
+        "translations_id": "a66beb5e-af3c-4e47-9c7a-101bd5be1a2a",
+        "name": "Südsee"
+      },
+      {
+        "id": 83,
+        "destinations_id": 14,
+        "translations_id": "263b1ac9-aa7a-48f4-b472-b816dfa3d921",
+        "name": "Südsee"
+      },
+      {
+        "id": 84,
+        "destinations_id": 14,
+        "translations_id": "fe5d14c3-0051-47a5-97a3-679e05fa3dc9",
+        "name": "Stille Zuidzee"
+      }
+    ]
+  }
+]
