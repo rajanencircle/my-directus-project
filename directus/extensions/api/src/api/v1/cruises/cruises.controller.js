@@ -1,12 +1,29 @@
-import { HTTP_STATUS } from '../../shared/constants.js';
+import { sendSuccess, sendPaginated } from "../../shared/apiResponse.js";
+import { parsePagination } from "../../shared/pagination.js";
+import { listCruises, getCruiseDetails } from "./cruises.service.js";
+import { shapeCruiseDetail } from "../../../transformers/cruise.transformer.js";
 
-export function createCruisesController() {
+export function createCruisesController(context) {
   return {
-    index(req, res) {
-      return res.status(HTTP_STATUS.NOT_IMPLEMENTED).json({
-        success: false,
-        message: 'Cruise schema not yet finalised',
-      });
+    async index(req, res) {
+      const { page, limit, offset } = parsePagination(req.query);
+      const { search, country, destination, season, sort, updated_after } = req.query;
+
+      const result = await listCruises(
+        { page, limit, offset, search, country, destination, season, sort, updated_after },
+        context,
+      );
+      const data = result.data.map(({ id, object_id, date_updated }) => ({ id, object_id, date_updated }));
+      return sendPaginated(res, { ...result, data });
+    },
+
+    async detail(req, res) {
+      const { id } = req.params;
+      const lang = req.query.lang ?? req.query.language ?? null;
+
+      const cruise = await getCruiseDetails({ id }, context);
+      const shaped = shapeCruiseDetail(cruise, lang ?? null);
+      return sendSuccess(res, shaped);
     },
   };
 }

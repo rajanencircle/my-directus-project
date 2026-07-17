@@ -1,5 +1,8 @@
 import { shapeHotelDetail } from "./hotel.transformer.js";
-import { shapeCruise } from "./cruise.transformer.js";
+import { shapeCruiseDetail } from "./cruise.transformer.js";
+import { shapeTourDetail } from "./tour.transformer.js";
+import { shapeExcursionDetail } from "./excursion.transformer.js";
+import { shapeVehicleDetail } from "./vehicle.transformer.js";
 
 /**
  * Dispatches a raw product item to the correct per-type transformer.
@@ -14,7 +17,13 @@ export function shapeProduct(item, lang) {
     case "hotel":
       return shapeHotelDetail(item, lang);
     case "cruise":
-      return shapeCruise(item, lang);
+      return shapeCruiseDetail(item, lang);
+    case "tour":
+      return shapeTourDetail(item, lang);
+    case "excursion":
+      return shapeExcursionDetail(item, lang);
+    case "vehicle":
+      return shapeVehicleDetail(item, lang);
     default:
       return { type: item._productType ?? "unknown", id: item.id, ...item };
   }

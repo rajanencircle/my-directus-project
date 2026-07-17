@@ -340,7 +340,10 @@ export const openapiSpec = {
   tags: [
     { name: "Hotels", description: "Hotel listings and detail" },
     { name: "Products", description: "Product type catalogue" },
-    { name: "Cruises", description: "Cruise listings (not yet implemented)" },
+    { name: "Cruises", description: "Cruise listings and detail" },
+    { name: "Tours", description: "Tour (daytrip) listings and detail" },
+    { name: "Excursions", description: "Excursion listings and detail" },
+    { name: "Vehicles", description: "Rental vehicle (car/camper) listings and detail" },
   ],
   security: [{ BearerAuth: [] }],
   paths: {
@@ -551,10 +554,28 @@ export const openapiSpec = {
                       detail_url: "/api/v1/hotels/{id}",
                     },
                     {
+                      type: "tour",
+                      total: 18,
+                      list_url: "/api/v1/tours",
+                      detail_url: "/api/v1/tours/{id}",
+                    },
+                    {
+                      type: "excursion",
+                      total: 9,
+                      list_url: "/api/v1/excursions",
+                      detail_url: "/api/v1/excursions/{id}",
+                    },
+                    {
                       type: "cruise",
-                      total: 0,
+                      total: 5,
                       list_url: "/api/v1/cruises",
                       detail_url: "/api/v1/cruises/{id}",
+                    },
+                    {
+                      type: "vehicle",
+                      total: 12,
+                      list_url: "/api/v1/vehicles",
+                      detail_url: "/api/v1/vehicles/{id}",
                     },
                   ],
                   meta: {
@@ -859,21 +880,166 @@ export const openapiSpec = {
     "/api/v1/cruises": {
       get: {
         tags: ["Cruises"],
-        summary: "List cruises",
-        description: "Not yet implemented. Returns 501.",
+        summary: "List cruises (lightweight)",
+        description: "Returns a minimal paginated list of cruises containing only `id`, `object_id`, and `date_updated`. Use `GET /api/v1/cruises/{id}` for full detail.",
+        parameters: [
+          { in: "query", name: "search", schema: { type: "string", maxLength: 200 }, description: "Case-insensitive search across cruise headline and teaser." },
+          { in: "query", name: "country", schema: { type: "integer", minimum: 1 }, description: "Filter by country ID." },
+          { in: "query", name: "destination", schema: { type: "integer", minimum: 1 }, description: "Filter by destination ID." },
+          { in: "query", name: "season", schema: { type: "string", maxLength: 50 }, description: "Filter by season." },
+          { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
+          { in: "query", name: "limit", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
+          { in: "query", name: "sort", schema: { type: "string" }, description: "One of: date_updated, -date_updated, object_id, -object_id, season, -season." },
+          { in: "query", name: "updated_after", schema: { type: "string", format: "date-time" } },
+        ],
         responses: {
-          501: {
-            description: "Not implemented",
-            content: {
-              "application/json": {
-                example: {
-                  success: false,
-                  message: "Cruise schema not yet finalised",
-                },
-              },
-            },
-          },
+          200: { description: "Paginated cruise list" },
           401: { $ref: "#/components/responses/Unauthorized" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/cruises/{id}": {
+      get: {
+        tags: ["Cruises"],
+        summary: "Get cruise detail",
+        description: "Returns full cruise detail. `id` may be the internal numeric id or the legacy `px_source_id`. Note: cruises has no structured surcharges collection (the schema only holds a free-text `surcharges` field under price info) and pricing is a single per-market settings row (`price_settings`/`from_price`), not a per-cabin/date price matrix.",
+        parameters: [
+          { in: "path", name: "id", required: true, schema: { type: "string" } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+        ],
+        responses: {
+          200: { description: "Cruise detail" },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          404: { $ref: "#/components/responses/NotFound" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/tours": {
+      get: {
+        tags: ["Tours"],
+        summary: "List tours/daytrips (lightweight)",
+        description: "Returns a minimal paginated list of tours containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/tours/{id}` for full detail.",
+        parameters: [
+          { in: "query", name: "search", schema: { type: "string", maxLength: 200 } },
+          { in: "query", name: "country", schema: { type: "integer", minimum: 1 } },
+          { in: "query", name: "region", schema: { type: "integer", minimum: 1 } },
+          { in: "query", name: "state", schema: { type: "integer", minimum: 1 } },
+          { in: "query", name: "season", schema: { type: "string", maxLength: 50 } },
+          { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
+          { in: "query", name: "limit", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
+          { in: "query", name: "sort", schema: { type: "string" } },
+          { in: "query", name: "updated_after", schema: { type: "string", format: "date-time" } },
+        ],
+        responses: {
+          200: { description: "Paginated tour list" },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/tours/{id}": {
+      get: {
+        tags: ["Tours"],
+        summary: "Get tour/daytrip detail",
+        description: "Returns full tour detail. `id` may be the internal numeric id or the legacy `px_source_id`. Note: `categories[].prices[].occupancies{}.sell` and `from_price` are always null — tours' pricing schema only stores `buy_price` today, with no sell-price field/translation wired yet.",
+        parameters: [
+          { in: "path", name: "id", required: true, schema: { type: "string" } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+        ],
+        responses: {
+          200: { description: "Tour detail" },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          404: { $ref: "#/components/responses/NotFound" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/excursions": {
+      get: {
+        tags: ["Excursions"],
+        summary: "List excursions (lightweight)",
+        description: "Returns a minimal paginated list of excursions containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/excursions/{id}` for full detail.",
+        parameters: [
+          { in: "query", name: "search", schema: { type: "string", maxLength: 200 } },
+          { in: "query", name: "country", schema: { type: "integer", minimum: 1 } },
+          { in: "query", name: "region", schema: { type: "integer", minimum: 1 } },
+          { in: "query", name: "state", schema: { type: "integer", minimum: 1 } },
+          { in: "query", name: "season", schema: { type: "string", maxLength: 50 } },
+          { in: "query", name: "destination", schema: { type: "integer", minimum: 1 } },
+          { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
+          { in: "query", name: "limit", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
+          { in: "query", name: "sort", schema: { type: "string" } },
+          { in: "query", name: "updated_after", schema: { type: "string", format: "date-time" } },
+        ],
+        responses: {
+          200: { description: "Paginated excursion list" },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/excursions/{id}": {
+      get: {
+        tags: ["Excursions"],
+        summary: "Get excursion detail",
+        description: "Returns full excursion detail, including `categories[].prices[].occupancies{}.sell` and a computed `from_price` (excursions' pricing schema has a real sell-price translation junction, unlike tours). `id` may be the internal numeric id or the legacy `px_source_id`.",
+        parameters: [
+          { in: "path", name: "id", required: true, schema: { type: "string" } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+        ],
+        responses: {
+          200: { description: "Excursion detail" },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          404: { $ref: "#/components/responses/NotFound" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/vehicles": {
+      get: {
+        tags: ["Vehicles"],
+        summary: "List rental vehicles (lightweight)",
+        description: "Returns a minimal paginated list of vehicles containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/vehicles/{id}` for full detail.",
+        parameters: [
+          { in: "query", name: "search", schema: { type: "string", maxLength: 200 } },
+          { in: "query", name: "category", schema: { type: "integer", minimum: 1 } },
+          { in: "query", name: "rental_type", schema: { type: "string", enum: ["car", "camper"] } },
+          { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
+          { in: "query", name: "limit", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
+          { in: "query", name: "sort", schema: { type: "string" } },
+          { in: "query", name: "updated_after", schema: { type: "string", format: "date-time" } },
+        ],
+        responses: {
+          200: { description: "Paginated vehicle list" },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
+        },
+      },
+    },
+    "/api/v1/vehicles/{id}": {
+      get: {
+        tags: ["Vehicles"],
+        summary: "Get rental vehicle detail",
+        description: "Returns full vehicle detail. `pricing` is always `{ available: false, reason: \"...\" }` — vehicles_prices/vehicles_price_calculation/vehicles_surcharges exist in the schema but have no foreign key back to vehicles yet, so pricing cannot be resolved per vehicle until that schema work lands. `id` may be the internal numeric id or the legacy `px_source_id`.",
+        parameters: [
+          { in: "path", name: "id", required: true, schema: { type: "string" } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+        ],
+        responses: {
+          200: { description: "Vehicle detail" },
+          401: { $ref: "#/components/responses/Unauthorized" },
+          404: { $ref: "#/components/responses/NotFound" },
+          422: { $ref: "#/components/responses/ValidationError" },
+          500: { $ref: "#/components/responses/ServerError" },
         },
       },
     },

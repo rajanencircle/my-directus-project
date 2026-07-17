@@ -9,6 +9,7 @@ export const HTTP_STATUS = {
   UNPROCESSABLE_ENTITY: 422,
   TOO_MANY_REQUESTS: 429,
   INTERNAL_SERVER_ERROR: 500,
+  NOT_IMPLEMENTED: 501,
   SERVICE_UNAVAILABLE: 503,
 };
 
@@ -23,5 +24,6 @@ export const HTTP_MESSAGE = {
   422: 'Validation failed',
   429: 'Too Many Requests',
   500: 'Internal Server Error',
+  501: 'Not Implemented',
   503: 'Service Unavailable',
 };
