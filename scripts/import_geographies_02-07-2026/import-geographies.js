@@ -31,6 +31,9 @@
 
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config({
+  path: path.join(__dirname, "../.env"),
+});
 
 // Never hardcode tokens here — this file is committed to git and leaked
 // Directus tokens have had to be rotated before (see CLAUDE.md rule 4).

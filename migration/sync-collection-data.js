@@ -65,7 +65,7 @@ const CONFIG = {
   TARGET_ENV: "main",
 
   // Collection name, e.g. "hotels"
-  COLLECTION: "field_dictionary",
+  COLLECTION: "content_hub_standards",
 
   // Field names to copy from source to target (item `id` is always the match key).
   // Set to "*" to copy ALL writable fields on the collection — this is auto-resolved
