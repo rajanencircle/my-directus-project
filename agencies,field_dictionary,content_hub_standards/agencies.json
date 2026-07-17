@@ -1,0 +1,2071 @@
+{
+    "collections": [
+        {
+            "collection": "agencies",
+            "meta": {
+                "collection": "agencies",
+                "icon": "contacts",
+                "note": "Agencies (Agenturen) — full agency master record incl. address + reservation contact. Parallel to booking_partners.",
+                "display_template": "{{name_agency}}",
+                "hidden": false,
+                "singleton": false,
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Agenturen",
+                        "singular": "Agentur",
+                        "plural": "Agenturen"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Agencies",
+                        "singular": "Agency",
+                        "plural": "Agencies"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Agentschappen",
+                        "singular": "Agentschap",
+                        "plural": "Agentschappen"
+                    }
+                ],
+                "archive_field": "status",
+                "archive_app_filter": true,
+                "archive_value": "archived",
+                "unarchive_value": "active",
+                "sort_field": "sort",
+                "accountability": "all",
+                "color": "#6B7785",
+                "item_duplication_fields": null,
+                "sort": null,
+                "group": "Global_Data",
+                "collapse": "open",
+                "preview_url": null,
+                "versioning": false
+            },
+            "schema": {}
+        }
+    ],
+    "fields": [
+        {
+            "collection": "agencies",
+            "field": "id",
+            "type": "uuid",
+            "schema": {
+                "name": "id",
+                "table": "agencies",
+                "data_type": "uuid",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": false,
+                "is_unique": true,
+                "is_indexed": false,
+                "is_primary_key": true,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "id",
+                "special": [
+                    "uuid"
+                ],
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": true,
+                "hidden": true,
+                "sort": 1,
+                "width": "full",
+                "translations": null,
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "object_id",
+            "type": "integer",
+            "schema": {
+                "name": "object_id",
+                "table": "agencies",
+                "data_type": "integer",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": 32,
+                "numeric_scale": 0,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "object_id",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": true,
+                "hidden": false,
+                "sort": 1,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Objekt-ID"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Object-ID"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Object-ID"
+                    }
+                ],
+                "note": "Primarix object id (oid) — natural key for import / recode.",
+                "conditions": null,
+                "required": false,
+                "group": "section_name_status",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "street",
+            "type": "string",
+            "schema": {
+                "name": "street",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "street",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 1,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Straße"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Street"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Straat"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "it_code",
+            "type": "string",
+            "schema": {
+                "name": "it_code",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "it_code",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 1,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "IT Code"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "IT Code"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "IT-code"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_reservation",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "section_name_status",
+            "type": "alias",
+            "schema": null,
+            "meta": {
+                "collection": "agencies",
+                "field": "section_name_status",
+                "special": [
+                    "alias",
+                    "no-data",
+                    "group"
+                ],
+                "interface": "group-detail",
+                "options": {
+                    "headerColor": "#008CC0",
+                    "start": "open"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 1,
+                "width": "full",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Status & Veröffentlichung"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Status & Publication"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Status & publicatie"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "name_agency",
+            "type": "string",
+            "schema": {
+                "name": "name_agency",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "name_agency",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 2,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Name (Agentur)"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Name (Agency)"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Naam (agentschap)"
+                    }
+                ],
+                "note": "Buchungspartner oder Tour Operator",
+                "conditions": null,
+                "required": false,
+                "group": "section_name_status",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "street_number",
+            "type": "string",
+            "schema": {
+                "name": "street_number",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "street_number",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 2,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Hausnummer"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Street Number"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Huisnummer"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "contact_greeting",
+            "type": "string",
+            "schema": {
+                "name": "contact_greeting",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "contact_greeting",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 2,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Anrede"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Salutation"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Aanhef"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_reservation",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "section_address",
+            "type": "alias",
+            "schema": null,
+            "meta": {
+                "collection": "agencies",
+                "field": "section_address",
+                "special": [
+                    "alias",
+                    "no-data",
+                    "group"
+                ],
+                "interface": "group-detail",
+                "options": {
+                    "headerColor": "#008CC0",
+                    "start": "open"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 2,
+                "width": "full",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Buchungsstelle"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Booking Partner"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Boekingspartner"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "status",
+            "type": "string",
+            "schema": {
+                "name": "status",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": "new",
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": false,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "status",
+                "special": null,
+                "interface": "select-dropdown",
+                "options": {
+                    "choices": [
+                        {
+                            "color": "#6B7785",
+                            "icon": "circle",
+                            "text": "New",
+                            "value": "new"
+                        },
+                        {
+                            "color": "#2ECDA7",
+                            "icon": "circle",
+                            "text": "Active",
+                            "value": "active"
+                        },
+                        {
+                            "color": "#F2994A",
+                            "icon": "circle",
+                            "text": "In review",
+                            "value": "in review"
+                        },
+                        {
+                            "color": "#E35169",
+                            "icon": "circle",
+                            "text": "Archived",
+                            "value": "archived"
+                        }
+                    ]
+                },
+                "display": "labels",
+                "display_options": {
+                    "choices": [
+                        {
+                            "background": "#EDEFF2",
+                            "foreground": "#6B7785",
+                            "text": "New",
+                            "value": "new"
+                        },
+                        {
+                            "background": "#E9F9F4",
+                            "foreground": "#2ECDA7",
+                            "text": "Active",
+                            "value": "active"
+                        },
+                        {
+                            "background": "#FDF0E6",
+                            "foreground": "#F2994A",
+                            "text": "In review",
+                            "value": "in review"
+                        },
+                        {
+                            "background": "#FCEAED",
+                            "foreground": "#E35169",
+                            "text": "Archived",
+                            "value": "archived"
+                        }
+                    ],
+                    "showAsDot": false
+                },
+                "readonly": false,
+                "hidden": false,
+                "sort": 3,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Status"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Status"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Status"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_name_status",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "sort",
+            "type": "integer",
+            "schema": {
+                "name": "sort",
+                "table": "agencies",
+                "data_type": "integer",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": 32,
+                "numeric_scale": 0,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "sort",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": true,
+                "sort": 3,
+                "width": "full",
+                "translations": null,
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "postcode",
+            "type": "string",
+            "schema": {
+                "name": "postcode",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "postcode",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 3,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "PLZ"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Postal Code"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Postcode"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "contact_first_name",
+            "type": "string",
+            "schema": {
+                "name": "contact_first_name",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "contact_first_name",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 3,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Vorname"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "First Name"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Voornaam"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_reservation",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "section_reservation",
+            "type": "alias",
+            "schema": null,
+            "meta": {
+                "collection": "agencies",
+                "field": "section_reservation",
+                "special": [
+                    "alias",
+                    "no-data",
+                    "group"
+                ],
+                "interface": "group-detail",
+                "options": {
+                    "headerColor": "#008CC0",
+                    "start": "open"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 3,
+                "width": "full",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Kontakt Reservierung"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Contact Reservation"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Contact reservering"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "user_created",
+            "type": "uuid",
+            "schema": {
+                "name": "user_created",
+                "table": "agencies",
+                "data_type": "uuid",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": "public",
+                "foreign_key_table": "directus_users",
+                "foreign_key_column": "id",
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "user_created",
+                "special": [
+                    "user-created"
+                ],
+                "interface": "select-dropdown-m2o",
+                "options": {
+                    "template": "{{avatar}} {{first_name}} {{last_name}}"
+                },
+                "display": "user",
+                "display_options": null,
+                "readonly": true,
+                "hidden": true,
+                "sort": 4,
+                "width": "half",
+                "translations": null,
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "place",
+            "type": "integer",
+            "schema": {
+                "name": "place",
+                "table": "agencies",
+                "data_type": "integer",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": 32,
+                "numeric_scale": 0,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": "public",
+                "foreign_key_table": "places",
+                "foreign_key_column": "id",
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "place",
+                "special": [
+                    "m2o"
+                ],
+                "interface": "cascading-individual-select",
+                "options": {
+                    "filterBy": [
+                        {
+                            "fieldKey": "country",
+                            "fk": "country_id"
+                        }
+                    ],
+                    "icon": "location_city",
+                    "searchLimit": 200,
+                    "target_collection": "places"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 4,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Ort"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "City / Town"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Plaats"
+                    }
+                ],
+                "note": "Defines further geographical details (country, state, region).",
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "contact_name",
+            "type": "string",
+            "schema": {
+                "name": "contact_name",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "contact_name",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 4,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Nachname"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Last Name"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Achternaam"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_reservation",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "date_created",
+            "type": "timestamp",
+            "schema": {
+                "name": "date_created",
+                "table": "agencies",
+                "data_type": "timestamp with time zone",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "date_created",
+                "special": [
+                    "date-created"
+                ],
+                "interface": "datetime",
+                "options": null,
+                "display": "datetime",
+                "display_options": {
+                    "relative": true
+                },
+                "readonly": true,
+                "hidden": true,
+                "sort": 5,
+                "width": "half",
+                "translations": null,
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "location_tour32",
+            "type": "integer",
+            "schema": {
+                "name": "location_tour32",
+                "table": "agencies",
+                "data_type": "integer",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": 32,
+                "numeric_scale": 0,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": "public",
+                "foreign_key_table": "locations_tour32",
+                "foreign_key_column": "id",
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "location_tour32",
+                "special": [
+                    "m2o"
+                ],
+                "interface": "cascading-individual-select",
+                "options": {
+                    "cascadeFrom": [
+                        {
+                            "fieldKey": "place",
+                            "fk": "location_tour32",
+                            "parentCollection": "places"
+                        }
+                    ],
+                    "icon": "pin_drop",
+                    "searchLimit": 200,
+                    "target_collection": "locations_tour32"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 5,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Suchort (Tour User only)"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Search Location (Tour User only)"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Zoeklocatie (Tour User only)"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "contact_title",
+            "type": "string",
+            "schema": {
+                "name": "contact_title",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "contact_title",
+                "special": null,
+                "interface": "input",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 5,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Titel"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Title"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Titel"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_reservation",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "user_updated",
+            "type": "uuid",
+            "schema": {
+                "name": "user_updated",
+                "table": "agencies",
+                "data_type": "uuid",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": "public",
+                "foreign_key_table": "directus_users",
+                "foreign_key_column": "id",
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "user_updated",
+                "special": [
+                    "user-updated"
+                ],
+                "interface": "select-dropdown-m2o",
+                "options": {
+                    "template": "{{avatar}} {{first_name}} {{last_name}}"
+                },
+                "display": "user",
+                "display_options": null,
+                "readonly": true,
+                "hidden": true,
+                "sort": 6,
+                "width": "half",
+                "translations": null,
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "country",
+            "type": "integer",
+            "schema": {
+                "name": "country",
+                "table": "agencies",
+                "data_type": "integer",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": 32,
+                "numeric_scale": 0,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": "public",
+                "foreign_key_table": "countries",
+                "foreign_key_column": "id",
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "country",
+                "special": [
+                    "m2o"
+                ],
+                "interface": "cascading-individual-select",
+                "options": {
+                    "cascadeFrom": [
+                        {
+                            "fieldKey": "place",
+                            "fk": "country_id",
+                            "parentCollection": "places"
+                        }
+                    ],
+                    "icon": "flag",
+                    "searchLimit": 200,
+                    "target_collection": "countries"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 6,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Land"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Country"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Land"
+                    }
+                ],
+                "note": "Defined by \"Place\"",
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "phone_reservation",
+            "type": "string",
+            "schema": {
+                "name": "phone_reservation",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "phone_reservation",
+                "special": null,
+                "interface": "input",
+                "options": {
+                    "placeholder": "+49 30 12345678",
+                    "softLength": 15
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 6,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Telefon"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Phone (reservation)"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Telefoon (reservering)"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_reservation",
+                "validation": null,
+                "validation_message": "Please enter a valid phone number in E.164 format (e.g., +49 171 8317486)",
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "date_updated",
+            "type": "timestamp",
+            "schema": {
+                "name": "date_updated",
+                "table": "agencies",
+                "data_type": "timestamp with time zone",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "date_updated",
+                "special": [
+                    "date-updated"
+                ],
+                "interface": "datetime",
+                "options": null,
+                "display": "datetime",
+                "display_options": {
+                    "relative": true
+                },
+                "readonly": true,
+                "hidden": true,
+                "sort": 7,
+                "width": "half",
+                "translations": null,
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": null,
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "state",
+            "type": "integer",
+            "schema": {
+                "name": "state",
+                "table": "agencies",
+                "data_type": "integer",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": 32,
+                "numeric_scale": 0,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": "public",
+                "foreign_key_table": "states",
+                "foreign_key_column": "id",
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "state",
+                "special": [
+                    "m2o"
+                ],
+                "interface": "cascading-individual-select",
+                "options": {
+                    "cascadeFrom": [
+                        {
+                            "fieldKey": "place",
+                            "fk": "state_id",
+                            "parentCollection": "places"
+                        }
+                    ],
+                    "icon": "map",
+                    "searchLimit": 200,
+                    "target_collection": "states"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 7,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Staat / Bundesland"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "State / Province"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Staat / Provincie"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "email_reservation",
+            "type": "string",
+            "schema": {
+                "name": "email_reservation",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "email_reservation",
+                "special": null,
+                "interface": "input",
+                "options": {
+                    "placeholder": "john.doe@example.com"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 7,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "E-Mail (Reservierung)"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Email (reservation)"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "E-mail (reservering)"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_reservation",
+                "validation": null,
+                "validation_message": "Please enter a valid email address (example@company.com)",
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "phone_general",
+            "type": "string",
+            "schema": {
+                "name": "phone_general",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "phone_general",
+                "special": null,
+                "interface": "input",
+                "options": {
+                    "placeholder": "+49 30 12345678",
+                    "softLength": 15
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 8,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Telefon (allgemein)"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Phone (general)"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Telefoon (algemeen)"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": "Please enter a valid phone number in E.164 format (e.g., +49 171 8317486)",
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "internal_remarks_reservation",
+            "type": "text",
+            "schema": {
+                "name": "internal_remarks_reservation",
+                "table": "agencies",
+                "data_type": "text",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": null,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "internal_remarks_reservation",
+                "special": null,
+                "interface": "input-multiline",
+                "options": null,
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 8,
+                "width": "full",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Interne Buchungsinfos /-Hinweise"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Internal Reservation Infos / Remarks"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Interne boekingsinfo / -opmerkingen"
+                    }
+                ],
+                "note": "Internal notes and additional contact details.",
+                "conditions": null,
+                "required": false,
+                "group": "section_reservation",
+                "validation": null,
+                "validation_message": null,
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "phone_after_hours",
+            "type": "string",
+            "schema": {
+                "name": "phone_after_hours",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "phone_after_hours",
+                "special": null,
+                "interface": "input",
+                "options": {
+                    "placeholder": "+49 30 12345678",
+                    "softLength": 15
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 9,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Telefon (after hours)"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Phone (after hours)"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Telefoon (na kantooruren)"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": "Please enter a valid phone number in E.164 format (e.g., +49 171 8317486)",
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "email_general",
+            "type": "string",
+            "schema": {
+                "name": "email_general",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "email_general",
+                "special": null,
+                "interface": "input",
+                "options": {
+                    "placeholder": "john.doe@example.com"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 10,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "E-Mail (allgemein)"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Email (general)"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "E-mail (algemeen)"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": null,
+                "validation_message": "Please enter a valid email address (example@company.com)",
+                "searchable": true
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "website",
+            "type": "string",
+            "schema": {
+                "name": "website",
+                "table": "agencies",
+                "data_type": "character varying",
+                "default_value": null,
+                "generation_expression": null,
+                "max_length": 255,
+                "numeric_precision": null,
+                "numeric_scale": null,
+                "is_generated": false,
+                "is_nullable": true,
+                "is_unique": false,
+                "is_indexed": false,
+                "is_primary_key": false,
+                "has_auto_increment": false,
+                "foreign_key_schema": null,
+                "foreign_key_table": null,
+                "foreign_key_column": null,
+                "comment": null
+            },
+            "meta": {
+                "collection": "agencies",
+                "field": "website",
+                "special": null,
+                "interface": "input",
+                "options": {
+                    "placeholder": "https://www.example.com"
+                },
+                "display": null,
+                "display_options": null,
+                "readonly": false,
+                "hidden": false,
+                "sort": 11,
+                "width": "half",
+                "translations": [
+                    {
+                        "language": "de-DE",
+                        "translation": "Webseite"
+                    },
+                    {
+                        "language": "en-GB",
+                        "translation": "Website"
+                    },
+                    {
+                        "language": "nl-NL",
+                        "translation": "Homepage"
+                    }
+                ],
+                "note": null,
+                "conditions": null,
+                "required": false,
+                "group": "section_address",
+                "validation": {
+                    "_and": [
+                        {
+                            "website": {
+                                "_regex": "^https?://[^\\s/$.?#].[^\\s]*$"
+                            }
+                        }
+                    ]
+                },
+                "validation_message": "Please enter a valid website URL (like https://example.com)",
+                "searchable": true
+            }
+        }
+    ],
+    "relations": [
+        {
+            "collection": "agencies",
+            "field": "user_created",
+            "related_collection": "directus_users",
+            "schema": {
+                "constraint_name": "agencies_user_created_foreign",
+                "table": "agencies",
+                "column": "user_created",
+                "foreign_key_schema": "public",
+                "foreign_key_table": "directus_users",
+                "foreign_key_column": "id",
+                "on_update": "NO ACTION",
+                "on_delete": "NO ACTION"
+            },
+            "meta": {
+                "many_collection": "agencies",
+                "many_field": "user_created",
+                "one_collection": "directus_users",
+                "one_field": null,
+                "one_collection_field": null,
+                "one_allowed_collections": null,
+                "junction_field": null,
+                "sort_field": null,
+                "one_deselect_action": "nullify"
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "user_updated",
+            "related_collection": "directus_users",
+            "schema": {
+                "constraint_name": "agencies_user_updated_foreign",
+                "table": "agencies",
+                "column": "user_updated",
+                "foreign_key_schema": "public",
+                "foreign_key_table": "directus_users",
+                "foreign_key_column": "id",
+                "on_update": "NO ACTION",
+                "on_delete": "NO ACTION"
+            },
+            "meta": {
+                "many_collection": "agencies",
+                "many_field": "user_updated",
+                "one_collection": "directus_users",
+                "one_field": null,
+                "one_collection_field": null,
+                "one_allowed_collections": null,
+                "junction_field": null,
+                "sort_field": null,
+                "one_deselect_action": "nullify"
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "place",
+            "related_collection": "places",
+            "schema": {
+                "constraint_name": "agencies_place_foreign",
+                "table": "agencies",
+                "column": "place",
+                "foreign_key_schema": "public",
+                "foreign_key_table": "places",
+                "foreign_key_column": "id",
+                "on_update": "NO ACTION",
+                "on_delete": "SET NULL"
+            },
+            "meta": {
+                "many_collection": "agencies",
+                "many_field": "place",
+                "one_collection": "places",
+                "one_field": null,
+                "one_collection_field": null,
+                "one_allowed_collections": null,
+                "junction_field": null,
+                "sort_field": null,
+                "one_deselect_action": "nullify"
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "location_tour32",
+            "related_collection": "locations_tour32",
+            "schema": {
+                "constraint_name": "agencies_location_tour32_foreign",
+                "table": "agencies",
+                "column": "location_tour32",
+                "foreign_key_schema": "public",
+                "foreign_key_table": "locations_tour32",
+                "foreign_key_column": "id",
+                "on_update": "NO ACTION",
+                "on_delete": "SET NULL"
+            },
+            "meta": {
+                "many_collection": "agencies",
+                "many_field": "location_tour32",
+                "one_collection": "locations_tour32",
+                "one_field": null,
+                "one_collection_field": null,
+                "one_allowed_collections": null,
+                "junction_field": null,
+                "sort_field": null,
+                "one_deselect_action": "nullify"
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "country",
+            "related_collection": "countries",
+            "schema": {
+                "constraint_name": "agencies_country_foreign",
+                "table": "agencies",
+                "column": "country",
+                "foreign_key_schema": "public",
+                "foreign_key_table": "countries",
+                "foreign_key_column": "id",
+                "on_update": "NO ACTION",
+                "on_delete": "SET NULL"
+            },
+            "meta": {
+                "many_collection": "agencies",
+                "many_field": "country",
+                "one_collection": "countries",
+                "one_field": null,
+                "one_collection_field": null,
+                "one_allowed_collections": null,
+                "junction_field": null,
+                "sort_field": null,
+                "one_deselect_action": "nullify"
+            }
+        },
+        {
+            "collection": "agencies",
+            "field": "state",
+            "related_collection": "states",
+            "schema": {
+                "constraint_name": "agencies_state_foreign",
+                "table": "agencies",
+                "column": "state",
+                "foreign_key_schema": "public",
+                "foreign_key_table": "states",
+                "foreign_key_column": "id",
+                "on_update": "NO ACTION",
+                "on_delete": "SET NULL"
+            },
+            "meta": {
+                "many_collection": "agencies",
+                "many_field": "state",
+                "one_collection": "states",
+                "one_field": null,
+                "one_collection_field": null,
+                "one_allowed_collections": null,
+                "junction_field": null,
+                "sort_field": null,
+                "one_deselect_action": "nullify"
+            }
+        }
+    ]
+}
