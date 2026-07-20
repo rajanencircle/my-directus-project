@@ -320,6 +320,30 @@ All 25+ daytrips junction/translation tables were:
 
 ---
 
+## 2.10 Tours Field Metadata — "Last Updated" / "by" under Status & publication
+
+**Date:** 2026-07-20
+
+Updated `date_updated` and `user_updated` fields in `tours` collection to match the hotels pattern (read-only, formatted display, conditional visibility).
+
+| Field | Property | Old value | New value |
+|-------|----------|-----------|-----------|
+| `date_updated` | `readonly` | `false` | `true` |
+| `date_updated` | `options` | `null` | `{"format": "dd.MM.yyyy HH:mm:ss"}` |
+| `date_updated` | `display` | `null` | `"datetime"` |
+| `date_updated` | `display_options` | `null` | `{"relative": true}` |
+| `date_updated` | `conditions` | `null` | `[{"name":"View on Edit","rule":{"_and":[{"id":{"_nnull":true}}]},"readonly":true,"hidden":false}]` |
+| `date_updated` | `sort` | `null` | `6` |
+| `user_updated` | `readonly` | `false` | `true` |
+| `user_updated` | `options` | `null` | `{"template": "{{first_name}} {{last_name}}"}` |
+| `user_updated` | `display` | `null` | `"user"` |
+| `user_updated` | `conditions` | `null` | `[{"name":"View on Edit","rule":{"_and":[{"id":{"_nnull":true}}]},"readonly":true,"hidden":false}]` |
+| `user_updated` | `sort` | `null` | `7` |
+
+**To revert:** Set `readonly: false`, `options: null`, `display: null`, `display_options: null`, `conditions: null`, `sort: null` for both fields.
+
+---
+
 # PHASE 3 — PENDING ⏳
 **Scope:** Master Flow Consolidation (operation-level changes inside flows)
 **Prerequisite:** Test on staging FIRST via `mcp__directus-staging__*` tools before applying to local
