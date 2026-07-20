@@ -110,7 +110,7 @@ const routeConfig: RouteConfig[] = [
       addClasses: [],
       tabGroupRawStyles: [
         {
-          tabIds: ["master_data_group"],
+          tabIds: ["tab_master_data", "tab_calculator_inputs"],
           styles: {
             "background-color": "transparent",
             padding: "0px",
@@ -141,7 +141,7 @@ const routeConfig: RouteConfig[] = [
       addClasses: [],
       tabGroupRawStyles: [
         {
-          tabIds: ["master_data_group"],
+          tabIds: ["tab_master_data", "tab_calculator_inputs"],
           styles: {
             "background-color": "transparent",
             padding: "0px",
@@ -174,7 +174,7 @@ const routeConfig: RouteConfig[] = [
       addClasses: [],
       tabGroupRawStyles: [
         {
-          tabIds: ["master_data_group"],
+          tabIds: ["tab_master_data", "tab_calculator_inputs"],
           styles: {
             "background-color": "transparent",
             padding: "0px",
@@ -199,6 +199,24 @@ const routeConfig: RouteConfig[] = [
           "save_and_stay_surcharge",
         ],
       },
+      addClasses: [],
+      tabGroupRawStyles: [
+        {
+          tabIds: ["tab_master_data", "tab_calculator_inputs"],
+          styles: {
+            "background-color": "transparent",
+            padding: "0px",
+            border: "0px solid #E5E7EB",
+          },
+        },
+      ],
+    },
+  },
+  {
+    path: "/content/vehicles",
+    children: true,
+    actions: {
+      hideLabels: { fields: [] },
       addClasses: [],
       tabGroupRawStyles: [
         {
