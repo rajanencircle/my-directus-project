@@ -133,7 +133,7 @@ export function shapeTourDetail(tour, lang) {
       // no translationsKey — no sell price source exists
     },
     (cat) => ({
-      category: cat.tour_category_type?.designation ?? null,
+      category: cat.tour_category_type?.name ?? null,
       booking_code: cat.category_supplier_code ?? null,
       from: cat.category_from ?? null,
     }),
@@ -205,8 +205,8 @@ export function shapeTourDetail(tour, lang) {
     max_children_free_age: tour.children_free_age ?? null,
     week_min_before_start: tour.week_min_before_start ?? null,
     mobility_advice_text: tour.mobility_advice_text?.id ?? null,
-    flight_service: tour.flight_service ? { id: tour.flight_service.id, label: tour.flight_service.label } : null,
-    airlines: tour.airlines ? { id: tour.airlines.id, label: tour.airlines.label } : null,
+    flight_service: tour.flight_service ? { id: tour.flight_service.id, label: tour.flight_service.name } : null,
+    airlines: tour.airlines ? { id: tour.airlines.id, label: tour.airlines.name } : null,
     routes: tour.routes ?? null,
     travel_categories: (tour.travel_categories ?? []).map((t) => t.travel_categories_id).filter(Boolean),
     accommodation_types: (tour.accommodation_types ?? []).map((a) => a.accommodation_types_id).filter(Boolean),

@@ -121,7 +121,7 @@ export const DETAIL_FIELDS = [
   // Categories
   "categories.id",
   "categories.excursion_category_type.id",
-  "categories.excursion_category_type.designation",
+  "categories.excursion_category_type.name",
   "categories.category_supplier_code",
   "categories.category_from",
   "categories.translations.translations_id.code",

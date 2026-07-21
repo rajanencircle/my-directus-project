@@ -115,9 +115,9 @@ export const DETAIL_FIELDS = [
   "location_tour32.translations.translations_id.code",
   // Flight
   "flight_service.id",
-  "flight_service.label",
+  "flight_service.name",
   "airlines.id",
-  "airlines.label",
+  "airlines.name",
   "routes",
   // m2m
   "travel_categories.travel_categories_id.id",
@@ -136,12 +136,12 @@ export const DETAIL_FIELDS = [
   // Categories (rooms-equivalent)
   "categories.id",
   "categories.tour_category_type.id",
-  "categories.tour_category_type.designation",
+  "categories.tour_category_type.name",
   "categories.category_supplier_code",
   "categories.category_from",
   "categories.translations.translations_id.code",
-  "categories.translations.room_category_additions",
-  "categories.translations.room_category_description",
+  "categories.translations.category_original",
+  "categories.translations.category_text",
   // Dates
   "dates.id",
   "dates.available_from",

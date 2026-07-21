@@ -133,7 +133,7 @@ export function shapeExcursionDetail(excursion, lang) {
       dateEndKey: 'price_period_end',
     },
     (cat) => ({
-      category: cat.excursion_category_type?.designation ?? null,
+      category: cat.excursion_category_type?.name ?? null,
       booking_code: cat.category_supplier_code ?? null,
       from: cat.category_from ?? null,
     }),
