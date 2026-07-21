@@ -344,6 +344,76 @@ Updated `date_updated` and `user_updated` fields in `tours` collection to match 
 
 ---
 
+## 2.11 Tours `section_operator` — Synced to Dev
+
+**Date:** 2026-07-20
+
+Updated all 14 fields in the `section_operator` group of the `tours` collection to match the Dev configuration (source of truth). This is a cosmetic/meta change only — no schema or relations modified.
+
+### Key changes
+
+| Field | Change |
+|-------|--------|
+| `operator_direct` | width → `full`, added Yes/No choices |
+| `operator_linked` | added filter/template options |
+| `name_operator` | hidden → `true`, added Show-on-No condition |
+| `street`, `street_number`, `postcode` | hidden → `true`, added Show-on-No condition |
+| `place`, `location_tour32`, `country`, `state` | interface → `cascading-individual-select`, added cascade options, hidden → `true`, added Show-on-No condition |
+| `phone_general`, `phone_after_hours`, `email_general`, `website` | hidden → `true`, added Show-on-No condition |
+
+**To revert:** See `STAGING_CHANGES/TOURS-SECTION-OPERATOR-CHANGES.md` for per-field revert instructions.
+
+---
+
+## 2.12 Tours `section_botg_filter` — Synced to Dev
+
+**Date:** 2026-07-20
+
+Updated all 3 fields in the `section_botg_filter` group of the `tours` collection to match the Dev configuration (source of truth). This is a cosmetic/meta change only — no schema or relations modified.
+
+### Changes
+
+| Field | Change |
+|-------|--------|
+| `partner_visibility` | options.choices → hardcoded `All`/`Selected` (was broken `$t:` keys), sort → `null`, translations → `null` |
+| `is_axolot_export` | sort → `null` |
+| `partner_selected` | added options `{template:"{{partner_id.label}}"}`, added conditions (hide when partner_visibility="all"), sort → `null`, translations → `null` |
+
+**To revert:**
+
+| Field | Revert PATCH |
+|-------|-------------|
+| `partner_visibility` | `options: null, sort: null` (translations stays null) |
+| `is_axolot_export` | `sort: null` (no other change needed) |
+| `partner_selected` | `options: null, conditions: null, sort: null` |
+
+---
+
+## 2.13 Tours Service Provider Labels — Synced from Hotels
+
+**Date:** 2026-07-20
+
+Copied field translations and note references from hotels `id_tour_user` / `haupt_id_tour_user` to tours `service_provider_id_tour32` / `main_service_provider_id_tour32`. Meta change only — no schema or relations modified.
+
+| Field | Changes |
+|-------|---------|
+| `service_provider_id_tour32` | translations → 3 languages (en-GB/de-DE/nl-NL), note → `$t:hotels_id_tour_user_note` |
+| `main_service_provider_id_tour32` | translations → 3 languages (en-GB/de-DE/nl-NL), note → `$t:hotels_haupt_id_tour_user_note` |
+
+**To revert:**
+
+```bash
+curl -s -X PATCH "http://localhost:8055/fields/tours/service_provider_id_tour32" \
+  -H "Content-Type: application/json" -H "Authorization: Bearer <token>" \
+  -d '{"meta": {"translations": [{"language": "en-GB", "translation": "Service Provider (Tour32 only)"}], "note": null}}'
+
+curl -s -X PATCH "http://localhost:8055/fields/tours/main_service_provider_id_tour32" \
+  -H "Content-Type: application/json" -H "Authorization: Bearer <token>" \
+  -d '{"meta": {"translations": null, "note": null}}'
+```
+
+---
+
 # PHASE 3 — PENDING ⏳
 **Scope:** Master Flow Consolidation (operation-level changes inside flows)
 **Prerequisite:** Test on staging FIRST via `mcp__directus-staging__*` tools before applying to local
