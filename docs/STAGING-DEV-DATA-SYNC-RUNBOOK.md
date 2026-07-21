@@ -35,7 +35,8 @@ runs Postgres before proceeding.
 - [ ] 10. Delete orphaned rows / null out orphaned FK values
 - [ ] 11. Final verification
 - [ ] 12. Restart Directus and check in the browser
-- [ ] 13. Log the change in `STAGING_CHANGES/`
+- [ ] 13. Reapply known post-restore schema fixes (e.g. excursions FK)
+- [ ] 14. Log the change in `STAGING_CHANGES/`
 
 ---
 
@@ -345,7 +346,32 @@ shows the real files; spot-check a hotel/tour/cruise that uses
 
 ---
 
-## 13. Log the change in `STAGING_CHANGES/`
+## 13. Reapply known post-restore schema fixes
+
+Restoring the dev dump resets any relation/schema fixes that only exist in
+staging's live DB and not in dev (the dump doesn't know about staging-only
+patches). As of 2026-07-21 there are **no outstanding ones** — the
+`excursions_*` FK `on_delete` inconsistency (6 tables, `NO ACTION` instead
+of `CASCADE`) that used to require reapplying after every restore has been
+fixed at the source on **dev** itself (and on local), so it now survives
+the restore automatically. See
+[`DEV_CHANGES/EXCURSIONS-ON-DELETE-CASCADE-FIX.md`](../DEV_CHANGES/EXCURSIONS-ON-DELETE-CASCADE-FIX.md)
+and
+[`STAGING_CHANGES/EXCURSIONS-DIRECTUS-FILES-ON-DELETE-CASCADE-FIX.md`](../STAGING_CHANGES/EXCURSIONS-DIRECTUS-FILES-ON-DELETE-CASCADE-FIX.md)
+for the history.
+
+Sanity check after any restore (should return zero rows — if it doesn't,
+something regressed on dev or a new inconsistency was introduced): read all
+relations via MCP and filter to `related_collection == 'excursions'` and
+`schema.on_delete == 'NO ACTION'`.
+
+(Add to this list if other staging-only relation/schema fixes are made in
+the future that aren't also fixed on dev — otherwise they'll keep silently
+reverting on every resync.)
+
+---
+
+## 14. Log the change in `STAGING_CHANGES/`
 
 Per the repo's non-negotiable rule (`CLAUDE.md`), every direct change to
 staging must be logged. Create/update a file in
