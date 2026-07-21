@@ -190,13 +190,15 @@ const routeConfig: RouteConfig[] = [
     actions: {
       hideLabels: {
         fields: [
-          "booking_partner",
+          "booking_channel",
           "partner",
           "item_preview_button",
           "image_badge_translations",
           "price_info_translations",
           "save_and_stay_price",
           "save_and_stay_surcharge",
+          "partner_visibility",
+          "partner_selected",
         ],
       },
       addClasses: [],
