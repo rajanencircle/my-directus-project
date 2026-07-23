@@ -1,0 +1,329 @@
+root@vm-directus-botg-staging:/opt/directus-staging# docker logs --tail 500 directus-staging-directus-1 > /tmp/directus-crash.log
+tail -100 /tmp/directus-crash.log
+[14:44:13] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed5e59919e14bbd9050486014258726%22%7D%7D&limit=1 200 113ms
+[14:44:15] POST /files 200 1.5s
+[14:44:15] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%228490d736-60a8-45e1-ab24-700396acc90f%22%7D%7D&limit=1 200 34ms
+[14:44:15] PATCH /files/8490d736-60a8-45e1-ab24-700396acc90f 200 64ms
+[14:44:15] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed618a0dd34486da4f3ec2dc4612308%22%7D%7D&limit=1 200 60ms
+[14:44:15] POST /files 200 382ms
+[14:44:15] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%2285d101f7-891c-4571-811b-9b8a1a380112%22%7D%7D&limit=1 200 22ms
+[14:44:16] PATCH /files/85d101f7-891c-4571-811b-9b8a1a380112 200 66ms
+[14:44:16] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed878f637a24db3920b361f870b527c%22%7D%7D&limit=1 200 74ms
+[14:44:17] POST /files 200 1.1s
+[14:44:17] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%2216f03616-6659-4809-91f5-a471b95ac78f%22%7D%7D&limit=1 200 42ms
+[14:44:17] PATCH /files/16f03616-6659-4809-91f5-a471b95ac78f 200 69ms
+[14:44:17] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed87db89987472c8e99a8c7dae9f6bd%22%7D%7D&limit=1 200 90ms
+[14:44:20] POST /files 200 2.2s
+[14:44:20] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Cphotographer%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22c9a4f514-6107-4ea0-9d5f-d3b9f0a50036%22%7D%7D&limit=1 200 38ms
+[14:44:20] PATCH /files/c9a4f514-6107-4ea0-9d5f-d3b9f0a50036 200 75ms
+[14:44:20] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed8883f9dc844b093e4b880b9b85e27%22%7D%7D&limit=1 200 63ms
+[14:44:23] POST /files 200 2.4s
+[14:44:23] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Cphotographer%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22576e1aaf-b308-4094-8e71-6bc7c282d5d0%22%7D%7D&limit=1 200 21ms
+[14:44:23] PATCH /files/576e1aaf-b308-4094-8e71-6bc7c282d5d0 200 50ms
+[14:44:23] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed8fb0fb2994caabd732798f8e83f3c%22%7D%7D&limit=1 200 82ms
+[14:44:25] POST /files 200 1.2s
+[14:44:25] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%227a5b620a-40c9-4a01-85b2-6a3603932697%22%7D%7D&limit=1 200 30ms
+[14:44:25] PATCH /files/7a5b620a-40c9-4a01-85b2-6a3603932697 200 70ms
+[14:44:25] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed9641410e84f91ad4b763e36bd791d%22%7D%7D&limit=1 200 88ms
+[14:44:26] POST /files 200 1.2s
+[14:44:26] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Coriginal_filename%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22488af8e6-0bbb-4ab8-86be-425bd40bbd7b%22%7D%7D&limit=1 200 27ms
+[14:44:26] PATCH /files/488af8e6-0bbb-4ab8-86be-425bd40bbd7b 200 61ms
+[14:44:27] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed9e313ad374e8d8f1ac2f900a976cf%22%7D%7D&limit=1 200 68ms
+[14:44:27] POST /files 200 598ms
+[14:44:27] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Cphotographer%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%225dd2ff2d-756c-481b-9063-6f3b66dd7b69%22%7D%7D&limit=1 200 33ms
+[14:44:27] PATCH /files/5dd2ff2d-756c-481b-9063-6f3b66dd7b69 200 74ms
+[14:44:28] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ed9efcffce14f568d4658fb24e6c590%22%7D%7D&limit=1 200 85ms
+[14:44:31] POST /files 200 3.1s
+[14:44:31] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22dc08ea23-c462-4578-9631-54dacab09814%22%7D%7D&limit=1 200 27ms
+[14:44:31] PATCH /files/dc08ea23-c462-4578-9631-54dacab09814 200 56ms
+[14:44:31] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224eda2bcfba1247a1aa64f7de87bd6db0%22%7D%7D&limit=1 200 114ms
+[14:44:32] POST /files 200 813ms
+[14:44:32] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%222bfac13a-b459-4f0a-ae3c-4c7329b11606%22%7D%7D&limit=1 200 45ms
+[14:44:32] PATCH /files/2bfac13a-b459-4f0a-ae3c-4c7329b11606 200 67ms
+[14:44:33] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224eda63fa55b44b8aa4ed5e7744afbe4b%22%7D%7D&limit=1 200 73ms
+[14:44:34] POST /files 200 1s
+[14:44:34] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22175a2356-f140-4134-a575-b814cd833ad5%22%7D%7D&limit=1 200 29ms
+[14:44:34] PATCH /files/175a2356-f140-4134-a575-b814cd833ad5 200 125ms
+[14:44:34] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224edae36b62c442bbb35f4f7dc38189f4%22%7D%7D&limit=1 200 125ms
+[14:44:36] POST /files 200 1.6s
+[14:44:36] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22b4e182ca-cbd7-40b2-b7a4-d5a3f6453794%22%7D%7D&limit=1 200 40ms
+[14:44:36] PATCH /files/b4e182ca-cbd7-40b2-b7a4-d5a3f6453794 200 74ms
+[14:44:36] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224edc06f9d65940d98ab3a21434393572%22%7D%7D&limit=1 200 59ms
+[14:44:38] POST /files 200 1s
+[14:44:38] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Cphotographer%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22e831dc12-aced-4782-bfe4-9e659df06745%22%7D%7D&limit=1 200 32ms
+[14:44:38] PATCH /files/e831dc12-aced-4782-bfe4-9e659df06745 200 53ms
+[14:44:38] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224edc2e5fe8454def8994a2905120335c%22%7D%7D&limit=1 200 91ms
+[14:44:39] POST /files 200 726ms
+[14:44:39] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%2252f9fb8e-5f0f-4fad-86ab-5323ff0a3b62%22%7D%7D&limit=1 200 23ms
+[14:44:39] PATCH /files/52f9fb8e-5f0f-4fad-86ab-5323ff0a3b62 200 54ms
+[14:44:39] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224edc56908c644b28b7dea4f4fd3a4033%22%7D%7D&limit=1 200 100ms
+[14:44:41] POST /files 200 1.6s
+[14:44:41] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Cphotographer%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22edefe041-9f7f-4ec6-89ae-0d5eb1c87abc%22%7D%7D&limit=1 200 26ms
+[14:44:41] PATCH /files/edefe041-9f7f-4ec6-89ae-0d5eb1c87abc 200 54ms
+[14:44:41] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224edc7d9794384269a3857e9d5d4dc496%22%7D%7D&limit=1 200 99ms
+[14:44:44] POST /files 200 2.7s
+[14:44:44] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22e36c1698-a5b3-4271-938f-af706655ea50%22%7D%7D&limit=1 200 22ms
+[14:44:44] PATCH /files/e36c1698-a5b3-4271-938f-af706655ea50 200 51ms
+[14:44:44] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224edcbd24fd9d4d25a7754dd3d0c778c0%22%7D%7D&limit=1 200 104ms
+[14:44:45] POST /files 200 821ms
+[14:44:46] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Cphotographer%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%2241b29e69-ba05-460e-927a-2d453628a5b1%22%7D%7D&limit=1 200 30ms
+[14:44:46] PATCH /files/41b29e69-ba05-460e-927a-2d453628a5b1 200 72ms
+[14:44:46] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224eded3362871482696668c3fa414b6e2%22%7D%7D&limit=1 200 90ms
+[14:44:47] POST /files 200 1.5s
+[14:44:48] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Cphotographer%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%2276ce8e64-a6f8-4ae3-9fc6-0d0808bd170c%22%7D%7D&limit=1 200 29ms
+[14:44:48] PATCH /files/76ce8e64-a6f8-4ae3-9fc6-0d0808bd170c 200 81ms
+[14:44:48] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224edf4d5d5c304cc6b8523a1521b65df8%22%7D%7D&limit=1 200 133ms
+[14:44:49] POST /files 200 910ms
+[14:44:49] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22a610361d-ac65-4ac7-af72-29c167660c74%22%7D%7D&limit=1 200 29ms
+[14:44:49] PATCH /files/a610361d-ac65-4ac7-af72-29c167660c74 200 61ms
+[14:44:49] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224edfc1629b624864964d212930f82311%22%7D%7D&limit=1 200 95ms
+[14:44:53] POST /files 200 3.8s
+[14:44:54] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%223895c8b7-fde3-4b75-a87f-4a4e8bbe4e29%22%7D%7D&limit=1 200 35ms
+[14:44:54] PATCH /files/3895c8b7-fde3-4b75-a87f-4a4e8bbe4e29 200 63ms
+[14:44:54] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ee11cf4d16f4706b4695c833c4822a0%22%7D%7D&limit=1 200 68ms
+[14:44:57] POST /files 200 3.1s
+[14:44:57] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%222c42a8b4-f654-4088-889a-91c5aab29f99%22%7D%7D&limit=1 200 29ms
+[14:44:58] PATCH /files/2c42a8b4-f654-4088-889a-91c5aab29f99 200 63ms
+[14:44:58] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ee15981be564a428a51e3758a70c423%22%7D%7D&limit=1 200 87ms
+[14:45:00] POST /files 200 2.3s
+[14:45:00] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22c1bf0582-dfa9-44ec-a48e-0d2ce079bcf2%22%7D%7D&limit=1 200 42ms
+[14:45:01] PATCH /files/c1bf0582-dfa9-44ec-a48e-0d2ce079bcf2 200 82ms
+[14:45:01] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ee1924359ff4eb5a5c1403fcf2f0cce%22%7D%7D&limit=1 200 77ms
+[14:45:03] POST /files 200 2s
+[14:45:03] GET /files?fields=id%2Cfile_size_mb%2Cfile_format%2Cdimensions_px%2Cresolution_dpi%2Cmedia_sizes_cm%2Ccolor_space%2Cphotographer%2Ccopyright%2Ccompany_name%2Coriginal_filename%2Calt_text%2Cdescription%2Ciptc_creation_date%2Ciptc_creation_time%2Cfotoware_mongo_id%2Cfotoware_original_path%2Cfotoware_archive%2Cprimarix_picid%2Cprimarix_filename%2Cprimarix_workspace%2Cprimarix_copyright%2Cprimarix_source&filter=%7B%22id%22%3A%7B%22_eq%22%3A%22717f0112-77a2-4bcd-813b-59029f81786a%22%7D%7D&limit=1 200 38ms
+[14:45:03] PATCH /files/717f0112-77a2-4bcd-813b-59029f81786a 200 63ms
+[14:45:03] GET /files?fields=id%2Cfotoware_is_placeholder&filter=%7B%22fotoware_mongo_id%22%3A%7B%22_eq%22%3A%224ee1938e7ab04c509d8dd38bc51815f3%22%7D%7D&limit=1 200 126ms
+2026-07-22T14:50:12: PM2 log: App name:directus id:0 disconnected
+2026-07-22T14:50:12: PM2 log: App [directus:0] exited with code [0] via signal [SIGKILL]
+2026-07-22T14:50:14: PM2 log: 0 application online, retry = 3
+2026-07-22T14:50:16: PM2 log: 0 application online, retry = 2
+2026-07-22T14:50:18: PM2 log: 0 application online, retry = 1
+2026-07-22T14:50:20: PM2 log: 0 application online, retry = 0
+2026-07-22T14:50:20: PM2 log: PM2 successfully stopped
+root@vm-directus-botg-staging:/opt/directus-staging# docker inspect directus-staging-directus-1 --format='OOMKilled={{.State.OOMKilled}} ExitCode={{.State.ExitCode}} FinishedAt={{.State.FinishedAt}} StartedAt={{.State.StartedAt}}'
+OOMKilled=true ExitCode=2 FinishedAt=2026-07-22T14:50:20.767710473Z StartedAt=2026-07-21T14:28:00.31233422Z
+root@vm-directus-botg-staging:/opt/directus-staging# dmesg -T | grep -i -E "oom|killed process|out of memory" | tail -30
+[Wed Jul 22 14:50:34 2026] cloudflared invoked oom-killer: gfp_mask=0x140cca(GFP_HIGHUSER_MOVABLE|__GFP_COMP), order=0, oom_score_adj=0
+[Wed Jul 22 14:50:34 2026]  oom_kill_process+0x118/0x280
+[Wed Jul 22 14:50:34 2026]  ? oom_evaluate_task+0x143/0x1e0
+[Wed Jul 22 14:50:34 2026]  __alloc_pages_may_oom+0x10c/0x1d0
+[Wed Jul 22 14:50:34 2026] [  pid  ]   uid  tgid total_vm      rss rss_anon rss_file rss_shmem pgtables_bytes swapents oom_score_adj name
+[Wed Jul 22 14:50:34 2026] oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=cloudflared.service,mems_allowed=0,global_oom,task_memcg=/system.slice/docker-a00795f92840a7ac30f4fa818d3cda39e07bd75ffea9f742a337e5453f6dd924.scope,task=node /directus/,pid=3249605,uid=1000
+[Wed Jul 22 14:50:34 2026] Out of memory: Killed process 3249605 (node /directus/) total-vm:16647280kB, anon-rss:3260616kB, file-rss:128kB, shmem-rss:0kB, UID:1000 pgtables:11624kB oom_score_adj:0
+root@vm-directus-botg-staging:/opt/directus-staging# df -h
+du -sh /opt/directus-staging/uploads /opt/directus-staging/data/database 2>/dev/null
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           382M  1.2M  381M   1% /run
+efivarfs        256K   45K  207K  18% /sys/firmware/efi/efivars
+/dev/sda1        75G   36G   36G  50% /
+tmpfs           1.9G     0  1.9G   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+/dev/sda15      253M  146K  252M   1% /boot/efi
+overlay          75G   36G   36G  50% /var/lib/docker/rootfs/overlayfs/d33024cd64e9060dbc04ef7836f5528fb688d15f650d07e6bde5a5ce83abf7a8
+overlay          75G   36G   36G  50% /var/lib/docker/rootfs/overlayfs/1a96eb34f3833ce7ac15053ace627633d3d2fd9d8a305be44c6c57adcb0bd158
+overlay          75G   36G   36G  50% /var/lib/docker/rootfs/overlayfs/aa3cab31159d7cbe93c75d8d8af7338f2f4d5a7716ece42478c2f6c5c87f9f41
+tmpfs           382M   12K  382M   1% /run/user/1000
+92M	/opt/directus-staging/uploads
+617M	/opt/directus-staging/data/database
+root@vm-directus-botg-staging:/opt/directus-staging# docker logs --tail 200 directus-staging-database-1 | grep -i -E "too many|connection|fatal"
+2026-07-22 08:27:38.099 UTC [14] LOG:  checkpoint complete: wrote 396 buffers (2.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=39.231 s, sync=0.008 s, total=39.243 s; sync files=38, longest=0.002 s, average=0.001 s; distance=3156 kB, estimate=5880 kB
+2026-07-22 08:31:58.151 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 08:33:17.539 UTC [14] LOG:  checkpoint complete: wrote 795 buffers (4.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=79.371 s, sync=0.013 s, total=79.389 s; sync files=43, longest=0.003 s, average=0.001 s; distance=5669 kB, estimate=5858 kB
+2026-07-22 08:36:58.637 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 08:38:02.605 UTC [14] LOG:  checkpoint complete: wrote 643 buffers (3.9%); 0 WAL file(s) added, 1 removed, 0 recycled; write=63.940 s, sync=0.018 s, total=63.969 s; sync files=45, longest=0.003 s, average=0.001 s; distance=5377 kB, estimate=5810 kB
+2026-07-22 08:41:58.706 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 08:43:13.764 UTC [14] LOG:  checkpoint complete: wrote 753 buffers (4.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=75.041 s, sync=0.011 s, total=75.059 s; sync files=43, longest=0.002 s, average=0.001 s; distance=6774 kB, estimate=6774 kB
+2026-07-22 08:46:58.861 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 08:47:58.886 UTC [14] LOG:  checkpoint complete: wrote 603 buffers (3.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=60.001 s, sync=0.014 s, total=60.025 s; sync files=42, longest=0.002 s, average=0.001 s; distance=5351 kB, estimate=6632 kB
+2026-07-22 08:51:58.914 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 08:52:25.065 UTC [1380217] ERROR:  value too long for type character varying(255)
+2026-07-22 08:52:25.065 UTC [1380217] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 08:52:25.113 UTC [1382360] ERROR:  value too long for type character varying(255)
+2026-07-22 08:52:25.113 UTC [1382360] STATEMENT:  update "directus_files" set "resolution_dpi" = $1, "media_sizes_cm" = $2, "color_space" = $3, "company_name" = $4, "original_filename" = $5, "alt_text" = $6, "iptc_creation_time" = $7, "file_size_mb" = $8, "file_format" = $9, "dimensions_px" = $10, "iptc_creation_date" = $11, "fotoware_original_path" = $12, "fotoware_archive" = $13, "primarix_picid" = $14, "primarix_filename" = $15, "primarix_workspace" = $16, "primarix_copyright" = $17, "primarix_source" = $18, "modified_by" = $19, "modified_on" = $20 where "id" in ($21)
+2026-07-22 08:53:05.382 UTC [14] LOG:  checkpoint complete: wrote 668 buffers (4.1%); 0 WAL file(s) added, 0 removed, 1 recycled; write=66.441 s, sync=0.022 s, total=66.469 s; sync files=45, longest=0.006 s, average=0.001 s; distance=5787 kB, estimate=6547 kB
+2026-07-22 08:56:58.473 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:00:56.740 UTC [14] LOG:  checkpoint complete: wrote 2382 buffers (14.5%); 0 WAL file(s) added, 0 removed, 0 recycled; write=238.247 s, sync=0.013 s, total=238.267 s; sync files=41, longest=0.003 s, average=0.001 s; distance=6624 kB, estimate=6624 kB
+2026-07-22 09:01:58.763 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:03:25.098 UTC [14] LOG:  checkpoint complete: wrote 866 buffers (5.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=86.307 s, sync=0.022 s, total=86.336 s; sync files=44, longest=0.003 s, average=0.001 s; distance=6258 kB, estimate=6587 kB
+2026-07-22 09:06:58.198 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:10:36.905 UTC [14] LOG:  checkpoint complete: wrote 2181 buffers (13.3%); 0 WAL file(s) added, 0 removed, 1 recycled; write=218.692 s, sync=0.010 s, total=218.707 s; sync files=40, longest=0.002 s, average=0.001 s; distance=5932 kB, estimate=6522 kB
+2026-07-22 09:11:58.974 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:12:37.805 UTC [14] LOG:  checkpoint complete: wrote 392 buffers (2.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=38.807 s, sync=0.018 s, total=38.832 s; sync files=42, longest=0.003 s, average=0.001 s; distance=3561 kB, estimate=6226 kB
+2026-07-22 09:16:58.905 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:17:30.019 UTC [14] LOG:  checkpoint complete: wrote 314 buffers (1.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=31.098 s, sync=0.011 s, total=31.115 s; sync files=40, longest=0.003 s, average=0.001 s; distance=2446 kB, estimate=5848 kB
+2026-07-22 09:21:58.119 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:23:04.900 UTC [14] LOG:  checkpoint complete: wrote 670 buffers (4.1%); 0 WAL file(s) added, 0 removed, 1 recycled; write=66.757 s, sync=0.018 s, total=66.782 s; sync files=42, longest=0.003 s, average=0.001 s; distance=5715 kB, estimate=5834 kB
+2026-07-22 09:26:18.609 UTC [1390898] ERROR:  value too long for type character varying(255)
+2026-07-22 09:26:18.609 UTC [1390898] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 09:26:18.720 UTC [1390898] ERROR:  value too long for type character varying(255)
+2026-07-22 09:26:18.720 UTC [1390898] STATEMENT:  update "directus_files" set "company_name" = $1, "alt_text" = $2, "iptc_creation_time" = $3, "fotoware_original_path" = $4, "fotoware_archive" = $5, "modified_by" = $6, "modified_on" = $7 where "id" in ($8)
+2026-07-22 09:26:58.997 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:28:15.715 UTC [14] LOG:  checkpoint complete: wrote 770 buffers (4.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=76.699 s, sync=0.012 s, total=76.718 s; sync files=43, longest=0.002 s, average=0.001 s; distance=6844 kB, estimate=6844 kB
+2026-07-22 09:31:58.814 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:33:20.948 UTC [14] LOG:  checkpoint complete: wrote 824 buffers (5.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=82.117 s, sync=0.011 s, total=82.135 s; sync files=46, longest=0.002 s, average=0.001 s; distance=6688 kB, estimate=6828 kB
+2026-07-22 09:36:58.994 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:38:26.158 UTC [14] LOG:  checkpoint complete: wrote 875 buffers (5.3%); 0 WAL file(s) added, 0 removed, 1 recycled; write=87.147 s, sync=0.011 s, total=87.165 s; sync files=45, longest=0.002 s, average=0.001 s; distance=6596 kB, estimate=6805 kB
+2026-07-22 09:41:58.203 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:43:03.182 UTC [14] LOG:  checkpoint complete: wrote 652 buffers (4.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=64.956 s, sync=0.018 s, total=64.980 s; sync files=40, longest=0.003 s, average=0.001 s; distance=5942 kB, estimate=6719 kB
+2026-07-22 09:46:58.283 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:51:28.032 UTC [14] LOG:  checkpoint complete: wrote 2809 buffers (17.1%); 0 WAL file(s) added, 0 removed, 1 recycled; write=269.719 s, sync=0.023 s, total=269.750 s; sync files=43, longest=0.003 s, average=0.001 s; distance=6603 kB, estimate=6707 kB
+2026-07-22 09:51:58.062 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:53:04.860 UTC [14] LOG:  checkpoint complete: wrote 670 buffers (4.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=66.783 s, sync=0.011 s, total=66.799 s; sync files=40, longest=0.002 s, average=0.001 s; distance=6454 kB, estimate=6682 kB
+2026-07-22 09:56:58.922 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 09:58:15.438 UTC [14] LOG:  checkpoint complete: wrote 768 buffers (4.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=76.495 s, sync=0.015 s, total=76.517 s; sync files=43, longest=0.003 s, average=0.001 s; distance=6703 kB, estimate=6703 kB
+2026-07-22 10:01:58.537 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:03:07.353 UTC [14] LOG:  checkpoint complete: wrote 690 buffers (4.2%); 0 WAL file(s) added, 0 removed, 1 recycled; write=68.798 s, sync=0.010 s, total=68.816 s; sync files=42, longest=0.002 s, average=0.001 s; distance=5996 kB, estimate=6632 kB
+2026-07-22 10:06:58.448 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:08:16.847 UTC [14] LOG:  checkpoint complete: wrote 786 buffers (4.8%); 0 WAL file(s) added, 0 removed, 0 recycled; write=78.380 s, sync=0.014 s, total=78.400 s; sync files=40, longest=0.002 s, average=0.001 s; distance=5586 kB, estimate=6528 kB
+2026-07-22 10:11:58.942 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:13:09.691 UTC [14] LOG:  checkpoint complete: wrote 710 buffers (4.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=70.723 s, sync=0.021 s, total=70.750 s; sync files=42, longest=0.003 s, average=0.001 s; distance=5864 kB, estimate=6461 kB
+2026-07-22 10:16:58.770 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:18:18.589 UTC [14] LOG:  checkpoint complete: wrote 799 buffers (4.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=79.787 s, sync=0.023 s, total=79.820 s; sync files=45, longest=0.004 s, average=0.001 s; distance=6741 kB, estimate=6741 kB
+2026-07-22 10:21:58.675 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:26:28.088 UTC [14] LOG:  checkpoint complete: wrote 2852 buffers (17.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=269.393 s, sync=0.015 s, total=269.413 s; sync files=45, longest=0.002 s, average=0.001 s; distance=8043 kB, estimate=8043 kB
+2026-07-22 10:26:58.098 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:28:01.057 UTC [14] LOG:  checkpoint complete: wrote 631 buffers (3.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=62.939 s, sync=0.013 s, total=62.960 s; sync files=42, longest=0.002 s, average=0.001 s; distance=6251 kB, estimate=7864 kB
+2026-07-22 10:31:58.105 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:33:08.779 UTC [14] LOG:  checkpoint complete: wrote 699 buffers (4.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=70.656 s, sync=0.014 s, total=70.675 s; sync files=40, longest=0.003 s, average=0.001 s; distance=6332 kB, estimate=7710 kB
+2026-07-22 10:36:58.818 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:38:11.029 UTC [14] LOG:  checkpoint complete: wrote 720 buffers (4.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=72.191 s, sync=0.016 s, total=72.211 s; sync files=40, longest=0.002 s, average=0.001 s; distance=5133 kB, estimate=7453 kB
+2026-07-22 10:41:58.106 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:43:10.522 UTC [14] LOG:  checkpoint complete: wrote 659 buffers (4.0%); 0 WAL file(s) added, 0 removed, 1 recycled; write=72.394 s, sync=0.016 s, total=72.416 s; sync files=44, longest=0.003 s, average=0.001 s; distance=6402 kB, estimate=7348 kB
+2026-07-22 10:44:43.934 UTC [1411451] ERROR:  value too long for type character varying(255)
+2026-07-22 10:44:43.934 UTC [1411451] STATEMENT:  update "directus_files" set "resolution_dpi" = $1, "media_sizes_cm" = $2, "color_space" = $3, "company_name" = $4, "original_filename" = $5, "alt_text" = $6, "file_size_mb" = $7, "file_format" = $8, "dimensions_px" = $9, "iptc_creation_date" = $10, "fotoware_original_path" = $11, "fotoware_archive" = $12, "modified_by" = $13, "modified_on" = $14 where "id" in ($15)
+2026-07-22 10:44:43.936 UTC [1410715] ERROR:  value too long for type character varying(255)
+2026-07-22 10:44:43.936 UTC [1410715] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 10:46:58.617 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:47:57.435 UTC [14] LOG:  checkpoint complete: wrote 550 buffers (3.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=58.793 s, sync=0.019 s, total=58.818 s; sync files=42, longest=0.003 s, average=0.001 s; distance=6482 kB, estimate=7261 kB
+2026-07-22 10:51:58.507 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:52:44.692 UTC [14] LOG:  checkpoint complete: wrote 444 buffers (2.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=46.160 s, sync=0.019 s, total=46.185 s; sync files=45, longest=0.003 s, average=0.001 s; distance=5159 kB, estimate=7051 kB
+2026-07-22 10:56:58.778 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 10:57:48.393 UTC [14] LOG:  checkpoint complete: wrote 459 buffers (2.8%); 0 WAL file(s) added, 0 removed, 1 recycled; write=49.585 s, sync=0.023 s, total=49.616 s; sync files=45, longest=0.005 s, average=0.001 s; distance=6292 kB, estimate=6975 kB
+2026-07-22 11:01:58.471 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:02:06.788 UTC [1417224] ERROR:  value too long for type character varying(255)
+2026-07-22 11:02:06.788 UTC [1417224] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 11:02:06.853 UTC [1411451] ERROR:  value too long for type character varying(255)
+2026-07-22 11:02:06.853 UTC [1411451] STATEMENT:  update "directus_files" set "resolution_dpi" = $1, "media_sizes_cm" = $2, "color_space" = $3, "company_name" = $4, "original_filename" = $5, "alt_text" = $6, "iptc_creation_time" = $7, "file_size_mb" = $8, "file_format" = $9, "dimensions_px" = $10, "iptc_creation_date" = $11, "fotoware_original_path" = $12, "fotoware_archive" = $13, "modified_by" = $14, "modified_on" = $15 where "id" in ($16)
+2026-07-22 11:02:25.304 UTC [14] LOG:  checkpoint complete: wrote 245 buffers (1.5%); 0 WAL file(s) added, 0 removed, 0 recycled; write=26.804 s, sync=0.023 s, total=26.834 s; sync files=43, longest=0.003 s, average=0.001 s; distance=6379 kB, estimate=6915 kB
+2026-07-22 11:06:58.401 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:07:23.632 UTC [14] LOG:  checkpoint complete: wrote 201 buffers (1.2%); 0 WAL file(s) added, 0 removed, 1 recycled; write=25.195 s, sync=0.028 s, total=25.231 s; sync files=44, longest=0.003 s, average=0.001 s; distance=5962 kB, estimate=6820 kB
+2026-07-22 11:11:58.729 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:13:21.291 UTC [14] LOG:  checkpoint complete: wrote 758 buffers (4.6%); 0 WAL file(s) added, 0 removed, 1 recycled; write=82.534 s, sync=0.021 s, total=82.563 s; sync files=41, longest=0.004 s, average=0.001 s; distance=15920 kB, estimate=15920 kB
+2026-07-22 11:16:58.391 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:17:43.304 UTC [14] LOG:  checkpoint complete: wrote 428 buffers (2.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=44.887 s, sync=0.020 s, total=44.914 s; sync files=45, longest=0.003 s, average=0.001 s; distance=7467 kB, estimate=15075 kB
+2026-07-22 11:21:58.404 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:22:23.637 UTC [14] LOG:  checkpoint complete: wrote 231 buffers (1.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=25.207 s, sync=0.022 s, total=25.234 s; sync files=42, longest=0.004 s, average=0.001 s; distance=6283 kB, estimate=14196 kB
+2026-07-22 11:26:58.702 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:27:20.602 UTC [14] LOG:  checkpoint complete: wrote 200 buffers (1.2%); 0 WAL file(s) added, 0 removed, 1 recycled; write=21.881 s, sync=0.013 s, total=21.901 s; sync files=41, longest=0.002 s, average=0.001 s; distance=5534 kB, estimate=13330 kB
+2026-07-22 11:31:58.681 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:32:14.363 UTC [14] LOG:  checkpoint complete: wrote 137 buffers (0.8%); 0 WAL file(s) added, 0 removed, 0 recycled; write=15.656 s, sync=0.020 s, total=15.682 s; sync files=42, longest=0.004 s, average=0.001 s; distance=4648 kB, estimate=12461 kB
+2026-07-22 11:36:58.448 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:37:18.366 UTC [14] LOG:  checkpoint complete: wrote 196 buffers (1.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=19.871 s, sync=0.041 s, total=19.918 s; sync files=39, longest=0.029 s, average=0.002 s; distance=5158 kB, estimate=11731 kB
+2026-07-22 11:40:45.652 UTC [1425455] ERROR:  value too long for type character varying(255)
+2026-07-22 11:40:45.652 UTC [1425455] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 11:40:45.694 UTC [1425060] ERROR:  value too long for type character varying(255)
+2026-07-22 11:40:45.694 UTC [1425060] STATEMENT:  update "directus_files" set "resolution_dpi" = $1, "media_sizes_cm" = $2, "color_space" = $3, "photographer" = $4, "company_name" = $5, "original_filename" = $6, "alt_text" = $7, "file_size_mb" = $8, "file_format" = $9, "dimensions_px" = $10, "iptc_creation_date" = $11, "fotoware_original_path" = $12, "fotoware_archive" = $13, "primarix_picid" = $14, "primarix_filename" = $15, "primarix_workspace" = $16, "primarix_copyright" = $17, "primarix_source" = $18, "modified_by" = $19, "modified_on" = $20 where "id" in ($21)
+2026-07-22 11:41:58.465 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:42:10.096 UTC [1425310] ERROR:  value too long for type character varying(255)
+2026-07-22 11:42:10.096 UTC [1425310] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 11:42:10.201 UTC [1425310] ERROR:  invalid byte sequence for encoding "UTF8": 0x00
+2026-07-22 11:42:10.201 UTC [1425310] CONTEXT:  unnamed portal parameter $3
+2026-07-22 11:42:10.201 UTC [1425310] STATEMENT:  update "directus_flows" set "flow_manager_last_run_at" = $1, "flow_manager_run_counter" = $2, "flow_manager_last_run_message" = $3, "flow_manager_last_run_operation" = $4 where "id" = $5
+2026-07-22 11:42:24.494 UTC [14] LOG:  checkpoint complete: wrote 236 buffers (1.4%); 0 WAL file(s) added, 0 removed, 1 recycled; write=26.002 s, sync=0.015 s, total=26.030 s; sync files=40, longest=0.002 s, average=0.001 s; distance=6575 kB, estimate=11215 kB
+2026-07-22 11:46:58.590 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:47:27.713 UTC [14] LOG:  checkpoint complete: wrote 243 buffers (1.5%); 0 WAL file(s) added, 0 removed, 0 recycled; write=29.096 s, sync=0.022 s, total=29.123 s; sync files=43, longest=0.003 s, average=0.001 s; distance=7404 kB, estimate=10834 kB
+2026-07-22 11:51:58.813 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:53:10.344 UTC [14] LOG:  checkpoint complete: wrote 639 buffers (3.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=71.508 s, sync=0.016 s, total=71.531 s; sync files=46, longest=0.003 s, average=0.001 s; distance=6706 kB, estimate=10422 kB
+2026-07-22 11:56:58.447 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 11:58:09.091 UTC [14] LOG:  checkpoint complete: wrote 613 buffers (3.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=70.618 s, sync=0.019 s, total=70.645 s; sync files=44, longest=0.003 s, average=0.001 s; distance=7755 kB, estimate=10155 kB
+2026-07-22 12:01:58.181 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:02:22.772 UTC [14] LOG:  checkpoint complete: wrote 237 buffers (1.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=24.579 s, sync=0.008 s, total=24.592 s; sync files=41, longest=0.002 s, average=0.001 s; distance=6252 kB, estimate=9765 kB
+2026-07-22 12:06:58.811 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:07:24.260 UTC [14] LOG:  checkpoint complete: wrote 233 buffers (1.4%); 0 WAL file(s) added, 0 removed, 1 recycled; write=25.416 s, sync=0.020 s, total=25.449 s; sync files=45, longest=0.004 s, average=0.001 s; distance=6366 kB, estimate=9425 kB
+2026-07-22 12:11:58.312 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:12:24.139 UTC [14] LOG:  checkpoint complete: wrote 234 buffers (1.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=25.797 s, sync=0.022 s, total=25.827 s; sync files=43, longest=0.003 s, average=0.001 s; distance=6229 kB, estimate=9105 kB
+2026-07-22 12:16:58.233 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:17:22.463 UTC [14] LOG:  checkpoint complete: wrote 208 buffers (1.3%); 0 WAL file(s) added, 0 removed, 1 recycled; write=24.206 s, sync=0.019 s, total=24.230 s; sync files=45, longest=0.004 s, average=0.001 s; distance=6855 kB, estimate=8880 kB
+2026-07-22 12:21:58.562 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:22:16.049 UTC [14] LOG:  checkpoint complete: wrote 165 buffers (1.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=17.461 s, sync=0.020 s, total=17.488 s; sync files=42, longest=0.002 s, average=0.001 s; distance=6728 kB, estimate=8665 kB
+2026-07-22 12:26:58.127 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:27:23.861 UTC [14] LOG:  checkpoint complete: wrote 224 buffers (1.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=25.721 s, sync=0.009 s, total=25.735 s; sync files=43, longest=0.002 s, average=0.001 s; distance=5666 kB, estimate=8365 kB
+2026-07-22 12:31:58.941 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:32:21.570 UTC [14] LOG:  checkpoint complete: wrote 208 buffers (1.3%); 0 WAL file(s) added, 0 removed, 1 recycled; write=22.609 s, sync=0.015 s, total=22.630 s; sync files=40, longest=0.003 s, average=0.001 s; distance=6535 kB, estimate=8182 kB
+2026-07-22 12:36:33.611 UTC [1438588] ERROR:  value too long for type character varying(255)
+2026-07-22 12:36:33.611 UTC [1438588] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 12:36:33.642 UTC [1439465] ERROR:  value too long for type character varying(255)
+2026-07-22 12:36:33.642 UTC [1439465] STATEMENT:  update "directus_files" set "resolution_dpi" = $1, "media_sizes_cm" = $2, "color_space" = $3, "company_name" = $4, "original_filename" = $5, "alt_text" = $6, "file_size_mb" = $7, "file_format" = $8, "dimensions_px" = $9, "iptc_creation_date" = $10, "fotoware_original_path" = $11, "fotoware_archive" = $12, "modified_by" = $13, "modified_on" = $14 where "id" in ($15)
+2026-07-22 12:36:58.640 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:37:17.676 UTC [14] LOG:  checkpoint complete: wrote 163 buffers (1.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=19.004 s, sync=0.024 s, total=19.037 s; sync files=41, longest=0.003 s, average=0.001 s; distance=6746 kB, estimate=8038 kB
+2026-07-22 12:41:58.772 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:42:23.811 UTC [14] LOG:  checkpoint complete: wrote 195 buffers (1.2%); 0 WAL file(s) added, 0 removed, 1 recycled; write=25.015 s, sync=0.018 s, total=25.040 s; sync files=39, longest=0.002 s, average=0.001 s; distance=6323 kB, estimate=7867 kB
+2026-07-22 12:46:58.911 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:47:21.342 UTC [14] LOG:  checkpoint complete: wrote 201 buffers (1.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=22.392 s, sync=0.033 s, total=22.431 s; sync files=43, longest=0.007 s, average=0.001 s; distance=6862 kB, estimate=7766 kB
+2026-07-22 12:47:23.979 UTC [1441702] ERROR:  value too long for type character varying(255)
+2026-07-22 12:47:23.979 UTC [1441702] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 12:47:24.025 UTC [1440939] ERROR:  value too long for type character varying(255)
+2026-07-22 12:47:24.025 UTC [1440939] STATEMENT:  update "directus_files" set "resolution_dpi" = $1, "media_sizes_cm" = $2, "color_space" = $3, "company_name" = $4, "original_filename" = $5, "alt_text" = $6, "iptc_creation_time" = $7, "file_size_mb" = $8, "file_format" = $9, "dimensions_px" = $10, "iptc_creation_date" = $11, "fotoware_original_path" = $12, "fotoware_archive" = $13, "modified_by" = $14, "modified_on" = $15 where "id" in ($16)
+2026-07-22 12:51:58.431 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:52:44.174 UTC [14] LOG:  checkpoint complete: wrote 430 buffers (2.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=45.724 s, sync=0.013 s, total=45.743 s; sync files=48, longest=0.002 s, average=0.001 s; distance=5723 kB, estimate=7562 kB
+2026-07-22 12:56:58.274 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 12:57:09.227 UTC [14] LOG:  checkpoint complete: wrote 106 buffers (0.6%); 0 WAL file(s) added, 0 removed, 1 recycled; write=10.937 s, sync=0.010 s, total=10.953 s; sync files=36, longest=0.002 s, average=0.001 s; distance=2015 kB, estimate=7007 kB
+2026-07-22 13:01:58.327 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:02:19.742 UTC [14] LOG:  checkpoint complete: wrote 195 buffers (1.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=21.395 s, sync=0.016 s, total=21.416 s; sync files=38, longest=0.003 s, average=0.001 s; distance=4491 kB, estimate=6756 kB
+2026-07-22 13:04:24.127 UTC [1444066] ERROR:  value too long for type character varying(255)
+2026-07-22 13:04:24.127 UTC [1444066] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 13:04:24.193 UTC [1444066] ERROR:  value too long for type character varying(255)
+2026-07-22 13:04:24.193 UTC [1444066] STATEMENT:  update "directus_files" set "resolution_dpi" = $1, "media_sizes_cm" = $2, "color_space" = $3, "company_name" = $4, "original_filename" = $5, "alt_text" = $6, "iptc_creation_time" = $7, "file_size_mb" = $8, "file_format" = $9, "dimensions_px" = $10, "iptc_creation_date" = $11, "fotoware_original_path" = $12, "fotoware_archive" = $13, "primarix_picid" = $14, "primarix_filename" = $15, "primarix_workspace" = $16, "primarix_copyright" = $17, "primarix_source" = $18, "modified_by" = $19, "modified_on" = $20 where "id" in ($21)
+2026-07-22 13:06:58.842 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:07:28.509 UTC [14] LOG:  checkpoint complete: wrote 278 buffers (1.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=29.635 s, sync=0.027 s, total=29.667 s; sync files=46, longest=0.003 s, average=0.001 s; distance=6110 kB, estimate=6691 kB
+2026-07-22 13:11:58.596 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:12:18.726 UTC [14] LOG:  checkpoint complete: wrote 173 buffers (1.1%); 0 WAL file(s) added, 0 removed, 1 recycled; write=20.105 s, sync=0.018 s, total=20.131 s; sync files=41, longest=0.004 s, average=0.001 s; distance=6149 kB, estimate=6637 kB
+2026-07-22 13:16:58.830 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:17:19.241 UTC [14] LOG:  checkpoint complete: wrote 188 buffers (1.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=20.389 s, sync=0.018 s, total=20.412 s; sync files=44, longest=0.003 s, average=0.001 s; distance=6742 kB, estimate=6742 kB
+2026-07-22 13:21:58.340 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:22:13.230 UTC [14] LOG:  checkpoint complete: wrote 133 buffers (0.8%); 0 WAL file(s) added, 0 removed, 0 recycled; write=14.862 s, sync=0.023 s, total=14.890 s; sync files=41, longest=0.004 s, average=0.001 s; distance=6364 kB, estimate=6704 kB
+2026-07-22 13:24:02.692 UTC [1447293] ERROR:  invalid byte sequence for encoding "UTF8": 0x00
+2026-07-22 13:24:02.692 UTC [1447293] CONTEXT:  unnamed portal parameter $3
+2026-07-22 13:24:02.692 UTC [1447293] STATEMENT:  update "directus_files" set "filename_download" = $1, "tags" = $2, "copyright" = $3, "resolution_dpi" = $4, "media_sizes_cm" = $5, "color_space" = $6, "photographer" = $7, "original_filename" = $8, "iptc_creation_time" = $9, "file_size_mb" = $10, "file_format" = $11, "dimensions_px" = $12, "keyword_ids" = $13, "iptc_creation_date" = $14, "modified_by" = $15, "modified_on" = $16 where "id" in ($17)
+2026-07-22 13:26:58.329 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:27:14.043 UTC [14] LOG:  checkpoint complete: wrote 136 buffers (0.8%); 0 WAL file(s) added, 0 removed, 1 recycled; write=15.686 s, sync=0.021 s, total=15.714 s; sync files=44, longest=0.002 s, average=0.001 s; distance=6230 kB, estimate=6657 kB
+2026-07-22 13:31:58.071 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:32:11.551 UTC [14] LOG:  checkpoint complete: wrote 113 buffers (0.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=13.457 s, sync=0.018 s, total=13.481 s; sync files=38, longest=0.003 s, average=0.001 s; distance=4960 kB, estimate=6487 kB
+2026-07-22 13:36:58.613 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:37:13.913 UTC [14] LOG:  checkpoint complete: wrote 133 buffers (0.8%); 0 WAL file(s) added, 0 removed, 0 recycled; write=15.284 s, sync=0.010 s, total=15.300 s; sync files=40, longest=0.002 s, average=0.001 s; distance=6644 kB, estimate=6644 kB
+2026-07-22 13:41:59.004 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:43:11.899 UTC [14] LOG:  checkpoint complete: wrote 698 buffers (4.3%); 0 WAL file(s) added, 0 removed, 1 recycled; write=72.877 s, sync=0.013 s, total=72.896 s; sync files=42, longest=0.003 s, average=0.001 s; distance=6113 kB, estimate=6591 kB
+2026-07-22 13:46:59.965 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:47:37.869 UTC [14] LOG:  checkpoint complete: wrote 345 buffers (2.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=37.877 s, sync=0.022 s, total=37.904 s; sync files=42, longest=0.003 s, average=0.001 s; distance=7599 kB, estimate=7599 kB
+2026-07-22 13:51:59.976 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:52:26.012 UTC [14] LOG:  checkpoint complete: wrote 215 buffers (1.3%); 0 WAL file(s) added, 0 removed, 1 recycled; write=25.999 s, sync=0.018 s, total=26.036 s; sync files=43, longest=0.003 s, average=0.001 s; distance=6688 kB, estimate=7508 kB
+2026-07-22 13:56:59.030 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 13:57:11.989 UTC [14] LOG:  checkpoint complete: wrote 133 buffers (0.8%); 0 WAL file(s) added, 0 removed, 0 recycled; write=12.933 s, sync=0.021 s, total=12.959 s; sync files=43, longest=0.004 s, average=0.001 s; distance=5671 kB, estimate=7324 kB
+2026-07-22 14:02:00.065 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:02:15.031 UTC [14] LOG:  checkpoint complete: wrote 145 buffers (0.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=14.950 s, sync=0.010 s, total=14.967 s; sync files=41, longest=0.002 s, average=0.001 s; distance=5635 kB, estimate=7155 kB
+2026-07-22 14:06:40.752 UTC [1455671] ERROR:  value too long for type character varying(255)
+2026-07-22 14:06:40.752 UTC [1455671] STATEMENT:  insert into "junction_directus_files_translations_2" ("caption_i18n", "directus_files_id", "translations_id") values ($1, $2, $3) returning "id"
+2026-07-22 14:06:40.859 UTC [1455671] ERROR:  invalid byte sequence for encoding "UTF8": 0x00
+2026-07-22 14:06:40.859 UTC [1455671] CONTEXT:  unnamed portal parameter $3
+2026-07-22 14:06:40.859 UTC [1455671] STATEMENT:  update "directus_flows" set "flow_manager_last_run_at" = $1, "flow_manager_run_counter" = $2, "flow_manager_last_run_message" = $3, "flow_manager_last_run_operation" = $4 where "id" = $5
+2026-07-22 14:07:00.088 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:07:13.771 UTC [14] LOG:  checkpoint complete: wrote 122 buffers (0.7%); 0 WAL file(s) added, 0 removed, 1 recycled; write=13.659 s, sync=0.016 s, total=13.683 s; sync files=40, longest=0.003 s, average=0.001 s; distance=5240 kB, estimate=6964 kB
+2026-07-22 14:12:00.871 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:12:15.869 UTC [14] LOG:  checkpoint complete: wrote 113 buffers (0.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=14.971 s, sync=0.021 s, total=14.998 s; sync files=41, longest=0.003 s, average=0.001 s; distance=5606 kB, estimate=6828 kB
+2026-07-22 14:17:00.948 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:17:14.710 UTC [14] LOG:  checkpoint complete: wrote 137 buffers (0.8%); 0 WAL file(s) added, 0 removed, 0 recycled; write=13.743 s, sync=0.012 s, total=13.762 s; sync files=37, longest=0.002 s, average=0.001 s; distance=5221 kB, estimate=6667 kB
+2026-07-22 14:22:00.719 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:22:16.497 UTC [14] LOG:  checkpoint complete: wrote 152 buffers (0.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=15.754 s, sync=0.015 s, total=15.778 s; sync files=40, longest=0.003 s, average=0.001 s; distance=6057 kB, estimate=6606 kB
+2026-07-22 14:27:00.597 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:27:17.493 UTC [14] LOG:  checkpoint complete: wrote 140 buffers (0.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=16.869 s, sync=0.021 s, total=16.896 s; sync files=43, longest=0.003 s, average=0.001 s; distance=6268 kB, estimate=6572 kB
+2026-07-22 14:32:00.571 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:32:16.758 UTC [14] LOG:  checkpoint complete: wrote 145 buffers (0.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=16.158 s, sync=0.021 s, total=16.187 s; sync files=46, longest=0.003 s, average=0.001 s; distance=7236 kB, estimate=7236 kB
+2026-07-22 14:37:00.857 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:37:34.519 UTC [14] LOG:  checkpoint complete: wrote 308 buffers (1.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=33.637 s, sync=0.019 s, total=33.663 s; sync files=43, longest=0.003 s, average=0.001 s; distance=7142 kB, estimate=7227 kB
+2026-07-22 14:42:00.583 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:42:14.879 UTC [14] LOG:  checkpoint complete: wrote 134 buffers (0.8%); 0 WAL file(s) added, 0 removed, 1 recycled; write=14.264 s, sync=0.026 s, total=14.297 s; sync files=43, longest=0.006 s, average=0.001 s; distance=19337 kB, estimate=19337 kB
+2026-07-22 14:47:00.957 UTC [14] LOG:  checkpoint starting: time
+2026-07-22 14:47:12.707 UTC [14] LOG:  checkpoint complete: wrote 120 buffers (0.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=11.738 s, sync=0.008 s, total=11.750 s; sync files=41, longest=0.002 s, average=0.001 s; distance=4711 kB, estimate=17875 kB
+2026-07-23 02:02:10.835 UTC [14] LOG:  checkpoint starting: time
+2026-07-23 02:02:10.845 UTC [14] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.010 s; sync files=5, longest=0.001 s, average=0.001 s; distance=37 kB, estimate=16091 kB
+root@vm-directus-botg-staging:/opt/directus-staging# 
