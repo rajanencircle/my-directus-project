@@ -13,19 +13,30 @@ try {
 }
 
 /**
- * Download BOTG + Karawane Primarix MySQL dumps and import each into its own
+ * Download any number of MySQL dumps and import each into its own
  * dated database, then delete the local dump file.
  *
+ * Dumps are declared as numbered pairs, starting at 1, with no gaps:
+ *   DUMP_1_NAME="botg_full"
+ *   DUMP_1_URL="https://www.botg.de/fileadmin/bestof_full.dump"
+ *   DUMP_2_NAME="botg"
+ *   DUMP_2_URL="https://www.botg.de/fileadmin/bestof.dump"
+ *   DUMP_3_NAME="karawane_full"
+ *   DUMP_3_URL="https://www.karawane-primarix.de/downloads/karawane_full.dump"
+ *   DUMP_4_NAME="karawane"
+ *   DUMP_4_URL="https://www.karawane-primarix.de/downloads/karawane.dump"
+ *   ... DUMP_5_*, DUMP_6_*, etc. — add as many as needed.
+ *
+ * Each becomes database "<DUMP_n_NAME>_<YYYYMMDD>".
+ *
  * Usage:
- *   export BOTG_DUMP_URL="https://www.botg.de/fileadmin/bestof_full.dump"
- *   export KARAWANE_DUMP_URL="https://www.karawane-primarix.de/downloads/karawane.dump"
  *   export MYSQL_HOST="127.0.0.1"       # optional, default 127.0.0.1
  *   export MYSQL_PORT="3306"            # optional, default 3306
  *   export MYSQL_USER="root"            # optional, default root
  *   export MYSQL_PASSWORD="..."         # required if server needs auth
  *
- *   node import-mysql-dumps.js              # live run
- *   node import-mysql-dumps.js --dry-run    # log intended actions, no download/import/delete
+ *   node index.js              # live run
+ *   node index.js --dry-run    # log intended actions, no download/import/delete
  */
 
 const DRY_RUN = process.argv.includes("--dry-run");
@@ -37,16 +48,33 @@ const MYSQL_PASSWORD = process.env.MYSQL_PASSWORD || "";
 
 const DUMP_DIR = path.join(__dirname, "db-dumps");
 
-// name prefix, source env var
-const DUMPS = [
-  { label: "botg", urlEnv: "BOTG_DUMP_URL" },
-  { label: "karawane", urlEnv: "KARAWANE_DUMP_URL" },
-];
-
 // Only allow simple, predictable database name segments (derived from the
-// fixed DUMPS labels + a date stamp we generate ourselves) — never build a
-// SQL identifier from anything sourced externally (e.g. the dump URL).
+// DUMP_n_NAME env values + a date stamp we generate ourselves) — never build
+// a SQL identifier from anything sourced externally (e.g. the dump URL).
 const SAFE_NAME = /^[a-zA-Z0-9_]+$/;
+
+// Reads DUMP_1_NAME/DUMP_1_URL, DUMP_2_NAME/DUMP_2_URL, ... stopping at the
+// first missing index so the list can grow to however many dumps exist.
+function loadDumpsFromEnv() {
+  const dumps = [];
+  const seenLabels = new Set();
+  for (let i = 1; ; i++) {
+    const url = process.env[`DUMP_${i}_URL`];
+    if (!url) break;
+    const label = process.env[`DUMP_${i}_NAME`];
+    if (!label) {
+      console.error(`DUMP_${i}_URL is set but DUMP_${i}_NAME is missing. Skipping DUMP_${i}.`);
+      continue;
+    }
+    if (seenLabels.has(label)) {
+      console.error(`DUMP_${i}_NAME "${label}" duplicates an earlier entry (would collide on database name). Skipping DUMP_${i}.`);
+      continue;
+    }
+    seenLabels.add(label);
+    dumps.push({ label, url, index: i });
+  }
+  return dumps;
+}
 
 function todayStamp() {
   const d = new Date();
@@ -113,17 +141,17 @@ async function importDump(dbName, localFile) {
 }
 
 async function main() {
+  const dumps = loadDumpsFromEnv();
+  if (dumps.length === 0) {
+    console.error("No dumps configured. Set DUMP_1_NAME / DUMP_1_URL (and DUMP_2_*, DUMP_3_*, ...) in .env.");
+    process.exit(1);
+  }
+
   if (!DRY_RUN) fs.mkdirSync(DUMP_DIR, { recursive: true });
 
   const stamp = todayStamp();
 
-  for (const { label, urlEnv } of DUMPS) {
-    const url = process.env[urlEnv];
-    if (!url) {
-      console.error(`Missing ${urlEnv} env var. Skipping ${label}.`);
-      continue;
-    }
-
+  for (const { label, url, index } of dumps) {
     const dbName = `${label}_${stamp}`;
     if (!SAFE_NAME.test(dbName)) {
       console.error(
@@ -136,7 +164,7 @@ async function main() {
     try {
       ext = path.extname(new URL(url).pathname) || ".dump";
     } catch (e) {
-      console.error(`Invalid URL in ${urlEnv}: ${url}. Skipping ${label}.`);
+      console.error(`Invalid URL in DUMP_${index}_URL: ${url}. Skipping ${label}.`);
       continue;
     }
     const localFile = path.join(DUMP_DIR, `${label}_${stamp}${ext}`);
