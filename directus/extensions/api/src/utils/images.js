@@ -42,8 +42,11 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
         copyright: file.copyright ?? null,
         alt_text: file.alt_text ?? null,
         caption_i18n,
-        is_map: file.is_map ?? null,
-        tour32_export: file.tour32_export ?? null,
+        // is_map/tour32_export can live either on the junction row itself (per-product,
+        // e.g. cruises_directus_files) or on the shared file record depending on how each
+        // product's fields.js queries it — junction-level value wins when present.
+        is_map: row.is_map ?? file.is_map ?? null,
+        tour32_export: row.tour32_export ?? file.tour32_export ?? null,
         dimensions_px: file.dimensions_px ?? null,
         keyword_ids: file.keyword_ids ?? null,
         folder: file.folder

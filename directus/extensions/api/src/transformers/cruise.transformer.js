@@ -1,6 +1,7 @@
 import { CRUISES_STRIP_FIELDS } from "../maps/cruises.strip-fields.js";
 import { LOCALE_TO_ISO } from "../maps/language-code.map.js";
 import { ensureUtcSuffix } from "../utils/timestamps.js";
+import { groupPrices2 } from "../utils/grouping.js";
 import { buildImageUrls } from "../utils/images.js";
 
 function getLocaleCode(translationsId) {
@@ -82,8 +83,8 @@ export function shapeCruiseDetail(cruise, lang) {
     important_information: t.important_information ?? null,
     good_to_know: t.good_to_know ?? null,
     occupancy_single: t.occupancy_single ?? null,
-    deviating_cancellation_terms: t.deviating_cancellation_terms ?? null,
-    deviating_cancellation_terms_additions: t.deviating_cancellation_terms_additions ?? null,
+    deviating_cancellation_terms: t.deviating_cancellation_terms_selector ?? null,
+    deviating_cancellation_terms_additions: t.deviating_cancellation_terms_text ?? null,
     mobility_advice_text: t.mobility_advice_text ?? null,
   }));
 
@@ -102,9 +103,9 @@ export function shapeCruiseDetail(cruise, lang) {
   const specials_translations = lang ? (specialsMap[lang] ? { [lang]: specialsMap[lang] } : {}) : specialsMap;
 
   // price_calculation is a per-market pricing-settings row (structurally like hotels'
-  // hotel_prices), NOT a per-cabin/per-date price matrix — cruises has no such matrix
-  // collection, so cabin_categories/price_dates/occupancies are exposed as plain reference
-  // lists rather than grouped via groupPrices2.
+  // hotel_prices) — margin/exchange config, separate from the actual per-cabin/date/
+  // occupancy price cells, which DO exist in cruises_prices (fetched separately, see
+  // `categories` below, grouped the same way as tours/excursions via groupPrices2).
   const priceCalc = cruise.price_calculation?.[0] ?? null;
   const sellByLang = {};
   for (const t of priceCalc?.translations ?? []) {
@@ -141,6 +142,33 @@ export function shapeCruiseDetail(cruise, lang) {
     name: o.occupancy?.name ?? null,
     from: o.occupancy_from ?? null,
   }));
+
+  // Categories/prices grouped via the generic groupPrices2 helper (same pattern as
+  // tours/excursions). cruises_prices only stores buy_price — no sell_price/translations
+  // junction is wired for cruises yet, so `sell` is always null here (honest degradation,
+  // same as tours' pricing gap).
+  const categories = groupPrices2(
+    cruise.cabin_categories ?? [],
+    cruise.price_dates ?? [],
+    cruise.prices ?? [],
+    (cruise.occupancies ?? []).map((o) => o.occupancy).filter(Boolean),
+    LOCALE_TO_ISO,
+    {
+      categoryIdKey: 'cabin_category',
+      dateIdKey: 'price_date',
+      occupancyIdKey: 'occupancy',
+      dateStartKey: 'date_departure',
+      dateEndKey: 'date_arrival',
+      // no translationsKey — no sell price source exists
+    },
+    (cc) => ({
+      id: cc.id,
+      category: cc.cabin_category?.name ?? null,
+      booking_code: cc.cabin_category_booking_code ?? null,
+      from: cc.cabin_category_from ?? null,
+    }),
+    { lang },
+  );
 
   return {
     type: "cruise",
@@ -181,11 +209,14 @@ export function shapeCruiseDetail(cruise, lang) {
     cabin_categories,
     price_dates,
     occupancies,
+    categories,
     from_price,
     price_settings: priceCalc
       ? {
           buy_price_type: priceCalc.buy_price_type ?? null,
           sell_price_type: priceCalc.sell_price_type ?? null,
+          percentage_type: priceCalc.percentage_type ?? null,
+          provision_percentage: priceCalc.provision_percentage ?? null,
           margin_percentage: priceCalc.margin_percentage ?? null,
         }
       : null,

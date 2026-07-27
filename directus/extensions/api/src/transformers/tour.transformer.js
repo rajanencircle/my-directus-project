@@ -50,6 +50,7 @@ function stripFields(obj, fields) {
 
 export function shapeTourListItem(tour, lang) {
   const descMap = buildTranslationsMap(tour.descriptions_translations, (t) => ({
+    name_tour: t.name_tour ?? null,
     teaser: t.teaser ?? null,
     subline: t.subline ?? null,
   }));
@@ -58,7 +59,9 @@ export function shapeTourListItem(tour, lang) {
   const shaped = {
     type: "tour",
     id: tour.id,
-    name: tour.name,
+    // tours has no top-level `name` field — the display name only exists per-language
+    // on descriptions_translations.name_tour.
+    name: pickFromMap(descMap, lang)?.name_tour ?? null,
     object_id: tour.object_id ?? null,
     status: tour.status_primarix ?? null,
     date_created: ensureUtcSuffix(tour.date_created),
@@ -110,9 +113,33 @@ export function shapeTourDetail(tour, lang) {
     image_badge_details: t.image_badge_details ?? null,
   }));
 
+  const datesTextMap = buildTranslationsMap(tour.dates_translations, (t) => ({
+    departures_text: t.departures_text ?? null,
+  }));
+
+  const specialsMap = buildTranslationsMap(tour.specials_translations, (t) => ({
+    specials: t.specials ?? [],
+  }));
+
   const translations = lang ? (descMap[lang] ? { [lang]: descMap[lang] } : {}) : descMap;
   const price_info_translations = lang ? (infoMap[lang] ? { [lang]: infoMap[lang] } : {}) : infoMap;
   const programme_translations = lang ? (programmeMap[lang] ? { [lang]: programmeMap[lang] } : {}) : programmeMap;
+  const dates_translations = lang ? (datesTextMap[lang] ? { [lang]: datesTextMap[lang] } : {}) : datesTextMap;
+  const specials_translations = lang ? (specialsMap[lang] ? { [lang]: specialsMap[lang] } : {}) : specialsMap;
+
+  const departure_dates = (tour.departure_times ?? []).map((d) => ({
+    id: d.id,
+    available_from: d.available_from ?? null,
+    available_to: d.available_to ?? null,
+    trip_duration: d.trip_duration ?? null,
+    frequencies: (d.departure_frequencies ?? []).map((f) => f.trips_frequencies_id?.name).filter(Boolean),
+  }));
+
+  const routes = (tour.travel_routes ?? []).map((r) => ({
+    id: r.id,
+    departure: getGeoName(r.tour_departure, lang),
+    arrival: getGeoName(r.tour_arrival, lang),
+  }));
 
   // Categories/prices grouped via the generic groupPrices2 helper.
   // NOTE: tours_prices only stores buy_price — no sell_price/translations junction is wired
@@ -158,7 +185,9 @@ export function shapeTourDetail(tour, lang) {
   return {
     type: "tour",
     id: tour.id,
-    name: tour.name,
+    // tours has no top-level `name` field — the display name only exists per-language
+    // on descriptions_translations.name_tour.
+    name: pickFromMap(descMap, lang)?.name_tour ?? null,
     object_id: tour.object_id ?? null,
     status: tour.status ?? null,
     status_primarix: tour.status_primarix ?? null,
@@ -207,7 +236,8 @@ export function shapeTourDetail(tour, lang) {
     mobility_advice_text: tour.mobility_advice_text?.id ?? null,
     flight_service: tour.flight_service ? { id: tour.flight_service.id, label: tour.flight_service.name } : null,
     airlines: tour.airlines ? { id: tour.airlines.id, label: tour.airlines.name } : null,
-    routes: tour.routes ?? null,
+    routes,
+    departure_dates,
     travel_categories: (tour.travel_categories ?? []).map((t) => t.travel_categories_id).filter(Boolean),
     accommodation_types: (tour.accommodation_types ?? []).map((a) => a.accommodation_types_id).filter(Boolean),
     departure_airports: (tour.departure_airports ?? []).map((a) => a.airports_id).filter(Boolean),
@@ -222,6 +252,8 @@ export function shapeTourDetail(tour, lang) {
     translations,
     price_info_translations,
     programme_translations,
+    dates_translations,
+    specials_translations,
     categories,
     surcharges,
     // Computed sell-price-derived from_price is not available — tours' pricing schema

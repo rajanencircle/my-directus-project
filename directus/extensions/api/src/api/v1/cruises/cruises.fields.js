@@ -66,8 +66,10 @@ export const DETAIL_FIELDS = [
   "price_infos_translations.important_information",
   "price_infos_translations.good_to_know",
   "price_infos_translations.occupancy_single",
-  "price_infos_translations.deviating_cancellation_terms",
-  "price_infos_translations.deviating_cancellation_terms_additions",
+  // NOTE: field names are `_selector`/`_text`, not `deviating_cancellation_terms`/`_additions`
+  // (that mismatch previously made these always resolve to null).
+  "price_infos_translations.deviating_cancellation_terms_selector",
+  "price_infos_translations.deviating_cancellation_terms_text",
   "price_infos_translations.mobility_advice_text",
   // Specials translations
   "specials_translations.translations_id.code",
@@ -106,27 +108,45 @@ export const DETAIL_FIELDS = [
   "occupancies.occupancy.id",
   "occupancies.occupancy.name",
   "occupancies.occupancy_from",
-  // Price calculation — per-market pricing settings + from_price (no per-cabin/date matrix
-  // exists for cruises; this is structurally like hotels' hotel_prices, not room_prices)
+  // Price calculation — per-market pricing settings + from_price. This is a settings row
+  // (like hotels' hotel_prices), separate from the actual per-cabin/date/occupancy price
+  // matrix which lives in cruises_prices (fetched separately below, no alias on cruises).
   "price_calculation.buy_price_type",
   "price_calculation.sell_price_type",
+  "price_calculation.percentage_type",
+  "price_calculation.provision_percentage",
   "price_calculation.margin_percentage",
   "price_calculation.from_price",
   "price_calculation.translations.translations_id.code",
   "price_calculation.translations.sell_price",
-  // Media
+  // Media — is_map/tour32_export are junction-level fields on cruises_directus_files
+  // (per-product, can differ across products sharing the same file), NOT fields on the
+  // shared directus_files record.
   "media.directus_files_id.id",
   "media.directus_files_id.filename_download",
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.alt_text",
   "media.directus_files_id.expiry_date",
-  "media.directus_files_id.is_map",
-  "media.directus_files_id.tour32_export",
+  "media.is_map",
+  "media.tour32_export",
   "media.directus_files_id.dimensions_px",
   "media.directus_files_id.keyword_ids",
   "media.directus_files_id.folder.id",
   "media.directus_files_id.folder.name",
   "media.directus_files_id.translations.translations_id.code",
   "media.directus_files_id.translations.caption_i18n",
+];
+
+// cruises_prices (the real per-cabin_category x price_date x occupancy price matrix) has
+// no o2m alias on `cruises` — fetched as a separate query filtered by cruises_id, same
+// pattern as tours/excursions surcharges. No sell_price/translations junction exists for
+// cruises_prices (only buy_price), so `sell` is always null once grouped — same honest
+// degradation as tours' pricing.
+export const CRUISES_PRICES_FIELDS = [
+  "id",
+  "cabin_category",
+  "price_date",
+  "occupancy",
+  "buy_price",
 ];

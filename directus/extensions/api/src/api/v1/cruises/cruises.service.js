@@ -1,4 +1,4 @@
-import { DETAIL_FIELDS } from "./cruises.fields.js";
+import { DETAIL_FIELDS, CRUISES_PRICES_FIELDS } from "./cruises.fields.js";
 import {
   buildListFilter,
   buildSort,
@@ -9,6 +9,7 @@ import { AppError } from "../../shared/AppError.js";
 import { HTTP_STATUS } from "../../shared/constants.js";
 
 const COLLECTION = "cruises";
+const PRICES_COLLECTION = "cruises_prices";
 
 export async function listCruises(
   { page, limit, offset, search, country, destination, season, sort, updated_after },
@@ -48,6 +49,7 @@ export async function getCruiseDetails({ id }, { services, database, getSchema }
   const schema = await getSchema();
   const { ItemsService } = services;
   const cruisesService = new ItemsService(COLLECTION, { knex: database, schema });
+  const pricesService = new ItemsService(PRICES_COLLECTION, { knex: database, schema });
 
   const filter = buildIdFilter(id);
 
@@ -62,5 +64,13 @@ export async function getCruiseDetails({ id }, { services, database, getSchema }
     throw new AppError(`Cruise not found: ${id}`, HTTP_STATUS.NOT_FOUND);
   }
 
-  return cruise;
+  // cruises_prices (the real per-cabin/date/occupancy price matrix) has no o2m alias on
+  // cruises — fetched separately, same pattern as tours/excursions surcharges.
+  const prices = await pricesService.readByQuery({
+    fields: CRUISES_PRICES_FIELDS,
+    filter: { cruises_id: { _eq: cruise.id } },
+    limit: -1,
+  });
+
+  return { ...cruise, prices };
 }

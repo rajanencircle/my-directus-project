@@ -1,12 +1,13 @@
 export const LIST_FIELDS = [
   "id",
-  "name",
   "object_id",
   "status_primarix",
   "date_created",
   "date_updated",
-  // Descriptions
+  // Descriptions — tours has no top-level `name` field; the display name only exists
+  // per-language on descriptions_translations.name_tour.
   "descriptions_translations.translations_id.code",
+  "descriptions_translations.name_tour",
   "descriptions_translations.teaser",
   "descriptions_translations.subline",
   // Country / place / state
@@ -28,7 +29,6 @@ export const LIST_FIELDS = [
 
 export const DETAIL_FIELDS = [
   "id",
-  "name",
   "object_id",
   "status",
   "status_primarix",
@@ -118,7 +118,27 @@ export const DETAIL_FIELDS = [
   "flight_service.name",
   "airlines.id",
   "airlines.name",
-  "routes",
+  // Travel routes (alias is `travel_routes`, NOT `routes` — a bare "routes" field
+  // doesn't exist on tours and was silently dropped by Directus)
+  "travel_routes.id",
+  "travel_routes.tour_departure.id",
+  "travel_routes.tour_departure.translations.name",
+  "travel_routes.tour_departure.translations.translations_id.code",
+  "travel_routes.tour_arrival.id",
+  "travel_routes.tour_arrival.translations.name",
+  "travel_routes.tour_arrival.translations.translations_id.code",
+  // Departure dates (alias `departure_times` → tours_dates)
+  "departure_times.id",
+  "departure_times.available_from",
+  "departure_times.available_to",
+  "departure_times.trip_duration",
+  "departure_times.departure_frequencies.trips_frequencies_id.name",
+  // Departure dates translations (alias `dates_translations` → tours_dates_translations)
+  "dates_translations.translations_id.code",
+  "dates_translations.departures_text",
+  // Specials translations
+  "specials_translations.translations_id.code",
+  "specials_translations.specials",
   // m2m
   "travel_categories.travel_categories_id.id",
   "travel_categories.travel_categories_id.name",
@@ -142,12 +162,6 @@ export const DETAIL_FIELDS = [
   "categories.translations.translations_id.code",
   "categories.translations.category_original",
   "categories.translations.category_text",
-  // Dates
-  "dates.id",
-  "dates.available_from",
-  "dates.available_to",
-  "dates.departure_frequencies",
-  "dates.trip_duration",
   // Occupancies
   "occupancies.id",
   "occupancies.occupancy.id",

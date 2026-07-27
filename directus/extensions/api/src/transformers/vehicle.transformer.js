@@ -43,6 +43,42 @@ const PRICING_UNAVAILABLE = {
     "key back to vehicles). TODO: populate once that schema work lands.",
 };
 
+// camper_specs (O2O to vehicles, only rental_type=Camper) — now has a working FK, unlike
+// the pricing collections above. Returns null for cars / vehicles without a spec row yet.
+function shapeCamperSpecs(specs) {
+  if (!specs) return null;
+  return {
+    id: specs.id,
+    berths_adults: specs.berths_adults ?? null,
+    berths_children: specs.berths_children ?? null,
+    seats_cab: specs.seats_cab ?? null,
+    seats_living: specs.seats_living ?? null,
+    length_m: specs.length_m ?? null,
+    width_m: specs.width_m ?? null,
+    height_m: specs.height_m ?? null,
+    interior_height_m: specs.interior_height_m ?? null,
+    transmission: specs.transmission ?? null,
+    fuel_type: specs.fuel_type ?? null,
+    engine_power_kw: specs.engine_power_kw ?? null,
+    fuel_tank_l: specs.fuel_tank_l ?? null,
+    beds: specs.beds ?? [],
+    fridge_l: specs.fridge_l ?? null,
+    freshwater_tank_l: specs.freshwater_tank_l ?? null,
+    wastewater_tank_l: specs.wastewater_tank_l ?? null,
+    highlights: specs.highlights ?? [],
+    rating_botg: specs.rating_botg ?? null,
+    equipment: (specs.equipment_features ?? [])
+      .filter((e) => e.feature)
+      .map((e) => ({
+        id: e.feature.id,
+        name: e.feature.name ?? null,
+        category: e.feature.category ?? null,
+        icon: e.feature.icon ?? null,
+        availability: e.availability ?? null,
+      })),
+  };
+}
+
 export function shapeVehicleListItem(vehicle, lang) {
   const descMap = buildTranslationsMap(vehicle.descriptions_translations, (t) => ({
     teaser: t.teaser ?? null,
@@ -113,6 +149,7 @@ export function shapeVehicleDetail(vehicle, lang) {
     translations,
     description: pickFromMap(descMap, lang)?.teaser ?? null,
     pricing: PRICING_UNAVAILABLE,
+    camper_specs: shapeCamperSpecs(vehicle.camper_specs),
     image_badge: {
       status: vehicle.image_badge_status ?? null,
       start_date: vehicle.image_badge_start_date ?? null,

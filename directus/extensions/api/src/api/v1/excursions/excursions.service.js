@@ -11,6 +11,15 @@ import { HTTP_STATUS } from "../../shared/constants.js";
 const COLLECTION = "excursions";
 const SURCHARGES_COLLECTION = "excursions_surcharges";
 
+// excursions has no top-level `name` field — the display name only exists per-language
+// on descriptions_translations.name_excursion. Prefers de-DE, falls back to the first
+// translation row present (list endpoint has no `lang` query param today).
+function pickListName(translations) {
+  if (!translations?.length) return null;
+  const preferred = translations.find((t) => t.translations_id?.code === "de-DE") ?? translations[0];
+  return preferred?.name_excursion ?? null;
+}
+
 export async function listExcursions(
   { page, limit, offset, search, country, region, state, season, destination, sort, updated_after },
   { services, database, getSchema },
@@ -23,9 +32,9 @@ export async function listExcursions(
   const deltaFilter = buildUpdatedAfterFilter(updated_after);
   const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
 
-  const [items, countResult] = await Promise.all([
+  const [rawItems, countResult] = await Promise.all([
     excursionsService.readByQuery({
-      fields: ['id', 'name', 'object_id', 'date_updated'],
+      fields: ['id', 'object_id', 'date_updated', 'descriptions_translations.translations_id.code', 'descriptions_translations.name_excursion'],
       sort: buildSort(sort),
       limit,
       offset,
@@ -36,6 +45,11 @@ export async function listExcursions(
       filter,
     }),
   ]);
+
+  const items = rawItems.map(({ descriptions_translations, ...rest }) => ({
+    ...rest,
+    name: pickListName(descriptions_translations),
+  }));
 
   const total = parseInt(countResult[0]?.count ?? "0", 10);
   const updatedAtMax = items.length

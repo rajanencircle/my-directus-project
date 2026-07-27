@@ -34,8 +34,9 @@ export function buildListFilter({ search, country, destination, season }) {
   return filter;
 }
 
-// cruises has no room_categories/price_dates-equivalent status/publish window fields
-// on cabin_categories/price_dates/occupancies — no deep publication filter needed.
+// NOTE: cruises_cabin_categories DOES have a `status` field (unlike price_dates/occupancies),
+// so a deep publication filter analogous to hotels' room_categories one is possible but not
+// implemented yet — left as {} (no filtering) rather than guessed at.
 export function buildPublicationDeepFilter() {
   return {};
 }

@@ -48,6 +48,39 @@ function stripFields(obj, fields) {
   for (const f of fields) delete obj[f];
 }
 
+// Builds a per-language map of { marginPct, unit, fromPrice, buyPriceType, sellPriceType,
+// percentageType, provisionPercentage } from excursions_price_calculation_translations rows.
+// Mirrors hotels' buildPriceSettingsMap (hotel.transformer.js) — same from_price FK-resolution
+// pattern (M2O to excursions_prices → excursions_prices_translations per language).
+function buildPriceSettingsMap(priceCalcRows) {
+  const map = {};
+  for (const row of priceCalcRows ?? []) {
+    const locale = getLocaleCode(row.translations_id);
+    const iso = LOCALE_TO_ISO[locale] ?? locale;
+    if (!iso) continue;
+
+    let fromPrice = null;
+    for (const t of row.from_price?.excursions_prices_translations ?? []) {
+      const tLocale = getLocaleCode(t.translations_id);
+      const tIso = LOCALE_TO_ISO[tLocale] ?? tLocale;
+      if (tIso === iso) {
+        fromPrice = t.sell_price ?? null;
+        break;
+      }
+    }
+
+    map[iso] = {
+      marginPct: row.margin_percentage ?? null,
+      buyPriceType: row.buy_price_type ?? null,
+      sellPriceType: row.sell_price_type ?? null,
+      percentageType: row.percentage_type ?? null,
+      provisionPercentage: row.provision_percentage ?? null,
+      fromPrice,
+    };
+  }
+  return map;
+}
+
 // Publication filter rules — same as hotels' isPublicationActive.
 function isPublicationActive(item, today) {
   if (item.status === "unpublished") return false;
@@ -60,6 +93,7 @@ function isPublicationActive(item, today) {
 
 export function shapeExcursionListItem(excursion, lang) {
   const descMap = buildTranslationsMap(excursion.descriptions_translations, (t) => ({
+    name_excursion: t.name_excursion ?? null,
     teaser: t.teaser ?? null,
     subline: t.subline ?? null,
   }));
@@ -68,7 +102,9 @@ export function shapeExcursionListItem(excursion, lang) {
   const shaped = {
     type: "excursion",
     id: excursion.id,
-    name: excursion.name,
+    // excursions has no top-level `name` field — the display name only exists
+    // per-language on descriptions_translations.name_excursion.
+    name: pickFromMap(descMap, lang)?.name_excursion ?? null,
     object_id: excursion.object_id ?? null,
     status: excursion.status_primarix ?? null,
     date_created: ensureUtcSuffix(excursion.date_created),
@@ -112,8 +148,37 @@ export function shapeExcursionDetail(excursion, lang) {
     image_badge_details: t.image_badge_details ?? null,
   }));
 
+  const datesTextMap = buildTranslationsMap(excursion.dates_translations, (t) => ({
+    departures_text: t.departures_text ?? null,
+  }));
+
+  const specialsMap = buildTranslationsMap(excursion.specials_translations, (t) => ({
+    specials: t.specials ?? [],
+  }));
+
+  const priceSettingsMap = buildPriceSettingsMap(excursion.price_calculation_translations);
+  const activePriceSettings =
+    lang && priceSettingsMap[lang]
+      ? priceSettingsMap[lang]
+      : (Object.values(priceSettingsMap)[0] ?? null);
+
+  const departure_dates = (excursion.departure_times ?? []).map((d) => ({
+    id: d.id,
+    available_from: d.available_from ?? null,
+    available_to: d.available_to ?? null,
+    frequencies: (d.departure_frequencies ?? []).map((f) => f.trips_frequencies_id?.name).filter(Boolean),
+  }));
+
+  const routes = (excursion.travel_routes ?? []).map((r) => ({
+    id: r.id,
+    departure: getGeoName(r.tour_departure, lang),
+    arrival: getGeoName(r.tour_arrival, lang),
+  }));
+
   const translations = lang ? (descMap[lang] ? { [lang]: descMap[lang] } : {}) : descMap;
   const price_info_translations = lang ? (infoMap[lang] ? { [lang]: infoMap[lang] } : {}) : infoMap;
+  const dates_translations = lang ? (datesTextMap[lang] ? { [lang]: datesTextMap[lang] } : {}) : datesTextMap;
+  const specials_translations = lang ? (specialsMap[lang] ? { [lang]: specialsMap[lang] } : {}) : specialsMap;
 
   // Categories/prices grouped via the generic groupPrices2 helper.
   // Unlike tours, excursions_prices HAS a per-language sell price junction
@@ -132,11 +197,20 @@ export function shapeExcursionDetail(excursion, lang) {
       dateStartKey: 'price_period_start',
       dateEndKey: 'price_period_end',
     },
-    (cat) => ({
-      category: cat.excursion_category_type?.name ?? null,
-      booking_code: cat.category_supplier_code ?? null,
-      from: cat.category_from ?? null,
-    }),
+    (cat) => {
+      const categoryTypeNameMap = buildTranslationsMap(cat.excursion_category_type?.translations, (t) => t.name ?? null);
+      const categoryTextMap = buildTranslationsMap(cat.translations, (t) => ({
+        category_text: t.category_text ?? null,
+        category_original: t.category_original ?? null,
+      }));
+      return {
+        category: cat.excursion_category_type?.name ?? null,
+        category_translations: lang ? (categoryTypeNameMap[lang] ? { [lang]: categoryTypeNameMap[lang] } : {}) : categoryTypeNameMap,
+        booking_code: cat.category_supplier_code ?? null,
+        from: cat.category_from ?? null,
+        text: lang ? (categoryTextMap[lang] ? { [lang]: categoryTextMap[lang] } : {}) : categoryTextMap,
+      };
+    },
     { lang },
   );
 
@@ -163,14 +237,19 @@ export function shapeExcursionDetail(excursion, lang) {
       };
     });
 
-  // from_price computed as the lowest sell price across all category/date/occupancy cells.
+  // from_price: prefer the authoritative value stored on price_calculation_translations
+  // (resolved via its from_price FK → excursions_prices → excursions_prices_translations).
+  // Falls back to the lowest sell price across all category/date/occupancy cells if that
+  // hasn't been computed/set yet.
   const allSells = categories.flatMap((c) => c.prices.flatMap((p) => Object.values(p.occupancies).map((o) => o.sell))).filter((v) => v !== null && v !== undefined);
-  const from_price = allSells.length ? Math.min(...allSells) : null;
+  const from_price = activePriceSettings?.fromPrice ?? (allSells.length ? Math.min(...allSells) : null);
 
   return {
     type: "excursion",
     id: excursion.id,
-    name: excursion.name,
+    // excursions has no top-level `name` field — the display name only exists
+    // per-language on descriptions_translations.name_excursion.
+    name: pickFromMap(descMap, lang)?.name_excursion ?? null,
     object_id: excursion.object_id ?? null,
     status: excursion.status_primarix ?? null,
     internal_remarks: excursion.internal_remarks ?? null,
@@ -231,11 +310,24 @@ export function shapeExcursionDetail(excursion, lang) {
         return isNaN(n) ? null : n;
       })
       .filter((n) => n !== null),
+    routes,
+    departure_dates,
     translations,
     price_info_translations,
+    dates_translations,
+    specials_translations,
     categories,
     surcharges,
     from_price,
+    price_settings: activePriceSettings
+      ? {
+          buy_price_type: activePriceSettings.buyPriceType,
+          sell_price_type: activePriceSettings.sellPriceType,
+          percentage_type: activePriceSettings.percentageType,
+          provision_percentage: activePriceSettings.provisionPercentage,
+          margin_percentage: activePriceSettings.marginPct,
+        }
+      : null,
     image_badge: {
       status: excursion.image_badge_status ?? null,
       start_date: excursion.image_badge_start_date ?? null,

@@ -1,11 +1,13 @@
 export const LIST_FIELDS = [
   "id",
-  "name",
   "object_id",
   "status_primarix",
   "date_created",
   "date_updated",
+  // excursions has no top-level `name` field — the display name only exists
+  // per-language on descriptions_translations.name_excursion.
   "descriptions_translations.translations_id.code",
+  "descriptions_translations.name_excursion",
   "descriptions_translations.teaser",
   "descriptions_translations.subline",
   "country.id",
@@ -26,7 +28,6 @@ export const LIST_FIELDS = [
 
 export const DETAIL_FIELDS = [
   "id",
-  "name",
   "object_id",
   "status_primarix",
   "internal_remarks",
@@ -89,6 +90,33 @@ export const DETAIL_FIELDS = [
   "price_infos_translations.participants_text",
   "price_infos_translations.additional_information",
   "price_infos_translations.price_info_supplementary",
+  // Price calculation — authoritative from_price pointer + margin/exchange config
+  "price_calculation_translations.translations_id.code",
+  "price_calculation_translations.buy_price_type",
+  "price_calculation_translations.sell_price_type",
+  "price_calculation_translations.percentage_type",
+  "price_calculation_translations.provision_percentage",
+  "price_calculation_translations.margin_percentage",
+  "price_calculation_translations.from_price",
+  // Travel routes (alias `travel_routes` → excursions_routes)
+  "travel_routes.id",
+  "travel_routes.tour_departure.id",
+  "travel_routes.tour_departure.translations.name",
+  "travel_routes.tour_departure.translations.translations_id.code",
+  "travel_routes.tour_arrival.id",
+  "travel_routes.tour_arrival.translations.name",
+  "travel_routes.tour_arrival.translations.translations_id.code",
+  // Departure dates (alias `departure_times` → excursions_dates)
+  "departure_times.id",
+  "departure_times.available_from",
+  "departure_times.available_to",
+  "departure_times.departure_frequencies.trips_frequencies_id.name",
+  // Departure dates translations (alias `dates_translations` → excursions_dates_translations)
+  "dates_translations.translations_id.code",
+  "dates_translations.departures_text",
+  // Specials translations
+  "specials_translations.translations_id.code",
+  "specials_translations.specials",
   // Image badge translations
   "image_badge_translations.translations_id.code",
   "image_badge_translations.image_badge_teaser",
@@ -122,9 +150,13 @@ export const DETAIL_FIELDS = [
   "categories.id",
   "categories.excursion_category_type.id",
   "categories.excursion_category_type.name",
+  "categories.excursion_category_type.translations.name",
+  "categories.excursion_category_type.translations.translations_id.code",
   "categories.category_supplier_code",
   "categories.category_from",
   "categories.translations.translations_id.code",
+  "categories.translations.category_text",
+  "categories.translations.category_original",
   // Price periods
   "price_periods.id",
   "price_periods.price_period_start",
@@ -134,6 +166,8 @@ export const DETAIL_FIELDS = [
   "price_categories.id",
   "price_categories.price_category.id",
   "price_categories.price_category.name",
+  "price_categories.price_category.translations.name",
+  "price_categories.price_category.translations.translations_id.code",
   "price_categories.price_category_from",
   // Prices — with per-language sell price
   "prices.id",

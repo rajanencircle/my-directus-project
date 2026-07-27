@@ -1,8 +1,10 @@
 import { AppError } from '../../shared/AppError.js';
 import { HTTP_STATUS } from '../../shared/constants.js';
 
+// 'name' is not sortable — tours has no top-level name field, only a per-language
+// descriptions_translations.name_tour (translations relation, not reliably sortable
+// via a single field).
 const SORT_ALLOWLIST = new Set([
-  'name', '-name',
   'date_updated', '-date_updated',
   'object_id', '-object_id',
   'season', '-season',
@@ -14,8 +16,9 @@ export function buildListFilter({ search, country, region, state, season }) {
   };
 
   if (search) {
+    // tours has no top-level `name` field — search the translated name instead.
     filter._or = [
-      { name: { _icontains: search } },
+      { 'descriptions_translations.name_tour': { _icontains: search } },
       { 'descriptions_translations.teaser': { _icontains: search } },
     ];
   }

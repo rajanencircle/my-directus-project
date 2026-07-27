@@ -69,3 +69,33 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.translations.translations_id.code",
   "media.directus_files_id.translations.caption_i18n",
 ];
+
+// camper_specs has no reverse alias on `vehicles` (O2O via camper_specs.vehicle, one_field
+// is null) — fetched as a separate query filtered by vehicle id, same pattern as
+// tours_surcharges/excursions_surcharges. Only populated for rental_type=Camper vehicles.
+export const CAMPER_SPECS_FIELDS = [
+  "id",
+  "berths_adults",
+  "berths_children",
+  "seats_cab",
+  "seats_living",
+  "length_m",
+  "width_m",
+  "height_m",
+  "interior_height_m",
+  "transmission",
+  "fuel_type",
+  "engine_power_kw",
+  "fuel_tank_l",
+  "beds",
+  "fridge_l",
+  "freshwater_tank_l",
+  "wastewater_tank_l",
+  "highlights",
+  "rating_botg",
+  "equipment_features.availability",
+  "equipment_features.feature.id",
+  "equipment_features.feature.name",
+  "equipment_features.feature.category",
+  "equipment_features.feature.icon",
+];
