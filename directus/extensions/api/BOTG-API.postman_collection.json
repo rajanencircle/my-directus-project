@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "BOTG API v1.2.0",
-    "description": "Custom REST API layer for BOTG — hotels, products, and more.\n\nSet the `baseUrl` collection variable to your environment (e.g. `http://localhost:8055` for local).\nSet `apiKey` to your Bearer token.",
+    "name": "BOTG API v1.3.0",
+    "description": "Custom REST API layer for BOTG — hotels, products, and more.\n\nSet the `baseUrl` collection variable to your environment (e.g. `http://localhost:8055` for local).\nSet `apiKey` to your Bearer token.\n\n**v1.3.0** — tours/excursions/vehicles/cruises detail responses were fixed and extended: corrected non-existent `name`/`routes` field bugs on tours and excursions, added departure dates/routes/specials to both, wired excursions' authoritative `from_price`, added `camper_specs` to vehicles, and wired the real cruises price matrix (`categories`) plus two cruises field-name bugs. See `directus/extensions/api/CHANGES_2026-07-28_tours-excursions-vehicles-cruises.md` for full details.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -640,7 +640,7 @@
                 }
               ]
             },
-            "description": "Returns full cruise detail. Note: cruises has no structured surcharges collection (only a free-text surcharges field under price info), and pricing is a single per-market settings row (price_settings / from_price), not a per-cabin/date price matrix like hotels. id accepts the internal numeric id or the legacy px_source_id."
+            "description": "Returns full cruise detail. Note: cruises has no structured surcharges collection (only a free-text surcharges field under price info). `price_settings`/`from_price` is a per-market settings row (like hotels' hotel_prices), while the actual per-cabin_category x price_date x occupancy price matrix (buy_price only, no sell price wired yet) is now exposed separately as `categories[]` (same grouped shape as tours/excursions). id accepts the internal numeric id or the legacy px_source_id."
           }
         }
       ]
@@ -737,7 +737,7 @@
                 {
                   "key": "sort",
                   "value": "-date_updated",
-                  "description": "name | -name | date_updated | -date_updated | object_id | -object_id | season | -season",
+                  "description": "date_updated | -date_updated | object_id | -object_id | season | -season (name is not sortable — tours has no top-level name field, only a per-language translation)",
                   "disabled": true
                 },
                 {
@@ -748,7 +748,7 @@
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of tours (daytrips) — only id, object_id, name, and date_updated."
+            "description": "Returns a minimal paginated list of tours (daytrips) — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_tour (tours has no top-level name field)."
           }
         },
         {
@@ -775,7 +775,7 @@
                 }
               ]
             },
-            "description": "Returns full tour detail. id accepts the internal numeric id or the legacy px_source_id.\n\nNOTE: categories[].prices[].occupancies{}.sell and from_price are always null — tours' pricing schema currently only stores buy_price, with no sell-price field/translation wired yet on directus-dev."
+            "description": "Returns full tour detail. id accepts the internal numeric id or the legacy px_source_id. Now includes routes[] (departure/arrival places), departure_dates[] + dates_translations (available_from/to, trip_duration, departure text), and specials_translations (previously all unwired).\n\nNOTE: categories[].prices[].occupancies{}.sell and from_price are always null — tours' pricing schema currently only stores buy_price, with no sell-price field/translation wired yet on directus-dev."
           }
         }
       ]
@@ -878,7 +878,7 @@
                 {
                   "key": "sort",
                   "value": "-date_updated",
-                  "description": "name | -name | date_updated | -date_updated | object_id | -object_id | season | -season",
+                  "description": "date_updated | -date_updated | object_id | -object_id | season | -season (name is not sortable — excursions has no top-level name field, only a per-language translation)",
                   "disabled": true
                 },
                 {
@@ -889,7 +889,7 @@
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of excursions — only id, object_id, name, and date_updated."
+            "description": "Returns a minimal paginated list of excursions — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_excursion (excursions has no top-level name field; a previous bug meant name was always null — now fixed)."
           }
         },
         {
@@ -916,7 +916,7 @@
                 }
               ]
             },
-            "description": "Returns full excursion detail, including categories[].prices[].occupancies{}.sell and a computed from_price (excursions has a real sell-price translation junction, unlike tours). id accepts the internal numeric id or the legacy px_source_id."
+            "description": "Returns full excursion detail, including categories[].prices[].occupancies{}.sell and from_price (excursions has a real sell-price translation junction, unlike tours). from_price now prefers the authoritative value stored on price_calculation_translations (exposed as price_settings), falling back to the computed minimum sell price only if that hasn't been set yet. Also now includes routes[], departure_dates[] + dates_translations, specials_translations, and localized category names (previously all unwired). id accepts the internal numeric id or the legacy px_source_id."
           }
         }
       ]
@@ -1039,7 +1039,7 @@
                 }
               ]
             },
-            "description": "Returns full vehicle detail. pricing is always { available: false, reason: \"...\" } — vehicles_prices/vehicles_price_calculation/vehicles_surcharges exist in the schema but have no foreign key back to vehicles yet on directus-dev, so pricing cannot be resolved per vehicle until that schema work lands. id accepts the internal numeric id or the legacy px_source_id."
+            "description": "Returns full vehicle detail. pricing is always { available: false, reason: \"...\" } — vehicles_prices/vehicles_price_calculation/vehicles_surcharges exist in the schema but have no foreign key back to vehicles yet on directus-dev, so pricing cannot be resolved per vehicle until that schema work lands. Now includes camper_specs (berths, dimensions, fuel/tank capacities, beds, highlights, rating, equipment list) for rental_type=camper vehicles — null for cars. id accepts the internal numeric id or the legacy px_source_id."
           }
         }
       ]
