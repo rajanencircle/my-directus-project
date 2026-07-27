@@ -1,6 +1,6 @@
 import { query } from 'express-validator';
 
-const VALID_LANG_CODES = ['de', 'en', 'nl', 'de-CH'];
+const VALID_LANG_CODES = ['de', 'en', 'nl'];
 const VALID_SORT_VALUES = [
   'name', '-name',
   'date_updated', '-date_updated',

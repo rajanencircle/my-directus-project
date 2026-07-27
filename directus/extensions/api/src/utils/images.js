@@ -24,7 +24,8 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
           typeof t.translations_id === "object"
             ? t.translations_id?.code
             : t.translations_id;
-        const iso = LOCALE_TO_ISO[code] ?? code;
+        // Unmapped locales (e.g. de-CH) are intentionally excluded, not passed through.
+        const iso = LOCALE_TO_ISO[code];
         if (iso) captionMap[iso] = t.caption_i18n ?? null;
       }
       const caption_i18n =

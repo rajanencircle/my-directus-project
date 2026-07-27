@@ -1,6 +1,6 @@
 import { query } from 'express-validator';
 
-const VALID_LANG_CODES = ['de', 'de-CH', 'en', 'nl'];
+const VALID_LANG_CODES = ['de', 'en', 'nl'];
 
 export const demoSchema = [
   query('lang')

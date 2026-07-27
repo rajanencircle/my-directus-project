@@ -12,7 +12,8 @@ function buildTranslationsMap(rows, pickFields) {
   const map = {};
   for (const row of rows ?? []) {
     const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale] ?? locale;
+    // Unmapped locales (e.g. de-CH) are intentionally excluded, not passed through.
+    const iso = LOCALE_TO_ISO[locale];
     if (!iso) continue;
     map[iso] = pickFields(row);
   }

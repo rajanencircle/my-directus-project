@@ -12,7 +12,8 @@ function buildTranslationsMap(rows, pickFields) {
   const map = {};
   for (const row of rows ?? []) {
     const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale] ?? locale;
+    // Unmapped locales (e.g. de-CH) are intentionally excluded, not passed through.
+    const iso = LOCALE_TO_ISO[locale];
     if (!iso) continue;
     map[iso] = pickFields(row);
   }
@@ -56,13 +57,14 @@ function buildPriceSettingsMap(priceCalcRows) {
   const map = {};
   for (const row of priceCalcRows ?? []) {
     const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale] ?? locale;
+    // Unmapped locales (e.g. de-CH) are intentionally excluded, not passed through.
+    const iso = LOCALE_TO_ISO[locale];
     if (!iso) continue;
 
     let fromPrice = null;
     for (const t of row.from_price?.excursions_prices_translations ?? []) {
       const tLocale = getLocaleCode(t.translations_id);
-      const tIso = LOCALE_TO_ISO[tLocale] ?? tLocale;
+      const tIso = LOCALE_TO_ISO[tLocale];
       if (tIso === iso) {
         fromPrice = t.sell_price ?? null;
         break;

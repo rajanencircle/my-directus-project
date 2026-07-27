@@ -21,7 +21,7 @@
       "key": "lang",
       "value": "de",
       "type": "string",
-      "description": "ISO 639-1 language code: de | en | nl | de-CH"
+      "description": "ISO 639-1 language code: de | en | nl"
     },
     {
       "key": "hotelId",
@@ -91,7 +91,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). Optional."
+                  "description": "ISO 639-1 code (de | en | nl). Optional."
                 }
               ]
             },
@@ -223,7 +223,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). If set, all translations blocks return only that language key."
+                  "description": "ISO 639-1 code (de | en | nl). If set, all translations blocks return only that language key."
                 }
               ]
             },
@@ -272,7 +272,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). Optional."
+                  "description": "ISO 639-1 code (de | en | nl). Optional."
                 }
               ]
             },
@@ -332,7 +332,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). Filters all translations blocks to that language."
+                  "description": "ISO 639-1 code (de | en | nl). Filters all translations blocks to that language."
                 },
                 {
                   "key": "page",
@@ -542,7 +542,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). Optional."
+                  "description": "ISO 639-1 code (de | en | nl). Optional."
                 }
               ]
             },
@@ -636,7 +636,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). If set, all translations blocks return only that language key."
+                  "description": "ISO 639-1 code (de | en | nl). If set, all translations blocks return only that language key."
                 }
               ]
             },
@@ -671,7 +671,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). Optional."
+                  "description": "ISO 639-1 code (de | en | nl). Optional."
                 }
               ]
             },
@@ -771,7 +771,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). If set, all translations blocks return only that language key."
+                  "description": "ISO 639-1 code (de | en | nl). If set, all translations blocks return only that language key."
                 }
               ]
             },
@@ -806,7 +806,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). Optional."
+                  "description": "ISO 639-1 code (de | en | nl). Optional."
                 }
               ]
             },
@@ -912,7 +912,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). If set, all translations blocks return only that language key."
+                  "description": "ISO 639-1 code (de | en | nl). If set, all translations blocks return only that language key."
                 }
               ]
             },
@@ -947,7 +947,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). Optional."
+                  "description": "ISO 639-1 code (de | en | nl). Optional."
                 }
               ]
             },
@@ -1035,7 +1035,7 @@
                 {
                   "key": "lang",
                   "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl | de-CH). If set, all translations blocks return only that language key."
+                  "description": "ISO 639-1 code (de | en | nl). If set, all translations blocks return only that language key."
                 }
               ]
             },

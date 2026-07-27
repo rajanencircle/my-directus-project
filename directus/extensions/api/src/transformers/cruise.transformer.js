@@ -12,7 +12,8 @@ function buildTranslationsMap(rows, pickFields) {
   const map = {};
   for (const row of rows ?? []) {
     const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale] ?? locale;
+    // Unmapped locales (e.g. de-CH) are intentionally excluded, not passed through.
+    const iso = LOCALE_TO_ISO[locale];
     if (!iso) continue;
     map[iso] = pickFields(row);
   }
@@ -110,7 +111,9 @@ export function shapeCruiseDetail(cruise, lang) {
   const sellByLang = {};
   for (const t of priceCalc?.translations ?? []) {
     const code = t.translations_id?.code ?? t.translations_id;
-    const iso = LOCALE_TO_ISO[code] ?? code;
+    // Unmapped locales (e.g. de-CH) are intentionally excluded, not passed through.
+    const iso = LOCALE_TO_ISO[code];
+    if (!iso) continue;
     sellByLang[iso] = t.sell_price ?? null;
   }
   const from_price = priceCalc?.from_price ?? (lang ? (sellByLang[lang] ?? null) : (Object.values(sellByLang)[0] ?? null));

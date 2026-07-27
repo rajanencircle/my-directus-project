@@ -61,7 +61,7 @@ const REAL_HOTEL = {
     { id: "04520670-cdf6-4448-9c52-f1a825bc7a46", label: "Wellness" },
   ],
   price_info_translations: {
-    "de-CH": {
+    de: {
       services_included: "Übernachtung",
       services_not_included: "",
       service_highlights: "",
@@ -184,11 +184,11 @@ const REAL_HOTEL = {
   ],
 };
 
-// Multi-lang version (no lang param) — translations keyed by de-CH, de, nl
+// Multi-lang version (no lang param) — translations keyed by de, en, nl
 const REAL_HOTEL_MULTILANG = {
   ...REAL_HOTEL,
   translations: {
-    "de-CH": {
+    de: {
       subline_location: "Alice Springs",
       teaser:
         "Das Hotel wird gerne wegen der zentralen Lage direkt an der Todd Mall gebucht.",
@@ -355,7 +355,7 @@ export const openapiSpec = {
         description: "Public, unauthenticated endpoint — returns the first published hotel, shaped exactly like GET /api/v1/hotels/{id}. Intended as a quick, tokenless way to see a real response shape.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Demo hotel detail" },
@@ -372,7 +372,7 @@ export const openapiSpec = {
         description: "Public, unauthenticated endpoint — returns the first published tour, shaped exactly like GET /api/v1/tours/{id}.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Demo tour detail" },
@@ -389,7 +389,7 @@ export const openapiSpec = {
         description: "Public, unauthenticated endpoint — returns the first published excursion, shaped exactly like GET /api/v1/excursions/{id}.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Demo excursion detail" },
@@ -406,7 +406,7 @@ export const openapiSpec = {
         description: "Public, unauthenticated endpoint — returns the first published cruise, shaped exactly like GET /api/v1/cruises/{id}.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Demo cruise detail" },
@@ -423,7 +423,7 @@ export const openapiSpec = {
         description: "Public, unauthenticated endpoint — returns the first published vehicle, shaped exactly like GET /api/v1/vehicles/{id}.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Demo vehicle detail" },
@@ -440,7 +440,7 @@ export const openapiSpec = {
         description: "Public, unauthenticated endpoint — returns the first published item across hotels/tours/excursions/cruises/vehicles (same merge/sort as GET /api/v1/products/details), shaped via the product dispatcher.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Demo product detail" },
@@ -586,7 +586,7 @@ export const openapiSpec = {
           {
             in: "query",
             name: "lang",
-            schema: { type: "string", enum: ["de", "en", "nl", "de-CH"] },
+            schema: { type: "string", enum: ["de", "en", "nl"] },
             description:
               "ISO 639-1 language code. If set, every translations block (translations, price_info_translations, rooms[].prices[].occupancies[].translations, price_options[].translations, image_badge.translations, pictures[].caption_i18n) returns only that language key. Omit to get all available languages.",
           },
@@ -704,7 +704,7 @@ export const openapiSpec = {
           {
             in: "query",
             name: "lang",
-            schema: { type: "string", enum: ["de", "en", "nl", "de-CH"] },
+            schema: { type: "string", enum: ["de", "en", "nl"] },
             description: "If set, only that language is returned in all translations blocks.",
           },
           {
@@ -1010,7 +1010,7 @@ export const openapiSpec = {
         description: "Returns full cruise detail. `id` may be the internal numeric id or the legacy `px_source_id`. Note: cruises has no structured surcharges collection (the schema only holds a free-text `surcharges` field under price info) and pricing is a single per-market settings row (`price_settings`/`from_price`), not a per-cabin/date price matrix.",
         parameters: [
           { in: "path", name: "id", required: true, schema: { type: "string" } },
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Cruise detail" },
@@ -1052,7 +1052,7 @@ export const openapiSpec = {
         description: "Returns full tour detail. `id` may be the internal numeric id or the legacy `px_source_id`. Note: `categories[].prices[].occupancies{}.sell` and `from_price` are always null — tours' pricing schema only stores `buy_price` today, with no sell-price field/translation wired yet.",
         parameters: [
           { in: "path", name: "id", required: true, schema: { type: "string" } },
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Tour detail" },
@@ -1095,7 +1095,7 @@ export const openapiSpec = {
         description: "Returns full excursion detail, including `categories[].prices[].occupancies{}.sell` and a computed `from_price` (excursions' pricing schema has a real sell-price translation junction, unlike tours). `id` may be the internal numeric id or the legacy `px_source_id`.",
         parameters: [
           { in: "path", name: "id", required: true, schema: { type: "string" } },
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Excursion detail" },
@@ -1135,7 +1135,7 @@ export const openapiSpec = {
         description: "Returns full vehicle detail. `pricing` is always `{ available: false, reason: \"...\" }` — vehicles_prices/vehicles_price_calculation/vehicles_surcharges exist in the schema but have no foreign key back to vehicles yet, so pricing cannot be resolved per vehicle until that schema work lands. `id` may be the internal numeric id or the legacy `px_source_id`.",
         parameters: [
           { in: "path", name: "id", required: true, schema: { type: "string" } },
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "de-CH", "en", "nl"] } },
+          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
         ],
         responses: {
           200: { description: "Vehicle detail" },
@@ -1551,7 +1551,7 @@ export const openapiSpec = {
           translations: {
             type: "object",
             description:
-              "Hotel description fields keyed by ISO 639-1 code (e.g. \"de\", \"de-CH\", \"nl\"). Filtered to the requested lang when lang param is set. Source: hotel_descriptions_translations junction.",
+              "Hotel description fields keyed by ISO 639-1 code (\"de\", \"en\", \"nl\"). Filtered to the requested lang when lang param is set. Source: hotel_descriptions_translations junction.",
             additionalProperties: {
               type: "object",
               properties: {
