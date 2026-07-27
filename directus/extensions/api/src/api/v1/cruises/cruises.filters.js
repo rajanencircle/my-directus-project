@@ -58,7 +58,11 @@ export function buildIdFilter(id) {
   return { px_source_id: { _eq: id } };
 }
 
+// Delta sync filters on source_updated_at (the legacy source's own last-modified
+// timestamp), NOT date_updated (Directus's own edit timestamp) — consumers poll using
+// the value the API previously returned as updated_at_max, which is now also derived
+// from source_updated_at (see cruises.service.js) to keep the two consistent.
 export function buildUpdatedAfterFilter(updatedAfter) {
   if (!updatedAfter) return null;
-  return { date_updated: { _gt: updatedAfter } };
+  return { source_updated_at: { _gt: updatedAfter } };
 }

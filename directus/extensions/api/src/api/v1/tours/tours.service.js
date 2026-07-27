@@ -34,7 +34,7 @@ export async function listTours(
 
   const [rawItems, countResult] = await Promise.all([
     toursService.readByQuery({
-      fields: ['id', 'object_id', 'date_updated', 'descriptions_translations.translations_id.code', 'descriptions_translations.name_tour'],
+      fields: ['id', 'object_id', 'date_updated', 'source_updated_at', 'descriptions_translations.translations_id.code', 'descriptions_translations.name_tour'],
       sort: buildSort(sort),
       limit,
       offset,
@@ -46,15 +46,17 @@ export async function listTours(
     }),
   ]);
 
-  const items = rawItems.map(({ descriptions_translations, ...rest }) => ({
+  const total = parseInt(countResult[0]?.count ?? "0", 10);
+  // updated_at_max is derived from source_updated_at (not date_updated) so a client can
+  // feed it straight back in as the next updated_after value.
+  const updatedAtMax = rawItems.length
+    ? rawItems.reduce((max, h) => (h.source_updated_at > max ? h.source_updated_at : max), rawItems[0].source_updated_at)
+    : null;
+
+  const items = rawItems.map(({ descriptions_translations, source_updated_at, ...rest }) => ({
     ...rest,
     name: pickListName(descriptions_translations),
   }));
-
-  const total = parseInt(countResult[0]?.count ?? "0", 10);
-  const updatedAtMax = items.length
-    ? items.reduce((max, h) => (h.date_updated > max ? h.date_updated : max), items[0].date_updated)
-    : null;
 
   return { data: items, total, page, limit, updatedAtMax };
 }

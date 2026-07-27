@@ -181,7 +181,7 @@
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
+                  "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
                 }
               ]
@@ -400,7 +400,7 @@
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
+                  "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
                 }
               ]
@@ -492,7 +492,7 @@
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
+                  "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
                 }
               ]
@@ -608,7 +608,7 @@
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
+                  "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
                 }
               ]
@@ -743,7 +743,7 @@
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
+                  "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
                 }
               ]
@@ -884,7 +884,7 @@
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
+                  "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
                 }
               ]
@@ -1007,7 +1007,7 @@
                 {
                   "key": "updated_after",
                   "value": "2026-01-01T00:00:00Z",
-                  "description": "Delta sync — return only records updated after this ISO 8601 timestamp",
+                  "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
                 }
               ]

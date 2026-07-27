@@ -31,9 +31,9 @@ export async function listHotels(
   const deltaFilter = buildUpdatedAfterFilter(updated_after);
   const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
 
-  const [items, countResult] = await Promise.all([
+  const [rawItems, countResult] = await Promise.all([
     hotelsService.readByQuery({
-      fields: ['id', 'name', 'object_id', 'date_updated'],
+      fields: ['id', 'name', 'object_id', 'date_updated', 'source_updated_at'],
       sort: buildSort(sort),
       limit,
       offset,
@@ -46,12 +46,16 @@ export async function listHotels(
   ]);
 
   const total = parseInt(countResult[0]?.count ?? "0", 10);
-  const updatedAtMax = items.length
-    ? items.reduce(
-        (max, h) => (h.date_updated > max ? h.date_updated : max),
-        items[0].date_updated,
+  // updated_at_max is derived from source_updated_at (not date_updated) so a client can
+  // feed it straight back in as the next updated_after value.
+  const updatedAtMax = rawItems.length
+    ? rawItems.reduce(
+        (max, h) => (h.source_updated_at > max ? h.source_updated_at : max),
+        rawItems[0].source_updated_at,
       )
     : null;
+
+  const items = rawItems.map(({ source_updated_at, ...rest }) => rest);
 
   return { data: items, total, page, limit, updatedAtMax };
 }
