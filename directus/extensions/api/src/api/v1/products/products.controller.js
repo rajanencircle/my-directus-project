@@ -19,16 +19,17 @@ function shapeLimitedProduct(item) {
 export function createProductsController(context) {
   return {
     async catalog(req, res) {
-      const data = await getProductCatalog(context);
+      const { status } = req.query;
+      const data = await getProductCatalog(context, { status });
       return sendSuccess(res, data);
     },
 
     async details(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, lang, updated_after } = req.query;
+      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, lang, updated_after, status } = req.query;
 
       const result = await listProducts(
-        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
+        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status },
         context,
       );
 
@@ -43,10 +44,10 @@ export function createProductsController(context) {
 
     async limitedList(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after } = req.query;
+      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status } = req.query;
 
       const result = await listProductsLimited(
-        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
+        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status },
         context,
       );
 

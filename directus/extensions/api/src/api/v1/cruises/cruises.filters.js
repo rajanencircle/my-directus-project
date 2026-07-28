@@ -1,5 +1,5 @@
 import { AppError } from '../../shared/AppError.js';
-import { HTTP_STATUS } from '../../shared/constants.js';
+import { HTTP_STATUS, DEFAULT_PRIMARIX_STATUS } from '../../shared/constants.js';
 
 const SORT_ALLOWLIST = new Set([
   'date_updated', '-date_updated',
@@ -7,9 +7,9 @@ const SORT_ALLOWLIST = new Set([
   'season', '-season',
 ]);
 
-export function buildListFilter({ search, country, destination, season }) {
+export function buildListFilter({ search, country, destination, season, status }) {
   const filter = {
-    status_primarix: { _eq: 'published' },
+    status_primarix: { _eq: status ?? DEFAULT_PRIMARIX_STATUS },
   };
 
   if (search) {

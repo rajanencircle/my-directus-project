@@ -13,6 +13,12 @@ export const HTTP_STATUS = {
   SERVICE_UNAVAILABLE: 503,
 };
 
+// Allowed values of the `status_primarix` field, shared by every product collection
+// (hotels/tours/excursions/cruises/vehicles). Used both to validate the `status` query
+// param and as the default applied when it's omitted.
+export const PRIMARIX_STATUS_VALUES = ['draft', 'published', 'unpublished', 'archived', 'deleted'];
+export const DEFAULT_PRIMARIX_STATUS = 'published';
+
 export const HTTP_MESSAGE = {
   200: 'OK',
   201: 'Created',

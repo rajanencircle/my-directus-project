@@ -1,5 +1,5 @@
 import { AppError } from '../../shared/AppError.js';
-import { HTTP_STATUS } from '../../shared/constants.js';
+import { HTTP_STATUS, DEFAULT_PRIMARIX_STATUS } from '../../shared/constants.js';
 
 const SORT_ALLOWLIST = new Set([
   'name_vehicle', '-name_vehicle',
@@ -7,9 +7,9 @@ const SORT_ALLOWLIST = new Set([
   'object_id', '-object_id',
 ]);
 
-export function buildListFilter({ search, category, rental_type }) {
+export function buildListFilter({ search, category, rental_type, status }) {
   const filter = {
-    status_primarix: { _eq: 'published' },
+    status_primarix: { _eq: status ?? DEFAULT_PRIMARIX_STATUS },
   };
 
   if (search) {

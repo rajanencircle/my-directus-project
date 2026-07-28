@@ -1,5 +1,5 @@
 import { AppError } from '../../shared/AppError.js';
-import { HTTP_STATUS } from '../../shared/constants.js';
+import { HTTP_STATUS, DEFAULT_PRIMARIX_STATUS } from '../../shared/constants.js';
 
 const SORT_ALLOWLIST = new Set([
   'name', '-name',
@@ -9,9 +9,9 @@ const SORT_ALLOWLIST = new Set([
 ]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season }) {
+export function buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status }) {
   const filter = {
-    status_primarix: { _eq: 'published' },
+    status_primarix: { _eq: status ?? DEFAULT_PRIMARIX_STATUS },
   };
 
   if (search) {

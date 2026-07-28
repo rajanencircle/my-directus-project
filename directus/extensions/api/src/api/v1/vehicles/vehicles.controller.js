@@ -7,10 +7,10 @@ export function createVehiclesController(context) {
   return {
     async index(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, category, rental_type, sort, updated_after } = req.query;
+      const { search, category, rental_type, sort, updated_after, status } = req.query;
 
       const result = await listVehicles(
-        { page, limit, offset, search, category, rental_type, sort, updated_after },
+        { page, limit, offset, search, category, rental_type, sort, updated_after, status },
         context,
       );
       const data = result.data.map(({ id, object_id, name_vehicle, date_updated }) => ({ id, object_id, name: name_vehicle, date_updated }));

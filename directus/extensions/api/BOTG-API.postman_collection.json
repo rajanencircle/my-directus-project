@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "BOTG API v1.3.0",
-    "description": "Custom REST API layer for BOTG — hotels, products, and more.\n\nSet the `baseUrl` collection variable to your environment (e.g. `http://localhost:8055` for local).\nSet `apiKey` to your Bearer token.\n\n**v1.3.0** — tours/excursions/vehicles/cruises detail responses were fixed and extended: corrected non-existent `name`/`routes` field bugs on tours and excursions, added departure dates/routes/specials to both, wired excursions' authoritative `from_price`, added `camper_specs` to vehicles, and wired the real cruises price matrix (`categories`) plus two cruises field-name bugs. See `directus/extensions/api/CHANGES_2026-07-28_tours-excursions-vehicles-cruises.md` for full details.",
+    "name": "BOTG API v1.4.0",
+    "description": "Custom REST API layer for BOTG — hotels, products, and more.\n\nSet the `baseUrl` collection variable to your environment (e.g. `http://localhost:8055` for local).\nSet `apiKey` to your Bearer token.\n\n**v1.4.0** — added an optional `status` query param (draft/published/unpublished/archived/deleted, default published) to every list/aggregate endpoint (hotels, tours, excursions, cruises, vehicles, products/details, products/limited-list, products catalog). Also fixed field drift on dev: hotels' `hotels_specials` → `specials_translations`, excursions' flat reservation-contact columns → `booking_partner` (agencies) relation, and a stale `descriptions_translations.mobility_advice_text` field removed from excursions.\n\n**v1.3.0** — tours/excursions/vehicles/cruises detail responses were fixed and extended: corrected non-existent `name`/`routes` field bugs on tours and excursions, added departure dates/routes/specials to both, wired excursions' authoritative `from_price`, added `camper_specs` to vehicles, and wired the real cruises price matrix (`categories`) plus two cruises field-name bugs. See `directus/extensions/api/CHANGES_2026-07-28_tours-excursions-vehicles-cruises.md` for full details.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -183,10 +183,16 @@
                   "value": "2026-01-01T00:00:00Z",
                   "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
+                  "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of hotels — only `id`, `object_id`, `name`, and `date_updated`. No `lang` param needed (no translations in response).\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
+            "description": "Returns a minimal paginated list of hotels — only `id`, `object_id`, `name`, and `date_updated`. No `lang` param needed (no translations in response).\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": [
             {
@@ -293,9 +299,17 @@
                 "api",
                 "v1",
                 "products"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Returns a live catalog of all product types with real published item counts and route URLs. No query parameters required."
+            "description": "Returns a live catalog of all product types with real item counts (published by default) and route URLs.\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           },
           "response": [
             {
@@ -402,10 +416,16 @@
                   "value": "2026-01-01T00:00:00Z",
                   "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
+                  "disabled": true
                 }
               ]
             },
-            "description": "Returns full product detail (all fields) for all product types in a single paginated list. Currently includes hotels only.\n\n**Filters:** lang, search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
+            "description": "Returns full product detail (all fields) for all product types in a single paginated list. Currently includes hotels only.\n\n**Filters:** lang, search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": []
         },
@@ -494,10 +514,16 @@
                   "value": "2026-01-01T00:00:00Z",
                   "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
+                  "disabled": true
                 }
               ]
             },
-            "description": "Lightweight product list — only `type`, `id`, `object_id`, `name`, `status`, `date_created`, `date_updated`. No `lang` param.\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
+            "description": "Lightweight product list — only `type`, `id`, `object_id`, `name`, `status`, `date_created`, `date_updated`. No `lang` param.\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": [
             {
@@ -610,10 +636,16 @@
                   "value": "2026-01-01T00:00:00Z",
                   "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
+                  "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of cruises — only id, object_id, and date_updated."
+            "description": "Returns a minimal paginated list of cruises — only id, object_id, and date_updated.\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           }
         },
         {
@@ -745,10 +777,16 @@
                   "value": "2026-01-01T00:00:00Z",
                   "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
+                  "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of tours (daytrips) — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_tour (tours has no top-level name field)."
+            "description": "Returns a minimal paginated list of tours (daytrips) — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_tour (tours has no top-level name field).\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           }
         },
         {
@@ -886,10 +924,16 @@
                   "value": "2026-01-01T00:00:00Z",
                   "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
+                  "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of excursions — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_excursion (excursions has no top-level name field; a previous bug meant name was always null — now fixed)."
+            "description": "Returns a minimal paginated list of excursions — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_excursion (excursions has no top-level name field; a previous bug meant name was always null — now fixed).\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           }
         },
         {
@@ -1009,10 +1053,16 @@
                   "value": "2026-01-01T00:00:00Z",
                   "description": "Delta sync — return only records with source_updated_at (legacy source's own last-modified timestamp, not Directus' date_updated) greater than this ISO 8601 timestamp. Feed back the response's meta.pagination.updated_at_max as the next request's updated_after.",
                   "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
+                  "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of rental vehicles (cars/campers) — only id, object_id, name, and date_updated."
+            "description": "Returns a minimal paginated list of rental vehicles (cars/campers) — only id, object_id, name, and date_updated.\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           }
         },
         {

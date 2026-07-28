@@ -12,14 +12,14 @@ const COLLECTION = "vehicles";
 const CAMPER_SPECS_COLLECTION = "camper_specs";
 
 export async function listVehicles(
-  { page, limit, offset, search, category, rental_type, sort, updated_after },
+  { page, limit, offset, search, category, rental_type, sort, updated_after, status },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
   const { ItemsService } = services;
   const vehiclesService = new ItemsService(COLLECTION, { knex: database, schema });
 
-  const listFilter = buildListFilter({ search, category, rental_type });
+  const listFilter = buildListFilter({ search, category, rental_type, status });
   const deltaFilter = buildUpdatedAfterFilter(updated_after);
   const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
 

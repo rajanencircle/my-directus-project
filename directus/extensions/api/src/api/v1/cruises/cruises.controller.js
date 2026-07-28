@@ -7,10 +7,10 @@ export function createCruisesController(context) {
   return {
     async index(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, destination, season, sort, updated_after } = req.query;
+      const { search, country, destination, season, sort, updated_after, status } = req.query;
 
       const result = await listCruises(
-        { page, limit, offset, search, country, destination, season, sort, updated_after },
+        { page, limit, offset, search, country, destination, season, sort, updated_after, status },
         context,
       );
       const data = result.data.map(({ id, object_id, date_updated }) => ({ id, object_id, date_updated }));

@@ -1,5 +1,5 @@
 import { AppError } from '../../shared/AppError.js';
-import { HTTP_STATUS } from '../../shared/constants.js';
+import { HTTP_STATUS, DEFAULT_PRIMARIX_STATUS } from '../../shared/constants.js';
 
 // 'name' is not sortable — excursions has no top-level name field, only a
 // per-language descriptions_translations.name_excursion (translations relation,
@@ -10,9 +10,9 @@ const SORT_ALLOWLIST = new Set([
   'season', '-season',
 ]);
 
-export function buildListFilter({ search, country, region, state, season, destination }) {
+export function buildListFilter({ search, country, region, state, season, destination, status }) {
   const filter = {
-    status_primarix: { _eq: 'published' },
+    status_primarix: { _eq: status ?? DEFAULT_PRIMARIX_STATUS },
   };
 
   if (search) {

@@ -8,6 +8,7 @@ import { DETAIL_FIELDS as CRUISES_DETAIL_FIELDS } from '../cruises/cruises.field
 import { buildUpdatedAfterFilter as buildCruisesUpdatedAfterFilter } from '../cruises/cruises.filters.js';
 import { DETAIL_FIELDS as VEHICLES_DETAIL_FIELDS } from '../vehicles/vehicles.fields.js';
 import { buildUpdatedAfterFilter as buildVehiclesUpdatedAfterFilter } from '../vehicles/vehicles.filters.js';
+import { DEFAULT_PRIMARIX_STATUS } from '../../shared/constants.js';
 
 const HOTELS_COLLECTION = 'hotels';
 const TOURS_COLLECTION = 'tours';
@@ -34,7 +35,7 @@ const LIMITED_FIELDS_GENERIC = [
  * Each item gets a `_productType` field (stripped by the transformer after dispatch)
  * so the product transformer can route to the correct per-type shaper.
  */
-async function fetchAllProductTypes({ updated_after }, { services, database, getSchema }) {
+async function fetchAllProductTypes({ updated_after, status }, { services, database, getSchema }) {
   const schema = await getSchema();
   const { ItemsService } = services;
 
@@ -50,9 +51,10 @@ async function fetchAllProductTypes({ updated_after }, { services, database, get
   const cruisesDelta = buildCruisesUpdatedAfterFilter(updated_after);
   const vehiclesDelta = buildVehiclesUpdatedAfterFilter(updated_after);
 
+  const statusFilter = status ?? DEFAULT_PRIMARIX_STATUS;
   const publishedFilter = (delta) => (delta
-    ? { _and: [{ status_primarix: { _eq: 'published' } }, delta] }
-    : { status_primarix: { _eq: 'published' } });
+    ? { _and: [{ status_primarix: { _eq: statusFilter } }, delta] }
+    : { status_primarix: { _eq: statusFilter } });
 
   return {
     hotelsService, toursService, excursionsService, cruisesService, vehiclesService,
@@ -65,15 +67,15 @@ async function fetchAllProductTypes({ updated_after }, { services, database, get
 }
 
 export async function listProducts(
-  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status },
   context,
 ) {
   const {
     hotelsService, toursService, excursionsService, cruisesService, vehiclesService,
     hotelsFilter, toursFilter, excursionsFilter, cruisesFilter, vehiclesFilter,
-  } = await fetchAllProductTypes({ updated_after }, context);
+  } = await fetchAllProductTypes({ updated_after, status }, context);
 
-  const hotelsListFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season });
+  const hotelsListFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status });
   const hotelsDelta = buildUpdatedAfterFilter(updated_after);
   const hotelsCombinedFilter = hotelsDelta ? { _and: [hotelsListFilter, hotelsDelta] } : hotelsListFilter;
 
@@ -106,15 +108,15 @@ export async function listProducts(
 }
 
 export async function listProductsLimited(
-  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status },
   context,
 ) {
   const {
     hotelsService, toursService, excursionsService, cruisesService, vehiclesService,
     toursFilter, excursionsFilter, cruisesFilter, vehiclesFilter,
-  } = await fetchAllProductTypes({ updated_after }, context);
+  } = await fetchAllProductTypes({ updated_after, status }, context);
 
-  const hotelsListFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season });
+  const hotelsListFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status });
   const hotelsDelta = buildUpdatedAfterFilter(updated_after);
   const hotelsCombinedFilter = hotelsDelta ? { _and: [hotelsListFilter, hotelsDelta] } : hotelsListFilter;
 
@@ -146,7 +148,7 @@ export async function listProductsLimited(
   return { data, total, page, limit, updatedAtMax };
 }
 
-export async function getProductCatalog({ services, database, getSchema }) {
+export async function getProductCatalog({ services, database, getSchema }, { status } = {}) {
   const schema = await getSchema();
   const { ItemsService } = services;
 
@@ -158,10 +160,11 @@ export async function getProductCatalog({ services, database, getSchema }) {
     { type: 'vehicle', collection: VEHICLES_COLLECTION, list_url: '/api/v1/vehicles', detail_url: '/api/v1/vehicles/{id}' },
   ];
 
+  const statusFilter = status ?? DEFAULT_PRIMARIX_STATUS;
   const counts = await Promise.all(
     collections.map(({ collection }) => {
       const service = new ItemsService(collection, { knex: database, schema });
-      return service.readByQuery({ aggregate: { count: ['*'] }, filter: { status_primarix: { _eq: 'published' } } });
+      return service.readByQuery({ aggregate: { count: ['*'] }, filter: { status_primarix: { _eq: statusFilter } } });
     }),
   );
 

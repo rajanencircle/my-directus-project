@@ -5,7 +5,7 @@ import { createProductsController } from './products.controller.js';
 
 export function setupProductsRoutes(router, prefix, context) {
   const { catalog, details, limitedList } = createProductsController(context);
-  router.get(prefix, asyncWrapper(catalog));
+  router.get(prefix, validate(listProductsSchema), asyncWrapper(catalog));
   router.get(`${prefix}/details`, validate(listProductsSchema), asyncWrapper(details));
   router.get(`${prefix}/limited-list`, validate(listProductsSchema), asyncWrapper(limitedList));
 }

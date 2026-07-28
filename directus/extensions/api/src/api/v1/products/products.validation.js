@@ -1,4 +1,5 @@
 import { query } from 'express-validator';
+import { PRIMARIX_STATUS_VALUES } from '../../shared/constants.js';
 
 const VALID_LANG_CODES = ['de', 'en', 'nl'];
 const VALID_SORT_VALUES = [
@@ -77,4 +78,9 @@ export const listProductsSchema = [
     .optional()
     .isISO8601()
     .withMessage('updated_after must be a valid ISO 8601 date-time'),
+
+  query('status')
+    .optional()
+    .isIn(PRIMARIX_STATUS_VALUES)
+    .withMessage(`status must be one of: ${PRIMARIX_STATUS_VALUES.join(', ')}`),
 ];
