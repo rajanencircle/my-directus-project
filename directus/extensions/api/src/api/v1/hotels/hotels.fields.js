@@ -198,8 +198,9 @@ export const DETAIL_FIELDS = [
   "image_badge_translations.translations_id.code",
   "image_badge_translations.image_badge_teaser",
   "image_badge_translations.image_badge_details",
-  // Offers / specials (JSON repeater — filtered in transformer)
-  "hotels_specials",
+  // Offers / specials (per-language JSON repeater — filtered in transformer)
+  "specials_translations.translations_id.code",
+  "specials_translations.specials",
   // Surcharges — fetched separately to avoid Directus nested-translation resolution issues
   "surcharges.id",
 ];

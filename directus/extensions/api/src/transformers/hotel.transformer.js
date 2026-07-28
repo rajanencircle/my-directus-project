@@ -238,10 +238,15 @@ export function shapeHotelDetail(hotel, lang) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  // Specials — filter by publication status and date range
-  const specials = (hotel.hotels_specials ?? [])
-    .filter((s) => isPublicationActive(s, today))
-    .map(({ status, publish_start, publish_end, ...rest }) => rest);
+  // Specials — per-language JSON list; filter each item by publication status/date range
+  const specialsMap = buildTranslationsMap(hotel.specials_translations, (t) => ({
+    specials: (t.specials ?? [])
+      .filter((s) => isPublicationActive(s, today))
+      .map(({ status, publish_start, publish_end, ...rest }) => rest),
+  }));
+  const specials_translations = lang
+    ? (specialsMap[lang] ? { [lang]: specialsMap[lang] } : {})
+    : specialsMap;
 
   // Rooms with new shape — filter room_categories and price_dates by publication
   const roomCategories = (hotel.room_categories ?? []).filter((rc) =>
@@ -371,7 +376,7 @@ export function shapeHotelDetail(hotel, lang) {
     price_info_translations,
     rooms,
     price_options,
-    specials,
+    specials_translations,
     image_badge: {
       status: hotel.image_badge_status ?? null,
       start_date: hotel.image_badge_start_date ?? null,

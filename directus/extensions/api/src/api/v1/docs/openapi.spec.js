@@ -116,22 +116,14 @@ const REAL_HOTEL = {
       prices: [],
     },
   ],
-  specials: [
-    {
-      name: "123123",
-      special_description: "qwesaddasd",
-      status: "published",
-      publish_start: "2026-05-20",
-      publish_end: "2026-06-25",
+  specials_translations: {
+    en: {
+      specials: [
+        { name: "123123", special_description: "qwesaddasd" },
+        { name: "555", special_description: "22222" },
+      ],
     },
-    {
-      name: "555",
-      special_description: "22222",
-      status: "published",
-      publish_start: "2026-05-15",
-      publish_end: "2026-05-30",
-    },
-  ],
+  },
   image_badge: {
     status: "published_period",
     start_date: "2026-05-12",
@@ -588,7 +580,7 @@ export const openapiSpec = {
             name: "lang",
             schema: { type: "string", enum: ["de", "en", "nl"] },
             description:
-              "ISO 639-1 language code. If set, every translations block (translations, price_info_translations, rooms[].prices[].occupancies[].translations, price_options[].translations, image_badge.translations, pictures[].caption_i18n) returns only that language key. Omit to get all available languages.",
+              "ISO 639-1 language code. If set, every translations block (translations, price_info_translations, specials_translations, rooms[].prices[].occupancies[].translations, price_options[].translations, image_badge.translations, pictures[].caption_i18n) returns only that language key. Omit to get all available languages.",
           },
         ],
         responses: {
@@ -1791,36 +1783,34 @@ export const openapiSpec = {
               },
             },
           },
-          specials: {
-            type: "array",
+          specials_translations: {
+            type: "object",
             description:
-              "Active special offers (JSON repeater). Only specials whose publication status is active are included.",
-            items: {
+              "Active special offers keyed by ISO 639-1 code. Filtered to the requested lang when lang param is set. Only specials whose publication status/date range is currently active are included. Source: specials_translations junction.",
+            additionalProperties: {
               type: "object",
               properties: {
-                name: { type: "string", nullable: true, example: "123123" },
-                special_description: {
-                  type: "string",
-                  nullable: true,
-                  example: "qwesaddasd",
+                specials: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string", nullable: true, example: "123123" },
+                      special_description: {
+                        type: "string",
+                        nullable: true,
+                        example: "qwesaddasd",
+                      },
+                    },
+                  },
                 },
-                status: {
-                  type: "string",
-                  nullable: true,
-                  example: "published",
-                },
-                publish_start: {
-                  type: "string",
-                  format: "date",
-                  nullable: true,
-                  example: "2026-05-20",
-                },
-                publish_end: {
-                  type: "string",
-                  format: "date",
-                  nullable: true,
-                  example: "2026-06-25",
-                },
+              },
+            },
+            example: {
+              en: {
+                specials: [
+                  { name: "123123", special_description: "qwesaddasd" },
+                ],
               },
             },
           },

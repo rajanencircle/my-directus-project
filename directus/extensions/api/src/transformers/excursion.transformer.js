@@ -131,7 +131,9 @@ export function shapeExcursionDetail(excursion, lang) {
     excursion_programme_disclaimer: t.excursion_programme_disclaimer ?? null,
     excursion_programme: t.excursion_programme ?? null,
     recommendations: t.recommendations ?? null,
-    mobility_advice_text: t.mobility_advice_text ?? null,
+    // Per-language mobility advice text field was removed from
+    // excursions_descriptions_translations; the top-level `mobility_advice_text`
+    // m2o (global MAT record id) is the only source for excursions now.
     description_supplementary: t.description_supplementary ?? null,
   }));
 
@@ -286,12 +288,14 @@ export function shapeExcursionDetail(excursion, lang) {
     booking: {
       channel: excursion.booking_channel ?? null,
       email_booking: excursion.email_booking ?? null,
-      res_phone: excursion.res_phone ?? null,
-      res_email2: excursion.res_email2 ?? null,
-      contact_title: excursion.contact_title ?? null,
-      contact_greeting: excursion.contact_greeting ?? null,
-      contact_firstname: excursion.contact_firstname ?? null,
-      contact_name: excursion.contact_name ?? null,
+      // Reservation contact details now live on the linked booking-partner
+      // agency record (agencies collection) rather than as flat columns here.
+      res_phone: excursion.booking_partner?.phone_reservation ?? null,
+      res_email2: excursion.booking_partner?.email_reservation ?? null,
+      contact_title: excursion.booking_partner?.contact_title ?? null,
+      contact_greeting: excursion.booking_partner?.contact_greeting ?? null,
+      contact_firstname: excursion.booking_partner?.contact_first_name ?? null,
+      contact_name: excursion.booking_partner?.contact_name ?? null,
       id_service_provider_tour32: excursion.id_service_provider_tour32 ?? null,
       id_main_service_provider_tour32: excursion.id_main_service_provider_tour32 ?? null,
     },
