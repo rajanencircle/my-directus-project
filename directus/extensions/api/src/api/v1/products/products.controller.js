@@ -19,17 +19,17 @@ function shapeLimitedProduct(item) {
 export function createProductsController(context) {
   return {
     async catalog(req, res) {
-      const { status } = req.query;
-      const data = await getProductCatalog(context, { status });
+      const { status_primarix } = req.query;
+      const data = await getProductCatalog(context, { status_primarix });
       return sendSuccess(res, data);
     },
 
     async details(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, lang, updated_after, status } = req.query;
+      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, lang, updated_after, status_primarix } = req.query;
 
       const result = await listProducts(
-        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status },
+        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix },
         context,
       );
 
@@ -44,10 +44,10 @@ export function createProductsController(context) {
 
     async limitedList(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status } = req.query;
+      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix } = req.query;
 
       const result = await listProductsLimited(
-        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status },
+        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix },
         context,
       );
 

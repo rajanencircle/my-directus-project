@@ -79,8 +79,8 @@ export const listProductsSchema = [
     .isISO8601()
     .withMessage('updated_after must be a valid ISO 8601 date-time'),
 
-  query('status')
+  query('status_primarix')
     .optional()
     .isIn(PRIMARIX_STATUS_VALUES)
-    .withMessage(`status must be one of: ${PRIMARIX_STATUS_VALUES.join(', ')}`),
+    .withMessage(`status_primarix must be one of: ${PRIMARIX_STATUS_VALUES.join(', ')}`),
 ];

@@ -7,9 +7,9 @@ const SORT_ALLOWLIST = new Set([
   'season', '-season',
 ]);
 
-export function buildListFilter({ search, country, destination, season, status }) {
+export function buildListFilter({ search, country, destination, season, status_primarix }) {
   const filter = {
-    status_primarix: { _eq: status ?? DEFAULT_PRIMARIX_STATUS },
+    status_primarix: { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS },
   };
 
   if (search) {

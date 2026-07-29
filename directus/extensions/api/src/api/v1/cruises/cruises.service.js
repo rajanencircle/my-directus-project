@@ -12,14 +12,14 @@ const COLLECTION = "cruises";
 const PRICES_COLLECTION = "cruises_prices";
 
 export async function listCruises(
-  { page, limit, offset, search, country, destination, season, sort, updated_after, status },
+  { page, limit, offset, search, country, destination, season, sort, updated_after, status_primarix },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
   const { ItemsService } = services;
   const cruisesService = new ItemsService(COLLECTION, { knex: database, schema });
 
-  const listFilter = buildListFilter({ search, country, destination, season, status });
+  const listFilter = buildListFilter({ search, country, destination, season, status_primarix });
   const deltaFilter = buildUpdatedAfterFilter(updated_after);
   const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
 

@@ -35,7 +35,7 @@ const LIMITED_FIELDS_GENERIC = [
  * Each item gets a `_productType` field (stripped by the transformer after dispatch)
  * so the product transformer can route to the correct per-type shaper.
  */
-async function fetchAllProductTypes({ updated_after, status }, { services, database, getSchema }) {
+async function fetchAllProductTypes({ updated_after, status_primarix }, { services, database, getSchema }) {
   const schema = await getSchema();
   const { ItemsService } = services;
 
@@ -51,7 +51,7 @@ async function fetchAllProductTypes({ updated_after, status }, { services, datab
   const cruisesDelta = buildCruisesUpdatedAfterFilter(updated_after);
   const vehiclesDelta = buildVehiclesUpdatedAfterFilter(updated_after);
 
-  const statusFilter = status ?? DEFAULT_PRIMARIX_STATUS;
+  const statusFilter = status_primarix ?? DEFAULT_PRIMARIX_STATUS;
   const publishedFilter = (delta) => (delta
     ? { _and: [{ status_primarix: { _eq: statusFilter } }, delta] }
     : { status_primarix: { _eq: statusFilter } });
@@ -67,15 +67,15 @@ async function fetchAllProductTypes({ updated_after, status }, { services, datab
 }
 
 export async function listProducts(
-  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix },
   context,
 ) {
   const {
     hotelsService, toursService, excursionsService, cruisesService, vehiclesService,
     hotelsFilter, toursFilter, excursionsFilter, cruisesFilter, vehiclesFilter,
-  } = await fetchAllProductTypes({ updated_after, status }, context);
+  } = await fetchAllProductTypes({ updated_after, status_primarix }, context);
 
-  const hotelsListFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status });
+  const hotelsListFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status_primarix });
   const hotelsDelta = buildUpdatedAfterFilter(updated_after);
   const hotelsCombinedFilter = hotelsDelta ? { _and: [hotelsListFilter, hotelsDelta] } : hotelsListFilter;
 
@@ -108,15 +108,15 @@ export async function listProducts(
 }
 
 export async function listProductsLimited(
-  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix },
   context,
 ) {
   const {
     hotelsService, toursService, excursionsService, cruisesService, vehiclesService,
     toursFilter, excursionsFilter, cruisesFilter, vehiclesFilter,
-  } = await fetchAllProductTypes({ updated_after, status }, context);
+  } = await fetchAllProductTypes({ updated_after, status_primarix }, context);
 
-  const hotelsListFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status });
+  const hotelsListFilter = buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status_primarix });
   const hotelsDelta = buildUpdatedAfterFilter(updated_after);
   const hotelsCombinedFilter = hotelsDelta ? { _and: [hotelsListFilter, hotelsDelta] } : hotelsListFilter;
 
@@ -148,7 +148,7 @@ export async function listProductsLimited(
   return { data, total, page, limit, updatedAtMax };
 }
 
-export async function getProductCatalog({ services, database, getSchema }, { status } = {}) {
+export async function getProductCatalog({ services, database, getSchema }, { status_primarix } = {}) {
   const schema = await getSchema();
   const { ItemsService } = services;
 
@@ -160,7 +160,7 @@ export async function getProductCatalog({ services, database, getSchema }, { sta
     { type: 'vehicle', collection: VEHICLES_COLLECTION, list_url: '/api/v1/vehicles', detail_url: '/api/v1/vehicles/{id}' },
   ];
 
-  const statusFilter = status ?? DEFAULT_PRIMARIX_STATUS;
+  const statusFilter = status_primarix ?? DEFAULT_PRIMARIX_STATUS;
   const counts = await Promise.all(
     collections.map(({ collection }) => {
       const service = new ItemsService(collection, { knex: database, schema });

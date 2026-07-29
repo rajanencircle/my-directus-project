@@ -9,9 +9,9 @@ const SORT_ALLOWLIST = new Set([
 ]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status }) {
+export function buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status_primarix }) {
   const filter = {
-    status_primarix: { _eq: status ?? DEFAULT_PRIMARIX_STATUS },
+    status_primarix: { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS },
   };
 
   if (search) {

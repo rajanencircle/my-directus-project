@@ -185,14 +185,14 @@
                   "disabled": true
                 },
                 {
-                  "key": "status",
+                  "key": "status_primarix",
                   "value": "",
                   "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
                   "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of hotels — only `id`, `object_id`, `name`, and `date_updated`. No `lang` param needed (no translations in response).\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
+            "description": "Returns a minimal paginated list of hotels — only `id`, `object_id`, `name`, and `date_updated`. No `lang` param needed (no translations in response).\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status_primarix\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": [
             {
@@ -302,14 +302,14 @@
               ],
               "query": [
                 {
-                  "key": "status",
+                  "key": "status_primarix",
                   "value": "",
                   "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
                   "disabled": true
                 }
               ]
             },
-            "description": "Returns a live catalog of all product types with real item counts (published by default) and route URLs.\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
+            "description": "Returns a live catalog of all product types with real item counts (published by default) and route URLs.\n\n**Status filter:** `status_primarix` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           },
           "response": [
             {
@@ -418,14 +418,14 @@
                   "disabled": true
                 },
                 {
-                  "key": "status",
+                  "key": "status_primarix",
                   "value": "",
                   "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
                   "disabled": true
                 }
               ]
             },
-            "description": "Returns full product detail (all fields) for all product types in a single paginated list. Currently includes hotels only.\n\n**Filters:** lang, search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
+            "description": "Returns full product detail (all fields) for all product types in a single paginated list. Currently includes hotels only.\n\n**Filters:** lang, search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status_primarix\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": []
         },
@@ -516,14 +516,14 @@
                   "disabled": true
                 },
                 {
-                  "key": "status",
+                  "key": "status_primarix",
                   "value": "",
                   "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
                   "disabled": true
                 }
               ]
             },
-            "description": "Lightweight product list — only `type`, `id`, `object_id`, `name`, `status`, `date_created`, `date_updated`. No `lang` param.\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
+            "description": "Lightweight product list — only `type`, `id`, `object_id`, `name`, `status`, `date_created`, `date_updated`. No `lang` param.\n\n**Filters:** search, country, region, state, hotel_group, hotel_classification, activity, season, updated_after, status_primarix\n**Sort:** name, date_updated, object_id, season (prefix `-` for descending)"
           },
           "response": [
             {
@@ -638,14 +638,14 @@
                   "disabled": true
                 },
                 {
-                  "key": "status",
+                  "key": "status_primarix",
                   "value": "",
                   "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
                   "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of cruises — only id, object_id, and date_updated.\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
+            "description": "Returns a minimal paginated list of cruises — only id, object_id, and date_updated.\n\n**Status filter:** `status_primarix` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           }
         },
         {
@@ -779,14 +779,14 @@
                   "disabled": true
                 },
                 {
-                  "key": "status",
+                  "key": "status_primarix",
                   "value": "",
                   "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
                   "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of tours (daytrips) — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_tour (tours has no top-level name field).\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
+            "description": "Returns a minimal paginated list of tours (daytrips) — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_tour (tours has no top-level name field).\n\n**Status filter:** `status_primarix` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           }
         },
         {
@@ -926,14 +926,14 @@
                   "disabled": true
                 },
                 {
-                  "key": "status",
+                  "key": "status_primarix",
                   "value": "",
                   "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
                   "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of excursions — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_excursion (excursions has no top-level name field; a previous bug meant name was always null — now fixed).\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
+            "description": "Returns a minimal paginated list of excursions — only id, object_id, name, and date_updated. name is resolved from descriptions_translations.name_excursion (excursions has no top-level name field; a previous bug meant name was always null — now fixed).\n\n**Status filter:** `status_primarix` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           }
         },
         {
@@ -1055,14 +1055,14 @@
                   "disabled": true
                 },
                 {
-                  "key": "status",
+                  "key": "status_primarix",
                   "value": "",
                   "description": "Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted.",
                   "disabled": true
                 }
               ]
             },
-            "description": "Returns a minimal paginated list of rental vehicles (cars/campers) — only id, object_id, name, and date_updated.\n\n**Status filter:** `status` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
+            "description": "Returns a minimal paginated list of rental vehicles (cars/campers) — only id, object_id, name, and date_updated.\n\n**Status filter:** `status_primarix` — Filter by lifecycle status_primarix. One of: draft | published | unpublished | archived | deleted. Defaults to published when omitted."
           }
         },
         {
