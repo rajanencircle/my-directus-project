@@ -84,8 +84,8 @@ export function shapeCruiseDetail(cruise, lang) {
     important_information: t.important_information ?? null,
     good_to_know: t.good_to_know ?? null,
     occupancy_single: t.occupancy_single ?? null,
-    deviating_cancellation_terms: t.deviating_cancellation_terms_selector ?? null,
-    deviating_cancellation_terms_additions: t.deviating_cancellation_terms_text ?? null,
+    deviating_cancellation_terms: t.deviating_cancellation_terms ?? null,
+    deviating_cancellation_terms_additions: t.deviating_cancellation_terms_additions ?? null,
     mobility_advice_text: t.mobility_advice_text ?? null,
   }));
 
@@ -187,7 +187,7 @@ export function shapeCruiseDetail(cruise, lang) {
     user_updated: cruise.user_updated
       ? { id: cruise.user_updated.id ?? null, first_name: cruise.user_updated.first_name ?? null, last_name: cruise.user_updated.last_name ?? null }
       : null,
-    season: cruise.season ?? null,
+    season: cruise.season?.season ?? null,
     travel_id_karawane: cruise.travel_id_karawane ?? null,
     id_tour32: cruise.id_tour32 ?? null,
     real_url: cruise.real_url ?? null,

@@ -10,14 +10,16 @@ const SORT_ALLOWLIST = new Set([
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status_primarix }) {
-  const filter = {
-    status_primarix: { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS },
-  };
+  const filter = {};
+  // 'all' means don't filter by status_primarix at all — otherwise default to published.
+  if (status_primarix !== 'all') {
+    filter.status_primarix = { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS };
+  }
 
   if (search) {
     filter._or = [
       { name: { _icontains: search } },
-      { 'hotel_descriptions_translations.teaser': { _icontains: search } },
+      { hotel_descriptions_translations: { teaser: { _icontains: search } } },
     ];
   }
 
@@ -46,7 +48,7 @@ export function buildListFilter({ search, country, hotel_group, hotel_classifica
   }
 
   if (season) {
-    filter.season = { _eq: season };
+    filter.season = { season: { _eq: season } };
   }
 
   return filter;

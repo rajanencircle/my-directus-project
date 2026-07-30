@@ -213,11 +213,15 @@ export function shapeHotelDetail(hotel, lang) {
   }));
 
   const translations = lang
-    ? (descMap[lang] ? { [lang]: descMap[lang] } : {})
+    ? descMap[lang]
+      ? { [lang]: descMap[lang] }
+      : {}
     : descMap;
 
   const price_info_translations = lang
-    ? (infoMap[lang] ? { [lang]: infoMap[lang] } : {})
+    ? infoMap[lang]
+      ? { [lang]: infoMap[lang] }
+      : {}
     : infoMap;
 
   // Per-language price settings (margin, buy entity)
@@ -239,13 +243,18 @@ export function shapeHotelDetail(hotel, lang) {
   const today = new Date().toISOString().slice(0, 10);
 
   // Specials — per-language JSON list; filter each item by publication status/date range
-  const specialsMap = buildTranslationsMap(hotel.specials_translations, (t) => ({
-    specials: (t.specials ?? [])
-      .filter((s) => isPublicationActive(s, today))
-      .map(({ status, publish_start, publish_end, ...rest }) => rest),
-  }));
+  const specialsMap = buildTranslationsMap(
+    hotel.specials_translations,
+    (t) => ({
+      specials: (t.specials ?? [])
+        .filter((s) => isPublicationActive(s, today))
+        .map(({ status, publish_start, publish_end, ...rest }) => rest),
+    }),
+  );
   const specials_translations = lang
-    ? (specialsMap[lang] ? { [lang]: specialsMap[lang] } : {})
+    ? specialsMap[lang]
+      ? { [lang]: specialsMap[lang] }
+      : {}
     : specialsMap;
 
   // Rooms with new shape — filter room_categories and price_dates by publication
@@ -282,7 +291,10 @@ export function shapeHotelDetail(hotel, lang) {
         sell_price: t.sell_price ?? null,
         type: t.surcharge_type?.designation ?? null,
         catering: t.surcharge_catering
-          ? { id: t.surcharge_catering.id, designation: t.surcharge_catering.designation }
+          ? {
+              id: t.surcharge_catering.id,
+              designation: t.surcharge_catering.designation,
+            }
           : null,
         calc_type: t.surcharge_calc_type?.designation ?? null,
       }));
@@ -300,22 +312,82 @@ export function shapeHotelDetail(hotel, lang) {
         catering: active.catering ?? null,
         calc_type: active.calc_type ?? null,
         translations: lang
-          ? (translationsMap[lang] ? { [lang]: translationsMap[lang] } : {})
+          ? translationsMap[lang]
+            ? { [lang]: translationsMap[lang] }
+            : {}
           : translationsMap,
       };
     });
 
   return {
-    type: "hotel",
     id: hotel.id,
-    name: hotel.name,
-    season: hotel.season?.season ?? null,
     object_id: hotel.object_id ?? null,
-    object_info: hotel.object_info ?? null,
-    internal_remarks: hotel.internal_remarks ?? null,
+    type: "hotel",
     status_primarix: hotel.status_primarix ?? null,
     date_created: ensureUtcSuffix(hotel.date_created),
     date_updated: ensureUtcSuffix(hotel.date_updated),
+
+    name: hotel.name,
+    classification: hotel.hotel_classification?.label ?? null,
+    accommodation_type:
+      hotel.accommodation_type?.[0]?.accommodation_types_id?.label ?? null,
+
+    supplier: {
+      type: SUPPLIER_TYPE_MAP[hotel.booking_partner] ?? null,
+      id_tour_user: hotel.id_tour_user ?? null,
+      haupt_id_tour_user: hotel.haupt_id_tour_user ?? null,
+      booking_partner: hotel.booking?.name_agency ?? null,
+      booking_email: hotel.booking_email ?? null,
+      booking_info: hotel.booking_info ?? null,
+    },
+
+    partner_type: hotel.partner_type ?? null,
+    partner_filter_ids: (hotel.partner ?? [])
+      .map((p) => {
+        const n = parseInt(p.partner_id?.primarix_id, 10);
+        return isNaN(n) ? null : n;
+      })
+      .filter((n) => n !== null),
+
+    address: {
+      street: hotel.street ?? null,
+      street_number: hotel.street_number ?? null,
+      zip_code: hotel.zip_code ?? null,
+      town: getGeoName(hotel.place, lang),
+      state: getGeoName(hotel.state, lang),
+      region: getGeoName(hotel.region, lang),
+      country: getGeoName(hotel.country, lang),
+      country_code: hotel.country?.ISO ?? null,
+      // Extra field beyond the reference shape:
+      location_tour32: getGeoName(hotel.location_tour32, lang),
+    },
+
+    contact: {
+      phone_general: hotel.phone_general ?? null,
+      phone_ah: hotel.phone_ah ?? null,
+      email_general: hotel.email_general ?? null,
+      website: hotel.website ?? null,
+    },
+
+    translations,
+    rooms,
+    price_options,
+    image_badge: {
+      status: hotel.image_badge_status ?? null,
+      start_date: hotel.image_badge_start_date ?? null,
+      end_date: hotel.image_badge_end_date ?? null,
+      translations: lang
+        ? badgeTranslations[lang]
+          ? { [lang]: badgeTranslations[lang] }
+          : {}
+        : badgeTranslations,
+    },
+    activities: (hotel.hotel_activities ?? [])
+      .map((a) => a.activities_id)
+      .filter(Boolean)
+      .map((a) => ({ id: a.id, label: a.label })),
+    pictures: buildImageUrls(hotel.media, lang),
+
     user_created: hotel.user_created
       ? {
           id: hotel.user_created.id ?? null,
@@ -330,61 +402,18 @@ export function shapeHotelDetail(hotel, lang) {
           last_name: hotel.user_updated.last_name ?? null,
         }
       : null,
-    partner_type: hotel.partner_type ?? null,
+    season: hotel.season?.season ?? null,
+    object_info: hotel.object_info ?? null,
+    internal_remarks: hotel.internal_remarks ?? null,
+
     hotel_group: hotel.hotel_group
       ? { id: hotel.hotel_group.id, label: hotel.hotel_group.label }
       : null,
-    address: {
-      street: hotel.street ?? null,
-      street_number: hotel.street_number ?? null,
-      zip_code: hotel.zip_code ?? null,
-      town: getGeoName(hotel.place, lang),
-      state: getGeoName(hotel.state, lang),
-      region: getGeoName(hotel.region, lang),
-      country: getGeoName(hotel.country, lang),
-      location_tour32: getGeoName(hotel.location_tour32, lang),
-    },
-    contact: {
-      phone_general: hotel.phone_general ?? null,
-      phone_ah: hotel.phone_ah ?? null,
-      email_general: hotel.email_general ?? null,
-      website: hotel.website ?? null,
-    },
-    partner_filter_ids: (hotel.partner ?? [])
-      .map((p) => {
-        const n = parseInt(p.partner_id?.primarix_id, 10);
-        return isNaN(n) ? null : n;
-      })
-      .filter((n) => n !== null),
-    supplier: {
-      type: SUPPLIER_TYPE_MAP[hotel.booking_partner] ?? null,
-      id_tour_user: hotel.id_tour_user ?? null,
-      haupt_id_tour_user: hotel.haupt_id_tour_user ?? null,
-      booking_partner: hotel.booking?.name_agency ?? null,
-      booking_email: hotel.booking_email ?? null,
-      booking_info: hotel.booking_info ?? null,
-    },
+
     from_price: activeSettings.fromPrice ?? null,
-    accommodation_type:
-      hotel.accommodation_type?.[0]?.accommodation_types_id?.label ?? null,
-    classification: hotel.hotel_classification?.label ?? null,
-    activities: (hotel.hotel_activities ?? [])
-      .map((a) => a.activities_id)
-      .filter(Boolean)
-      .map((a) => ({ id: a.id, label: a.label })),
-    translations,
+
     price_info_translations,
-    rooms,
-    price_options,
+
     specials_translations,
-    image_badge: {
-      status: hotel.image_badge_status ?? null,
-      start_date: hotel.image_badge_start_date ?? null,
-      end_date: hotel.image_badge_end_date ?? null,
-      translations: lang
-        ? (badgeTranslations[lang] ? { [lang]: badgeTranslations[lang] } : {})
-        : badgeTranslations,
-    },
-    pictures: buildImageUrls(hotel.media, lang),
   };
 }

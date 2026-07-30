@@ -21,14 +21,14 @@ function pickListName(translations) {
 }
 
 export async function listExcursions(
-  { page, limit, offset, search, country, region, state, season, destination, sort, updated_after, status_primarix },
+  { page, limit, offset, search, country, state, season, destination, sort, updated_after, status_primarix },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
   const { ItemsService } = services;
   const excursionsService = new ItemsService(COLLECTION, { knex: database, schema });
 
-  const listFilter = buildListFilter({ search, country, region, state, season, destination, status_primarix });
+  const listFilter = buildListFilter({ search, country, state, season, destination, status_primarix });
   const deltaFilter = buildUpdatedAfterFilter(updated_after);
   const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
 

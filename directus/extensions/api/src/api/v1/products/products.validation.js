@@ -1,5 +1,5 @@
 import { query } from 'express-validator';
-import { PRIMARIX_STATUS_VALUES } from '../../shared/constants.js';
+import { PRIMARIX_STATUS_QUERY_VALUES } from '../../shared/constants.js';
 
 const VALID_LANG_CODES = ['de', 'en', 'nl'];
 const VALID_SORT_VALUES = [
@@ -8,6 +8,9 @@ const VALID_SORT_VALUES = [
   'object_id', '-object_id',
   'season', '-season',
 ];
+// Only used by /products/details and /products/limited-list — /products (catalog)
+// ignores it. Default (omitted) is all types.
+const VALID_TYPE_VALUES = ['hotel', 'tour', 'excursion', 'cruise', 'vehicle'];
 
 export const listProductsSchema = [
   query('page')
@@ -81,6 +84,11 @@ export const listProductsSchema = [
 
   query('status_primarix')
     .optional()
-    .isIn(PRIMARIX_STATUS_VALUES)
-    .withMessage(`status_primarix must be one of: ${PRIMARIX_STATUS_VALUES.join(', ')}`),
+    .isIn(PRIMARIX_STATUS_QUERY_VALUES)
+    .withMessage(`status_primarix must be one of: ${PRIMARIX_STATUS_QUERY_VALUES.join(', ')}`),
+
+  query('type')
+    .optional()
+    .isIn(VALID_TYPE_VALUES)
+    .withMessage(`type must be one of: ${VALID_TYPE_VALUES.join(', ')}`),
 ];

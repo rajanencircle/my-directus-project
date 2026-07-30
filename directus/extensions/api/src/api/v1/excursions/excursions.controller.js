@@ -7,10 +7,10 @@ export function createExcursionsController(context) {
   return {
     async index(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, region, state, season, destination, sort, updated_after, status_primarix } = req.query;
+      const { search, country, state, season, destination, sort, updated_after, status_primarix } = req.query;
 
       const result = await listExcursions(
-        { page, limit, offset, search, country, region, state, season, destination, sort, updated_after, status_primarix },
+        { page, limit, offset, search, country, state, season, destination, sort, updated_after, status_primarix },
         context,
       );
       const data = result.data.map(({ id, object_id, name, date_updated }) => ({ id, object_id, name, date_updated }));

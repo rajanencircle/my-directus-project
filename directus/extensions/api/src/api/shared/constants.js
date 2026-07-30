@@ -18,6 +18,10 @@ export const HTTP_STATUS = {
 // param and as the default applied when it's omitted.
 export const PRIMARIX_STATUS_VALUES = ['draft', 'published', 'unpublished', 'archived', 'deleted'];
 export const DEFAULT_PRIMARIX_STATUS = 'published';
+// 'all' is an API-only sentinel meaning "don't filter by status_primarix at all" — it is
+// never a real value stored in the database, so it's kept out of PRIMARIX_STATUS_VALUES
+// (which mirrors the actual column's value set) and only added here for query validation.
+export const PRIMARIX_STATUS_QUERY_VALUES = [...PRIMARIX_STATUS_VALUES, 'all'];
 
 export const HTTP_MESSAGE = {
   200: 'OK',

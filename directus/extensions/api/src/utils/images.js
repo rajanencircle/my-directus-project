@@ -13,7 +13,7 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
 
   return (mediaJunctionRows ?? [])
     .filter((row) => row.directus_files_id?.draft_status !== 'draft')
-    .map((row, index) => {
+    .map((row) => {
       const file = row.directus_files_id;
       if (!file?.id) return null;
 
@@ -41,7 +41,11 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
         url: `${base}/assets/${file.id}`,
         thumbnail_url: `${base}/assets/${file.id}?width=400&height=300&fit=cover`,
         copyright: file.copyright ?? null,
+        workspace: file.primarix_workspace ?? null,
+        expiry_date: file.expiry_date ?? null,
         alt_text: file.alt_text ?? null,
+        sort: row.sort ?? null,
+        // Extra fields beyond the reference shape:
         caption_i18n,
         // is_map/tour32_export can live either on the junction row itself (per-product,
         // e.g. cruises_directus_files) or on the shared file record depending on how each
@@ -53,8 +57,6 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
         folder: file.folder
           ? { id: file.folder.id ?? null, name: file.folder.name ?? null }
           : null,
-        expiry_date: file.expiry_date ?? null,
-        sort: index + 1,
       };
     })
     .filter(Boolean);

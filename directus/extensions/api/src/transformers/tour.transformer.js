@@ -49,6 +49,42 @@ function stripFields(obj, fields) {
   for (const f of fields) delete obj[f];
 }
 
+// Per-language map of { marginPct, unit, fromPrice } from price_calculation_translations —
+// internal pricing settings, mirrors hotels' buildPriceSettingsMap/activeSettings.
+function buildPriceSettingsMap(priceCalculationRows) {
+  const map = {};
+  for (const row of priceCalculationRows ?? []) {
+    const locale = getLocaleCode(row.translations_id);
+    const iso = LOCALE_TO_ISO[locale];
+    if (!iso) continue;
+    map[iso] = {
+      marginPct: row.margin_percentage ?? null,
+      unit:
+        row.buy_price_type === "per_person"
+          ? "person"
+          : row.buy_price_type === "per_unit"
+            ? "unit"
+            : null,
+      fromPrice: row.from_price ?? null,
+    };
+  }
+  return map;
+}
+
+// Per-language map of { marginPct } from surcharges_calculation_translations — internal,
+// feeds surcharges[].margin (kept separate from price settings since tours has a distinct
+// surcharge margin configuration, unlike hotels which shares one margin across both).
+function buildSurchargeSettingsMap(surchargesCalculationRows) {
+  const map = {};
+  for (const row of surchargesCalculationRows ?? []) {
+    const locale = getLocaleCode(row.translations_id);
+    const iso = LOCALE_TO_ISO[locale];
+    if (!iso) continue;
+    map[iso] = { marginPct: row.surcharge_margin_percentage ?? null };
+  }
+  return map;
+}
+
 export function shapeTourListItem(tour, lang) {
   const descMap = buildTranslationsMap(tour.descriptions_translations, (t) => ({
     name_tour: t.name_tour ?? null,
@@ -122,6 +158,20 @@ export function shapeTourDetail(tour, lang) {
     specials: t.specials ?? [],
   }));
 
+  // Per-language pricing settings (margin, buy entity, from_price) — internal only,
+  // not exposed as their own translations block (mirrors hotels' activeSettings).
+  const priceSettingsMap = buildPriceSettingsMap(tour.price_calculation_translations);
+  const activeSettings =
+    lang && priceSettingsMap[lang]
+      ? priceSettingsMap[lang]
+      : (Object.values(priceSettingsMap)[0] ?? { marginPct: null, unit: null, fromPrice: null });
+
+  const surchargeSettingsMap = buildSurchargeSettingsMap(tour.surcharges_calculation_translations);
+  const activeSurchargeSettings =
+    lang && surchargeSettingsMap[lang]
+      ? surchargeSettingsMap[lang]
+      : (Object.values(surchargeSettingsMap)[0] ?? { marginPct: null });
+
   const translations = lang ? (descMap[lang] ? { [lang]: descMap[lang] } : {}) : descMap;
   const price_info_translations = lang ? (infoMap[lang] ? { [lang]: infoMap[lang] } : {}) : infoMap;
   const programme_translations = lang ? (programmeMap[lang] ? { [lang]: programmeMap[lang] } : {}) : programmeMap;
@@ -165,7 +215,7 @@ export function shapeTourDetail(tour, lang) {
       booking_code: cat.category_supplier_code ?? null,
       from: cat.category_from ?? null,
     }),
-    { lang },
+    { lang, marginPct: activeSettings.marginPct, unit: activeSettings.unit },
   );
 
   const surcharges = (tour.surcharges ?? []).map((s) => {
@@ -179,6 +229,7 @@ export function shapeTourDetail(tour, lang) {
       type: s.surcharge_type?.designation ?? null,
       calculation_method: s.calculation_method?.designation ?? null,
       description: active.description ?? null,
+      margin: activeSurchargeSettings.marginPct ?? null,
       translations: lang ? (translationsMap[lang] ? { [lang]: translationsMap[lang] } : {}) : translationsMap,
     };
   });
@@ -201,7 +252,7 @@ export function shapeTourDetail(tour, lang) {
     user_updated: tour.user_updated
       ? { id: tour.user_updated.id ?? null, first_name: tour.user_updated.first_name ?? null, last_name: tour.user_updated.last_name ?? null }
       : null,
-    season: tour.season ?? null,
+    season: tour.season?.season ?? null,
     operator: {
       direct: tour.operator_direct ?? null,
       name: tour.name_operator ?? null,
@@ -213,6 +264,8 @@ export function shapeTourDetail(tour, lang) {
       place: getGeoName(tour.place, lang),
       state: getGeoName(tour.state, lang),
       country: getGeoName(tour.country, lang),
+      country_code: tour.country?.ISO ?? null,
+      // Extra field beyond the reference shape:
       location_tour32: getGeoName(tour.location_tour32, lang),
     },
     contact: {
@@ -257,9 +310,9 @@ export function shapeTourDetail(tour, lang) {
     specials_translations,
     categories,
     surcharges,
-    // Computed sell-price-derived from_price is not available — tours' pricing schema
-    // currently only stores buy_price (no sell_price wired). See categories[].prices note above.
-    from_price: null,
+    // Directly configured on price_calculation_translations (not sell-price-derived —
+    // categories[].prices[].occupancies{}.sell is still always null, see note above).
+    from_price: activeSettings.fromPrice ?? null,
     image_badge: {
       status: tour.image_badge_status ?? null,
       start_date: tour.image_badge_start_date ?? null,

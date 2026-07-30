@@ -1,5 +1,5 @@
 import { query, param } from 'express-validator';
-import { PRIMARIX_STATUS_VALUES } from '../../shared/constants.js';
+import { PRIMARIX_STATUS_QUERY_VALUES } from '../../shared/constants.js';
 
 const VALID_LANG_CODES = ['de', 'en', 'nl'];
 const VALID_SORT_VALUES = [
@@ -19,7 +19,7 @@ export const listVehiclesSchema = [
   query('language').optional().isIn(VALID_LANG_CODES).withMessage(`language must be one of: ${VALID_LANG_CODES.join(', ')}`),
   query('sort').optional().isIn(VALID_SORT_VALUES).withMessage(`sort must be one of: ${VALID_SORT_VALUES.join(', ')}`),
   query('updated_after').optional().isISO8601().withMessage('updated_after must be a valid ISO 8601 date-time'),
-  query('status_primarix').optional().isIn(PRIMARIX_STATUS_VALUES).withMessage(`status_primarix must be one of: ${PRIMARIX_STATUS_VALUES.join(', ')}`),
+  query('status_primarix').optional().isIn(PRIMARIX_STATUS_QUERY_VALUES).withMessage(`status_primarix must be one of: ${PRIMARIX_STATUS_QUERY_VALUES.join(', ')}`),
 ];
 
 export const getVehicleDetailSchema = [

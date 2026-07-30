@@ -1,0 +1,6662 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "BOTG ContentHub API",
+    "version": "1.0.0-alpha",
+    "description": "Contract (source of truth) for the BOTG ContentHub product API. Greenfield target design — describes how the API should look, independent of the Directus backend. Mapping from the native Directus structure to these fields lives in the implementation tickets and the `field_dictionary`, not in this document.\n\n**Two families:** `products` (web, aggregated, no purchase prices) and per-product backoffice families such as `hotels` (full data incl. EK/margin).\n\n**Three access patterns each:** list (slim directory), `/full` (all records; delta/DIV sync via `updated_after`), `/{id}` (single record).\n\nOne language per response (`lang` mandatory). `date_updated` is present in every response as the consumer's delta cursor.\n\n**Field labels** (the caption of each field, per language) are served separately via `GET /metadata/labels` — fetched once and cached — so the data feed stays slim. Value labels (e.g. catering, classification) travel inline as `Ref.name`.\n\nOpen points flagged **TBD**: final backoffice status rule; full Markdown-blob scope; `updated_after` boundary & de-publish semantics."
+  },
+  "servers": [
+    {
+      "url": "https://content.botg.cloud/api/v1",
+      "description": "Production"
+    },
+    {
+      "url": "https://staging.content.botg.cloud/api/v1",
+      "description": "Staging"
+    },
+    {
+      "url": "https://dev.content.botg.cloud/api/v1",
+      "description": "DEV"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Products (Web)",
+      "description": "Aggregated, web-safe feed across all products. Published only; no purchase prices."
+    },
+    {
+      "name": "Hotels (Backoffice)",
+      "description": "Full hotel records for backoffice / import consumers."
+    },
+    {
+      "name": "Tours (Backoffice)",
+      "description": "Full tour (roundtrip) records for backoffice / import consumers."
+    },
+    {
+      "name": "Excursions (Backoffice)",
+      "description": "Full excursion records for backoffice / import consumers."
+    },
+    {
+      "name": "Cruises (Backoffice)",
+      "description": "Full cruise records for backoffice / import consumers."
+    },
+    {
+      "name": "Rental Cars (Backoffice)",
+      "description": "Full rental-car records for backoffice / import consumers."
+    },
+    {
+      "name": "Campers (Backoffice)",
+      "description": "Full camper records for backoffice / import consumers."
+    },
+    {
+      "name": "Field Labels",
+      "description": "Field captions (field_key -> label) per language. Fetch once, cache."
+    },
+    {
+      "name": "Field Mapping",
+      "description": "Legacy <-> new field map for migration/mapping. Fetch once, cache."
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "Web",
+      "tags": [
+        "Products (Web)"
+      ]
+    },
+    {
+      "name": "Backoffice",
+      "tags": [
+        "Hotels (Backoffice)",
+        "Tours (Backoffice)",
+        "Excursions (Backoffice)",
+        "Cruises (Backoffice)",
+        "Rental Cars (Backoffice)",
+        "Campers (Backoffice)"
+      ]
+    },
+    {
+      "name": "Metadata",
+      "tags": [
+        "Field Labels",
+        "Field Mapping"
+      ]
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "tags": [
+          "Products (Web)"
+        ],
+        "summary": "List products (slim, no prices)",
+        "description": "Returns **published** products only.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_products"
+      }
+    },
+    "/products/full": {
+      "get": {
+        "tags": [
+          "Products (Web)"
+        ],
+        "summary": "Full product records (sync / delta)",
+        "description": "Returns **published** products only. Supports `updated_after` for delta/DIV sync.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductDetail"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_products_full"
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": [
+          "Products (Web)"
+        ],
+        "summary": "Single product by id",
+        "description": "Returns **published** products only.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          },
+          {
+            "$ref": "#/components/parameters/LangParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_products_id"
+      }
+    },
+    "/hotels": {
+      "get": {
+        "tags": [
+          "Hotels (Backoffice)"
+        ],
+        "summary": "List hotels (slim, no prices)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HotelListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_hotels"
+      }
+    },
+    "/hotels/full": {
+      "get": {
+        "tags": [
+          "Hotels (Backoffice)"
+        ],
+        "summary": "Full hotel records (sync / delta)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule). Supports `updated_after` for delta/DIV sync.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HotelDetail"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_hotels_full"
+      }
+    },
+    "/hotels/{id}": {
+      "get": {
+        "tags": [
+          "Hotels (Backoffice)"
+        ],
+        "summary": "Single hotel by id",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          },
+          {
+            "$ref": "#/components/parameters/LangParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HotelDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_hotels_id"
+      }
+    },
+    "/tours": {
+      "get": {
+        "tags": [
+          "Tours (Backoffice)"
+        ],
+        "summary": "List tours (slim, no prices)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TourListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_tours"
+      }
+    },
+    "/tours/full": {
+      "get": {
+        "tags": [
+          "Tours (Backoffice)"
+        ],
+        "summary": "Full tour records (sync / delta)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule). Supports `updated_after` for delta/DIV sync.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TourDetail"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_tours_full"
+      }
+    },
+    "/tours/{id}": {
+      "get": {
+        "tags": [
+          "Tours (Backoffice)"
+        ],
+        "summary": "Single tour by id",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          },
+          {
+            "$ref": "#/components/parameters/LangParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TourDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_tours_id"
+      }
+    },
+    "/excursions": {
+      "get": {
+        "tags": [
+          "Excursions (Backoffice)"
+        ],
+        "summary": "List excursions (slim, no prices)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExcursionListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_excursions"
+      }
+    },
+    "/excursions/full": {
+      "get": {
+        "tags": [
+          "Excursions (Backoffice)"
+        ],
+        "summary": "Full excursion records (sync / delta)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule). Supports `updated_after` for delta/DIV sync.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExcursionDetail"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_excursions_full"
+      }
+    },
+    "/excursions/{id}": {
+      "get": {
+        "tags": [
+          "Excursions (Backoffice)"
+        ],
+        "summary": "Single excursion by id",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          },
+          {
+            "$ref": "#/components/parameters/LangParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExcursionDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_excursions_id"
+      }
+    },
+    "/cruises": {
+      "get": {
+        "tags": [
+          "Cruises (Backoffice)"
+        ],
+        "summary": "List cruises (slim, no prices)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CruiseListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_cruises"
+      }
+    },
+    "/cruises/full": {
+      "get": {
+        "tags": [
+          "Cruises (Backoffice)"
+        ],
+        "summary": "Full cruise records (sync / delta)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule). Supports `updated_after` for delta/DIV sync.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CruiseDetail"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_cruises_full"
+      }
+    },
+    "/cruises/{id}": {
+      "get": {
+        "tags": [
+          "Cruises (Backoffice)"
+        ],
+        "summary": "Single cruise by id",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          },
+          {
+            "$ref": "#/components/parameters/LangParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CruiseDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_cruises_id"
+      }
+    },
+    "/rental_cars": {
+      "get": {
+        "tags": [
+          "Rental Cars (Backoffice)"
+        ],
+        "summary": "List rental cars (slim, no prices)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalCarListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_rental_cars"
+      }
+    },
+    "/rental_cars/full": {
+      "get": {
+        "tags": [
+          "Rental Cars (Backoffice)"
+        ],
+        "summary": "Full rental-car records (sync / delta)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule). Supports `updated_after` for delta/DIV sync.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RentalCarDetail"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_rental_cars_full"
+      }
+    },
+    "/rental_cars/{id}": {
+      "get": {
+        "tags": [
+          "Rental Cars (Backoffice)"
+        ],
+        "summary": "Single rental car by id",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          },
+          {
+            "$ref": "#/components/parameters/LangParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalCarDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_rental_cars_id"
+      }
+    },
+    "/campers": {
+      "get": {
+        "tags": [
+          "Campers (Backoffice)"
+        ],
+        "summary": "List campers (slim, no prices)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CamperListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_campers"
+      }
+    },
+    "/campers/full": {
+      "get": {
+        "tags": [
+          "Campers (Backoffice)"
+        ],
+        "summary": "Full camper records (sync / delta)",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule). Supports `updated_after` for delta/DIV sync.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CamperDetail"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_campers_full"
+      }
+    },
+    "/campers/{id}": {
+      "get": {
+        "tags": [
+          "Campers (Backoffice)"
+        ],
+        "summary": "Single camper by id",
+        "description": "Currently returns **published** records only (TBD: final backoffice status rule).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          },
+          {
+            "$ref": "#/components/parameters/LangParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CamperDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_campers_id"
+      }
+    },
+    "/metadata/labels": {
+      "get": {
+        "tags": [
+          "Field Labels"
+        ],
+        "summary": "Field labels (field_key -> label) in the requested language",
+        "description": "Returns the field-label map so consumers can render captions in the requested language without inflating the data feed. Intended to be fetched **once and cached**.\n\n- **Field labels** (this endpoint) = the caption of a field, e.g. `minimum_stay` -> \"Mindestaufenthalt\". Served **live from the Directus field metadata** (`meta.translations`), so they are always current; the brief label columns DE/EN/NL are only the build source.\n- **Value labels** (e.g. catering \"Halbpension\", classification \"4 Sterne\") are NOT here — they travel inline in the data as `Ref.name`.\n- **Dynamic labels** (repeater headlines, surcharge names) are content and travel with the record.\n\nReturned product-wide by default; use `collection` to restrict.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/CollectionParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_metadata_labels"
+      }
+    },
+    "/metadata/field-map": {
+      "get": {
+        "tags": [
+          "Field Mapping"
+        ],
+        "summary": "Legacy <-> new field map (transition aid)",
+        "description": "Maps legacy Primarix fields to their new API names, to help existing consumers transition. Token-gated; honours the `audience` governance flag — only **public** and **backoffice** rows are exposed, **internal** never. Intended to be fetched **once and cached**.\n\n- **Default (`flat`):** one row per legacy source — look up your `legacy_fieldid` and read `api_field_name`.\n- **`new` fields** appear with null `legacy_*` and a set `api_field_name` (status=new) — 'this is new'.\n- **`outdated` fields** (used in Primarix but not imported) appear with null `api_field_name` (status=outdated) — 'this is gone'.\n- **`?shape=nested`** returns one row per new field with the legacy sources embedded.\n\nLabels are returned in full (`label_de`/`label_en`/`label_nl`); this endpoint takes no `lang`.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MapCollectionParam"
+          },
+          {
+            "$ref": "#/components/parameters/StatusParam"
+          },
+          {
+            "$ref": "#/components/parameters/ShapeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMapResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_metadata_field_map"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Web token -> partner. Row-level visibility (which products a partner may see) is enforced via the token; the fields partner_visibility / partner_selected belong to authorization and are NOT part of any response body."
+      }
+    },
+    "parameters": {
+      "LangParam": {
+        "name": "lang",
+        "in": "query",
+        "required": true,
+        "description": "Response language (mandatory). One language per response, inlined. Values are the Directus locale codes.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "de-DE",
+            "en-GB",
+            "nl-NL",
+            "de-CH"
+          ]
+        }
+      },
+      "PageParam": {
+        "name": "page",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      "LimitParam": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200,
+          "default": 50
+        }
+      },
+      "UpdatedAfterParam": {
+        "name": "updated_after",
+        "in": "query",
+        "required": false,
+        "description": "Delta cursor: returns only records changed after this timestamp. Available on /full only. TBD: inclusive/exclusive boundary, and whether de-publishing (a record leaving 'published') is surfaced as a change so consumers can detect removals.",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "IdParam": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Record id — accepts the UUID or the numeric object_id.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "CollectionParam": {
+        "name": "collection",
+        "in": "query",
+        "required": false,
+        "description": "Optional: restrict to one collection. Default: all collections.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "hotels",
+            "cruises",
+            "excursions",
+            "tours",
+            "rental_cars",
+            "campers"
+          ]
+        }
+      },
+      "MapCollectionParam": {
+        "name": "collection",
+        "in": "query",
+        "required": false,
+        "description": "Optional: restrict to one target collection.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "hotels",
+            "tours",
+            "excursions",
+            "vehicles",
+            "cruises",
+            "rental_companies",
+            "rental_depots"
+          ]
+        }
+      },
+      "StatusParam": {
+        "name": "status",
+        "in": "query",
+        "required": false,
+        "description": "Optional: filter by lifecycle status.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "active",
+            "renamed",
+            "new",
+            "outdated"
+          ]
+        }
+      },
+      "ShapeParam": {
+        "name": "shape",
+        "in": "query",
+        "required": false,
+        "description": "Response shape. `flat` (default) = one row per legacy source (direct old->new lookup). `nested` = one row per new field with embedded legacy sources.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "flat",
+            "nested"
+          ],
+          "default": "flat"
+        }
+      }
+    },
+    "schemas": {
+      "ResponseMeta": {
+        "type": "object",
+        "description": "Pagination / result metadata.",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "example": 1
+          },
+          "limit": {
+            "type": "integer",
+            "example": 50
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total matching records.",
+            "example": 235
+          },
+          "returned": {
+            "type": "integer",
+            "description": "Records in this response.",
+            "example": 50
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "message"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Validation failed"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "Ref": {
+        "type": "object",
+        "description": "Resolved reference to a lookup record. `name` is already in the requested language.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 12
+          },
+          "name": {
+            "type": "string",
+            "example": "Beispielwert"
+          }
+        }
+      },
+      "GeoRef": {
+        "type": "object",
+        "description": "Resolved geography reference (country / state / region / place), name in requested language.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 49
+          },
+          "name": {
+            "type": "string",
+            "example": "Spanien"
+          },
+          "code": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO / short code where available.",
+            "example": "ES"
+          }
+        }
+      },
+      "SupplementaryBlock": {
+        "type": "object",
+        "description": "One headline+text pair from a supplementary repeater. Texts are in the requested language.",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "description": "Hotel address and public contact data.",
+        "properties": {
+          "street": {
+            "type": "string",
+            "nullable": true
+          },
+          "street_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "place": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "country": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "region": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "phone_general": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone_after_hours": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_general": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          }
+        }
+      },
+      "Classification": {
+        "type": "object",
+        "properties": {
+          "accommodation_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          },
+          "hotel_classification": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "Star rating / category."
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          }
+        }
+      },
+      "Descriptions": {
+        "type": "object",
+        "description": "Editorial texts, all in the requested language.",
+        "properties": {
+          "subline_location": {
+            "type": "string",
+            "nullable": true
+          },
+          "teaser": {
+            "type": "string",
+            "nullable": true
+          },
+          "description_short": {
+            "type": "string",
+            "nullable": true
+          },
+          "description_surrounding": {
+            "type": "string",
+            "nullable": true
+          },
+          "description_rooms": {
+            "type": "string",
+            "nullable": true
+          },
+          "remarks_arrival": {
+            "type": "string",
+            "nullable": true
+          },
+          "total_number_of_rooms": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Computed (Flow)."
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            },
+            "description": "Repeater (headline+text)."
+          },
+          "descriptions_markdown": {
+            "type": "string",
+            "nullable": true,
+            "description": "Consolidated Markdown block of the supplementary repeater for direct re-use. TBD: exact scope of which fields feed this blob."
+          }
+        }
+      },
+      "PriceInfo": {
+        "type": "object",
+        "description": "Service / booking-condition texts, in the requested language.",
+        "properties": {
+          "services_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "services_not_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "service_highlights": {
+            "type": "string",
+            "nullable": true
+          },
+          "minimum_stay": {
+            "type": "string",
+            "nullable": true
+          },
+          "minimum_stay_additions": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviating_cancellation_terms": {
+            "type": "string",
+            "nullable": true
+          },
+          "children_policy": {
+            "type": "string",
+            "nullable": true
+          },
+          "children_free_age": {
+            "type": "integer",
+            "nullable": true
+          },
+          "children_free_number": {
+            "type": "integer",
+            "nullable": true
+          },
+          "important_information": {
+            "type": "string",
+            "nullable": true
+          },
+          "mobility_advice": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            },
+            "description": "Repeater (headline+text)."
+          },
+          "price_info_markdown": {
+            "type": "string",
+            "nullable": true,
+            "description": "Consolidated Markdown block of the supplementary repeater for direct re-use. TBD: exact scope."
+          }
+        }
+      },
+      "Specials": {
+        "type": "object",
+        "properties": {
+          "special_description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ImageBadge": {
+        "type": "object",
+        "description": "Optional promotional badge.",
+        "properties": {
+          "teaser": {
+            "type": "string",
+            "nullable": true
+          },
+          "details": {
+            "type": "string",
+            "nullable": true
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PricePeriod": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "from": {
+            "type": "boolean",
+            "description": "Open-ended 'ab'/from period."
+          }
+        }
+      },
+      "OccupancyCellWeb": {
+        "type": "object",
+        "description": "One price cell on the occupancy/price-type column axis (e.g. 1 Pers, 2 Pers, adult, child). Web exposes the sell price only.",
+        "properties": {
+          "occupancy": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "Column = occupancy / price type."
+          },
+          "sell": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Sell price (VK)."
+          }
+        }
+      },
+      "OccupancyCell": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OccupancyCellWeb"
+          },
+          {
+            "type": "object",
+            "description": "Backoffice adds purchase price (EK) and margin.",
+            "properties": {
+              "buy": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Purchase price (EK) — backoffice only."
+              },
+              "margin": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Margin — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "OccupancyPeriodWeb": {
+        "type": "object",
+        "description": "One price-period row with its occupancy cells.",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PricePeriod"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccupancyCellWeb"
+            }
+          }
+        }
+      },
+      "OccupancyPeriod": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PricePeriod"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccupancyCell"
+            }
+          }
+        }
+      },
+      "RoomWeb": {
+        "type": "object",
+        "description": "Block = room category. Rows = price periods; columns = occupancy.",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "sort": {
+            "type": "integer",
+            "nullable": true
+          },
+          "additions": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccupancyPeriodWeb"
+            }
+          }
+        }
+      },
+      "Room": {
+        "type": "object",
+        "description": "Backoffice room (adds Tour32 name, booking/calc fields and EK/margin in prices).",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "sort": {
+            "type": "integer",
+            "nullable": true
+          },
+          "additions": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "booking_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "catering": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "calc_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "tour32_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Tour32 — backoffice only."
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccupancyPeriod"
+            }
+          }
+        }
+      },
+      "SurchargeWeb": {
+        "type": "object",
+        "properties": {
+          "booking_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "Surcharge": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SurchargeWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "catering": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "calc_type": {
+                "type": "string",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "buy": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "EK — backoffice only."
+              },
+              "margin": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Margin — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "MediaItemWeb": {
+        "type": "object",
+        "description": "Media reference served from object storage. Only 'published' media are returned.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "alt": {
+            "type": "string",
+            "nullable": true,
+            "description": "Alt text in the requested language."
+          },
+          "sort": {
+            "type": "integer",
+            "nullable": true
+          },
+          "copyright": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "MediaItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MediaItemWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "is_map": {
+                "type": "boolean",
+                "description": "Hidden field — backoffice only."
+              },
+              "object_id_primarix": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Import reference — backoffice only."
+              },
+              "filename_fotoweb": {
+                "type": "string",
+                "nullable": true,
+                "description": "Import reference — backoffice only."
+              },
+              "use_tour32": {
+                "type": "boolean",
+                "description": "Tour32 flag — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "Booking": {
+        "type": "object",
+        "description": "Reservation / booking data — backoffice only.",
+        "properties": {
+          "booking_channel": {
+            "type": "string",
+            "nullable": true
+          },
+          "booking_partner": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "id_service_provider_tour32": {
+            "type": "string",
+            "nullable": true
+          },
+          "id_main_service_provider_tour32": {
+            "type": "string",
+            "nullable": true
+          },
+          "res_phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_booking": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "res_email2": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "contact_title": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_greeting": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_firstname": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "internal_remarks_reservation": {
+            "type": "string",
+            "nullable": true
+          },
+          "it_code": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PricingConfig": {
+        "type": "object",
+        "description": "Calculation inputs (EK / margin / exchange) — backoffice only. In Development.",
+        "properties": {
+          "buy_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "from_price": {
+            "type": "string",
+            "nullable": true,
+            "description": "Reference to the 'from' price."
+          },
+          "surcharge_percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "surcharge_provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "surcharge_margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "surcharge_exchange_rate": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "Internal": {
+        "type": "object",
+        "description": "Internal / technical fields — backoffice only.",
+        "properties": {
+          "internal_remarks": {
+            "type": "string",
+            "nullable": true
+          },
+          "object_info_primarix": {
+            "type": "string",
+            "nullable": true
+          },
+          "location_tour32": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "sell_prices_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_prices_updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "HotelListItem": {
+        "type": "object",
+        "description": "Slim directory entry. No prices.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer",
+            "description": "Customer-facing ID."
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "classification": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "geo": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "$ref": "#/components/schemas/GeoRef",
+                "nullable": true
+              },
+              "region": {
+                "$ref": "#/components/schemas/GeoRef",
+                "nullable": true
+              }
+            }
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Required in every response; basis for the consumer's delta cursor."
+          }
+        }
+      },
+      "ProductListItem": {
+        "type": "object",
+        "description": "Slim cross-product directory entry. No prices.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer"
+          },
+          "product_type": {
+            "type": "string",
+            "enum": [
+              "hotel",
+              "cruise",
+              "excursion",
+              "tour",
+              "rental_car",
+              "camper"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published"
+            ]
+          },
+          "geo": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "$ref": "#/components/schemas/GeoRef",
+                "nullable": true
+              },
+              "region": {
+                "$ref": "#/components/schemas/GeoRef",
+                "nullable": true
+              }
+            }
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HotelWebDetail": {
+        "type": "object",
+        "description": "Web-safe hotel body (used inside ProductDetail). No EK/margin, Tour32, reservation or internal data.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "hotel_group": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "classification": {
+            "$ref": "#/components/schemas/Classification"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/Descriptions"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/PriceInfo"
+          },
+          "rooms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoomWeb"
+            }
+          },
+          "surcharges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurchargeWeb"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/Specials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItemWeb"
+            }
+          }
+        }
+      },
+      "HotelDetail": {
+        "type": "object",
+        "description": "Full backoffice hotel record.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "hotel_group": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "classification": {
+            "$ref": "#/components/schemas/Classification"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/Descriptions"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/PriceInfo"
+          },
+          "rooms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Room"
+            }
+          },
+          "surcharges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Surcharge"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/Specials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItem"
+            }
+          },
+          "booking": {
+            "$ref": "#/components/schemas/Booking"
+          },
+          "pricing_config": {
+            "$ref": "#/components/schemas/PricingConfig"
+          },
+          "internal": {
+            "$ref": "#/components/schemas/Internal"
+          }
+        }
+      },
+      "ProductDetail": {
+        "type": "object",
+        "description": "Web product. Common identity + product-type-specific body in `details`.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer"
+          },
+          "product_type": {
+            "type": "string",
+            "enum": [
+              "hotel",
+              "cruise",
+              "excursion",
+              "tour",
+              "rental_car",
+              "camper"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published"
+            ]
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "details": {
+            "description": "Product-type-specific body. Specified: hotel, excursion, tour, cruise, rental_car, camper. Others TBD.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HotelWebDetail"
+              },
+              {
+                "$ref": "#/components/schemas/ExcursionWebDetail"
+              },
+              {
+                "$ref": "#/components/schemas/TourWebDetail"
+              },
+              {
+                "$ref": "#/components/schemas/CruiseWebDetail"
+              },
+              {
+                "$ref": "#/components/schemas/RentalCarWebDetail"
+              },
+              {
+                "$ref": "#/components/schemas/CamperWebDetail"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "product_type",
+              "mapping": {
+                "hotel": "#/components/schemas/HotelWebDetail",
+                "excursion": "#/components/schemas/ExcursionWebDetail",
+                "tour": "#/components/schemas/TourWebDetail",
+                "cruise": "#/components/schemas/CruiseWebDetail",
+                "rental_car": "#/components/schemas/RentalCarWebDetail",
+                "camper": "#/components/schemas/CamperWebDetail"
+              }
+            }
+          }
+        }
+      },
+      "HotelListResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HotelListItem"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "HotelDetailResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "$ref": "#/components/schemas/HotelDetail"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "ProductListResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductListItem"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "ProductDetailResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ProductDetail"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "ExcursionClassification": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeoRef"
+            }
+          },
+          "travel_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          }
+        }
+      },
+      "ExcursionDescriptions": {
+        "type": "object",
+        "description": "Editorial texts, all in the requested language.",
+        "properties": {
+          "subline": {
+            "type": "string",
+            "nullable": true
+          },
+          "teaser": {
+            "type": "string",
+            "nullable": true
+          },
+          "programme_disclaimer": {
+            "type": "string",
+            "nullable": true
+          },
+          "programme": {
+            "type": "string",
+            "nullable": true
+          },
+          "recommendations": {
+            "type": "string",
+            "nullable": true
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            },
+            "description": "Repeater (headline+text)."
+          },
+          "descriptions_markdown": {
+            "type": "string",
+            "nullable": true,
+            "description": "Consolidated Markdown of the supplementary repeater. TBD: exact scope."
+          }
+        }
+      },
+      "ExcursionPriceInfo": {
+        "type": "object",
+        "description": "Service / booking-condition texts, in the requested language.",
+        "properties": {
+          "services_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "services_not_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "additional_information": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviating_cancellation_terms": {
+            "type": "string",
+            "nullable": true
+          },
+          "children_policy": {
+            "type": "string",
+            "nullable": true
+          },
+          "participants_text": {
+            "type": "string",
+            "nullable": true
+          },
+          "mobility_advice": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            },
+            "description": "Repeater (headline+text)."
+          },
+          "price_info_markdown": {
+            "type": "string",
+            "nullable": true,
+            "description": "Consolidated Markdown of the supplementary repeater. TBD: exact scope."
+          }
+        }
+      },
+      "ExcursionAttributes": {
+        "type": "object",
+        "description": "Booking constraints shown to the customer.",
+        "properties": {
+          "children_free_age": {
+            "type": "integer",
+            "nullable": true
+          },
+          "children_free_number": {
+            "type": "integer",
+            "nullable": true
+          },
+          "participants_min": {
+            "type": "integer",
+            "nullable": true
+          },
+          "participants_max": {
+            "type": "integer",
+            "nullable": true
+          },
+          "week_min_before_start": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Min. lead time in weeks."
+          }
+        }
+      },
+      "ExcursionDate": {
+        "type": "object",
+        "properties": {
+          "available_from": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "available_to": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "trips_frequencies."
+          },
+          "departure_place": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "arrival_place": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          }
+        }
+      },
+      "ExcursionDates": {
+        "type": "object",
+        "description": "Departure dates / frequencies (excursion-specific).",
+        "properties": {
+          "departures_text": {
+            "type": "string",
+            "nullable": true
+          },
+          "dates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionDate"
+            }
+          }
+        }
+      },
+      "ExcursionPriceCellWeb": {
+        "type": "object",
+        "description": "One price cell on the price-category column axis. Web exposes the sell price only.",
+        "properties": {
+          "price_category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "Column = price category (e.g. adult / child)."
+          },
+          "sell": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "ExcursionPriceCell": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ExcursionPriceCellWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "buy": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "EK — backoffice only."
+              },
+              "margin": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Margin — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "ExcursionPeriodWeb": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PricePeriod"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionPriceCellWeb"
+            }
+          }
+        }
+      },
+      "ExcursionPeriod": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PricePeriod"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionPriceCell"
+            }
+          }
+        }
+      },
+      "ExcursionCategoryWeb": {
+        "type": "object",
+        "description": "Block = excursion category. Rows = periods; columns = price category.",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "nullable": true,
+            "description": "Display category name."
+          },
+          "from": {
+            "type": "boolean",
+            "description": "Open-ended 'ab' category."
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionPeriodWeb"
+            }
+          }
+        }
+      },
+      "ExcursionCategory": {
+        "type": "object",
+        "description": "Backoffice category (adds source text, supplier code and EK/margin in prices).",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "original": {
+            "type": "string",
+            "nullable": true,
+            "description": "Source category text — backoffice only."
+          },
+          "supplier_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Backoffice only."
+          },
+          "from": {
+            "type": "boolean"
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionPeriod"
+            }
+          }
+        }
+      },
+      "ExcursionSurchargeWeb": {
+        "type": "object",
+        "properties": {
+          "booking_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "ExcursionSurcharge": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ExcursionSurchargeWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "calculation_method": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "buy": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "EK — backoffice only."
+              },
+              "margin": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Margin — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "Operator": {
+        "type": "object",
+        "description": "Tour operator / supplier — backoffice only.",
+        "properties": {
+          "operator_direct": {
+            "type": "string",
+            "nullable": true,
+            "description": "Direct vs linked operator."
+          },
+          "operator_linked": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "booking_partners."
+          },
+          "name_operator": {
+            "type": "string",
+            "nullable": true
+          },
+          "street": {
+            "type": "string",
+            "nullable": true
+          },
+          "street_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "postcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "place": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "country": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "location_tour32": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "Tour32."
+          },
+          "phone_general": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone_after_hours": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_general": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          }
+        }
+      },
+      "ExcursionBooking": {
+        "type": "object",
+        "description": "Reservation / booking data — backoffice only.",
+        "properties": {
+          "booking_channel": {
+            "type": "string",
+            "nullable": true
+          },
+          "booking_partner": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "service_provider_id_tour32": {
+            "type": "string",
+            "nullable": true
+          },
+          "main_service_provider_id_tour32": {
+            "type": "string",
+            "nullable": true
+          },
+          "res_phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "res_email2": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "email_booking": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "contact_title": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_greeting": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_firstname": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "internal_remarks_reservation": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ExcursionPricingConfig": {
+        "type": "object",
+        "description": "EK/margin calculation inputs — backoffice only.",
+        "properties": {
+          "buy_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "object",
+            "nullable": true
+          },
+          "from_price": {
+            "type": "integer",
+            "nullable": true
+          },
+          "surcharge_percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "surcharge_provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "surcharge_margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "surcharge_exchange_rate": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "ExcursionInternal": {
+        "type": "object",
+        "description": "Internal / technical — backoffice only.",
+        "properties": {
+          "object_info_primarix": {
+            "type": "string",
+            "nullable": true
+          },
+          "internal_remarks": {
+            "type": "string",
+            "nullable": true
+          },
+          "price_subline": {
+            "type": "string",
+            "nullable": true,
+            "description": "Hidden field — backoffice only."
+          },
+          "supplier_product_code": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sell_prices_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_prices_updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "ExcursionListItem": {
+        "type": "object",
+        "description": "Slim directory entry. No prices.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer",
+            "description": "Customer-facing ID."
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "geo": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "$ref": "#/components/schemas/GeoRef",
+                "nullable": true
+              },
+              "destination": {
+                "$ref": "#/components/schemas/GeoRef",
+                "nullable": true
+              }
+            }
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Required in every response; basis for the consumer's delta cursor."
+          }
+        }
+      },
+      "ExcursionWebDetail": {
+        "type": "object",
+        "description": "Web-safe excursion body (used inside ProductDetail). No EK/margin, Tour32, operator, reservation or internal data.",
+        "properties": {
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "classification": {
+            "$ref": "#/components/schemas/ExcursionClassification"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/ExcursionDescriptions"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/ExcursionPriceInfo"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/ExcursionAttributes"
+          },
+          "dates": {
+            "$ref": "#/components/schemas/ExcursionDates"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionCategoryWeb"
+            }
+          },
+          "surcharges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionSurchargeWeb"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/Specials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItemWeb"
+            }
+          }
+        }
+      },
+      "ExcursionDetail": {
+        "type": "object",
+        "description": "Full backoffice excursion record.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "operator": {
+            "$ref": "#/components/schemas/Operator"
+          },
+          "classification": {
+            "$ref": "#/components/schemas/ExcursionClassification"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/ExcursionDescriptions"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/ExcursionPriceInfo"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/ExcursionAttributes"
+          },
+          "dates": {
+            "$ref": "#/components/schemas/ExcursionDates"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionCategory"
+            }
+          },
+          "surcharges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionSurcharge"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/Specials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItem"
+            }
+          },
+          "booking": {
+            "$ref": "#/components/schemas/ExcursionBooking"
+          },
+          "pricing_config": {
+            "$ref": "#/components/schemas/ExcursionPricingConfig"
+          },
+          "internal": {
+            "$ref": "#/components/schemas/ExcursionInternal"
+          }
+        }
+      },
+      "ExcursionListResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExcursionListItem"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "ExcursionDetailResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ExcursionDetail"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "TourClassification": {
+        "type": "object",
+        "properties": {
+          "destinations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeoRef"
+            }
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeoRef"
+            }
+          },
+          "travel_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          },
+          "accommodation_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          }
+        }
+      },
+      "FlightInfo": {
+        "type": "object",
+        "description": "Flight information (tour-specific).",
+        "properties": {
+          "flight_service": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "flight_options."
+          },
+          "airlines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          },
+          "departure_airports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          },
+          "flights_recommended": {
+            "type": "string",
+            "nullable": true
+          },
+          "additional_recommendations": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TourProgrammeDay": {
+        "type": "object",
+        "properties": {
+          "day_destinations": {
+            "type": "string",
+            "nullable": true
+          },
+          "day_description": {
+            "type": "string",
+            "nullable": true
+          },
+          "day_accommodation_note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TourProgramme": {
+        "type": "object",
+        "description": "Day-by-day itinerary.",
+        "properties": {
+          "disclaimer": {
+            "type": "string",
+            "nullable": true
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourProgrammeDay"
+            }
+          }
+        }
+      },
+      "TourDescriptions": {
+        "type": "object",
+        "description": "Editorial texts, all in the requested language.",
+        "properties": {
+          "subline": {
+            "type": "string",
+            "nullable": true
+          },
+          "teaser": {
+            "type": "string",
+            "nullable": true
+          },
+          "at_a_glance": {
+            "type": "string",
+            "nullable": true
+          },
+          "from_to": {
+            "type": "string",
+            "nullable": true,
+            "description": "Route summary."
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            }
+          },
+          "descriptions_markdown": {
+            "type": "string",
+            "nullable": true,
+            "description": "Consolidated Markdown of the supplementary repeater. TBD: exact scope."
+          }
+        }
+      },
+      "TourPriceInfo": {
+        "type": "object",
+        "description": "Service / booking-condition texts, in the requested language.",
+        "properties": {
+          "services_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "services_not_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "services_optional": {
+            "type": "string",
+            "nullable": true
+          },
+          "service_highlights": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviating_cancellation_terms": {
+            "type": "string",
+            "nullable": true
+          },
+          "important_information": {
+            "type": "string",
+            "nullable": true
+          },
+          "departure": {
+            "type": "string",
+            "nullable": true,
+            "description": "Arrival/departure text."
+          },
+          "children_policy": {
+            "type": "string",
+            "nullable": true
+          },
+          "participants_text": {
+            "type": "string",
+            "nullable": true
+          },
+          "mobility_advice": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            }
+          },
+          "price_info_markdown": {
+            "type": "string",
+            "nullable": true,
+            "description": "Consolidated Markdown of the supplementary repeater. TBD: exact scope."
+          }
+        }
+      },
+      "TourAttributes": {
+        "type": "object",
+        "description": "Booking constraints shown to the customer.",
+        "properties": {
+          "children_free_age": {
+            "type": "integer",
+            "nullable": true
+          },
+          "children_free_number": {
+            "type": "integer",
+            "nullable": true
+          },
+          "participants_min": {
+            "type": "integer",
+            "nullable": true
+          },
+          "participants_max": {
+            "type": "integer",
+            "nullable": true
+          },
+          "week_min_before_start": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Min. lead time in weeks."
+          }
+        }
+      },
+      "TourDate": {
+        "type": "object",
+        "properties": {
+          "available_from": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "available_to": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "trips_frequencies."
+          },
+          "trip_duration": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Trip duration in days."
+          },
+          "departure_place": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "arrival_place": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          }
+        }
+      },
+      "TourDates": {
+        "type": "object",
+        "description": "Departure dates / frequencies.",
+        "properties": {
+          "departures_text": {
+            "type": "string",
+            "nullable": true
+          },
+          "dates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourDate"
+            }
+          }
+        }
+      },
+      "TourCategoryWeb": {
+        "type": "object",
+        "description": "Block = tour category. Rows = periods; columns = occupancy.",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "nullable": true,
+            "description": "Display category name."
+          },
+          "from": {
+            "type": "boolean"
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccupancyPeriodWeb"
+            }
+          }
+        }
+      },
+      "TourCategory": {
+        "type": "object",
+        "description": "Backoffice category (adds source text, supplier code and EK/margin in prices).",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "original": {
+            "type": "string",
+            "nullable": true,
+            "description": "Backoffice only."
+          },
+          "supplier_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Backoffice only."
+          },
+          "from": {
+            "type": "boolean"
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OccupancyPeriod"
+            }
+          }
+        }
+      },
+      "TourSurchargeWeb": {
+        "type": "object",
+        "properties": {
+          "booking_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "TourSurcharge": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TourSurchargeWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "calculation_method": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "buy": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "EK — backoffice only."
+              },
+              "margin": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Margin — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "TourBooking": {
+        "type": "object",
+        "description": "Reservation / booking data — backoffice only.",
+        "properties": {
+          "booking_channel": {
+            "type": "string",
+            "nullable": true
+          },
+          "booking_partner": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "id_service_provider_tour32": {
+            "type": "string",
+            "nullable": true
+          },
+          "id_main_service_provider_tour32": {
+            "type": "string",
+            "nullable": true
+          },
+          "res_phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "res_email2": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "email_booking": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "contact_title": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_greeting": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_firstname": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "internal_remarks_reservation": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TourPricingConfig": {
+        "type": "object",
+        "description": "EK/margin calculation inputs — backoffice only.",
+        "properties": {
+          "buy_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "object",
+            "nullable": true
+          },
+          "from_price": {
+            "type": "integer",
+            "nullable": true
+          },
+          "surcharge_percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "surcharge_provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "surcharge_margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "surcharge_exchange_rate": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "TourInternal": {
+        "type": "object",
+        "description": "Internal / technical — backoffice only.",
+        "properties": {
+          "object_info_primarix": {
+            "type": "string",
+            "nullable": true
+          },
+          "internal_remarks": {
+            "type": "string",
+            "nullable": true
+          },
+          "price_subline": {
+            "type": "string",
+            "nullable": true,
+            "description": "Hidden field — backoffice only."
+          },
+          "supplier_product_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_prices_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_prices_updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "TourListItem": {
+        "type": "object",
+        "description": "Slim directory entry. No prices.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer",
+            "description": "Customer-facing ID."
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "geo": {
+            "type": "object",
+            "properties": {
+              "countries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GeoRef"
+                }
+              },
+              "destinations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GeoRef"
+                }
+              }
+            }
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Required in every response; basis for the consumer's delta cursor."
+          }
+        }
+      },
+      "TourWebDetail": {
+        "type": "object",
+        "description": "Web-safe tour body (used inside ProductDetail). No EK/margin, Tour32, operator, reservation or internal data.",
+        "properties": {
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "classification": {
+            "$ref": "#/components/schemas/TourClassification"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/TourDescriptions"
+          },
+          "flight_info": {
+            "$ref": "#/components/schemas/FlightInfo"
+          },
+          "programme": {
+            "$ref": "#/components/schemas/TourProgramme"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/TourPriceInfo"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/TourAttributes"
+          },
+          "dates": {
+            "$ref": "#/components/schemas/TourDates"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourCategoryWeb"
+            }
+          },
+          "surcharges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourSurchargeWeb"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/Specials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItemWeb"
+            }
+          }
+        }
+      },
+      "TourDetail": {
+        "type": "object",
+        "description": "Full backoffice tour record.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "operator": {
+            "$ref": "#/components/schemas/Operator"
+          },
+          "classification": {
+            "$ref": "#/components/schemas/TourClassification"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/TourDescriptions"
+          },
+          "flight_info": {
+            "$ref": "#/components/schemas/FlightInfo"
+          },
+          "programme": {
+            "$ref": "#/components/schemas/TourProgramme"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/TourPriceInfo"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/TourAttributes"
+          },
+          "dates": {
+            "$ref": "#/components/schemas/TourDates"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourCategory"
+            }
+          },
+          "surcharges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourSurcharge"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/Specials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItem"
+            }
+          },
+          "booking": {
+            "$ref": "#/components/schemas/TourBooking"
+          },
+          "pricing_config": {
+            "$ref": "#/components/schemas/TourPricingConfig"
+          },
+          "internal": {
+            "$ref": "#/components/schemas/TourInternal"
+          }
+        }
+      },
+      "TourListResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourListItem"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "TourDetailResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TourDetail"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "CruiseClassification": {
+        "type": "object",
+        "properties": {
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeoRef"
+            }
+          },
+          "destinations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeoRef"
+            }
+          },
+          "cruise_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          }
+        }
+      },
+      "CruiseDescriptions": {
+        "type": "object",
+        "description": "Editorial texts, all in the requested language.",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "nullable": true,
+            "description": "Marketing headline (also used as the web title)."
+          },
+          "subline": {
+            "type": "string",
+            "nullable": true
+          },
+          "teaser": {
+            "type": "string",
+            "nullable": true
+          },
+          "ship": {
+            "type": "string",
+            "nullable": true,
+            "description": "Ship description."
+          },
+          "at_a_glance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CruisePriceInfo": {
+        "type": "object",
+        "description": "Service / booking-condition texts, in the requested language.",
+        "properties": {
+          "departure_arrival": {
+            "type": "string",
+            "nullable": true
+          },
+          "bord_languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Onboard languages. TBD: exact json shape."
+          },
+          "bord_languages_additions": {
+            "type": "string",
+            "nullable": true
+          },
+          "surcharges": {
+            "type": "string",
+            "nullable": true,
+            "description": "Surcharge note (text). Cruises have no structured surcharges."
+          },
+          "services_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "services_not_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "onboard_gratuities": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Gratuities. TBD: exact json shape."
+          },
+          "onboard_gratuities_additions": {
+            "type": "string",
+            "nullable": true
+          },
+          "important_information": {
+            "type": "string",
+            "nullable": true
+          },
+          "good_to_know": {
+            "type": "string",
+            "nullable": true
+          },
+          "occupancy_single": {
+            "type": "string",
+            "nullable": true
+          },
+          "participants_legacy": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviating_cancellation_terms_select": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "nullable": true
+          },
+          "deviating_cancellation_terms_text": {
+            "type": "string",
+            "nullable": true
+          },
+          "mobility_advice": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          }
+        }
+      },
+      "CruiseAttributes": {
+        "type": "object",
+        "properties": {
+          "participants_min": {
+            "type": "integer",
+            "nullable": true
+          },
+          "participants_max": {
+            "type": "integer",
+            "nullable": true
+          },
+          "week_min_before_start": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "CruiseProgramme": {
+        "type": "object",
+        "description": "Day-by-day itinerary.",
+        "properties": {
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourProgrammeDay"
+            }
+          }
+        }
+      },
+      "CruiseSailingCellWeb": {
+        "type": "object",
+        "description": "One price cell on the occupancy column axis. Web exposes the sell price only.",
+        "properties": {
+          "occupancy": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "sell": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "CruiseSailingCell": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CruiseSailingCellWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "buy": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "EK — backoffice only."
+              },
+              "margin": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Margin — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "CruiseSailingWeb": {
+        "type": "object",
+        "description": "One sailing row (specific departure/arrival dates, not a date-range period) with its occupancy cells.",
+        "properties": {
+          "date_departure": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "date_arrival": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CruiseSailingCellWeb"
+            }
+          }
+        }
+      },
+      "CruiseSailing": {
+        "type": "object",
+        "properties": {
+          "date_departure": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "date_arrival": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CruiseSailingCell"
+            }
+          }
+        }
+      },
+      "CruiseCabinCategoryWeb": {
+        "type": "object",
+        "description": "Block = cabin category. Rows = sailings (specific dates); columns = occupancy.",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "additions": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "from": {
+            "type": "boolean"
+          },
+          "sailings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CruiseSailingWeb"
+            }
+          }
+        }
+      },
+      "CruiseCabinCategory": {
+        "type": "object",
+        "description": "Backoffice cabin category (adds booking code, Tour32 name and EK/margin in prices).",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "additions": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "booking_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Backoffice only."
+          },
+          "tour32_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Tour32 — backoffice only."
+          },
+          "from": {
+            "type": "boolean"
+          },
+          "sailings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CruiseSailing"
+            }
+          }
+        }
+      },
+      "CruiseSpecials": {
+        "type": "object",
+        "description": "Special with validity window (cruise-specific).",
+        "properties": {
+          "special_description": {
+            "type": "string",
+            "nullable": true
+          },
+          "valid_from": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "valid_to": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "CruisePricingConfig": {
+        "type": "object",
+        "description": "EK/margin calculation inputs — backoffice only.",
+        "properties": {
+          "buy_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "object",
+            "nullable": true
+          },
+          "from_price": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "CruiseInternal": {
+        "type": "object",
+        "description": "Internal / technical / source IDs — backoffice only.",
+        "properties": {
+          "object_info_primarix": {
+            "type": "string",
+            "nullable": true
+          },
+          "travel_id_karawane": {
+            "type": "string",
+            "nullable": true,
+            "description": "Karawane source ID — hidden."
+          },
+          "id_tour32": {
+            "type": "string",
+            "nullable": true,
+            "description": "Tour32 — backoffice only."
+          },
+          "real_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Hidden field — backoffice only."
+          },
+          "sell_prices_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_prices_updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "CruiseListItem": {
+        "type": "object",
+        "description": "Slim directory entry. No prices.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer",
+            "description": "Customer-facing ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Cruise name (name_cruise)."
+          },
+          "title": {
+            "type": "string",
+            "description": "Marketing headline."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "geo": {
+            "type": "object",
+            "properties": {
+              "countries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GeoRef"
+                }
+              },
+              "destinations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GeoRef"
+                }
+              }
+            }
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CruiseWebDetail": {
+        "type": "object",
+        "description": "Web-safe cruise body (used inside ProductDetail). No EK/margin, Tour32, source IDs or internal data. Cruises have no structured surcharges; the title is the headline.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Cruise name (name_cruise)."
+          },
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "classification": {
+            "$ref": "#/components/schemas/CruiseClassification"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/CruiseDescriptions"
+          },
+          "programme": {
+            "$ref": "#/components/schemas/CruiseProgramme"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/CruisePriceInfo"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/CruiseAttributes"
+          },
+          "cabin_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CruiseCabinCategoryWeb"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/CruiseSpecials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItemWeb"
+            }
+          }
+        }
+      },
+      "CruiseDetail": {
+        "type": "object",
+        "description": "Full backoffice cruise record.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Cruise name (name_cruise)."
+          },
+          "classification": {
+            "$ref": "#/components/schemas/CruiseClassification"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/CruiseDescriptions"
+          },
+          "programme": {
+            "$ref": "#/components/schemas/CruiseProgramme"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/CruisePriceInfo"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/CruiseAttributes"
+          },
+          "cabin_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CruiseCabinCategory"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/CruiseSpecials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItem"
+            }
+          },
+          "pricing_config": {
+            "$ref": "#/components/schemas/CruisePricingConfig"
+          },
+          "internal": {
+            "$ref": "#/components/schemas/CruiseInternal"
+          }
+        }
+      },
+      "CruiseListResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CruiseListItem"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "CruiseDetailResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CruiseDetail"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "RentalCompanyConditions": {
+        "type": "object",
+        "description": "Rental conditions (from the company), in the requested language.",
+        "properties": {
+          "minimum_rental_days": {
+            "type": "integer",
+            "nullable": true
+          },
+          "conditions_calculation_day": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_calculation_season": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_driver": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_licence": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_calculation": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_oneway": {
+            "type": "string",
+            "nullable": true
+          },
+          "has_multi_rental_discount": {
+            "type": "boolean"
+          },
+          "conditions_multi_rental_discount": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_restricted_area": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_border_crossing": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_insurance": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_insurance_options": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_all_inclusive": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_insurance_exclusions": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_deposit": {
+            "type": "string",
+            "nullable": true
+          },
+          "minimum_rental_text": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            }
+          },
+          "conditions_markdown": {
+            "type": "string",
+            "nullable": true,
+            "description": "Consolidated Markdown of the conditions repeater. TBD: exact scope."
+          }
+        }
+      },
+      "RentalCompanyPriceInfo": {
+        "type": "object",
+        "description": "Price / service texts (from the company), in the requested language.",
+        "properties": {
+          "price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "flex_price_text": {
+            "type": "string",
+            "nullable": true
+          },
+          "services_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "services_not_included": {
+            "type": "string",
+            "nullable": true
+          },
+          "services_optional": {
+            "type": "string",
+            "nullable": true
+          },
+          "deviating_cancellation_terms": {
+            "type": "string",
+            "nullable": true
+          },
+          "important_information": {
+            "type": "string",
+            "nullable": true
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            }
+          },
+          "price_info_markdown": {
+            "type": "string",
+            "nullable": true
+          },
+          "mobility_advice": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          }
+        }
+      },
+      "RentalCompanyWeb": {
+        "type": "object",
+        "description": "Rental company, inlined into every vehicle (public part). Redundant across vehicles by design.",
+        "properties": {
+          "name_company": {
+            "type": "string",
+            "nullable": true
+          },
+          "rental_type": {
+            "type": "string",
+            "nullable": true,
+            "description": "Mietwagen | Camper."
+          },
+          "street": {
+            "type": "string",
+            "nullable": true
+          },
+          "street_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "place": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "country": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "phone_general": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone_after_hours": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_general": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeoRef"
+            }
+          },
+          "subline": {
+            "type": "string",
+            "nullable": true
+          },
+          "teaser": {
+            "type": "string",
+            "nullable": true
+          },
+          "text_positive": {
+            "type": "string",
+            "nullable": true
+          },
+          "text_negative": {
+            "type": "string",
+            "nullable": true
+          },
+          "description_supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            }
+          },
+          "conditions": {
+            "$ref": "#/components/schemas/RentalCompanyConditions"
+          },
+          "price_info": {
+            "$ref": "#/components/schemas/RentalCompanyPriceInfo"
+          }
+        }
+      },
+      "RentalCompany": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RentalCompanyWeb"
+          },
+          {
+            "type": "object",
+            "description": "Backoffice adds Tour32, source IDs and reservation data.",
+            "properties": {
+              "location_tour32": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Tour32 — backoffice only."
+              },
+              "object_info_primarix": {
+                "type": "string",
+                "nullable": true,
+                "description": "Hidden — backoffice only."
+              },
+              "internal_remarks": {
+                "type": "string",
+                "nullable": true
+              },
+              "booking_channel": {
+                "type": "string",
+                "nullable": true
+              },
+              "booking_partner": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true
+              },
+              "email_booking": {
+                "type": "string",
+                "format": "email",
+                "nullable": true
+              },
+              "internal_remarks_reservation": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "DepotWeb": {
+        "type": "object",
+        "description": "Pickup/return station, inlined from rental_depots (public part).",
+        "properties": {
+          "name_depot": {
+            "type": "string",
+            "nullable": true
+          },
+          "category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "rental_depot_categories."
+          },
+          "rental_zone": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "vehicles_rental_zones."
+          },
+          "street": {
+            "type": "string",
+            "nullable": true
+          },
+          "street_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "place": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "country": {
+            "$ref": "#/components/schemas/GeoRef",
+            "nullable": true
+          },
+          "phone_general": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "office_hours_deviating": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Depot": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DepotWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "status": {
+                "type": "string",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "rental_company": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "RentalPriceCellWeb": {
+        "type": "object",
+        "description": "One price cell on the rental-duration column axis. Web exposes the sell price only.",
+        "properties": {
+          "depot_category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "Part of the column head (rental_depot_categories)."
+          },
+          "duration_min": {
+            "type": "number",
+            "nullable": true
+          },
+          "duration_max": {
+            "type": "number",
+            "nullable": true
+          },
+          "duration_label": {
+            "type": "string",
+            "nullable": true,
+            "description": "Column head (rental duration)."
+          },
+          "duration_from": {
+            "type": "boolean",
+            "description": "Open-ended 'ab' duration."
+          },
+          "sell": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "RentalPriceCell": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RentalPriceCellWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "buy": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "EK — backoffice only."
+              },
+              "margin": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Margin — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "RentalZonePeriodWeb": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PricePeriod"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalPriceCellWeb"
+            }
+          }
+        }
+      },
+      "RentalZonePeriod": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PricePeriod"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalPriceCell"
+            }
+          }
+        }
+      },
+      "RentalZoneWeb": {
+        "type": "object",
+        "description": "Block = rental zone (e.g. Nord-Australien). Rows = price periods; columns = rental duration.",
+        "properties": {
+          "zone": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "vehicles_rental_zones."
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalZonePeriodWeb"
+            }
+          }
+        }
+      },
+      "RentalZone": {
+        "type": "object",
+        "properties": {
+          "zone": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalZonePeriod"
+            }
+          }
+        }
+      },
+      "RentalSurchargeWeb": {
+        "type": "object",
+        "properties": {
+          "booking_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "RentalSurcharge": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RentalSurchargeWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "calc_type": {
+                "$ref": "#/components/schemas/Ref",
+                "nullable": true,
+                "description": "Backoffice only."
+              },
+              "buy": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "EK — backoffice only."
+              },
+              "margin": {
+                "type": "number",
+                "format": "float",
+                "nullable": true,
+                "description": "Margin — backoffice only."
+              }
+            }
+          }
+        ]
+      },
+      "RentalPricingConfig": {
+        "type": "object",
+        "description": "EK/margin calculation inputs — backoffice only.",
+        "properties": {
+          "buy_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_price_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "object",
+            "nullable": true
+          },
+          "from_price": {
+            "type": "integer",
+            "nullable": true
+          },
+          "surcharge_percentage_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "surcharge_provision_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "surcharge_margin_percentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "surcharge_exchange_rate": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "RentalAttributes": {
+        "type": "object",
+        "properties": {
+          "drive_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "persons_max": {
+            "type": "integer",
+            "nullable": true
+          },
+          "suitcase_big": {
+            "type": "integer",
+            "nullable": true
+          },
+          "suitcase_small": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "RentalDescriptions": {
+        "type": "object",
+        "description": "Vehicle editorial texts, in the requested language.",
+        "properties": {
+          "subline": {
+            "type": "string",
+            "nullable": true
+          },
+          "teaser": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "equipment": {
+            "type": "string",
+            "nullable": true
+          },
+          "bond": {
+            "type": "string",
+            "nullable": true
+          },
+          "supplementary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementaryBlock"
+            }
+          },
+          "descriptions_markdown": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RentalCarConditions": {
+        "type": "object",
+        "description": "Rental-car-only conditions (from the company).",
+        "properties": {
+          "conditions_hotel_delivery": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_pickup_airport_ferry": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_toll": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_ferry": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CamperDetails": {
+        "type": "object",
+        "description": "Camper-only fields (vehicle camper descriptions + camper condition).",
+        "properties": {
+          "bedsize": {
+            "type": "string",
+            "nullable": true
+          },
+          "camping_equipment": {
+            "type": "string",
+            "nullable": true
+          },
+          "conditions_towaway": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RentalBaseWeb": {
+        "type": "object",
+        "description": "Shared web body for rental_car and camper (used inside ProductDetail). No EK/margin, Tour32, source IDs, reservation or internal data.",
+        "properties": {
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true,
+            "description": "vehicle_categories."
+          },
+          "depot_availability": {
+            "type": "string",
+            "nullable": true
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/RentalAttributes"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/RentalDescriptions"
+          },
+          "rental_company": {
+            "$ref": "#/components/schemas/RentalCompanyWeb"
+          },
+          "depots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DepotWeb"
+            }
+          },
+          "zones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalZoneWeb"
+            },
+            "description": "Prices: zone -> periods -> duration cells."
+          },
+          "surcharges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalSurchargeWeb"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/Specials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItemWeb"
+            }
+          }
+        }
+      },
+      "RentalCarWebDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RentalBaseWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "rental_car": {
+                "$ref": "#/components/schemas/RentalCarConditions"
+              }
+            }
+          }
+        ],
+        "description": "Web body for a rental car."
+      },
+      "CamperWebDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RentalBaseWeb"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "camper": {
+                "$ref": "#/components/schemas/CamperDetails"
+              }
+            }
+          }
+        ],
+        "description": "Web body for a camper."
+      },
+      "RentalBase": {
+        "type": "object",
+        "description": "Shared full backoffice record for rental_car and camper.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UI-hidden, but the API delta cursor."
+          },
+          "season": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "name_vehicle."
+          },
+          "rental_type": {
+            "type": "string",
+            "nullable": true,
+            "description": "Mietwagen | Camper (source of product_type)."
+          },
+          "category": {
+            "$ref": "#/components/schemas/Ref",
+            "nullable": true
+          },
+          "supplier_product_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Backoffice only."
+          },
+          "depot_availability": {
+            "type": "string",
+            "nullable": true
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/RentalAttributes"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/RentalDescriptions"
+          },
+          "rental_company": {
+            "$ref": "#/components/schemas/RentalCompany"
+          },
+          "depots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Depot"
+            }
+          },
+          "zones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalZone"
+            }
+          },
+          "surcharges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalSurcharge"
+            }
+          },
+          "specials": {
+            "$ref": "#/components/schemas/Specials"
+          },
+          "image_badge": {
+            "$ref": "#/components/schemas/ImageBadge",
+            "nullable": true
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MediaItem"
+            }
+          },
+          "pricing_config": {
+            "$ref": "#/components/schemas/RentalPricingConfig"
+          },
+          "sell_prices_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "sell_prices_updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "RentalCarDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RentalBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "rental_car": {
+                "$ref": "#/components/schemas/RentalCarConditions"
+              }
+            }
+          }
+        ],
+        "description": "Full backoffice rental-car record."
+      },
+      "CamperDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RentalBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "camper": {
+                "$ref": "#/components/schemas/CamperDetails"
+              }
+            }
+          }
+        ],
+        "description": "Full backoffice camper record."
+      },
+      "RentalListItem": {
+        "type": "object",
+        "description": "Slim directory entry (shared by rental_cars and campers). No prices.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "object_id": {
+            "type": "integer",
+            "description": "Customer-facing ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "name_vehicle."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "draft"
+            ]
+          },
+          "geo": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "$ref": "#/components/schemas/GeoRef",
+                "nullable": true
+              },
+              "place": {
+                "$ref": "#/components/schemas/GeoRef",
+                "nullable": true
+              }
+            }
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RentalCarListResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalListItem"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "CamperListResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RentalListItem"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "RentalCarDetailResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RentalCarDetail"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "CamperDetailResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CamperDetail"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "CollectionLabels": {
+        "type": "object",
+        "description": "Map of field_key -> field label in the requested language.",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "example": {
+          "subline_location": "Unterzeile Lage",
+          "teaser": "Teaser",
+          "minimum_stay": "Mindestaufenthalt",
+          "important_information": "Wichtige Information"
+        }
+      },
+      "LabelsResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "object",
+            "description": "Field labels grouped by collection (key = collection name).",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CollectionLabels"
+            },
+            "example": {
+              "hotels": {
+                "teaser": "Teaser",
+                "minimum_stay": "Mindestaufenthalt"
+              },
+              "cruises": {
+                "teaser": "Teaser"
+              }
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "PrimarixSource": {
+        "type": "object",
+        "description": "One legacy Primarix origin of a target field.",
+        "properties": {
+          "system": {
+            "type": "string",
+            "enum": [
+              "botg",
+              "karawane"
+            ]
+          },
+          "table": {
+            "type": "string",
+            "description": "Legacy parent table."
+          },
+          "fieldid": {
+            "type": "string",
+            "description": "Legacy Primarix field id."
+          },
+          "field_name": {
+            "type": "string",
+            "description": "Legacy field name (uid)."
+          },
+          "label_de": {
+            "type": "string",
+            "nullable": true,
+            "description": "Old DE label."
+          }
+        }
+      },
+      "FieldMapFlatRow": {
+        "type": "object",
+        "description": "Flat lookup row: one row per legacy source. `new` fields have null legacy_* ; `outdated` fields (used in Primarix, not imported) have null api_field_name.",
+        "properties": {
+          "system": {
+            "type": "string",
+            "enum": [
+              "botg",
+              "karawane"
+            ],
+            "nullable": true
+          },
+          "legacy_table": {
+            "type": "string",
+            "nullable": true
+          },
+          "legacy_fieldid": {
+            "type": "string",
+            "nullable": true
+          },
+          "legacy_field_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "legacy_label_de": {
+            "type": "string",
+            "nullable": true
+          },
+          "target_collection": {
+            "type": "string",
+            "nullable": true
+          },
+          "api_field_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Name in the API/dump (post-transformer). null when status=outdated."
+          },
+          "data_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "renamed",
+              "new",
+              "outdated"
+            ]
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "public",
+              "backoffice"
+            ],
+            "description": "internal rows are never exposed."
+          },
+          "since_version": {
+            "type": "string",
+            "nullable": true
+          },
+          "label_de": {
+            "type": "string",
+            "nullable": true
+          },
+          "label_en": {
+            "type": "string",
+            "nullable": true
+          },
+          "label_nl": {
+            "type": "string",
+            "nullable": true
+          },
+          "transform_note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FieldMapNestedRow": {
+        "type": "object",
+        "description": "Target-centric row: one per new field, legacy origins embedded. Returned with ?shape=nested.",
+        "properties": {
+          "api_field_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "field_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Directus field key."
+          },
+          "target_collection": {
+            "type": "string",
+            "nullable": true
+          },
+          "data_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "interface": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "renamed",
+              "new",
+              "outdated"
+            ]
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "public",
+              "backoffice"
+            ]
+          },
+          "since_version": {
+            "type": "string",
+            "nullable": true
+          },
+          "label_de": {
+            "type": "string",
+            "nullable": true
+          },
+          "label_en": {
+            "type": "string",
+            "nullable": true
+          },
+          "label_nl": {
+            "type": "string",
+            "nullable": true
+          },
+          "tab": {
+            "type": "string",
+            "nullable": true
+          },
+          "section": {
+            "type": "string",
+            "nullable": true
+          },
+          "transform_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "primarix_sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrimarixSource"
+            }
+          }
+        }
+      },
+      "FieldMapResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "description": "Default: flat rows (one per legacy source). With `?shape=nested`: target-centric rows. All items in one response share the shape set by `shape`.",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FieldMapFlatRow"
+                },
+                {
+                  "$ref": "#/components/schemas/FieldMapNestedRow"
+                }
+              ]
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      }
+    }
+  }
+}

@@ -42,7 +42,7 @@ export const DETAIL_FIELDS = [
   "user_updated.id",
   "user_updated.first_name",
   "user_updated.last_name",
-  "season",
+  "season.season",
   "operator_direct",
   "name_operator",
   "street",
@@ -178,11 +178,24 @@ export const DETAIL_FIELDS = [
   "price_periods.price_period_start",
   "price_periods.price_period_end",
   "price_periods.price_period_from",
+  // Price calculation settings (margin/buy-type per language) — internal, feeds
+  // categories[].prices margin/unit and top-level from_price, same as hotels'
+  // hotel_prices/activeSettings.
+  "price_calculation_translations.translations_id.code",
+  "price_calculation_translations.buy_price_type",
+  "price_calculation_translations.margin_percentage",
+  "price_calculation_translations.from_price",
+  // Surcharge calculation settings (margin per language) — internal, feeds
+  // surcharges[].margin.
+  "surcharges_calculation_translations.translations_id.code",
+  "surcharges_calculation_translations.surcharge_margin_percentage",
   // Media
+  "media.sort",
   "media.directus_files_id.id",
   "media.directus_files_id.filename_download",
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
+  "media.directus_files_id.primarix_workspace",
   "media.directus_files_id.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",

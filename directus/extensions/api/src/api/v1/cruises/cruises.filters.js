@@ -8,14 +8,16 @@ const SORT_ALLOWLIST = new Set([
 ]);
 
 export function buildListFilter({ search, country, destination, season, status_primarix }) {
-  const filter = {
-    status_primarix: { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS },
-  };
+  const filter = {};
+  // 'all' means don't filter by status_primarix at all — otherwise default to published.
+  if (status_primarix !== 'all') {
+    filter.status_primarix = { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS };
+  }
 
   if (search) {
     filter._or = [
-      { 'descriptions_translations.headline': { _icontains: search } },
-      { 'descriptions_translations.teaser': { _icontains: search } },
+      { descriptions_translations: { headline: { _icontains: search } } },
+      { descriptions_translations: { teaser: { _icontains: search } } },
     ];
   }
 
@@ -28,7 +30,7 @@ export function buildListFilter({ search, country, destination, season, status_p
   }
 
   if (season) {
-    filter.season = { _eq: season };
+    filter.season = { season: { _eq: season } };
   }
 
   return filter;

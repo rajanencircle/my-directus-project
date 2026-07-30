@@ -54,10 +54,12 @@ export const DETAIL_FIELDS = [
   "depots_selected.rental_depots_id.name_depot",
   "partner_selected.partner_id.primarix_id",
   // Media
+  "media.sort",
   "media.directus_files_id.id",
   "media.directus_files_id.filename_download",
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
+  "media.directus_files_id.primarix_workspace",
   "media.directus_files_id.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",

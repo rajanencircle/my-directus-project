@@ -265,7 +265,7 @@ export function shapeExcursionDetail(excursion, lang) {
     user_updated: excursion.user_updated
       ? { id: excursion.user_updated.id ?? null, first_name: excursion.user_updated.first_name ?? null, last_name: excursion.user_updated.last_name ?? null }
       : null,
-    season: excursion.season ?? null,
+    season: excursion.season?.season ?? null,
     operator: {
       direct: excursion.operator_direct ?? null,
       name: excursion.name_operator ?? null,
@@ -277,6 +277,8 @@ export function shapeExcursionDetail(excursion, lang) {
       place: getGeoName(excursion.place, lang),
       state: getGeoName(excursion.state, lang),
       country: getGeoName(excursion.country, lang),
+      country_code: excursion.country?.ISO ?? null,
+      // Extra field beyond the reference shape:
       location_tour32: getGeoName(excursion.location_tour32, lang),
     },
     contact: {

@@ -1,13 +1,17 @@
 import { openapiSpec } from "./openapi.spec.js";
+import { setRedocCsp, setSwaggerCsp } from "../shared/docsCsp.js";
+
+const contractTitle = openapiSpec?.info?.title ?? "BOTG ContentHub API";
+const contractVersion = openapiSpec?.info?.version ?? "";
 
 const REDOC_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>BOTG API v1 — Documentation</title>
+  <title>${contractTitle} — Contract</title>
 
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="BOTG REST API documentation — hotels, products, and more.">
+  <meta name="description" content="${contractTitle} — contract documentation, contributed via BOTG_API_Contract.json.">
 
   <style>
     body {
@@ -56,14 +60,25 @@ const REDOC_HTML = `<!DOCTYPE html>
     #api-banner .api-json-link:hover {
       color: #fff;
     }
+
+    #api-banner .api-internal-link {
+      color: #a0b4cc;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    #api-banner .api-internal-link:hover {
+      color: #fff;
+    }
   </style>
 </head>
 
 <body>
   <div id="api-banner">
-    <span class="api-title">BOTG API</span>
-    <span class="api-version">v1.2.0</span>
-    <span style="color:#a0b4cc; font-size:13px;">Hotels · Products · Cruises</span>
+    <span class="api-title">${contractTitle}</span>
+    <span class="api-version">${contractVersion}</span>
+    <span style="color:#a0b4cc; font-size:13px;">Contract (source of truth)</span>
+    <a class="api-internal-link" href="/api/v1/internal-docs" target="_blank">Internal implementation docs ↗</a>
     <a class="api-json-link" href="/api/v1/openapi.json" target="_blank">OpenAPI JSON ↗</a>
   </div>
 
@@ -90,11 +105,11 @@ const REDOC_HTML = `<!DOCTYPE html>
 const SWAGGER_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>BOTG API v1 — Swagger UI</title>
+  <title>${contractTitle} — Swagger UI</title>
 
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="BOTG REST API documentation (Swagger UI) — hotels, products, and more.">
+  <meta name="description" content="${contractTitle} — contract documentation (Swagger UI), contributed via BOTG_API_Contract.json.">
 
   <style>
     body {
@@ -103,46 +118,7 @@ const SWAGGER_HTML = `<!DOCTYPE html>
       font-family: sans-serif;
     }
 
-    /* Top banner */
-    #api-banner {
-      background: #1a1a2e;
-      color: #fff;
-      padding: 10px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      letter-spacing: 0.02em;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
 
-    #api-banner .api-title {
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    #api-banner .api-version {
-      background: #4f8ef7;
-      color: #fff;
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    #api-banner .api-json-link {
-      margin-left: auto;
-      color: #a0b4cc;
-      text-decoration: none;
-      font-size: 13px;
-    }
-
-    #api-banner .api-json-link:hover {
-      color: #fff;
-    }
   </style>
 
   <!-- Pinned to 5.17.14 for stability -->
@@ -155,12 +131,7 @@ const SWAGGER_HTML = `<!DOCTYPE html>
 </head>
 
 <body>
-  <div id="api-banner">
-    <span class="api-title">BOTG API</span>
-    <span class="api-version">v1.2.0</span>
-    <span style="color:#a0b4cc; font-size:13px;">Hotels · Products · Cruises</span>
-    <a class="api-json-link" href="/api/v1/openapi.json" target="_blank">OpenAPI JSON ↗</a>
-  </div>
+
 
   <div id="swagger-ui"></div>
 
@@ -189,9 +160,9 @@ const SWAGGER_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export function setupDocsRoutes(router) {
+export function setupContractDocsRoutes(router) {
   /**
-   * OpenAPI JSON
+   * OpenAPI JSON (client contract — BOTG_API_Contract.json)
    */
   router.get("/v1/openapi.json", (_req, res) => {
     res.json(openapiSpec);
@@ -201,26 +172,8 @@ export function setupDocsRoutes(router) {
    * ReDoc page
    */
   router.get("/v1/docs", (_req, res) => {
-    /**
-     * CSP headers
-     * Allow jsdelivr CDN for ReDoc
-     */
-    res.setHeader(
-      "Content-Security-Policy",
-      [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net",
-        "script-src-elem 'self' https://cdn.jsdelivr.net",
-        "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: https:",
-        "font-src 'self' data:",
-        "connect-src 'self'",
-        "worker-src 'self' blob:",
-      ].join("; "),
-    );
-
+    setRedocCsp(res);
     res.setHeader("Content-Type", "text/html");
-
     res.send(REDOC_HTML);
   });
 
@@ -228,27 +181,8 @@ export function setupDocsRoutes(router) {
    * Swagger UI page
    */
   router.get("/v1/api-docs", (_req, res) => {
-    /**
-     * CSP headers
-     * Allow jsdelivr CDN for Swagger UI assets; 'unsafe-inline' on script-src is required
-     * for the small inline SwaggerUIBundle initializer below (Swagger UI itself ships no
-     * separate init entry point that can be loaded as an external script).
-     */
-    res.setHeader(
-      "Content-Security-Policy",
-      [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-        "script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-        "img-src 'self' data: https:",
-        "font-src 'self' data:",
-        "connect-src 'self'",
-      ].join("; "),
-    );
-
+    setSwaggerCsp(res);
     res.setHeader("Content-Type", "text/html");
-
     res.send(SWAGGER_HTML);
   });
 }

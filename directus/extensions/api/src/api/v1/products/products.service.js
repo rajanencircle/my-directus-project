@@ -51,10 +51,13 @@ async function fetchAllProductTypes({ updated_after, status_primarix }, { servic
   const cruisesDelta = buildCruisesUpdatedAfterFilter(updated_after);
   const vehiclesDelta = buildVehiclesUpdatedAfterFilter(updated_after);
 
-  const statusFilter = status_primarix ?? DEFAULT_PRIMARIX_STATUS;
-  const publishedFilter = (delta) => (delta
-    ? { _and: [{ status_primarix: { _eq: statusFilter } }, delta] }
-    : { status_primarix: { _eq: statusFilter } });
+  // 'all' means don't filter by status_primarix at all — otherwise default to published.
+  const statusFilter = status_primarix === 'all' ? null : (status_primarix ?? DEFAULT_PRIMARIX_STATUS);
+  const publishedFilter = (delta) => {
+    const statusClause = statusFilter ? { status_primarix: { _eq: statusFilter } } : null;
+    if (statusClause && delta) return { _and: [statusClause, delta] };
+    return statusClause ?? delta ?? {};
+  };
 
   return {
     hotelsService, toursService, excursionsService, cruisesService, vehiclesService,
@@ -67,7 +70,7 @@ async function fetchAllProductTypes({ updated_after, status_primarix }, { servic
 }
 
 export async function listProducts(
-  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix, type },
   context,
 ) {
   const {
@@ -79,12 +82,15 @@ export async function listProducts(
   const hotelsDelta = buildUpdatedAfterFilter(updated_after);
   const hotelsCombinedFilter = hotelsDelta ? { _and: [hotelsListFilter, hotelsDelta] } : hotelsListFilter;
 
+  // type filters which product type(s) are included — omitted means all types.
+  const wants = (t) => !type || type === t;
+
   const [hotels, tours, excursions, cruises, vehicles] = await Promise.all([
-    hotelsService.readByQuery({ fields: HOTELS_DETAIL_FIELDS, deep: buildPublicationDeepFilter(), filter: hotelsCombinedFilter, limit: -1 }),
-    toursService.readByQuery({ fields: TOURS_DETAIL_FIELDS, filter: toursFilter, limit: -1 }),
-    excursionsService.readByQuery({ fields: EXCURSIONS_DETAIL_FIELDS, filter: excursionsFilter, limit: -1 }),
-    cruisesService.readByQuery({ fields: CRUISES_DETAIL_FIELDS, filter: cruisesFilter, limit: -1 }),
-    vehiclesService.readByQuery({ fields: VEHICLES_DETAIL_FIELDS, filter: vehiclesFilter, limit: -1 }),
+    wants('hotel') ? hotelsService.readByQuery({ fields: HOTELS_DETAIL_FIELDS, deep: buildPublicationDeepFilter(), filter: hotelsCombinedFilter, limit: -1 }) : [],
+    wants('tour') ? toursService.readByQuery({ fields: TOURS_DETAIL_FIELDS, filter: toursFilter, limit: -1 }) : [],
+    wants('excursion') ? excursionsService.readByQuery({ fields: EXCURSIONS_DETAIL_FIELDS, filter: excursionsFilter, limit: -1 }) : [],
+    wants('cruise') ? cruisesService.readByQuery({ fields: CRUISES_DETAIL_FIELDS, filter: cruisesFilter, limit: -1 }) : [],
+    wants('vehicle') ? vehiclesService.readByQuery({ fields: VEHICLES_DETAIL_FIELDS, filter: vehiclesFilter, limit: -1 }) : [],
   ]);
 
   const tagged = [
@@ -108,7 +114,7 @@ export async function listProducts(
 }
 
 export async function listProductsLimited(
-  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix },
+  { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix, type },
   context,
 ) {
   const {
@@ -120,12 +126,15 @@ export async function listProductsLimited(
   const hotelsDelta = buildUpdatedAfterFilter(updated_after);
   const hotelsCombinedFilter = hotelsDelta ? { _and: [hotelsListFilter, hotelsDelta] } : hotelsListFilter;
 
+  // type filters which product type(s) are included — omitted means all types.
+  const wants = (t) => !type || type === t;
+
   const [hotels, tours, excursions, cruises, vehicles] = await Promise.all([
-    hotelsService.readByQuery({ fields: LIMITED_FIELDS, filter: hotelsCombinedFilter, limit: -1 }),
-    toursService.readByQuery({ fields: LIMITED_FIELDS, filter: toursFilter, limit: -1 }),
-    excursionsService.readByQuery({ fields: LIMITED_FIELDS, filter: excursionsFilter, limit: -1 }),
-    cruisesService.readByQuery({ fields: LIMITED_FIELDS_GENERIC, filter: cruisesFilter, limit: -1 }),
-    vehiclesService.readByQuery({ fields: [...LIMITED_FIELDS_GENERIC, 'name_vehicle'], filter: vehiclesFilter, limit: -1 }),
+    wants('hotel') ? hotelsService.readByQuery({ fields: LIMITED_FIELDS, filter: hotelsCombinedFilter, limit: -1 }) : [],
+    wants('tour') ? toursService.readByQuery({ fields: LIMITED_FIELDS, filter: toursFilter, limit: -1 }) : [],
+    wants('excursion') ? excursionsService.readByQuery({ fields: LIMITED_FIELDS, filter: excursionsFilter, limit: -1 }) : [],
+    wants('cruise') ? cruisesService.readByQuery({ fields: LIMITED_FIELDS_GENERIC, filter: cruisesFilter, limit: -1 }) : [],
+    wants('vehicle') ? vehiclesService.readByQuery({ fields: [...LIMITED_FIELDS_GENERIC, 'name_vehicle'], filter: vehiclesFilter, limit: -1 }) : [],
   ]);
 
   const tagged = [
@@ -160,11 +169,13 @@ export async function getProductCatalog({ services, database, getSchema }, { sta
     { type: 'vehicle', collection: VEHICLES_COLLECTION, list_url: '/api/v1/vehicles', detail_url: '/api/v1/vehicles/{id}' },
   ];
 
-  const statusFilter = status_primarix ?? DEFAULT_PRIMARIX_STATUS;
+  // 'all' means don't filter by status_primarix at all — otherwise default to published.
+  const statusFilter = status_primarix === 'all' ? null : (status_primarix ?? DEFAULT_PRIMARIX_STATUS);
   const counts = await Promise.all(
     collections.map(({ collection }) => {
       const service = new ItemsService(collection, { knex: database, schema });
-      return service.readByQuery({ aggregate: { count: ['*'] }, filter: { status_primarix: { _eq: statusFilter } } });
+      const filter = statusFilter ? { status_primarix: { _eq: statusFilter } } : {};
+      return service.readByQuery({ aggregate: { count: ['*'] }, filter });
     }),
   );
 

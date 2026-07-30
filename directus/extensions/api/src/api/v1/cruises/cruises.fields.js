@@ -41,7 +41,7 @@ export const DETAIL_FIELDS = [
   "user_updated.id",
   "user_updated.first_name",
   "user_updated.last_name",
-  "season",
+  "season.season",
   // Descriptions translations
   "descriptions_translations.translations_id.code",
   "descriptions_translations.headline",
@@ -66,10 +66,11 @@ export const DETAIL_FIELDS = [
   "price_infos_translations.important_information",
   "price_infos_translations.good_to_know",
   "price_infos_translations.occupancy_single",
-  // NOTE: field names are `_selector`/`_text`, not `deviating_cancellation_terms`/`_additions`
+  // Fields on this collection are `deviating_cancellation_terms` (json) and
+  // `deviating_cancellation_terms_additions` (text).
   // (that mismatch previously made these always resolve to null).
-  "price_infos_translations.deviating_cancellation_terms_selector",
-  "price_infos_translations.deviating_cancellation_terms_text",
+  "price_infos_translations.deviating_cancellation_terms",
+  "price_infos_translations.deviating_cancellation_terms_additions",
   "price_infos_translations.mobility_advice_text",
   // Specials translations
   "specials_translations.translations_id.code",
@@ -122,10 +123,12 @@ export const DETAIL_FIELDS = [
   // Media — is_map/tour32_export are junction-level fields on cruises_directus_files
   // (per-product, can differ across products sharing the same file), NOT fields on the
   // shared directus_files record.
+  "media.sort",
   "media.directus_files_id.id",
   "media.directus_files_id.filename_download",
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
+  "media.directus_files_id.primarix_workspace",
   "media.directus_files_id.alt_text",
   "media.directus_files_id.expiry_date",
   "media.is_map",

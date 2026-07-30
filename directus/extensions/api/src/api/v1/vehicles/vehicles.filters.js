@@ -8,14 +8,16 @@ const SORT_ALLOWLIST = new Set([
 ]);
 
 export function buildListFilter({ search, category, rental_type, status_primarix }) {
-  const filter = {
-    status_primarix: { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS },
-  };
+  const filter = {};
+  // 'all' means don't filter by status_primarix at all — otherwise default to published.
+  if (status_primarix !== 'all') {
+    filter.status_primarix = { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS };
+  }
 
   if (search) {
     filter._or = [
       { name_vehicle: { _icontains: search } },
-      { 'descriptions_translations.teaser': { _icontains: search } },
+      { descriptions_translations: { teaser: { _icontains: search } } },
     ];
   }
 

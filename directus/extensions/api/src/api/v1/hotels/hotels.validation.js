@@ -1,5 +1,5 @@
 import { query, param } from 'express-validator';
-import { PRIMARIX_STATUS_VALUES } from '../../shared/constants.js';
+import { PRIMARIX_STATUS_QUERY_VALUES } from '../../shared/constants.js';
 
 const VALID_LANG_CODES = ['de', 'en', 'nl'];
 const VALID_SORT_VALUES = [
@@ -86,8 +86,8 @@ export const listHotelsSchema = [
 
   query('status_primarix')
     .optional()
-    .isIn(PRIMARIX_STATUS_VALUES)
-    .withMessage(`status_primarix must be one of: ${PRIMARIX_STATUS_VALUES.join(', ')}`),
+    .isIn(PRIMARIX_STATUS_QUERY_VALUES)
+    .withMessage(`status_primarix must be one of: ${PRIMARIX_STATUS_QUERY_VALUES.join(', ')}`),
 ];
 
 export const getHotelDetailSchema = [

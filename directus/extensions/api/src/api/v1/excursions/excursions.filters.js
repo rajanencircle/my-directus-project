@@ -10,16 +10,18 @@ const SORT_ALLOWLIST = new Set([
   'season', '-season',
 ]);
 
-export function buildListFilter({ search, country, region, state, season, destination, status_primarix }) {
-  const filter = {
-    status_primarix: { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS },
-  };
+export function buildListFilter({ search, country, state, season, destination, status_primarix }) {
+  const filter = {};
+  // 'all' means don't filter by status_primarix at all — otherwise default to published.
+  if (status_primarix !== 'all') {
+    filter.status_primarix = { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS };
+  }
 
   if (search) {
     // excursions has no top-level `name` field — search the translated name instead.
     filter._or = [
-      { 'descriptions_translations.name_excursion': { _icontains: search } },
-      { 'descriptions_translations.teaser': { _icontains: search } },
+      { descriptions_translations: { name_excursion: { _icontains: search } } },
+      { descriptions_translations: { teaser: { _icontains: search } } },
     ];
   }
 
@@ -27,16 +29,12 @@ export function buildListFilter({ search, country, region, state, season, destin
     filter.country = { id: { _eq: parseInt(country, 10) } };
   }
 
-  if (region) {
-    filter.region = { id: { _eq: parseInt(region, 10) } };
-  }
-
   if (state) {
     filter.state = { id: { _eq: parseInt(state, 10) } };
   }
 
   if (season) {
-    filter.season = { _eq: season };
+    filter.season = { season: { _eq: season } };
   }
 
   if (destination) {

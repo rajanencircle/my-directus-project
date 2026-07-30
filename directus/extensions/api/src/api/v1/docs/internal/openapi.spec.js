@@ -330,13 +330,20 @@ export const openapiSpec = {
     description: "Custom REST API layer for BOTG — hotels, products, and more.",
   },
   tags: [
-    { name: "Hotels", description: "Hotel listings and detail" },
+    {
+      name: "Demo",
+      description:
+        "Public, unauthenticated demo endpoints — no API key required",
+    },
     { name: "Products", description: "Product type catalogue" },
-    { name: "Cruises", description: "Cruise listings and detail" },
+    { name: "Hotels", description: "Hotel listings and detail" },
     { name: "Tours", description: "Tour (daytrip) listings and detail" },
     { name: "Excursions", description: "Excursion listings and detail" },
-    { name: "Vehicles", description: "Rental vehicle (car/camper) listings and detail" },
-    { name: "Demo", description: "Public, unauthenticated demo endpoints — no API key required" },
+    {
+      name: "Vehicles",
+      description: "Rental vehicle (car/camper) listings and detail",
+    },
+    { name: "Cruises", description: "Cruise listings and detail" },
   ],
   security: [{ BearerAuth: [] }],
   paths: {
@@ -344,10 +351,15 @@ export const openapiSpec = {
       get: {
         tags: ["Demo"],
         summary: "Demo: first published hotel (no auth)",
-        description: "Public, unauthenticated endpoint — returns the first published hotel, shaped exactly like GET /api/v1/hotels/{id}. Intended as a quick, tokenless way to see a real response shape.",
+        description:
+          "Public, unauthenticated endpoint — returns the first published hotel, shaped exactly like GET /api/v1/hotels/{id}. Intended as a quick, tokenless way to see a real response shape.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Demo hotel detail" },
@@ -361,10 +373,15 @@ export const openapiSpec = {
       get: {
         tags: ["Demo"],
         summary: "Demo: first published tour (no auth)",
-        description: "Public, unauthenticated endpoint — returns the first published tour, shaped exactly like GET /api/v1/tours/{id}.",
+        description:
+          "Public, unauthenticated endpoint — returns the first published tour, shaped exactly like GET /api/v1/tours/{id}.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Demo tour detail" },
@@ -378,10 +395,15 @@ export const openapiSpec = {
       get: {
         tags: ["Demo"],
         summary: "Demo: first published excursion (no auth)",
-        description: "Public, unauthenticated endpoint — returns the first published excursion, shaped exactly like GET /api/v1/excursions/{id}.",
+        description:
+          "Public, unauthenticated endpoint — returns the first published excursion, shaped exactly like GET /api/v1/excursions/{id}.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Demo excursion detail" },
@@ -395,10 +417,15 @@ export const openapiSpec = {
       get: {
         tags: ["Demo"],
         summary: "Demo: first published cruise (no auth)",
-        description: "Public, unauthenticated endpoint — returns the first published cruise, shaped exactly like GET /api/v1/cruises/{id}.",
+        description:
+          "Public, unauthenticated endpoint — returns the first published cruise, shaped exactly like GET /api/v1/cruises/{id}.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Demo cruise detail" },
@@ -412,10 +439,15 @@ export const openapiSpec = {
       get: {
         tags: ["Demo"],
         summary: "Demo: first published vehicle (no auth)",
-        description: "Public, unauthenticated endpoint — returns the first published vehicle, shaped exactly like GET /api/v1/vehicles/{id}.",
+        description:
+          "Public, unauthenticated endpoint — returns the first published vehicle, shaped exactly like GET /api/v1/vehicles/{id}.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Demo vehicle detail" },
@@ -428,11 +460,17 @@ export const openapiSpec = {
     "/api/v1/products/demo": {
       get: {
         tags: ["Demo"],
-        summary: "Demo: first published item across all product types (no auth)",
-        description: "Public, unauthenticated endpoint — returns the first published item across hotels/tours/excursions/cruises/vehicles (same merge/sort as GET /api/v1/products/details), shaped via the product dispatcher.",
+        summary:
+          "Demo: first published item across all product types (no auth)",
+        description:
+          "Public, unauthenticated endpoint — returns the first published item across hotels/tours/excursions/cruises/vehicles (same merge/sort as GET /api/v1/products/details), shaped via the product dispatcher.",
         security: [],
         parameters: [
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Demo product detail" },
@@ -449,12 +487,6 @@ export const openapiSpec = {
         description:
           "Returns a minimal paginated list of hotels containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/hotels/{id}` for full detail.",
         parameters: [
-          {
-            in: "query",
-            name: "search",
-            schema: { type: "string", maxLength: 200 },
-            description: "Case-insensitive search across hotel name and teaser description.",
-          },
           {
             in: "query",
             name: "country",
@@ -489,7 +521,8 @@ export const openapiSpec = {
             in: "query",
             name: "activity",
             schema: { type: "string", format: "uuid" },
-            description: "Filter by activity UUID — returns hotels that have this activity linked.",
+            description:
+              "Filter by activity UUID — returns hotels that have this activity linked.",
           },
           {
             in: "query",
@@ -502,7 +535,16 @@ export const openapiSpec = {
             name: "sort",
             schema: {
               type: "string",
-              enum: ["name", "-name", "date_updated", "-date_updated", "object_id", "-object_id", "season", "-season"],
+              enum: [
+                "name",
+                "-name",
+                "date_updated",
+                "-date_updated",
+                "object_id",
+                "-object_id",
+                "season",
+                "-season",
+              ],
             },
             description: "Default: `-date_updated`",
           },
@@ -510,7 +552,25 @@ export const openapiSpec = {
             in: "query",
             name: "updated_after",
             schema: { type: "string", format: "date-time" },
-            description: "Delta sync — return only records updated after this timestamp.",
+            description:
+              "Delta sync — return only records updated after this timestamp.",
+          },
+          {
+            in: "query",
+            name: "status_primarix",
+            schema: {
+              type: "string",
+              enum: [
+                "draft",
+                "published",
+                "unpublished",
+                "archived",
+                "deleted",
+                "all",
+              ],
+            },
+            description:
+              "Filter by lifecycle status_primarix. Defaults to `published` when omitted. Use `all` to disable this filter.",
           },
           {
             in: "query",
@@ -528,7 +588,9 @@ export const openapiSpec = {
             description: "Paginated lightweight hotel list",
             content: {
               "application/json": {
-                schema: { $ref: "#/components/schemas/PaginatedHotelListResponse" },
+                schema: {
+                  $ref: "#/components/schemas/PaginatedHotelListResponse",
+                },
                 example: {
                   success: true,
                   message: "OK",
@@ -620,7 +682,26 @@ export const openapiSpec = {
         tags: ["Products"],
         summary: "Product catalog",
         description:
-          "Returns a live catalog of all product types with real item counts and their list/detail route URLs. No query parameters required.",
+          "Returns a live catalog of all product types with real item counts (published by default) and their list/detail route URLs.",
+        parameters: [
+          {
+            in: "query",
+            name: "status_primarix",
+            schema: {
+              type: "string",
+              enum: [
+                "draft",
+                "published",
+                "unpublished",
+                "archived",
+                "deleted",
+                "all",
+              ],
+            },
+            description:
+              "Filter the item counts by lifecycle status_primarix. Defaults to `published` when omitted. Use `all` to disable this filter.",
+          },
+        ],
         responses: {
           200: {
             description: "Product catalog",
@@ -633,7 +714,9 @@ export const openapiSpec = {
                     message: { type: "string", example: "OK" },
                     data: {
                       type: "array",
-                      items: { $ref: "#/components/schemas/ProductCatalogItem" },
+                      items: {
+                        $ref: "#/components/schemas/ProductCatalogItem",
+                      },
                     },
                     meta: { $ref: "#/components/schemas/ResponseMeta" },
                   },
@@ -697,70 +780,31 @@ export const openapiSpec = {
             in: "query",
             name: "lang",
             schema: { type: "string", enum: ["de", "en", "nl"] },
-            description: "If set, only that language is returned in all translations blocks.",
+            description:
+              "If set, only that language is returned in all translations blocks.",
           },
           {
             in: "query",
-            name: "search",
-            schema: { type: "string", maxLength: 200 },
-            description: "Case-insensitive search across name and teaser description.",
+            name: "type",
+            schema: { type: "string", enum: ["hotel", "tour", "excursion", "cruise", "vehicle"] },
+            description: "Filter to a single product type. Omit to include all product types (default).",
           },
           {
             in: "query",
-            name: "country",
-            schema: { type: "integer", minimum: 1 },
-            description: "Filter by country ID.",
-          },
-          {
-            in: "query",
-            name: "region",
-            schema: { type: "integer", minimum: 1 },
-            description: "Filter by region ID.",
-          },
-          {
-            in: "query",
-            name: "state",
-            schema: { type: "integer", minimum: 1 },
-            description: "Filter by state ID.",
-          },
-          {
-            in: "query",
-            name: "hotel_group",
-            schema: { type: "string", format: "uuid" },
-            description: "Filter by hotel group UUID.",
-          },
-          {
-            in: "query",
-            name: "hotel_classification",
-            schema: { type: "string", format: "uuid" },
-            description: "Filter by hotel classification UUID.",
-          },
-          {
-            in: "query",
-            name: "activity",
-            schema: { type: "string", format: "uuid" },
-            description: "Filter by activity UUID.",
-          },
-          {
-            in: "query",
-            name: "season",
-            schema: { type: "string", maxLength: 50 },
-            description: "Filter by season string (e.g. `2026`).",
-          },
-          {
-            in: "query",
-            name: "sort",
+            name: "status_primarix",
             schema: {
               type: "string",
-              enum: ["name", "-name", "date_updated", "-date_updated", "object_id", "-object_id", "season", "-season"],
+              enum: [
+                "draft",
+                "published",
+                "unpublished",
+                "archived",
+                "deleted",
+                "all",
+              ],
             },
-            description: "Default: `-date_updated`",
-          },
-          {
-            in: "query",
-            name: "updated_after",
-            schema: { type: "string", format: "date-time" },
-            description: "Delta sync — return only records updated after this timestamp.",
+            description:
+              "Filter by lifecycle status_primarix. Defaults to `published` when omitted. Use `all` to disable this filter.",
           },
           {
             in: "query",
@@ -793,7 +837,9 @@ export const openapiSpec = {
                         {
                           type: "object",
                           properties: {
-                            pagination: { $ref: "#/components/schemas/PaginationMeta" },
+                            pagination: {
+                              $ref: "#/components/schemas/PaginationMeta",
+                            },
                           },
                         },
                       ],
@@ -836,66 +882,26 @@ export const openapiSpec = {
         parameters: [
           {
             in: "query",
-            name: "search",
-            schema: { type: "string", maxLength: 200 },
-            description: "Case-insensitive search across name and teaser description.",
+            name: "type",
+            schema: { type: "string", enum: ["hotel", "tour", "excursion", "cruise", "vehicle"] },
+            description: "Filter to a single product type. Omit to include all product types (default).",
           },
           {
             in: "query",
-            name: "country",
-            schema: { type: "integer", minimum: 1 },
-            description: "Filter by country ID.",
-          },
-          {
-            in: "query",
-            name: "region",
-            schema: { type: "integer", minimum: 1 },
-            description: "Filter by region ID.",
-          },
-          {
-            in: "query",
-            name: "state",
-            schema: { type: "integer", minimum: 1 },
-            description: "Filter by state ID.",
-          },
-          {
-            in: "query",
-            name: "hotel_group",
-            schema: { type: "string", format: "uuid" },
-            description: "Filter by hotel group UUID.",
-          },
-          {
-            in: "query",
-            name: "hotel_classification",
-            schema: { type: "string", format: "uuid" },
-            description: "Filter by hotel classification UUID.",
-          },
-          {
-            in: "query",
-            name: "activity",
-            schema: { type: "string", format: "uuid" },
-            description: "Filter by activity UUID.",
-          },
-          {
-            in: "query",
-            name: "season",
-            schema: { type: "string", maxLength: 50 },
-            description: "Filter by season string (e.g. `2026`).",
-          },
-          {
-            in: "query",
-            name: "sort",
+            name: "status_primarix",
             schema: {
               type: "string",
-              enum: ["name", "-name", "date_updated", "-date_updated", "object_id", "-object_id", "season", "-season"],
+              enum: [
+                "draft",
+                "published",
+                "unpublished",
+                "archived",
+                "deleted",
+                "all",
+              ],
             },
-            description: "Default: `-date_updated`",
-          },
-          {
-            in: "query",
-            name: "updated_after",
-            schema: { type: "string", format: "date-time" },
-            description: "Delta sync — return only records updated after this timestamp.",
+            description:
+              "Filter by lifecycle status_primarix. Defaults to `published` when omitted. Use `all` to disable this filter.",
           },
           {
             in: "query",
@@ -920,7 +926,9 @@ export const openapiSpec = {
                     message: { type: "string", example: "OK" },
                     data: {
                       type: "array",
-                      items: { $ref: "#/components/schemas/ProductLimitedItem" },
+                      items: {
+                        $ref: "#/components/schemas/ProductLimitedItem",
+                      },
                     },
                     meta: {
                       allOf: [
@@ -928,7 +936,9 @@ export const openapiSpec = {
                         {
                           type: "object",
                           properties: {
-                            pagination: { $ref: "#/components/schemas/PaginationMeta" },
+                            pagination: {
+                              $ref: "#/components/schemas/PaginationMeta",
+                            },
                           },
                         },
                       ],
@@ -976,16 +986,68 @@ export const openapiSpec = {
       get: {
         tags: ["Cruises"],
         summary: "List cruises (lightweight)",
-        description: "Returns a minimal paginated list of cruises containing only `id`, `object_id`, and `date_updated`. Use `GET /api/v1/cruises/{id}` for full detail.",
+        description:
+          "Returns a minimal paginated list of cruises containing only `id`, `object_id`, and `date_updated`. Use `GET /api/v1/cruises/{id}` for full detail.",
         parameters: [
-          { in: "query", name: "search", schema: { type: "string", maxLength: 200 }, description: "Case-insensitive search across cruise headline and teaser." },
-          { in: "query", name: "country", schema: { type: "integer", minimum: 1 }, description: "Filter by country ID." },
-          { in: "query", name: "destination", schema: { type: "integer", minimum: 1 }, description: "Filter by destination ID." },
-          { in: "query", name: "season", schema: { type: "string", maxLength: 50 }, description: "Filter by season." },
-          { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
-          { in: "query", name: "limit", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
-          { in: "query", name: "sort", schema: { type: "string" }, description: "One of: date_updated, -date_updated, object_id, -object_id, season, -season." },
-          { in: "query", name: "updated_after", schema: { type: "string", format: "date-time" } },
+          {
+            in: "query",
+            name: "country",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by country ID.",
+          },
+          {
+            in: "query",
+            name: "destination",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by destination ID.",
+          },
+          {
+            in: "query",
+            name: "season",
+            schema: { type: "string", maxLength: 50 },
+            description: "Filter by season.",
+          },
+          {
+            in: "query",
+            name: "page",
+            schema: { type: "integer", minimum: 1, default: 1 },
+          },
+          {
+            in: "query",
+            name: "limit",
+            schema: { type: "integer", minimum: 1, maximum: 100, default: 20 },
+          },
+          {
+            in: "query",
+            name: "sort",
+            schema: { type: "string" },
+            description:
+              "One of: date_updated, -date_updated, object_id, -object_id, season, -season.",
+          },
+          {
+            in: "query",
+            name: "updated_after",
+            schema: { type: "string", format: "date-time" },
+            description:
+              "Delta sync — return only records updated after this timestamp.",
+          },
+          {
+            in: "query",
+            name: "status_primarix",
+            schema: {
+              type: "string",
+              enum: [
+                "draft",
+                "published",
+                "unpublished",
+                "archived",
+                "deleted",
+                "all",
+              ],
+            },
+            description:
+              "Filter by lifecycle status_primarix. Defaults to `published` when omitted. Use `all` to disable this filter.",
+          },
         ],
         responses: {
           200: { description: "Paginated cruise list" },
@@ -999,10 +1061,20 @@ export const openapiSpec = {
       get: {
         tags: ["Cruises"],
         summary: "Get cruise detail",
-        description: "Returns full cruise detail. `id` may be the internal numeric id or the legacy `px_source_id`. Note: cruises has no structured surcharges collection (the schema only holds a free-text `surcharges` field under price info) and pricing is a single per-market settings row (`price_settings`/`from_price`), not a per-cabin/date price matrix.",
+        description:
+          "Returns full cruise detail. `id` may be the internal numeric id or the legacy `px_source_id`. Note: cruises has no structured surcharges collection (the schema only holds a free-text `surcharges` field under price info) and pricing is a single per-market settings row (`price_settings`/`from_price`), not a per-cabin/date price matrix.",
         parameters: [
-          { in: "path", name: "id", required: true, schema: { type: "string" } },
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: { type: "string" },
+          },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Cruise detail" },
@@ -1017,17 +1089,77 @@ export const openapiSpec = {
       get: {
         tags: ["Tours"],
         summary: "List tours/daytrips (lightweight)",
-        description: "Returns a minimal paginated list of tours containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/tours/{id}` for full detail.",
+        description:
+          "Returns a minimal paginated list of tours containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/tours/{id}` for full detail.",
         parameters: [
-          { in: "query", name: "search", schema: { type: "string", maxLength: 200 } },
-          { in: "query", name: "country", schema: { type: "integer", minimum: 1 } },
-          { in: "query", name: "region", schema: { type: "integer", minimum: 1 } },
-          { in: "query", name: "state", schema: { type: "integer", minimum: 1 } },
-          { in: "query", name: "season", schema: { type: "string", maxLength: 50 } },
-          { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
-          { in: "query", name: "limit", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
-          { in: "query", name: "sort", schema: { type: "string" } },
-          { in: "query", name: "updated_after", schema: { type: "string", format: "date-time" } },
+          {
+            in: "query",
+            name: "country",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by country ID.",
+          },
+          {
+            in: "query",
+            name: "state",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by state ID.",
+          },
+          {
+            in: "query",
+            name: "season",
+            schema: { type: "string", maxLength: 50 },
+            description: "Filter by season (e.g. `2026`).",
+          },
+          {
+            in: "query",
+            name: "sort",
+            schema: {
+              type: "string",
+              enum: [
+                "date_updated",
+                "-date_updated",
+                "object_id",
+                "-object_id",
+                "season",
+                "-season",
+              ],
+            },
+            description: "Default: `-date_updated`",
+          },
+          {
+            in: "query",
+            name: "updated_after",
+            schema: { type: "string", format: "date-time" },
+            description:
+              "Delta sync — return only records updated after this timestamp.",
+          },
+          {
+            in: "query",
+            name: "status_primarix",
+            schema: {
+              type: "string",
+              enum: [
+                "draft",
+                "published",
+                "unpublished",
+                "archived",
+                "deleted",
+                "all",
+              ],
+            },
+            description:
+              "Filter by lifecycle status_primarix. Defaults to `published` when omitted. Use `all` to disable this filter.",
+          },
+          {
+            in: "query",
+            name: "page",
+            schema: { type: "integer", minimum: 1, default: 1 },
+          },
+          {
+            in: "query",
+            name: "limit",
+            schema: { type: "integer", minimum: 1, maximum: 100, default: 20 },
+          },
         ],
         responses: {
           200: { description: "Paginated tour list" },
@@ -1041,10 +1173,20 @@ export const openapiSpec = {
       get: {
         tags: ["Tours"],
         summary: "Get tour/daytrip detail",
-        description: "Returns full tour detail. `id` may be the internal numeric id or the legacy `px_source_id`. Note: `categories[].prices[].occupancies{}.sell` and `from_price` are always null — tours' pricing schema only stores `buy_price` today, with no sell-price field/translation wired yet.",
+        description:
+          "Returns full tour detail. `id` may be the internal numeric id or the legacy `px_source_id`. Note: `categories[].prices[].occupancies{}.sell` and `from_price` are always null — tours' pricing schema only stores `buy_price` today, with no sell-price field/translation wired yet.",
         parameters: [
-          { in: "path", name: "id", required: true, schema: { type: "string" } },
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: { type: "string" },
+          },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Tour detail" },
@@ -1059,18 +1201,74 @@ export const openapiSpec = {
       get: {
         tags: ["Excursions"],
         summary: "List excursions (lightweight)",
-        description: "Returns a minimal paginated list of excursions containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/excursions/{id}` for full detail.",
+        description:
+          "Returns a minimal paginated list of excursions containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/excursions/{id}` for full detail.",
         parameters: [
-          { in: "query", name: "search", schema: { type: "string", maxLength: 200 } },
-          { in: "query", name: "country", schema: { type: "integer", minimum: 1 } },
-          { in: "query", name: "region", schema: { type: "integer", minimum: 1 } },
-          { in: "query", name: "state", schema: { type: "integer", minimum: 1 } },
-          { in: "query", name: "season", schema: { type: "string", maxLength: 50 } },
-          { in: "query", name: "destination", schema: { type: "integer", minimum: 1 } },
-          { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
-          { in: "query", name: "limit", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
-          { in: "query", name: "sort", schema: { type: "string" } },
-          { in: "query", name: "updated_after", schema: { type: "string", format: "date-time" } },
+          {
+            in: "query",
+            name: "country",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by country ID.",
+          },
+          {
+            in: "query",
+            name: "state",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by state ID.",
+          },
+          {
+            in: "query",
+            name: "season",
+            schema: { type: "string", maxLength: 50 },
+            description: "Filter by season (e.g. `2026`).",
+          },
+          {
+            in: "query",
+            name: "destination",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by destination ID.",
+          },
+          {
+            in: "query",
+            name: "page",
+            schema: { type: "integer", minimum: 1, default: 1 },
+          },
+          {
+            in: "query",
+            name: "limit",
+            schema: { type: "integer", minimum: 1, maximum: 100, default: 20 },
+          },
+          {
+            in: "query",
+            name: "sort",
+            schema: { type: "string" },
+            description:
+              "One of: date_updated, -date_updated, object_id, -object_id, season, -season.",
+          },
+          {
+            in: "query",
+            name: "updated_after",
+            schema: { type: "string", format: "date-time" },
+            description:
+              "Delta sync — return only records updated after this timestamp.",
+          },
+          {
+            in: "query",
+            name: "status_primarix",
+            schema: {
+              type: "string",
+              enum: [
+                "draft",
+                "published",
+                "unpublished",
+                "archived",
+                "deleted",
+                "all",
+              ],
+            },
+            description:
+              "Filter by lifecycle status_primarix. Defaults to `published` when omitted. Use `all` to disable this filter.",
+          },
         ],
         responses: {
           200: { description: "Paginated excursion list" },
@@ -1084,10 +1282,20 @@ export const openapiSpec = {
       get: {
         tags: ["Excursions"],
         summary: "Get excursion detail",
-        description: "Returns full excursion detail, including `categories[].prices[].occupancies{}.sell` and a computed `from_price` (excursions' pricing schema has a real sell-price translation junction, unlike tours). `id` may be the internal numeric id or the legacy `px_source_id`.",
+        description:
+          "Returns full excursion detail, including `categories[].prices[].occupancies{}.sell` and a computed `from_price` (excursions' pricing schema has a real sell-price translation junction, unlike tours). `id` may be the internal numeric id or the legacy `px_source_id`.",
         parameters: [
-          { in: "path", name: "id", required: true, schema: { type: "string" } },
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: { type: "string" },
+          },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Excursion detail" },
@@ -1102,15 +1310,62 @@ export const openapiSpec = {
       get: {
         tags: ["Vehicles"],
         summary: "List rental vehicles (lightweight)",
-        description: "Returns a minimal paginated list of vehicles containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/vehicles/{id}` for full detail.",
+        description:
+          "Returns a minimal paginated list of vehicles containing only `id`, `object_id`, `name`, and `date_updated`. Use `GET /api/v1/vehicles/{id}` for full detail.",
         parameters: [
-          { in: "query", name: "search", schema: { type: "string", maxLength: 200 } },
-          { in: "query", name: "category", schema: { type: "integer", minimum: 1 } },
-          { in: "query", name: "rental_type", schema: { type: "string", enum: ["car", "camper"] } },
-          { in: "query", name: "page", schema: { type: "integer", minimum: 1, default: 1 } },
-          { in: "query", name: "limit", schema: { type: "integer", minimum: 1, maximum: 100, default: 20 } },
-          { in: "query", name: "sort", schema: { type: "string" } },
-          { in: "query", name: "updated_after", schema: { type: "string", format: "date-time" } },
+          {
+            in: "query",
+            name: "category",
+            schema: { type: "integer", minimum: 1 },
+            description: "Filter by category ID.",
+          },
+          {
+            in: "query",
+            name: "rental_type",
+            schema: { type: "string", enum: ["car", "camper"] },
+            description: "Filter by rental type.",
+          },
+          {
+            in: "query",
+            name: "page",
+            schema: { type: "integer", minimum: 1, default: 1 },
+          },
+          {
+            in: "query",
+            name: "limit",
+            schema: { type: "integer", minimum: 1, maximum: 100, default: 20 },
+          },
+          {
+            in: "query",
+            name: "sort",
+            schema: { type: "string" },
+            description:
+              "One of: name_vehicle, -name_vehicle, date_updated, -date_updated, object_id, -object_id.",
+          },
+          {
+            in: "query",
+            name: "updated_after",
+            schema: { type: "string", format: "date-time" },
+            description:
+              "Delta sync — return only records updated after this timestamp.",
+          },
+          {
+            in: "query",
+            name: "status_primarix",
+            schema: {
+              type: "string",
+              enum: [
+                "draft",
+                "published",
+                "unpublished",
+                "archived",
+                "deleted",
+                "all",
+              ],
+            },
+            description:
+              "Filter by lifecycle status_primarix. Defaults to `published` when omitted. Use `all` to disable this filter.",
+          },
         ],
         responses: {
           200: { description: "Paginated vehicle list" },
@@ -1124,10 +1379,20 @@ export const openapiSpec = {
       get: {
         tags: ["Vehicles"],
         summary: "Get rental vehicle detail",
-        description: "Returns full vehicle detail. `pricing` is always `{ available: false, reason: \"...\" }` — vehicles_prices/vehicles_price_calculation/vehicles_surcharges exist in the schema but have no foreign key back to vehicles yet, so pricing cannot be resolved per vehicle until that schema work lands. `id` may be the internal numeric id or the legacy `px_source_id`.",
+        description:
+          'Returns full vehicle detail. `pricing` is always `{ available: false, reason: "..." }` — vehicles_prices/vehicles_price_calculation/vehicles_surcharges exist in the schema but have no foreign key back to vehicles yet, so pricing cannot be resolved per vehicle until that schema work lands. `id` may be the internal numeric id or the legacy `px_source_id`.',
         parameters: [
-          { in: "path", name: "id", required: true, schema: { type: "string" } },
-          { in: "query", name: "lang", schema: { type: "string", enum: ["de", "en", "nl"] } },
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: { type: "string" },
+          },
+          {
+            in: "query",
+            name: "lang",
+            schema: { type: "string", enum: ["de", "en", "nl"] },
+          },
         ],
         responses: {
           200: { description: "Vehicle detail" },
@@ -1187,33 +1452,71 @@ export const openapiSpec = {
         type: "object",
         description: "Lightweight hotel record returned by GET /api/v1/hotels.",
         properties: {
-          id: { type: "string", format: "uuid", example: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca" },
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca",
+          },
           object_id: { type: "integer", nullable: true, example: 9 },
           name: { type: "string", example: "Stay at Alice Springs" },
-          date_updated: { type: "string", format: "date-time", example: "2026-05-29T10:16:30.057Z" },
+          date_updated: {
+            type: "string",
+            format: "date-time",
+            example: "2026-05-29T10:16:30.057Z",
+          },
         },
       },
       ProductCatalogItem: {
         type: "object",
-        description: "One entry in the product catalog returned by GET /api/v1/products.",
+        description:
+          "One entry in the product catalog returned by GET /api/v1/products.",
         properties: {
-          type: { type: "string", example: "hotel", description: "Product type identifier." },
-          total: { type: "integer", example: 42, description: "Live count of published items of this type." },
-          list_url: { type: "string", example: "/api/v1/hotels", description: "Endpoint to list all items of this type." },
-          detail_url: { type: "string", example: "/api/v1/hotels/{id}", description: "Endpoint template for a single item detail." },
+          type: {
+            type: "string",
+            example: "hotel",
+            description: "Product type identifier.",
+          },
+          total: {
+            type: "integer",
+            example: 42,
+            description: "Live count of published items of this type.",
+          },
+          list_url: {
+            type: "string",
+            example: "/api/v1/hotels",
+            description: "Endpoint to list all items of this type.",
+          },
+          detail_url: {
+            type: "string",
+            example: "/api/v1/hotels/{id}",
+            description: "Endpoint template for a single item detail.",
+          },
         },
       },
       ProductLimitedItem: {
         type: "object",
-        description: "Lightweight product record returned by GET /api/v1/products/limited-list.",
+        description:
+          "Lightweight product record returned by GET /api/v1/products/limited-list.",
         properties: {
           type: { type: "string", example: "hotel" },
-          id: { type: "string", format: "uuid", example: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca" },
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "6f8a8c0a-d8af-415b-904d-02a6d6f225ca",
+          },
           object_id: { type: "integer", nullable: true, example: 9 },
           name: { type: "string", example: "Stay at Alice Springs" },
           status: { type: "string", nullable: true, example: "published" },
-          date_created: { type: "string", format: "date-time", example: "2026-05-09T11:48:36.379Z" },
-          date_updated: { type: "string", format: "date-time", example: "2026-05-29T10:16:30.057Z" },
+          date_created: {
+            type: "string",
+            format: "date-time",
+            example: "2026-05-09T11:48:36.379Z",
+          },
+          date_updated: {
+            type: "string",
+            format: "date-time",
+            example: "2026-05-29T10:16:30.057Z",
+          },
         },
       },
       PaginatedHotelListResponse: {
@@ -1309,7 +1612,8 @@ export const openapiSpec = {
           type: {
             type: "string",
             nullable: true,
-            description: "Surcharge type designation (from mandatory collection).",
+            description:
+              "Surcharge type designation (from mandatory collection).",
           },
           catering: {
             type: "object",
@@ -1543,7 +1847,7 @@ export const openapiSpec = {
           translations: {
             type: "object",
             description:
-              "Hotel description fields keyed by ISO 639-1 code (\"de\", \"en\", \"nl\"). Filtered to the requested lang when lang param is set. Source: hotel_descriptions_translations junction.",
+              'Hotel description fields keyed by ISO 639-1 code ("de", "en", "nl"). Filtered to the requested lang when lang param is set. Source: hotel_descriptions_translations junction.',
             additionalProperties: {
               type: "object",
               properties: {
@@ -1606,7 +1910,7 @@ export const openapiSpec = {
                 minimum_stay: {
                   type: "string",
                   nullable: true,
-                  description: "e.g. \"2 Nights\", \"3 Nights\"",
+                  description: 'e.g. "2 Nights", "3 Nights"',
                 },
                 minimum_stay_additions: { type: "string", nullable: true },
                 deviating_cancelation_terms: {
@@ -1704,7 +2008,7 @@ export const openapiSpec = {
                       occupancies: {
                         type: "object",
                         description:
-                          "Keyed by occupancy name (e.g. \"DZ\", \"EZ\").",
+                          'Keyed by occupancy name (e.g. "DZ", "EZ").',
                         additionalProperties: {
                           $ref: "#/components/schemas/OccupancyPrices",
                         },
@@ -1795,7 +2099,11 @@ export const openapiSpec = {
                   items: {
                     type: "object",
                     properties: {
-                      name: { type: "string", nullable: true, example: "123123" },
+                      name: {
+                        type: "string",
+                        nullable: true,
+                        example: "123123",
+                      },
                       special_description: {
                         type: "string",
                         nullable: true,
@@ -1876,7 +2184,8 @@ export const openapiSpec = {
                 filename: {
                   type: "string",
                   nullable: true,
-                  example: "claudio-schwarz-Axx5fWxrcFA-unsplash_optimized_2000",
+                  example:
+                    "claudio-schwarz-Axx5fWxrcFA-unsplash_optimized_2000",
                 },
                 url: {
                   type: "string",
