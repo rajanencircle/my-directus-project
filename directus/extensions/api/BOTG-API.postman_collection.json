@@ -69,36 +69,6 @@
       "name": "Hotels",
       "item": [
         {
-          "name": "Demo (No Auth)",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/hotels/demo?lang={{lang}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "hotels",
-                "demo"
-              ],
-              "query": [
-                {
-                  "key": "lang",
-                  "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl). Optional."
-                }
-              ]
-            },
-            "description": "Public, unauthenticated demo endpoint — returns the first published hotel, fully shaped exactly like GET /api/v1/hotels/{id}. No Bearer token required (this request explicitly overrides the collection's auth)."
-          }
-        },
-        {
           "name": "List Hotels (lightweight)",
           "request": {
             "method": "GET",
@@ -255,36 +225,6 @@
     {
       "name": "Products",
       "item": [
-        {
-          "name": "Demo (No Auth)",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/products/demo?lang={{lang}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "products",
-                "demo"
-              ],
-              "query": [
-                {
-                  "key": "lang",
-                  "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl). Optional."
-                }
-              ]
-            },
-            "description": "Public, unauthenticated demo endpoint — returns the first published item across ALL product types (hotels/tours/excursions/cruises/vehicles), shaped exactly like the real product detail. No Bearer token required."
-          }
-        },
         {
           "name": "Product Catalog",
           "request": {
@@ -546,36 +486,6 @@
       "name": "Cruises",
       "item": [
         {
-          "name": "Demo (No Auth)",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/cruises/demo?lang={{lang}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "cruises",
-                "demo"
-              ],
-              "query": [
-                {
-                  "key": "lang",
-                  "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl). Optional."
-                }
-              ]
-            },
-            "description": "Public, unauthenticated demo endpoint — returns the first published cruise, fully shaped exactly like GET /api/v1/cruises/{id}. No Bearer token required."
-          }
-        },
-        {
           "name": "List Cruises (lightweight)",
           "request": {
             "method": "GET",
@@ -680,36 +590,6 @@
     {
       "name": "Tours",
       "item": [
-        {
-          "name": "Demo (No Auth)",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/tours/demo?lang={{lang}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "tours",
-                "demo"
-              ],
-              "query": [
-                {
-                  "key": "lang",
-                  "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl). Optional."
-                }
-              ]
-            },
-            "description": "Public, unauthenticated demo endpoint — returns the first published tour, fully shaped exactly like GET /api/v1/tours/{id}. No Bearer token required."
-          }
-        },
         {
           "name": "List Tours (lightweight)",
           "request": {
@@ -821,36 +701,6 @@
     {
       "name": "Excursions",
       "item": [
-        {
-          "name": "Demo (No Auth)",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/excursions/demo?lang={{lang}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "excursions",
-                "demo"
-              ],
-              "query": [
-                {
-                  "key": "lang",
-                  "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl). Optional."
-                }
-              ]
-            },
-            "description": "Public, unauthenticated demo endpoint — returns the first published excursion, fully shaped exactly like GET /api/v1/excursions/{id}. No Bearer token required."
-          }
-        },
         {
           "name": "List Excursions (lightweight)",
           "request": {
@@ -968,36 +818,6 @@
     {
       "name": "Vehicles",
       "item": [
-        {
-          "name": "Demo (No Auth)",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/vehicles/demo?lang={{lang}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "vehicles",
-                "demo"
-              ],
-              "query": [
-                {
-                  "key": "lang",
-                  "value": "{{lang}}",
-                  "description": "ISO 639-1 code (de | en | nl). Optional."
-                }
-              ]
-            },
-            "description": "Public, unauthenticated demo endpoint — returns the first published vehicle, fully shaped exactly like GET /api/v1/vehicles/{id}. No Bearer token required."
-          }
-        },
         {
           "name": "List Vehicles (lightweight)",
           "request": {

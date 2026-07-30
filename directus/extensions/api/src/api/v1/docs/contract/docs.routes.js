@@ -70,6 +70,16 @@ const REDOC_HTML = `<!DOCTYPE html>
     #api-banner .api-internal-link:hover {
       color: #fff;
     }
+
+    #api-banner .api-swagger-link {
+      color: #a0b4cc;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    #api-banner .api-swagger-link:hover {
+      color: #fff;
+    }
   </style>
 </head>
 
@@ -79,6 +89,7 @@ const REDOC_HTML = `<!DOCTYPE html>
     <span class="api-version">${contractVersion}</span>
     <span style="color:#a0b4cc; font-size:13px;">Contract (source of truth)</span>
     <a class="api-internal-link" href="/api/v1/internal-docs" target="_blank">Internal implementation docs ↗</a>
+    <a class="api-swagger-link" href="/api/v1/docs/swagger" target="_blank">Try it out (Swagger) ↗</a>
     <a class="api-json-link" href="/api/v1/openapi.json" target="_blank">OpenAPI JSON ↗</a>
   </div>
 
@@ -178,9 +189,9 @@ export function setupContractDocsRoutes(router) {
   });
 
   /**
-   * Swagger UI page
+   * Swagger UI page (sandbox — "try it out" with a token)
    */
-  router.get("/v1/api-docs", (_req, res) => {
+  router.get("/v1/docs/swagger", (_req, res) => {
     setSwaggerCsp(res);
     res.setHeader("Content-Type", "text/html");
     res.send(SWAGGER_HTML);

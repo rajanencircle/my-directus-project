@@ -2,21 +2,22 @@
   "openapi": "3.0.3",
   "info": {
     "title": "BOTG ContentHub API",
-    "version": "1.0.0-alpha",
+    "version": "1.1.0",
     "description": "Contract (source of truth) for the BOTG ContentHub product API. Greenfield target design — describes how the API should look, independent of the Directus backend. Mapping from the native Directus structure to these fields lives in the implementation tickets and the `field_dictionary`, not in this document.\n\n**Two families:** `products` (web, aggregated, no purchase prices) and per-product backoffice families such as `hotels` (full data incl. EK/margin).\n\n**Three access patterns each:** list (slim directory), `/full` (all records; delta/DIV sync via `updated_after`), `/{id}` (single record).\n\nOne language per response (`lang` mandatory). `date_updated` is present in every response as the consumer's delta cursor.\n\n**Field labels** (the caption of each field, per language) are served separately via `GET /metadata/labels` — fetched once and cached — so the data feed stays slim. Value labels (e.g. catering, classification) travel inline as `Ref.name`.\n\nOpen points flagged **TBD**: final backoffice status rule; full Markdown-blob scope; `updated_after` boundary & de-publish semantics."
   },
   "servers": [
     {
-      "url": "https://content.botg.cloud/api/v1",
-      "description": "Production"
-    },
-    {
-      "url": "https://staging.content.botg.cloud/api/v1",
-      "description": "Staging"
-    },
-    {
-      "url": "https://dev.content.botg.cloud/api/v1",
-      "description": "DEV"
+      "url": "https://content.botg.cloud/api/{version}",
+      "description": "Production. Development and staging hosts are intentionally not published.",
+      "variables": {
+        "version": {
+          "default": "v1",
+          "enum": [
+            "v1"
+          ],
+          "description": "Major API version in the URL path. Minor and patch releases are backwards compatible and do NOT get their own path — see info.version for the full semantic version, and the X-API-Version response header for the version that served a given request."
+        }
+      }
     }
   ],
   "security": [
@@ -60,6 +61,10 @@
     {
       "name": "Field Mapping",
       "description": "Legacy <-> new field map for migration/mapping. Fetch once, cache."
+    },
+    {
+      "name": "Product Types",
+      "description": "Discovery: product types with live counts and route templates."
     }
   ],
   "x-tagGroups": [
@@ -84,7 +89,8 @@
       "name": "Metadata",
       "tags": [
         "Field Labels",
-        "Field Mapping"
+        "Field Mapping",
+        "Product Types"
       ]
     }
   ],
@@ -341,6 +347,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -417,6 +426,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -577,6 +589,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -653,6 +668,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -813,6 +831,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -889,6 +910,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -1049,6 +1073,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -1125,6 +1152,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -1285,6 +1315,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -1361,6 +1394,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -1521,6 +1557,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -1597,6 +1636,9 @@
           },
           {
             "$ref": "#/components/parameters/LimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
           }
         ],
         "responses": {
@@ -1741,76 +1783,6 @@
         "operationId": "get_campers_id"
       }
     },
-    "/metadata/labels": {
-      "get": {
-        "tags": [
-          "Field Labels"
-        ],
-        "summary": "Field labels (field_key -> label) in the requested language",
-        "description": "Returns the field-label map so consumers can render captions in the requested language without inflating the data feed. Intended to be fetched **once and cached**.\n\n- **Field labels** (this endpoint) = the caption of a field, e.g. `minimum_stay` -> \"Mindestaufenthalt\". Served **live from the Directus field metadata** (`meta.translations`), so they are always current; the brief label columns DE/EN/NL are only the build source.\n- **Value labels** (e.g. catering \"Halbpension\", classification \"4 Sterne\") are NOT here — they travel inline in the data as `Ref.name`.\n- **Dynamic labels** (repeater headlines, surcharge names) are content and travel with the record.\n\nReturned product-wide by default; use `collection` to restrict.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/LangParam"
-          },
-          {
-            "$ref": "#/components/parameters/CollectionParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LabelsResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (e.g. missing lang).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid token.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get_metadata_labels"
-      }
-    },
     "/metadata/field-map": {
       "get": {
         "tags": [
@@ -1883,6 +1855,122 @@
         },
         "operationId": "get_metadata_field_map"
       }
+    },
+    "/metadata/labels": {
+      "get": {
+        "tags": [
+          "Field Labels"
+        ],
+        "summary": "Field labels (field_key -> label) in the requested language",
+        "description": "Returns the field-label map so consumers can render captions in the requested language without inflating the data feed. Intended to be fetched **once and cached**.\n\n- **Field labels** (this endpoint) = the caption of a field, e.g. `minimum_stay` -> \"Mindestaufenthalt\". Served **live from the Directus field metadata** (`meta.translations`), so they are always current; the brief label columns DE/EN/NL are only the build source.\n- **Value labels** (e.g. catering \"Halbpension\", classification \"4 Sterne\") are NOT here — they travel inline in the data as `Ref.name`.\n- **Dynamic labels** (repeater headlines, surcharge names) are content and travel with the record.\n\nReturned product-wide by default; use `collection` to restrict.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangParam"
+          },
+          {
+            "$ref": "#/components/parameters/CollectionParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g. missing lang).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_metadata_labels"
+      }
+    },
+    "/metadata/product-types": {
+      "get": {
+        "tags": [
+          "Product Types"
+        ],
+        "summary": "Product type catalogue",
+        "description": "Discovery endpoint. Returns every product type with a live item count and its list/full/detail route templates, so a consumer can enumerate the API without hardcoding paths.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PublishingStatusParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductTypesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1898,15 +1986,15 @@
         "name": "lang",
         "in": "query",
         "required": true,
-        "description": "Response language (mandatory). One language per response, inlined. Values are the Directus locale codes.",
+        "description": "**Required.** Content language as ISO 639-1. Exactly one language per response.\n\nContent exists in `de`, `en` and `nl` only. Note that the Directus editing UI uses locale labels (`de-DE`, `en-GB`, `nl-NL`) for translation input — those are UI labels, not API values.",
         "schema": {
           "type": "string",
           "enum": [
-            "de-DE",
-            "en-GB",
-            "nl-NL",
-            "de-CH"
-          ]
+            "de",
+            "en",
+            "nl"
+          ],
+          "example": "de"
         }
       },
       "PageParam": {
@@ -2011,6 +2099,24 @@
             "nested"
           ],
           "default": "flat"
+        }
+      },
+      "PublishingStatusParam": {
+        "name": "publishing_status",
+        "in": "query",
+        "required": false,
+        "description": "Filter by lifecycle publishing status. Defaults to `published` when omitted. Use `all` to disable the filter. Backoffice only — the web endpoints always return published records and do not accept this parameter.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "published",
+            "unpublished",
+            "archived",
+            "deleted",
+            "all"
+          ],
+          "default": "published"
         }
       }
     },
@@ -2770,13 +2876,6 @@
           "name": {
             "type": "string"
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "published",
-              "draft"
-            ]
-          },
           "classification": {
             "$ref": "#/components/schemas/Ref",
             "nullable": true
@@ -2798,6 +2897,18 @@
             "type": "string",
             "format": "uri",
             "nullable": true
+          },
+          "publishing_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -2830,12 +2941,6 @@
           },
           "title": {
             "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "published"
-            ]
           },
           "geo": {
             "type": "object",
@@ -2926,12 +3031,17 @@
           "object_id": {
             "type": "integer"
           },
-          "status": {
+          "publishing_status": {
             "type": "string",
             "enum": [
+              "draft",
               "published",
-              "draft"
-            ]
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -3020,12 +3130,6 @@
           },
           "title": {
             "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "published"
-            ]
           },
           "date_updated": {
             "type": "string",
@@ -3743,13 +3847,6 @@
           "name": {
             "type": "string"
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "published",
-              "draft"
-            ]
-          },
           "geo": {
             "type": "object",
             "properties": {
@@ -3767,6 +3864,18 @@
             "type": "string",
             "format": "uri",
             "nullable": true
+          },
+          "publishing_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -3836,12 +3945,17 @@
           "object_id": {
             "type": "integer"
           },
-          "status": {
+          "publishing_status": {
             "type": "string",
             "enum": [
+              "draft",
               "published",
-              "draft"
-            ]
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -4484,13 +4598,6 @@
           "name": {
             "type": "string"
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "published",
-              "draft"
-            ]
-          },
           "geo": {
             "type": "object",
             "properties": {
@@ -4512,6 +4619,18 @@
             "type": "string",
             "format": "uri",
             "nullable": true
+          },
+          "publishing_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -4587,12 +4706,17 @@
           "object_id": {
             "type": "integer"
           },
-          "status": {
+          "publishing_status": {
             "type": "string",
             "enum": [
+              "draft",
               "published",
-              "draft"
-            ]
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -5134,13 +5258,6 @@
             "type": "string",
             "description": "Marketing headline."
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "published",
-              "draft"
-            ]
-          },
           "geo": {
             "type": "object",
             "properties": {
@@ -5162,6 +5279,18 @@
             "type": "string",
             "format": "uri",
             "nullable": true
+          },
+          "publishing_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -5229,12 +5358,17 @@
           "object_id": {
             "type": "integer"
           },
-          "status": {
+          "publishing_status": {
             "type": "string",
             "enum": [
+              "draft",
               "published",
-              "draft"
-            ]
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -6118,12 +6252,17 @@
           "object_id": {
             "type": "integer"
           },
-          "status": {
+          "publishing_status": {
             "type": "string",
             "enum": [
+              "draft",
               "published",
-              "draft"
-            ]
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -6258,13 +6397,6 @@
             "type": "string",
             "description": "name_vehicle."
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "published",
-              "draft"
-            ]
-          },
           "geo": {
             "type": "object",
             "properties": {
@@ -6282,6 +6414,18 @@
             "type": "string",
             "format": "uri",
             "nullable": true
+          },
+          "publishing_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "unpublished",
+              "archived",
+              "deleted"
+            ],
+            "description": "Lifecycle publishing status of this record. Backoffice only.",
+            "example": "published"
           },
           "date_updated": {
             "type": "string",
@@ -6650,6 +6794,48 @@
                   "$ref": "#/components/schemas/FieldMapNestedRow"
                 }
               ]
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        }
+      },
+      "ProductTypeCatalogItem": {
+        "type": "object",
+        "description": "One product type with its live item count and route templates.",
+        "properties": {
+          "product_type": {
+            "type": "string",
+            "example": "hotel",
+            "description": "Product type identifier."
+          },
+          "total": {
+            "type": "integer",
+            "example": 42,
+            "description": "Live count of items of this type matching publishing_status."
+          },
+          "list_url": {
+            "type": "string",
+            "example": "/hotels"
+          },
+          "full_url": {
+            "type": "string",
+            "example": "/hotels/full"
+          },
+          "detail_url": {
+            "type": "string",
+            "example": "/hotels/{id}"
+          }
+        }
+      },
+      "ProductTypesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTypeCatalogItem"
             }
           },
           "meta": {
