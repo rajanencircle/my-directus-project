@@ -25,23 +25,23 @@
 
 const fs = require("fs");
 
-// local
-const CONFIG = {
-  directusUrl: "http://localhost:8055",
-  directusToken: "2cpd1MiSahgbSQqyu_pUfz0MK8BJOjqV",
-};
+// // local
+// const CONFIG = {
+//   directusUrl: "http://localhost:8055",
+//   directusToken: "1ecR7PLJIpOZZOMUUaOERZWkKv0YT14q",
+// };
 
 // // staging
 // const CONFIG = {
-//   directusUrl: "https://cms.staging-5em2ouy-sxbqtq6mu5vgm.de-2.platformsh.site",
-//   directusToken: "-m5y_u_LpB62rOXFN0np1hnHpA1uOgRw",
+//   directusUrl: "https://staging.content.botg.cloud",
+//   directusToken: "1ecR7PLJIpOZZOMUUaOERZWkKv0YT14q",
 // };
 
-// // dev
-// const CONFIG = {
-//   directusUrl: "https://cms.dev-54ta5gq-sxbqtq6mu5vgm.de-2.platformsh.site",
-//   directusToken: "ojKBg1_90-3NgGPXpFL04G257Wu-VxYE",
-// };
+// dev
+const CONFIG = {
+  directusUrl: "https://dev.content.botg.cloud",
+  directusToken: "1ecR7PLJIpOZZOMUUaOERZWkKv0YT14q",
+};
 
 // =============================================================================
 // PROFILES — one per CSV/collection pair
@@ -286,7 +286,7 @@ const PROFILES = {
   },
 
   occupancies: {
-    csvFile: "./data/hotels_rooms_occupancies.csv",
+    csvFile: "../data/hotels_rooms_occupancies.csv",
     collection: "occupancies",
     translationsCollection: "occupancies_translations",
     parentFkField: "occupancies_id",
