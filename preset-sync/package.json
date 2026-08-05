@@ -1,0 +1,15 @@
+{
+  "name": "preset-sync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Copy directus_presets.layout / layout_query / layout_options from one preset to a list of destination presets, on any BOTG environment.",
+  "type": "commonjs",
+  "scripts": {
+    "copy:api": "node api-copy-preset.js",
+    "copy:ssh": "node ssh-copy-preset.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "ssh2": "^1.17.0"
+  }
+}
