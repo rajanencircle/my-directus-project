@@ -1,19 +1,34 @@
 import { sendSuccess, sendPaginated } from "../../shared/apiResponse.js";
 import { parsePagination } from "../../shared/pagination.js";
-import { listTours, getTourDetails } from "./tours.service.js";
-import { shapeTourDetail } from "../../../transformers/tour.transformer.js";
+import { listSlimTours, listFullTours, getTourDetails } from "./tours.service.js";
+import { shapeTourDetail, shapeTourListItem } from "../../../transformers/tour.transformer.js";
 
 export function createToursController(context) {
   return {
     async index(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, state, season, sort, updated_after, status_primarix } = req.query;
+      const { publishing_status } = req.query;
 
-      const result = await listTours(
-        { page, limit, offset, search, country, state, season, sort, updated_after, status_primarix },
+      const result = await listSlimTours(
+        { page, limit, offset, publishing_status },
         context,
       );
-      const data = result.data.map(({ id, object_id, name, date_updated }) => ({ id, object_id, name, date_updated }));
+      const lang = req.query.lang ?? req.query.language ?? null;
+      const data = result.data.map(item => shapeTourListItem(item, lang));
+      return sendPaginated(res, { ...result, data });
+    },
+
+    async fullList(req, res) {
+      const { page, limit, offset } = parsePagination(req.query);
+      const { publishing_status, updated_after } = req.query;
+      const lang = req.query.lang ?? req.query.language ?? null;
+
+      const result = await listFullTours(
+        { page, limit, offset, publishing_status, updated_after },
+        context,
+      );
+      
+      const data = result.data.map(tour => shapeTourDetail(tour, lang));
       return sendPaginated(res, { ...result, data });
     },
 

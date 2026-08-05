@@ -18,6 +18,7 @@ export const LIST_FIELDS = [
   "country.translations.translations_id.code",
   // State
   "state.id",
+  "state.ISO",
   "state.translations.name",
   "state.translations.translations_id.code",
   // Region
@@ -32,13 +33,31 @@ export const LIST_FIELDS = [
   "place.translations.translations_id.code",
   //location_tour32
   "location_tour32.id",
-  "location_tour32.translations.name",
-  "location_tour32.translations.translations_id.code",
+  "location_tour32.name",
   // Key relations
   "hotel_classification.id",
   "hotel_classification.label",
   "hotel_group.id",
   "hotel_group.label",
+  // Media fields for thumbnail
+  "media.sort",
+  "media.directus_files_id.id",
+  "media.directus_files_id.primarix_picid",
+  "media.directus_files_id.fotoware_file_name",
+  "media.directus_files_id.filename_download",
+  "media.directus_files_id.draft_status",
+  "media.directus_files_id.copyright",
+  "media.directus_files_id.primarix_workspace",
+  "media.directus_files_id.alt_text",
+  "media.directus_files_id.expiry_date",
+  "media.directus_files_id.is_map",
+  "media.directus_files_id.tour32_export",
+  "media.directus_files_id.dimensions_px",
+  "media.directus_files_id.keyword_ids",
+  "media.directus_files_id.folder.id",
+  "media.directus_files_id.folder.name",
+  "media.directus_files_id.translations.translations_id.code",
+  "media.directus_files_id.translations.caption_i18n",
 ];
 
 export const DETAIL_FIELDS = [
@@ -103,6 +122,10 @@ export const DETAIL_FIELDS = [
   "hotel_prices.translations_id.code",
   "hotel_prices.margin_percentage",
   "hotel_prices.buy_price_type",
+  "hotel_prices.sell_price_type",
+  "hotel_prices.percentage_type",
+  "hotel_prices.provision_percentage",
+  "hotel_prices.exchange_rate",
   "hotel_prices.from_price.room_prices_translations.translations_id.code",
   "hotel_prices.from_price.room_prices_translations.sell_price",
   // Country
@@ -123,31 +146,48 @@ export const DETAIL_FIELDS = [
   "region.translations.translations_id.code",
   // Place
   "place.id",
-  "place.location_tour32.translations.translations_id.code",
-  "place.location_tour32.translations.name",
   "place.translations.name",
   "place.translations.translations_id.code",
-  // location_tour32
+  // location_tour32 (locations_tour32 collection — plain scalar name, no translations relation)
   "location_tour32.id",
-  "location_tour32.location_tour32.translations.translations_id.code",
-  "location_tour32.location_tour32.translations.name",
-  "location_tour32.translations.name",
-  "location_tour32.translations.translations_id.code",
+  "location_tour32.name",
   // M2O relations
   "hotel_group.id",
   "hotel_group.label",
   "hotel_classification.id",
   "hotel_classification.label",
+  "booking.id",
   "booking.name_agency",
+  "booking.phone_general",
+  "booking.phone_after_hours",
+  "booking.email_general",
+  "booking.website",
+  "booking.phone_reservation",
+  "booking.email_reservation",
+  "booking.internal_remarks_reservation",
+  "booking.contact_title",
+  "booking.contact_greeting",
+  "booking.contact_first_name",
+  "booking.contact_name",
+  "booking.it_code",
+  "sell_prices_status",
+  "sell_prices_updated_at",
   // M2M relations
+  "accommodation_type.id",
   "accommodation_type.accommodation_types_id.id",
   "accommodation_type.accommodation_types_id.label",
+  "partner.partner_id.id",
   "partner.partner_id.primarix_id",
+  "partner.partner_id.label",
+  "partner.partner_id.partner_type",
+  "partner.partner_id.status",
   // Activities
+  "hotel_activities.id",
   "hotel_activities.activities_id.id",
   "hotel_activities.activities_id.label",
   // Room categories with translations
   "room_categories.id",
+  "room_categories.sort",
   "room_categories.room_category",
   "room_categories.room_category_calc_type",
   "room_categories.room_category_booking_code",
@@ -159,9 +199,17 @@ export const DETAIL_FIELDS = [
   "room_categories.status",
   "room_categories.publish_start",
   "room_categories.publish_end",
+  "room_categories.translations.id",
   "room_categories.translations.translations_id.code",
   "room_categories.translations.room_category_additions",
   "room_categories.translations.room_category_description",
+  // Room occupancies (name/value used to key rooms[].prices[].occupancies{})
+  "room_occupancies.id",
+  "room_occupancies.occupancies_id.id",
+  "room_occupancies.occupancies_id.value",
+  "room_occupancies.occupancies_id.name",
+  "room_occupancies.occupancies_id.translations.translations_id.code",
+  "room_occupancies.occupancies_id.translations.occupancy",
   // Price date windows
   "price_dates.id",
   "price_dates.name",
@@ -182,6 +230,8 @@ export const DETAIL_FIELDS = [
   // Media / images
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.primarix_picid",
+  "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
@@ -203,15 +253,28 @@ export const DETAIL_FIELDS = [
   // Offers / specials (per-language JSON repeater — filtered in transformer)
   "specials_translations.translations_id.code",
   "specials_translations.specials",
-  // Surcharges — fetched separately to avoid Directus nested-translation resolution issues
-  "surcharges.id",
+  // Surcharge margin settings per language (hotels' "surcharges" field alias resolves to
+  // the hotels_surcharges_translations collection — a per-market settings row, distinct
+  // from the real surcharge line items collection, which is fetched separately below via
+  // its own ItemsService query to avoid Directus nested-translation resolution issues).
+  "surcharges.translations_id.code",
+  "surcharges.surcharge_percentage_type",
+  "surcharges.surcharge_provision_percentage",
+  "surcharges.surcharge_margin_percentage",
+  "surcharges.surcharge_exchange_rate",
 ];
 
 export const CHILD_RC_FIELDS = [
   "id",
   "sharedId",
+  "sort",
   "room_category",
   "room_category_calc_type",
+  "room_category_booking_code",
+  "room_category_tour32_name",
+  "room_category_catering.id",
+  "room_category_catering.designation",
+  "days_repeater",
   "price_start",
   "status",
   "publish_start",
@@ -233,8 +296,10 @@ export const SURCHARGE_FIELDS = [
   "translations.surcharge_description",
   "translations.sell_price",
   "translations.surcharge_booking_name",
+  "translations.surcharge_type.id",
   "translations.surcharge_type.designation",
   "translations.surcharge_catering.id",
   "translations.surcharge_catering.designation",
+  "translations.surcharge_calc_type.id",
   "translations.surcharge_calc_type.designation",
 ];

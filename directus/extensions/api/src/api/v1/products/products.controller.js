@@ -1,59 +1,48 @@
 import { sendPaginated, sendSuccess } from '../../shared/apiResponse.js';
 import { parsePagination } from '../../shared/pagination.js';
-import { listProducts, listProductsLimited, getProductCatalog } from './products.service.js';
+import { listProducts, listProductsSlim, getProductById } from './products.service.js';
 import { shapeProduct } from '../../../transformers/product.transformer.js';
-import { ensureUtcSuffix } from '../../../utils/timestamps.js';
-
-function shapeLimitedProduct(item) {
-  return {
-    type: item._productType ?? 'unknown',
-    id: item.id,
-    object_id: item.object_id ?? null,
-    name: item.name,
-    status: item.status_primarix ?? null,
-    date_created: ensureUtcSuffix(item.date_created),
-    date_updated: ensureUtcSuffix(item.date_updated),
-  };
-}
 
 export function createProductsController(context) {
   return {
-    async catalog(req, res) {
-      const { status_primarix } = req.query;
-      const data = await getProductCatalog(context, { status_primarix });
+    // GET /products — ProductListItem[]
+    async list(req, res) {
+      const { page, limit, offset } = parsePagination(req.query);
+      const { lang, updated_after } = req.query;
+
+      const result = await listProductsSlim(
+        { page, limit, offset, updated_after, lang: lang ?? null },
+        context,
+      );
+
+      return sendPaginated(res, result);
+    },
+
+    // GET /products/full — ProductDetail[]
+    async full(req, res) {
+      const { page, limit, offset } = parsePagination(req.query);
+      const { lang, updated_after } = req.query;
+
+      const result = await listProducts(
+        { page, limit, offset, updated_after },
+        context,
+      );
+
+      const data = result.data.map(item => shapeProduct(item, lang ?? null));
+
+      return sendPaginated(res, { ...result, data });
+    },
+
+    // GET /products/{id} — ProductDetailResponse
+    async detail(req, res) {
+      const { id } = req.params;
+      const { lang } = req.query;
+
+      const item = await getProductById({ id }, context);
+      const data = shapeProduct(item, lang ?? null);
+
       return sendSuccess(res, data);
     },
 
-    async details(req, res) {
-      const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, lang, updated_after, status_primarix, type } = req.query;
-
-      const result = await listProducts(
-        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix, type },
-        context,
-      );
-
-      const data = result.data.map(item => {
-        const shaped = shapeProduct(item, lang ?? null);
-        delete shaped._productType;
-        return shaped;
-      });
-
-      return sendPaginated(res, { ...result, data });
-    },
-
-    async limitedList(req, res) {
-      const { page, limit, offset } = parsePagination(req.query);
-      const { search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix, type } = req.query;
-
-      const result = await listProductsLimited(
-        { page, limit, offset, search, country, hotel_group, hotel_classification, region, state, activity, season, sort, updated_after, status_primarix, type },
-        context,
-      );
-
-      const data = result.data.map(item => shapeLimitedProduct(item));
-
-      return sendPaginated(res, { ...result, data });
-    },
   };
 }

@@ -1,11 +1,11 @@
 import { asyncWrapper } from '../../shared/asyncWrapper.js';
 import { validate } from '../../shared/validate.js';
-import { listProductsSchema } from './products.validation.js';
+import { listProductsSchema, getProductDetailSchema } from './products.validation.js';
 import { createProductsController } from './products.controller.js';
 
 export function setupProductsRoutes(router, prefix, context) {
-  const { catalog, details, limitedList } = createProductsController(context);
-  router.get(prefix, validate(listProductsSchema), asyncWrapper(catalog));
-  router.get(`${prefix}/details`, validate(listProductsSchema), asyncWrapper(details));
-  router.get(`${prefix}/limited-list`, validate(listProductsSchema), asyncWrapper(limitedList));
+  const { list, full, detail } = createProductsController(context);
+  router.get(`${prefix}/full`, validate(listProductsSchema), asyncWrapper(full));
+  router.get(`${prefix}/:id`, validate(getProductDetailSchema), asyncWrapper(detail));
+  router.get(prefix, validate(listProductsSchema), asyncWrapper(list));
 }

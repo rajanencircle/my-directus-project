@@ -9,48 +9,12 @@ const SORT_ALLOWLIST = new Set([
 ]);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function buildListFilter({ search, country, hotel_group, hotel_classification, region, state, activity, season, status_primarix }) {
+export function buildListFilter({ publishing_status }) {
   const filter = {};
   // 'all' means don't filter by status_primarix at all — otherwise default to published.
-  if (status_primarix !== 'all') {
-    filter.status_primarix = { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS };
+  if (publishing_status !== 'all') {
+    filter.status_primarix = { _eq: publishing_status ?? DEFAULT_PRIMARIX_STATUS };
   }
-
-  if (search) {
-    filter._or = [
-      { name: { _icontains: search } },
-      { hotel_descriptions_translations: { teaser: { _icontains: search } } },
-    ];
-  }
-
-  if (country) {
-    filter.country = { id: { _eq: parseInt(country, 10) } };
-  }
-
-  if (hotel_group) {
-    filter.hotel_group = { id: { _eq: hotel_group } };
-  }
-
-  if (hotel_classification) {
-    filter.hotel_classification = { id: { _eq: hotel_classification } };
-  }
-
-  if (region) {
-    filter.region = { id: { _eq: parseInt(region, 10) } };
-  }
-
-  if (state) {
-    filter.state = { id: { _eq: parseInt(state, 10) } };
-  }
-
-  if (activity) {
-    filter.hotel_activities = { activities_id: { id: { _eq: activity } } };
-  }
-
-  if (season) {
-    filter.season = { season: { _eq: season } };
-  }
-
   return filter;
 }
 

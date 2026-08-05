@@ -20,8 +20,10 @@ export function errorHandler(err, req, res, next) {
     });
   }
 
+  console.error('[API Error]:', err);
+
   return sendError(res, {
     status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-    message: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+    message: err.message || 'Internal server error',
   });
 }

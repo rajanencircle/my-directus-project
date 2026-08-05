@@ -21,11 +21,16 @@
  * @param {string} [keys.sellPriceKey='sell_price'] - field on each translation row holding the sell price
  * @param {string} [keys.dateStartKey='start_date']
  * @param {string} [keys.dateEndKey='end_date']
+ * @param {string} [keys.dateFromKey='from_price'] - field on `dates` rows holding the "from price" flag
  * @param {function} [mapCategory] - (cat) => object, additional per-category fields to merge into the output (besides `category`/`prices`)
  * @param {object}   [opts]
+ * @param {function} [opts.mapDate] - (dateRow) => object, additional per-date fields to merge into each prices[] entry (besides start_date/end_date/occupancies)
  * @param {string}   [opts.lang]
  * @param {number}   [opts.marginPct]
  * @param {string}   [opts.unit]
+ * @param {function} [opts.buildDateEntry] - (dateRow) => object, returns the full per-date entry (replacing the default PricePeriod
+ *   `{ period: { start, end, from } }` block). Used by cruises to emit the contract's sailing rows instead of periods.
+ * @param {string}   [opts.dateOutputKey='periods'] - key under which per-date entries are collected (cruises: 'sailings').
  * @returns {object[]}
  */
 export function groupPrices2(
@@ -36,7 +41,7 @@ export function groupPrices2(
   localeToIso,
   keys,
   mapCategory = (cat) => ({ category: cat.id }),
-  { lang, marginPct, unit } = {},
+  { lang, marginPct, unit, mapDate = () => ({}), buildDateEntry, dateOutputKey = 'periods', occupancyOutputKey = 'occupancy' } = {},
 ) {
   const {
     categoryIdKey,
@@ -46,6 +51,7 @@ export function groupPrices2(
     sellPriceKey = 'sell_price',
     dateStartKey = 'start_date',
     dateEndKey = 'end_date',
+    dateFromKey = 'from_price',
   } = keys;
 
   const dateMapById = Object.fromEntries((dates ?? []).map((d) => [d.id, d]));
@@ -61,18 +67,24 @@ export function groupPrices2(
 
       const dateKey = dateRow.id;
       if (!dateMap[dateKey]) {
-        dateMap[dateKey] = {
-          start_date: dateRow[dateStartKey] ?? null,
-          end_date: dateRow[dateEndKey] ?? null,
-          occupancies: {},
-        };
+        const entry = buildDateEntry
+          ? buildDateEntry(dateRow)
+          : {
+              period: {
+                start: dateRow[dateStartKey] ?? null,
+                end: dateRow[dateEndKey] ?? null,
+                from: !!dateRow[dateFromKey],
+                ...mapDate(dateRow),
+              },
+            };
+        dateMap[dateKey] = { ...entry, prices: [] };
       }
 
       const occ = occupancyByValue[p[occupancyIdKey]];
-      const occKey = occ?.name ?? String(p[occupancyIdKey]);
+      const occId = occ ? (occ.id ?? occ.value) : p[occupancyIdKey];
+      const occName = occ?.name ?? String(p[occupancyIdKey]);
 
       let sell = null;
-      let sellTranslations = {};
       if (translationsKey) {
         const sellByLang = {};
         for (const t of p[translationsKey] ?? []) {
@@ -83,23 +95,22 @@ export function groupPrices2(
         sell = lang
           ? (sellByLang[lang] ?? Object.values(sellByLang)[0] ?? null)
           : (Object.values(sellByLang)[0] ?? null);
-        sellTranslations = lang
-          ? (sellByLang[lang] !== undefined ? { [lang]: sellByLang[lang] } : {})
-          : sellByLang;
       }
 
-      dateMap[dateKey].occupancies[occKey] = {
-        buy: p.buy_price ?? null,
-        sell,
-        translations: sellTranslations,
-        margin: marginPct ?? null,
-        unit: unit ?? null,
-      };
+      dateMap[dateKey].prices.push({
+        [occupancyOutputKey]: {
+          id: occId,
+          name: occName,
+        },
+        sell: sell !== null && sell !== undefined ? parseFloat(sell) : null,
+        buy: p.buy_price !== null && p.buy_price !== undefined ? parseFloat(p.buy_price) : null,
+        margin: marginPct !== null && marginPct !== undefined ? parseFloat(marginPct) : null,
+      });
     }
 
     return {
       ...mapCategory(cat),
-      prices: Object.values(dateMap),
+      [dateOutputKey]: Object.values(dateMap),
     };
   });
 }

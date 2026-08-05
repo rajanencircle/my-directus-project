@@ -12,7 +12,7 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
   const base = (process.env.DIRECTUS_PUBLIC_URL ?? "").replace(/\/$/, "");
 
   return (mediaJunctionRows ?? [])
-    .filter((row) => row.directus_files_id?.draft_status !== 'draft')
+    .filter((row) => row.directus_files_id?.draft_status !== "draft")
     .map((row) => {
       const file = row.directus_files_id;
       if (!file?.id) return null;
@@ -31,32 +31,18 @@ export function buildImageUrls(mediaJunctionRows, lang = null) {
       const caption_i18n =
         Object.keys(captionMap).length === 0
           ? null
-          : lang && captionMap[lang] !== undefined
-            ? captionMap[lang]
-            : captionMap;
+          : (captionMap[lang] ?? null);
 
       return {
         id: file.id,
-        filename: file.filename_download ?? null,
         url: `${base}/assets/${file.id}`,
-        thumbnail_url: `${base}/assets/${file.id}?width=400&height=300&fit=cover`,
-        copyright: file.copyright ?? null,
-        workspace: file.primarix_workspace ?? null,
-        expiry_date: file.expiry_date ?? null,
-        alt_text: file.alt_text ?? null,
+        alt: file.alt_text ?? null,
         sort: row.sort ?? null,
-        // Extra fields beyond the reference shape:
-        caption_i18n,
-        // is_map/tour32_export can live either on the junction row itself (per-product,
-        // e.g. cruises_directus_files) or on the shared file record depending on how each
-        // product's fields.js queries it — junction-level value wins when present.
+        copyright: file.copyright ?? null,
         is_map: row.is_map ?? file.is_map ?? null,
-        tour32_export: row.tour32_export ?? file.tour32_export ?? null,
-        dimensions_px: file.dimensions_px ?? null,
-        keyword_ids: file.keyword_ids ?? null,
-        folder: file.folder
-          ? { id: file.folder.id ?? null, name: file.folder.name ?? null }
-          : null,
+        object_id_primarix: file.primarix_picid ?? null,
+        filename_fotoweb: file.fotoware_file_name ?? null,
+        use_tour32: row.tour32_export ?? file.tour32_export ?? null,
       };
     })
     .filter(Boolean);

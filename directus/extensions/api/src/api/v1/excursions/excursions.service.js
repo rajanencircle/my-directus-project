@@ -1,41 +1,41 @@
-import { DETAIL_FIELDS, SURCHARGE_FIELDS } from "./excursions.fields.js";
+import { LIST_FIELDS } from "./excursions.fields.js";
+import { SURCHARGE_FIELDS } from "./excursions.fields.js";
+import { ROOT_COLLECTION, DETAIL_RELATIONS } from "./excursions.query-config.js";
 import {
   buildListFilter,
   buildSort,
   buildIdFilter,
   buildUpdatedAfterFilter,
 } from "./excursions.filters.js";
+import { enrichExchangeRates } from "../../../utils/ratesResolver.js";
 import { AppError } from "../../shared/AppError.js";
 import { HTTP_STATUS } from "../../shared/constants.js";
+import { buildDetailFields } from "../../../shared/query/buildQueryFields.js";
+import { computeUpdatedAtMax } from "../../../utils/delta.js";
 
 const COLLECTION = "excursions";
 const SURCHARGES_COLLECTION = "excursions_surcharges";
 
-// excursions has no top-level `name` field — the display name only exists per-language
-// on descriptions_translations.name_excursion. Prefers de-DE, falls back to the first
-// translation row present (list endpoint has no `lang` query param today).
 function pickListName(translations) {
   if (!translations?.length) return null;
   const preferred = translations.find((t) => t.translations_id?.code === "de-DE") ?? translations[0];
   return preferred?.name_excursion ?? null;
 }
 
-export async function listExcursions(
-  { page, limit, offset, search, country, state, season, destination, sort, updated_after, status_primarix },
+export async function listSlimExcursions(
+  { page, limit, offset, publishing_status },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
   const { ItemsService } = services;
   const excursionsService = new ItemsService(COLLECTION, { knex: database, schema });
 
-  const listFilter = buildListFilter({ search, country, state, season, destination, status_primarix });
-  const deltaFilter = buildUpdatedAfterFilter(updated_after);
-  const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
+  const filter = buildListFilter({ publishing_status });
 
   const [rawItems, countResult] = await Promise.all([
     excursionsService.readByQuery({
-      fields: ['id', 'object_id', 'date_updated', 'source_updated_at', 'descriptions_translations.translations_id.code', 'descriptions_translations.name_excursion'],
-      sort: buildSort(sort),
+      fields: LIST_FIELDS,
+      sort: buildSort(),
       limit,
       offset,
       filter,
@@ -47,18 +47,56 @@ export async function listExcursions(
   ]);
 
   const total = parseInt(countResult[0]?.count ?? "0", 10);
-  // updated_at_max is derived from source_updated_at (not date_updated) so a client can
-  // feed it straight back in as the next updated_after value.
-  const updatedAtMax = rawItems.length
-    ? rawItems.reduce((max, h) => (h.source_updated_at > max ? h.source_updated_at : max), rawItems[0].source_updated_at)
-    : null;
-
   const items = rawItems.map(({ descriptions_translations, source_updated_at, ...rest }) => ({
     ...rest,
     name: pickListName(descriptions_translations),
   }));
 
+  const updatedAtMax = computeUpdatedAtMax(rawItems);
   return { data: items, total, page, limit, updatedAtMax };
+}
+
+export async function listFullExcursions(
+  { page, limit, offset, publishing_status, updated_after },
+  context,
+) {
+  const { services, database, getSchema } = context;
+  const schema = await getSchema();
+  const { ItemsService } = services;
+  const excursionsService = new ItemsService(COLLECTION, { knex: database, schema });
+
+  const listFilter = buildListFilter({ publishing_status });
+  const deltaFilter = buildUpdatedAfterFilter(updated_after);
+  const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
+
+  const [rawItems, countResult] = await Promise.all([
+    excursionsService.readByQuery({
+      fields: LIST_FIELDS,
+      sort: buildSort(),
+      limit,
+      offset,
+      filter,
+    }),
+    excursionsService.readByQuery({
+      aggregate: { count: ["*"] },
+      filter,
+    }),
+  ]);
+
+  const total = parseInt(countResult[0]?.count ?? "0", 10);
+  const updatedAtMax = computeUpdatedAtMax(rawItems);
+
+  const data = [];
+  for (const item of rawItems) {
+    try {
+      const detail = await getExcursionDetails({ id: item.id.toString() }, context);
+      data.push(detail);
+    } catch (e) {
+      console.error(`Failed to fetch full detail for excursion ${item.id}`, e);
+    }
+  }
+
+  return { data, total, page, limit, updatedAtMax };
 }
 
 export async function getExcursionDetails({ id }, { services, database, getSchema }) {
@@ -70,7 +108,7 @@ export async function getExcursionDetails({ id }, { services, database, getSchem
   const filter = buildIdFilter(id);
 
   const items = await excursionsService.readByQuery({
-    fields: DETAIL_FIELDS,
+    fields: buildDetailFields({ schema, rootCollection: ROOT_COLLECTION, relations: DETAIL_RELATIONS }),
     filter,
     limit: 1,
   });
@@ -86,8 +124,6 @@ export async function getExcursionDetails({ id }, { services, database, getSchem
     { _or: [{ publish_end: { _null: true } }, { publish_end: { _gte: today } }] },
   ];
 
-  // Surcharges — fetched separately to avoid Directus nested-translation resolution issues
-  // (same pattern as hotels). excursions_surcharges DOES have status/publish window fields.
   const surcharges = await surchargesService.readByQuery({
     fields: SURCHARGE_FIELDS,
     filter: {
@@ -100,5 +136,7 @@ export async function getExcursionDetails({ id }, { services, database, getSchem
     limit: -1,
   });
 
-  return { ...excursion, surcharges };
+  const excursionData = { ...excursion, surcharges };
+  const enrichedExcursion = await enrichExchangeRates(excursionData, database);
+  return enrichedExcursion;
 }

@@ -7,32 +7,11 @@ const SORT_ALLOWLIST = new Set([
   'season', '-season',
 ]);
 
-export function buildListFilter({ search, country, destination, season, status_primarix }) {
+export function buildListFilter({ publishing_status }) {
   const filter = {};
-  // 'all' means don't filter by status_primarix at all — otherwise default to published.
-  if (status_primarix !== 'all') {
-    filter.status_primarix = { _eq: status_primarix ?? DEFAULT_PRIMARIX_STATUS };
+  if (publishing_status !== 'all') {
+    filter.status_primarix = { _eq: publishing_status ?? DEFAULT_PRIMARIX_STATUS };
   }
-
-  if (search) {
-    filter._or = [
-      { descriptions_translations: { headline: { _icontains: search } } },
-      { descriptions_translations: { teaser: { _icontains: search } } },
-    ];
-  }
-
-  if (country) {
-    filter.countries = { countries_id: { id: { _eq: parseInt(country, 10) } } };
-  }
-
-  if (destination) {
-    filter.destinations = { destinations_id: { id: { _eq: parseInt(destination, 10) } } };
-  }
-
-  if (season) {
-    filter.season = { season: { _eq: season } };
-  }
-
   return filter;
 }
 
@@ -53,9 +32,13 @@ export function buildSort(sortParam) {
 
 // cruises' PK (id) is an integer, so a numeric path param is treated as the internal
 // id directly, not object_id.
+// Numeric path param matches either the customer-facing object_id (per the contract's
+// IdParam: "accepts the UUID or the numeric object_id") or the internal id, for backward
+// compatibility with any existing internal-id-based lookups.
 export function buildIdFilter(id) {
   if (/^\d+$/.test(id)) {
-    return { id: { _eq: parseInt(id, 10) } };
+    const n = parseInt(id, 10);
+    return { _or: [{ object_id: { _eq: n } }, { id: { _eq: n } }] };
   }
   return { px_source_id: { _eq: id } };
 }
