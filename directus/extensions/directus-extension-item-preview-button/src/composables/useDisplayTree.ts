@@ -191,29 +191,48 @@ function resolveFieldValue(
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
+function addTranslationHelper(paths: string[], path: string): void {
+  const parts = path.split(".");
+  if (parts.length > 1) {
+    const parentPath = parts.slice(0, -1).join(".");
+    // Fetch the common FK field name so language auto-detection always works
+    paths.push(`${parentPath}.translations_id`);
+  }
+}
+
 /**
  * Extract all dot-notation paths needed for the Directus /items API call.
  * For translated fields the configured langField is added so filtering works.
+ * The title path is treated the same way, since it may itself live behind a
+ * translations relation (e.g. tours/excursions have no direct `name` field).
  */
 export function extractApiFields(config: PreviewConfig): string[] {
-  const paths: string[] = [config.title ?? "name"];
+  const titlePath = config.title ?? "name";
+  const paths: string[] = [titlePath];
+  addTranslationHelper(paths, titlePath);
 
   config.groups?.forEach((g) => {
     g.fields?.forEach((fc) => {
       paths.push(fc.value);
       if (fc.type === "translated") {
-        const parts = fc.value.split(".");
-        if (parts.length > 1) {
-          const parentPath = parts.slice(0, -1).join(".");
-          // Fetch both common FK field names so auto-detection always works
-          paths.push(`${parentPath}.translations_id`);
-          // paths.push(`${parentPath}.languages_code`);
-        }
+        addTranslationHelper(paths, fc.value);
       }
     });
   });
 
   return [...new Set(paths)];
+}
+
+/** Resolve the modal title from raw item data, supporting dot-paths and translation arrays. */
+export function resolveTitle(
+  data: Record<string, unknown>,
+  titlePath: string,
+  currentLang: string,
+  langField: string,
+  languages: Language[],
+): string {
+  const value = resolveFieldValue(data, titlePath, currentLang, langField, languages);
+  return typeof value === "string" ? value : "";
 }
 
 export function buildFieldNodes(
@@ -225,6 +244,7 @@ export function buildFieldNodes(
   languages: Language[],
   fieldMetaLabels?: Map<string, LangMap>,
   fieldChoices?: Map<string, Array<{ text: string; value: unknown }>>,
+  noAccessPaths?: Set<string>,
 ): DisplayNode[] {
   return fields.map((fc) => {
     // Label priority: explicit config label > Directus field meta > prettified leaf key
@@ -232,6 +252,11 @@ export function buildFieldNodes(
     const leafKey = fc.key.split(".").pop() ?? fc.key;
     const rawLabel: LangMap = fc.label ?? metaLabel ?? prettify(leafKey);
     const label = resolveLabel(rawLabel, systemLang);
+
+    // ── Field dropped from the request because the API rejected it (permission/unknown-field) ──
+    if (noAccessPaths?.has(fc.value)) {
+      return { key: fc.key, label, type: "scalar" as const, value: "⚠ No access" };
+    }
 
     // ── Dropdown: resolve stored key → display text ───────────────────────────
     if (fc.type === "dropdown") {

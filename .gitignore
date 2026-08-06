@@ -63,3 +63,4 @@ Workbook1.csv
 
 # Script backups (per-user data snapshots, not for git)
 /scripts/backups/
+/chats

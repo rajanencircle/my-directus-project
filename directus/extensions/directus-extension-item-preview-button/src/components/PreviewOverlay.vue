@@ -110,10 +110,12 @@ import LanguageSelector from "./LanguageSelector.vue";
 import AccordionSection from "./AccordionSection.vue";
 import { useLanguages } from "../composables/useLanguages";
 import { useFieldLabels } from "../composables/useFieldLabels";
+import { useRelationMap, resolveLeafCollection } from "../composables/useRelationMap";
 import {
   extractApiFields,
   buildFieldNodes,
   resolveLabel,
+  resolveTitle,
   prettify,
 } from "../composables/useDisplayTree";
 import type { PreviewConfig, LangMap } from "../types";
@@ -138,10 +140,23 @@ export default defineComponent({
       props.collection,
       toRef(props, "config"),
     );
+    const { getRelationMap } = useRelationMap();
 
     const rawItem = ref<Record<string, unknown>>({});
     const loading = ref(false);
     const error = ref<string | null>(null);
+    // Configured field paths the API rejected (403/unknown field) — dropped from the
+    // request and shown as "No access" instead of blanking the whole preview.
+    const noAccessPaths = ref<Set<string>>(new Set());
+
+    function extractErrorMatch(e: unknown): { field: string; collection: string } | null {
+      const apiErrors =
+        (e as { response?: { data?: { errors?: Array<{ message?: string }> } } })?.response?.data
+          ?.errors ?? (e as { errors?: Array<{ message?: string }> })?.errors;
+      const msg = apiErrors?.[0]?.message ?? (e instanceof Error ? e.message : "");
+      const match = /access field "([^"]+)" in collection "([^"]+)"/.exec(msg);
+      return match ? { field: match[1], collection: match[2] } : null;
+    }
 
     const currentLang = ref(props.config?.defaultLang ?? "de-DE");
 
@@ -165,18 +180,48 @@ export default defineComponent({
       if (!hasConfig.value) return;
       loading.value = true;
       error.value = null;
-      try {
-        const apiFields = extractApiFields(props.config!);
-        const res = await api.get(
-          `/items/${props.collection}/${props.itemId}`,
-          { params: { fields: apiFields } },
-        );
-        rawItem.value = res.data?.data ?? {};
-      } catch (e: unknown) {
-        error.value = e instanceof Error ? e.message : "Failed to load item.";
-      } finally {
-        loading.value = false;
+      noAccessPaths.value = new Set();
+
+      let fields = extractApiFields(props.config!);
+      const relMap = await getRelationMap();
+
+      // Retry loop: each failed attempt drops exactly the offending field(s) and
+      // tries again, so one forbidden/unknown field never blanks the whole modal.
+      for (let attempt = 0; attempt <= fields.length; attempt++) {
+        if (!fields.length) {
+          rawItem.value = {};
+          break;
+        }
+        try {
+          const res = await api.get(`/items/${props.collection}/${props.itemId}`, {
+            params: { fields },
+          });
+          rawItem.value = res.data?.data ?? {};
+          break;
+        } catch (e: unknown) {
+          const match = extractErrorMatch(e);
+          if (!match) {
+            error.value = e instanceof Error ? e.message : "Failed to load item.";
+            break;
+          }
+
+          const before = fields.length;
+          fields = fields.filter((p) => {
+            const leaf = resolveLeafCollection(props.collection, p, relMap);
+            const isBad = leaf?.leafCollection === match.collection && leaf?.leafField === match.field;
+            if (isBad) noAccessPaths.value.add(p);
+            return !isBad;
+          });
+
+          // Couldn't map the error back to a configured path — bail rather than loop forever.
+          if (fields.length === before) {
+            error.value = `access field "${match.field}" in collection "${match.collection}"`;
+            break;
+          }
+        }
       }
+
+      loading.value = false;
     }
 
     onMounted(fetchData);
@@ -209,6 +254,7 @@ export default defineComponent({
               languages.value,
               fieldLabels.value,
               fieldChoices.value,
+              noAccessPaths.value,
             ),
           };
         })
@@ -217,7 +263,14 @@ export default defineComponent({
 
     const itemTitle = computed(() => {
       const tf = props.config?.title ?? "name";
-      return (rawItem.value[tf] as string) ?? "";
+      const langField = props.config?.langField ?? "languages_code";
+      return resolveTitle(
+        rawItem.value,
+        tf,
+        currentLang.value,
+        langField,
+        languages.value,
+      );
     });
 
     return {
