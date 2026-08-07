@@ -139,3 +139,168 @@ title). Rebuild (`npm run build` in that extension's folder) and restart the
 Extension was rebuilt (`npm run build`) and the local `directus` container
 restarted to pick up the new bundle (extensions are volume-mounted, no
 rebuild-into-image needed).
+
+---
+
+## 2026-08-06 (same day, follow-up) — groups restructured to match brief + live data model
+
+**Ask:** align the preview `groups` JSON with `BOTG_Brief_DEV_Set-up_Collections_26-07-02_v57.xlsx`
+(sheets `hotels SOLL`, `#3 excursions (aka daytrips)`, `#4 tours (aka roundtrips)`)
+and with the actual Tab → Block → Section nesting each collection has live in
+Directus (`meta.group` chain on the `tab_*`/`block_*`/`section_*` alias fields).
+
+**What changed:** the ad-hoc group ids used in the first pass above
+(`general`, `partner_group`, `hotel_descriptions`, `Price`, …) were replaced
+with the **real `section_*` field names** from each collection's live data
+model, in live Tab/Section order, e.g. hotels: `section_id_status` →
+`section_botg_filter` → `section_address` → `section_reservation` →
+`section_classification` → `section_descriptions` → `section_price_infos` →
+`section_specials` → `section_image_badge`.
+
+Using the real section id as the group `id` means `useFieldLabels`'
+existing auto-detection (`rootLabels.get(g.id)`) now pulls each group's
+DE/EN/NL header straight from that section field's own `meta.translations`
+live in Directus — no hardcoded `label` needed on almost any group anymore.
+
+Read (not modified) to build this:
+- `BOTG_Brief_DEV_Set-up_Collections_26-07-02_v57.xlsx` (repo root) — brief structure/order.
+- `directus_fields` (via `fields`/`schema` MCP tools) for `hotels`, `tours`,
+  `excursions` and every lookup/junction collection referenced below — live
+  `meta.group`/`sort`/`translations` tree, confirmed close to (but not
+  identical to) the brief; live model was treated as source of truth where
+  the two disagreed, per the task ("matching the same in the way it is
+  placed in the data model").
+
+### Scope decision (all three collections, consistent)
+
+Included: every Tab/Section that holds plain scalar fields, translated text,
+or simple relation labels — `master_data` (all its sections),  `description`
+(classification + descriptions), `price_infos`/`price_info`, `specials`,
+`image_badge`, `media` (tours/excursions only — hotels' media tab has no
+plain fields, only the file-upload alias itself).
+
+Excluded (same as the original pass, now on firmer footing): `calculator_inputs`,
+`price_calculation`, `surcharge_calculation` — these are relational
+price-matrix builders (category × period × occupancy grids, `room_prices`/
+`prices`-table extensions) with no flat field path to preview meaningfully.
+`tab_tour_dates`/`tab_tour_programme` (tours) — only their simple translated
+text (`departures_text`, `tour_programme_disclaimer`) was pulled in; the
+O2M date-range/route arrays and the day-by-day JSON repeater's array wrapper
+were left out of scope (only `programme_translations.tour_programme` itself,
+as a `repeater` field, was included — its `day_destinations`/`day_description`/
+`day_accommodation_note` sub-fields render automatically).
+
+### New / previously-missing sections now covered
+
+- **`section_specials`** (all three) — was entirely missing from the first
+  pass. `specials_translations.specials` is a JSON repeater
+  (`name`/`special_description`/`status`/`publish_start`/`publish_end`),
+  same shape across hotels/tours/excursions.
+- **`section_classification`** (hotels) — previously merged into
+  `hotel_descriptions`; now its own group, matching the live model exactly.
+- **`section_media`** (tours, excursions) — `media_object_id_primarix`,
+  `media_filename_fotoweb`, `media_sort`, `is_map`, `use_tour32`,
+  `media_copyright`. Not added for hotels — hotels' `section_media` only has
+  the file-upload alias itself, no plain fields.
+- **`season`** (all three) — was missing from the first pass entirely.
+  `seasons` collection's label field is `season` (string), not `label` —
+  mapped as `season.season`.
+- **tours: `section_flight_info`, `section_tour_programme`** — new.
+- **excursions: `mobility_advice_text`** — first pass dropped this (no
+  `label` field on the target collection, flagged as unresolved). Now
+  resolved: it's `mobility_advice_text.hotel_translations.hotel_mobility_advice_text`
+  (the M2O's own translations junction — collection name `mobility_advice_text_translations`,
+  alias field on the parent is called `hotel_translations`). Verified via
+  `items.read` — returns real DE/EN/NL text, no error.
+
+### Lookup-collection label fields used (verified via `schema` MCP tool, not guessed)
+
+`accommodation_types.label`, `activities.label`, `hotel_classifications.label`,
+`hotel_group.label`, `flight_options.name`, `airlines.name`, `airports.name`,
+`partner.label` (via junction `partner_id`), `travel_categories.translations.name`,
+`destinations.translations.name`, `agencies.name_agency` (already fixed above).
+
+### Verification
+
+Same method as the first pass: flattened every group's field paths per
+collection (56 for hotels, 76 for tours, 65 for excursions) and ran them
+through `items.read` against a real record in each collection via the
+`directus-local` MCP `items` tool. All three returned clean — no
+permission/unknown-field errors.
+
+### How to revert this follow-up
+
+The `meta.options` payload from the *first* pass (documented above, "How to
+revert" section originally referred to the pre-existing-bug state, not this
+restructure) is preserved in the tool-call transcript for this session. To
+roll back to the flatter ad-hoc grouping instead of the current
+brief-aligned one, restore that earlier payload via the `fields` MCP tool.
+No extension code changed in this follow-up — only the three `item_preview_button.meta.options.groups` payloads.
+
+---
+
+## 2026-08-06 (same day, second follow-up) — added item_preview_button to cruises + vehicles
+
+**Ask:** apply the same brief/data-model-aligned treatment to "the main 5"
+product collections. Checked all product collections first — only
+`hotels`, `tours`, `excursions` had an `item_preview_button` field at all;
+`cruises` and `vehicles` (the collection backing both campers and rental
+cars, split via `rental_type`) had none. Confirmed with the user before
+proceeding, since adding the field is a **schema change** (new field), not
+just a JSON options edit like the rest of this tracker.
+
+**What changed:**
+- **New field** `item_preview_button` created on `cruises` (id 7976, sort 12)
+  and `vehicles` (id 7977, sort 10) — same shape as the existing field on
+  tours/excursions: `type: alias`, `schema: null`,
+  `meta.special: ["alias","no-data"]`, `meta.interface: "item-preview-button"`,
+  `width: "full"`, `group: null`.
+- Both ship with a full `groups` config built the same way as the
+  hotels/tours/excursions restructure above: group ids are the collections'
+  real live `section_*` field names (so labels auto-resolve from
+  `meta.translations`), in live Tab/Section order, verified via `schema`/
+  `relations` MCP calls — not guessed.
+
+### cruises — groups (Tab order: master_data → description → travel_programme → price_infos → specials → image_badge → media)
+
+`section_id_status`, `section_botg_filter`, `section_reservation`,
+`section_classification`, `section_descriptions`, `section_travel_programme`,
+`section_price_infos`, `section_attributes`, `section_specials`,
+`section_image_badge`, `section_media`. Title = `descriptions_translations.headline`
+(cruises has no direct `name`-style field — confirmed via `cruises_descriptions_translations`
+schema that `headline` is the display title, `subline`/`teaser`/`ship`/`at_a_glance`
+are secondary). Excluded (same rule as before): `tab_calculator_inputs` and
+`tab_price_calculation` are dev-note-only / relational price matrices with no
+flat field to preview.
+
+### vehicles — groups (Tab order: master_data → description → image_badge → media)
+
+`section_publication`, `section_botg_companies`, `section_type_company`,
+`section_attributes`, `section_descriptions`, `section_image_badge`,
+`section_media`. Title = `name_vehicle` (direct field — vehicles, unlike the
+other 4 products, has no separate translated name field). Excluded:
+`tab_calculator_inputs`, `tab_price_calculation`, `tab_surcharge_calculation`
+are all dev-note-placeholder tabs on this collection (no real fields yet).
+`section_camper_descriptions` (hidden, under `tab_description`) was skipped —
+hidden in the live model and not populated.
+
+### Lookup fields used (verified via `schema` MCP tool)
+
+`cruise_types.name` (direct, not translated), `rental_companies.name_company`,
+`vehicle_categories.name`, `rental_depots.name_depot` (via
+`depots_selected.rental_depots_id.name_depot`), `seasons.season`. Same
+`countries`/`destinations` M2M `.translations.name` pattern as tours.
+
+### Verification
+
+Flattened both groups configs (44 paths for cruises, 34 for vehicles) and
+ran them through `items.read` against a real record in each collection via
+the `directus-local` MCP `items` tool. Both returned clean — no
+permission/unknown-field errors.
+
+### How to revert
+
+Delete the `item_preview_button` field entirely on `cruises` and `vehicles`
+via the `fields` MCP tool (`action: "delete"`) — this removes both the
+schema addition and its JSON in one step, since the field didn't exist
+before this change.

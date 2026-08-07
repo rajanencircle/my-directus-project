@@ -289,7 +289,11 @@ export function buildFieldNodes(
         langField,
         languages,
       );
-      const arr = Array.isArray(raw) ? (raw as Record<string, unknown>[]) : [];
+      const arr = Array.isArray(raw)
+        ? (raw as Record<string, unknown>[]).filter(
+            (item) => item !== null && typeof item === "object",
+          )
+        : [];
 
       const items: DisplayNode[][] = arr.map((item) => {
         if (fc.fields?.length) {
