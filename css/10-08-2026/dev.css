@@ -1,0 +1,123 @@
+/* Tighter field spacing + equal, right-aligned 50/50 columns */
+.v-form.grid:has(> .field) {
+  row-gap: 20px !important;
+  column-gap: 20px !important;
+  grid-template-columns:
+    [start] minmax(0, 1fr) [half] minmax(0, 1fr)
+    [full fill] !important;
+}
+
+/* Labels: smaller, uppercase, tighter to field */
+.field .field-label.type-label,
+.field .field-label.type-label * {
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+}
+.field .field-label.type-label {
+  margin-bottom: 4px !important;
+}
+
+/* Center label text + translation chip */
+.field-label.type-label .field-name {
+  align-items: center !important;
+}
+
+/* Full-width wrappers reach the true right edge */
+.group-detail.full,
+.group-raw.full,
+.group-tabs.full,
+.field.full {
+  grid-column-end: fill !important;
+}
+
+/* More padding around the whole content area */
+.v-form.grid.with-fill:has(> .group-tabs) {
+  padding: 22px 22px 56px !important;
+}
+
+/* Space above each accordion, none below */
+.group-detail {
+  padding-top: 20px !important;
+  margin: 0 !important;
+}
+
+/* Space below the accordion divider line */
+.v-divider hr {
+  margin-bottom: 16px !important;
+}
+
+/* Fix clipped exchange rate preview text */
+.field[data-field="exchange_rate"] .preview {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Style header Object-ID / Season like translation chips */
+.text-subtitle .display-formatted.sans-serif {
+  display: inline-flex !important;
+  align-items: center !important;
+  background-color: rgb(230, 244, 249) !important;
+  color: rgb(0, 140, 192) !important;
+  border-radius: 5px !important;
+  padding: 0 5px !important;
+  height: 18px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.33px !important;
+  text-transform: uppercase !important;
+  margin-right: 6px !important;
+}
+.text-subtitle .render-template > span:not(.vertical-aligner) {
+  display: none !important;
+}
+
+/* Tab bar: sticky rounded gray box container.
+   .tab-list itself stays position:sticky (unchanged) — it is a Vue-managed
+   node, so we never wrap/move it in JS, only toggle a class and set the
+   two CSS vars below via directus-extension-route-dom-injector. */
+.group-tabs.full > .tab-list {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0px !important;
+  z-index: 6 !important;
+  background-color: rgb(240, 244, 248) !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
+}
+
+/* Full-width background layer (strictly transparent with NO shadow when at the top).
+   --rdi-bg-left / --rdi-bg-right are computed and kept up to date by the
+   extension (container edge minus tab-list edge), replacing the old
+   hardcoded -48px so this always matches the real content width. */
+.group-tabs.full > .tab-list::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: var(--rdi-bg-left, -48px) !important;
+  right: var(--rdi-bg-right, 48px) !important;
+  z-index: -1 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+  -webkit-transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease !important;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease !important;
+}
+
+/* ONLY when content is actually scrolled past the tabs: white bar + shadow */
+.group-tabs.full > .tab-list.rdi-stuck::before {
+  background: #ffffff !important;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 7px -4px !important;
+}
+
+/* Header: fine line instead of shadow on scroll */
+.header-bar,
+.header-bar.shadow {
+  box-shadow: none !important;
+  border-bottom: 1px solid rgb(228, 234, 241) !important;
+}
