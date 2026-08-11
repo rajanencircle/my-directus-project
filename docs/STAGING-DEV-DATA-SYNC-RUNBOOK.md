@@ -21,6 +21,48 @@ runs Postgres before proceeding.
 
 ---
 
+## Automated version: `migration-tool/`
+
+This entire procedure — generalized to **any** source → target pair among
+`dev`, `staging`, `main`, `local`, not just dev → staging — is automated by
+[`migration-tool/migrate.js`](../migration-tool/) at the repo root:
+
+```bash
+cd migration-tool
+npm install        # first time only
+cp .env.example .env   # first time only — fill in SSH hosts/keys per environment
+node migrate.js
+```
+
+It's fully interactive (target env → source env → which existing dump to
+use → preserve toggles → dry run or execute) and implements every step below
+under the hood, plus two additional preserve options this manual runbook
+doesn't cover — see [`migration-tool/README.md`](../migration-tool/README.md)
+for the full behavior:
+
+- **`directus_files`** (steps 4, 7–10 below) — on by default, exactly as
+  documented here.
+- **`directus_users` API tokens** — off by default in this manual runbook
+  (see step 15), on by default in the tool. Static tokens are plaintext in
+  `directus_users.token`, so a raw restore silently rotates every
+  integration's credential unless preserved.
+- **`global_configurations` rows, by `entity_type`** — off by default in
+  this manual runbook (see step 16), on by default in the tool for every
+  `entity_type` the target currently has (`ai-api`, `directus-url`,
+  `botg-api`, `user-token`, etc.), individually deselectable per run.
+
+**Dry run is the tool's default mode** — it restores the chosen dump into a
+disposable local Postgres container and previews row counts, column parity,
+and orphan counts without touching the live target. You explicitly choose
+"Execute" to perform the real migration, and `main` additionally requires
+typing a confirmation phrase.
+
+The manual steps below remain the reference for what the tool is actually
+doing, and the fallback procedure if the tool is unavailable or a step needs
+to be run/debugged by hand.
+
+---
+
 ## Execution order (checklist)
 
 - [ ] 1. Confirm access & container names
@@ -37,6 +79,8 @@ runs Postgres before proceeding.
 - [ ] 12. Restart Directus and check in the browser
 - [ ] 13. Reapply known post-restore schema fixes (e.g. excursions FK)
 - [ ] 14. Log the change in `STAGING_CHANGES/`
+- [ ] 15. (Optional) Preserve staging's `directus_users` API tokens
+- [ ] 16. (Optional) Preserve `global_configurations` rows by `entity_type`
 
 ---
 
@@ -46,9 +90,9 @@ runs Postgres before proceeding.
 - [ ] Confirm the staging DB container name (equivalent of
       `directus-cms-template-database-1` locally) and the Directus app
       container name (equivalent of `directus-cms-template-directus-1`):
-      ```bash
-      docker ps --format '{{.Names}}\t{{.Image}}\t{{.Ports}}'
-      ```
+      `bash
+docker ps --format '{{.Names}}\t{{.Image}}\t{{.Ports}}'
+`
 - [ ] Pick a low-traffic window; if there's a maintenance-mode option for the
       site, use it.
 
@@ -123,7 +167,9 @@ do it directly against the live DBs:
 ```bash
 # columns in the dev dump you're about to restore
 grep "^COPY public.directus_files " ~/dump_dev.sql | head -1
+```
 
+```bash
 # columns currently on staging (before the wipe)
 docker exec -i <staging-db-container> psql -U directus -d directus -t -c "
 SELECT string_agg(column_name, ', ' ORDER BY ordinal_position)
@@ -141,7 +187,9 @@ lists must match exactly, or the restore in step 7 will need adjusting
 ```bash
 docker exec -i <staging-db-container> psql -U directus -d directus \
   -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+```
 
+```
 docker exec -i <staging-db-container> psql -U directus -d directus \
   < ~/dump_dev.sql
 ```
@@ -245,21 +293,116 @@ nullable, and rows with a legitimate `NULL` are not orphans.
 
 ```bash
 docker exec -i <staging-db-container> psql -U directus -d directus <<'SQL'
-SELECT 'albums_directus_files' t, count(*) FROM albums_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'cruises_directus_files', count(*) FROM cruises_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'excursions_directus_files', count(*) FROM excursions_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'hotels_directus_files', count(*) FROM hotels_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'hotels_files', count(*) FROM hotels_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'junction_directus_files_translations_2', count(*) FROM junction_directus_files_translations_2 a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'media_share_link', count(*) FROM media_share_link a WHERE a.file IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.file)
-UNION ALL SELECT 'rental_companies_directus_files', count(*) FROM rental_companies_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'tours_directus_files', count(*) FROM tours_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'vehicles_directus_files', count(*) FROM vehicles_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id)
-UNION ALL SELECT 'directus_settings.project_logo', count(*) FROM directus_settings a WHERE a.project_logo IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.project_logo)
-UNION ALL SELECT 'directus_settings.public_background', count(*) FROM directus_settings a WHERE a.public_background IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.public_background)
-UNION ALL SELECT 'directus_settings.public_favicon', count(*) FROM directus_settings a WHERE a.public_favicon IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.public_favicon)
-UNION ALL SELECT 'directus_settings.public_foreground', count(*) FROM directus_settings a WHERE a.public_foreground IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.public_foreground)
-UNION ALL SELECT 'directus_users.avatar', count(*) FROM directus_users a WHERE a.avatar IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.avatar);
+SELECT 'albums_directus_files' AS t, count(*)
+FROM albums_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id
+  )
+
+UNION ALL
+SELECT 'cruises_directus_files', count(*)
+FROM cruises_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id
+  )
+
+UNION ALL
+SELECT 'excursions_directus_files', count(*)
+FROM excursions_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id
+  )
+
+UNION ALL
+SELECT 'hotels_directus_files', count(*)
+FROM hotels_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id
+  )
+
+UNION ALL
+SELECT 'junction_directus_files_translations_2', count(*)
+FROM junction_directus_files_translations_2 a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id
+  )
+
+UNION ALL
+SELECT 'media_share_link', count(*)
+FROM media_share_link a
+WHERE a.file IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.file
+  )
+
+UNION ALL
+SELECT 'rental_companies_directus_files', count(*)
+FROM rental_companies_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id
+  )
+
+UNION ALL
+SELECT 'tours_directus_files', count(*)
+FROM tours_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id
+  )
+
+UNION ALL
+SELECT 'vehicles_directus_files', count(*)
+FROM vehicles_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id
+  )
+
+UNION ALL
+SELECT 'directus_settings.project_logo', count(*)
+FROM directus_settings a
+WHERE a.project_logo IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.project_logo
+  )
+
+UNION ALL
+SELECT 'directus_settings.public_background', count(*)
+FROM directus_settings a
+WHERE a.public_background IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.public_background
+  )
+
+UNION ALL
+SELECT 'directus_settings.public_favicon', count(*)
+FROM directus_settings a
+WHERE a.public_favicon IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.public_favicon
+  )
+
+UNION ALL
+SELECT 'directus_settings.public_foreground', count(*)
+FROM directus_settings a
+WHERE a.public_foreground IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.public_foreground
+  )
+
+UNION ALL
+SELECT 'directus_users.avatar', count(*)
+FROM directus_users a
+WHERE a.avatar IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM directus_files f WHERE f.id = a.avatar
+  );
 SQL
 ```
 
@@ -291,22 +434,67 @@ already have the guard — don't drop it.
 docker exec -i <staging-db-container> psql -U directus -d directus -v ON_ERROR_STOP=1 <<'SQL'
 BEGIN;
 
-DELETE FROM albums_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
-DELETE FROM cruises_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
-DELETE FROM excursions_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
-DELETE FROM hotels_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
-DELETE FROM hotels_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
-DELETE FROM junction_directus_files_translations_2 a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
-DELETE FROM rental_companies_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
-DELETE FROM tours_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
-DELETE FROM vehicles_directus_files a WHERE a.directus_files_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
+DELETE FROM albums_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
 
-UPDATE media_share_link SET file = NULL WHERE file IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = media_share_link.file);
-UPDATE directus_settings SET project_logo = NULL WHERE project_logo IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_settings.project_logo);
-UPDATE directus_settings SET public_background = NULL WHERE public_background IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_settings.public_background);
-UPDATE directus_settings SET public_favicon = NULL WHERE public_favicon IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_settings.public_favicon);
-UPDATE directus_settings SET public_foreground = NULL WHERE public_foreground IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_settings.public_foreground);
-UPDATE directus_users SET avatar = NULL WHERE avatar IS NOT NULL AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_users.avatar);
+DELETE FROM cruises_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
+
+DELETE FROM excursions_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
+
+DELETE FROM hotels_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
+
+DELETE FROM junction_directus_files_translations_2 a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
+
+DELETE FROM rental_companies_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
+
+DELETE FROM tours_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
+
+DELETE FROM vehicles_directus_files a
+WHERE a.directus_files_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = a.directus_files_id);
+
+UPDATE media_share_link
+SET file = NULL
+WHERE file IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = media_share_link.file);
+
+UPDATE directus_settings
+SET project_logo = NULL
+WHERE project_logo IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_settings.project_logo);
+
+UPDATE directus_settings
+SET public_background = NULL
+WHERE public_background IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_settings.public_background);
+
+UPDATE directus_settings
+SET public_favicon = NULL
+WHERE public_favicon IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_settings.public_favicon);
+
+UPDATE directus_settings
+SET public_foreground = NULL
+WHERE public_foreground IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_settings.public_foreground);
+
+UPDATE directus_users
+SET avatar = NULL
+WHERE avatar IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM directus_files f WHERE f.id = directus_users.avatar);
 
 COMMIT;
 SQL
@@ -388,10 +576,117 @@ staging must be logged. Create/update a file in
 
 ---
 
+## 15. (Optional) Preserve staging's `directus_users` API tokens
+
+`directus_users.token` stores static API tokens **in plaintext** (unlike the
+bcrypt-hashed `password` column) — client integrations authenticate with
+these directly. A raw restore silently overwrites staging's tokens with
+dev's, breaking every integration pointed at staging until someone notices
+and manually re-issues tokens. Skip this step only if you're certain nothing
+depends on staging's current tokens.
+
+Run **before step 6** (the wipe), right after step 4:
+
+```bash
+docker exec -i <staging-db-container> psql -U directus -d directus -t -A -F'|' -c \
+  "SELECT email, token FROM directus_users WHERE token IS NOT NULL AND email IS NOT NULL;" \
+  > staging_user_tokens_backup.txt
+```
+
+After step 7 (or immediately after step 6 if you're not preserving
+`directus_files`), restore them by matching on email — a user with no match
+in dev's dump just gets no update (harmless; that user doesn't exist
+post-restore):
+
+```bash
+docker exec -i <staging-db-container> psql -U directus -d directus -v ON_ERROR_STOP=1 <<'SQL'
+WITH updated AS (
+  UPDATE directus_users u SET token = v.token
+  FROM (VALUES
+    -- one ('email','token') row per line from staging_user_tokens_backup.txt
+    ('user@example.com', 'the-plaintext-token-value')
+  ) AS v(email, token)
+  WHERE u.email = v.email AND u.token IS DISTINCT FROM v.token
+  RETURNING u.email
+)
+SELECT count(*) FROM updated;
+SQL
+```
+
+`migration-tool/migrate.js` generates this `VALUES` list automatically from
+the export in step 4's equivalent — see `buildTokenRestoreSql` in
+[`migration-tool/migrate.js`](../migration-tool/migrate.js) if doing this by
+hand for more than a couple of users.
+
+---
+
+## 16. (Optional) Preserve `global_configurations` rows by `entity_type`
+
+`global_configurations` is a flat key/value settings table — `entity` is
+unique per row, `entity_type` groups related rows (e.g. all `ai-api` rows:
+`token`, `url`, `model`; or `directus-url`'s `base_url`, which is inherently
+environment-specific and almost never something you want dev's copy of).
+Unlike `directus_files`, nothing else has a foreign key into this table
+(verified via the `relations` MCP tool — only its own `user_created`/
+`user_updated` point out to `directus_users`), so preservation is a plain
+upsert by `entity`, no orphan reconciliation needed.
+
+First, check which `entity_type`s exist on staging and decide which to keep:
+
+```bash
+docker exec -i <staging-db-container> psql -U directus -d directus -t -A -c \
+  "SELECT DISTINCT entity_type FROM global_configurations WHERE entity_type IS NOT NULL ORDER BY entity_type;"
+```
+
+Run **before step 6**, exporting only the `entity_type`(s) you've decided to
+keep (replace the `IN (...)` list):
+
+```bash
+docker exec -i <staging-db-container> psql -U directus -d directus -t -A -F'|' -c \
+  "SELECT entity, entity_type, key, value FROM global_configurations WHERE entity_type IN ('ai-api', 'directus-url') AND entity IS NOT NULL;" \
+  > staging_global_config_backup.txt
+```
+
+After step 6's restore, upsert them back by `entity` — staging's value wins
+for any `entity` name dev's dump also has; any `entity` dev's dump uniquely
+introduced under that same `entity_type` is left as-is:
+
+```bash
+docker exec -i <staging-db-container> psql -U directus -d directus -v ON_ERROR_STOP=1 <<'SQL'
+WITH upserted AS (
+  INSERT INTO global_configurations (entity, entity_type, key, value)
+  VALUES
+    -- one ('entity','entity_type','key','value') row per line from staging_global_config_backup.txt
+    ('botg-ai-api-token', 'ai-api', 'token', 'sk-...')
+  ON CONFLICT (entity) DO UPDATE SET
+    entity_type = EXCLUDED.entity_type,
+    key = EXCLUDED.key,
+    value = EXCLUDED.value
+  RETURNING entity
+)
+SELECT count(*) FROM upserted;
+SQL
+```
+
+`migration-tool/migrate.js` generates this automatically per selected
+`entity_type` — see `buildGlobalConfigRestoreSql` in
+[`migration-tool/migrate.js`](../migration-tool/migrate.js) for the
+reference implementation.
+
+---
+
 ## What is NOT preserved from staging
 
 Per the earlier decision on this sync: only `directus_files` itself is kept
-from staging. `directus_folders` and everything else (all collection data,
-flows, schema) comes from dev. If staging's folder structure for the Media
-Library mattered, it is now dev's — this was a deliberate choice, not an
-oversight.
+from staging by default. `directus_folders` and everything else (all other
+collection data, flows, schema) comes from dev. If staging's folder
+structure for the Media Library mattered, it is now dev's — this was a
+deliberate choice, not an oversight.
+
+`directus_users` API tokens (step 15) and `global_configurations` rows
+(step 16) are **also preservable, but off by default in this manual
+runbook** — they were added later, driven by a client request to keep
+integration tokens and per-environment config (like `ai-api` credentials)
+intact across syncs. `migration-tool/migrate.js` turns both on by default
+instead, since silently rotating a live integration's credentials is a
+worse default than the extra prompt.
