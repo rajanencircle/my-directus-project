@@ -1,6 +1,6 @@
 import { param, query } from 'express-validator';
+import { VALID_LANG_CODES } from '../../shared/constants.js';
 
-const VALID_LANG_CODES = ['de', 'en', 'nl'];
 export const listProductsSchema = [
   query('page')
     .optional()
@@ -9,8 +9,8 @@ export const listProductsSchema = [
 
   query('limit')
     .optional()
-    .isInt({ min: 1, max: 100 })
-    .withMessage('limit must be between 1 and 100'),
+    .isInt({ min: 1, max: 200 })
+    .withMessage('limit must be between 1 and 200'),
 
   query('lang')
     .notEmpty()

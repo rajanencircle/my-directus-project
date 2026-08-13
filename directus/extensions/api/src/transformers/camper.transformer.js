@@ -2,60 +2,36 @@ import { ensureUtcSuffix } from "../utils/timestamps.js";
 import { buildImageUrls } from "../utils/images.js";
 import { toSupplementaryBlocks, extractSpecialsDescription } from "../utils/supplementary.js";
 import { assembleResponse } from "../shared/response/assembleResponse.js";
-import { buildDenylist } from "../shared/response/denylist.js";
+import { restrictTo } from "../shared/response/visibility.js";
+import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
+import { toNumOrNull } from "./shared/numeric.js";
+import {
+  buildPricingConfig,
+  fromRawPriceCalc,
+  fromRawSurchargeCalc,
+} from "./shared/pricing.js";
+import { geoRef } from "./shared/geo.js";
 import {
   buildTranslationsMap,
   pickFromMap,
   shapeRentalCompany,
   shapeDepot,
   buildRentalZones,
+  buildDepotZones,
   shapeRentalSurcharges,
   getCompanyConditionsRow,
-  geoRef,
   toExchangeRateObject,
-} from "./rental_car.transformer.js";
+} from "./shared/vehicle.js";
 
 const CAMPER_GROUP_ORDER = ["main"];
-const CAMPER_DENYLIST = buildDenylist("vehicle");
 
-const CONSUMED_SOURCE_KEYS = [
-  "id",
-  "object_id",
-  "status_primarix",
-  "partner_visibility",
-  "rental_type",
-  "name_vehicle",
-  "supplier_product_code",
-  "depot_availability",
-  "drive_type",
-  "persons_max",
-  "suitcase_big",
-  "suitcase_small",
-  "image_badge_status",
-  "image_badge_start_date",
-  "image_badge_end_date",
-  "date_created",
-  "date_updated",
-  "user_created",
-  "user_updated",
-  "rental_company",
-  "category",
-  "descriptions_translations",
-  "image_badge_translations",
-  "depots_selected",
-  "partner_selected",
-  "media",
-  "season",
-  "camper_specs",
-  "surcharges",
-  "zones",
-  "price_periods",
-  "rental_periods",
-  "prices",
-  "price_calculation",
-  "surcharge_calculation",
-];
-
+/**
+ * Shapes the raw camper data into a summarized list item format.
+ *
+ * @param {Object} camper - The raw camper data from the database.
+ * @param {string} lang - The language code for translations.
+ * @returns {Object} The formatted camper list item payload.
+ */
 export function shapeCamperListItem(camper, lang) {
   return {
     id: camper.id,
@@ -65,16 +41,23 @@ export function shapeCamperListItem(camper, lang) {
       country: geoRef(camper.rental_company?.country, lang),
       place: geoRef(camper.rental_company?.place, lang),
     },
-    thumbnail: (() => {
-      const u = buildImageUrls(camper.media, lang)?.[0]?.url;
-      return u ? `${u}?width=400&height=300&fit=cover` : null;
-    })(),
+    thumbnail: buildThumbnailUrl(camper.media, lang),
     publishing_status: camper.status_primarix ?? null,
-    date_updated: ensureUtcSuffix(camper.date_updated),
+    date_updated: ensureUtcSuffix(camper.source_updated_at),
   };
 }
 
-export function shapeCamperDetail(camper, lang) {
+/**
+ * Shapes the raw camper data into a comprehensive detail format.
+ * Aggregates translations, pricing, depots, rental zones, and metadata.
+ *
+ * @param {Object} camper - The raw camper data from the database.
+ * @param {string} lang - The language code for translations.
+ * @param {Object} [options] - Configuration options.
+ * @param {string} [options.audience] - The target audience (e.g., 'web', 'backoffice') to restrict data visibility.
+ * @returns {Object} The formatted camper detail payload.
+ */
+export function shapeCamperDetail(camper, lang, { audience } = {}) {
   const descMap = buildTranslationsMap(
     camper.descriptions_translations,
     (t) => ({
@@ -111,21 +94,30 @@ export function shapeCamperDetail(camper, lang) {
   const companyConditions = getCompanyConditionsRow(rentalCompany, lang);
 
   const fieldDefs = [
-    { key: "id", group: "main", value: camper.id },
-    { key: "object_id", group: "main", value: camper.object_id ?? null },
+    /* Top-level metadata is restricted to backoffice endpoints to prevent exposing internal system state to the public web. */
+    { key: "id", group: "main", value: camper.id, visibleTo: ["backoffice"] },
+    { key: "object_id", group: "main", value: camper.object_id ?? null, visibleTo: ["backoffice"] },
     {
       key: "publishing_status",
       group: "main",
       value: camper.status_primarix ?? null,
+      visibleTo: ["backoffice"],
     },
     {
       key: "date_updated",
       group: "main",
-      value: ensureUtcSuffix(camper.date_updated),
+      value: ensureUtcSuffix(camper.source_updated_at),
+      visibleTo: ["backoffice"],
     },
-    { key: "season", group: "main", value: null },
-    { key: "name", group: "main", value: camper.name_vehicle ?? null },
-    { key: "rental_type", group: "main", value: camper.rental_type ?? null },
+    {
+      key: "season",
+      group: "main",
+      value: camper.rental_company?.season
+        ? { id: camper.rental_company.season.id, name: camper.rental_company.season.season ?? null }
+        : null,
+    },
+    { key: "name", group: "main", value: camper.name_vehicle ?? null, visibleTo: ["backoffice"] },
+    { key: "rental_type", group: "main", value: camper.rental_type ?? null, visibleTo: ["backoffice"] },
     {
       key: "category",
       group: "main",
@@ -137,6 +129,7 @@ export function shapeCamperDetail(camper, lang) {
       key: "supplier_product_code",
       group: "main",
       value: camper.supplier_product_code ?? null,
+      visibleTo: ["backoffice"],
     },
     {
       key: "depot_availability",
@@ -149,17 +142,11 @@ export function shapeCamperDetail(camper, lang) {
       value: {
         drive_type: camper.drive_type ?? null,
         persons_max:
-          camper.persons_max !== undefined && camper.persons_max !== null
-            ? Number(camper.persons_max)
-            : null,
+          toNumOrNull(camper?.persons_max),
         suitcase_big:
-          camper.suitcase_big !== undefined && camper.suitcase_big !== null
-            ? Number(camper.suitcase_big)
-            : null,
+          toNumOrNull(camper?.suitcase_big),
         suitcase_small:
-          camper.suitcase_small !== undefined && camper.suitcase_small !== null
-            ? Number(camper.suitcase_small)
-            : null,
+          toNumOrNull(camper?.suitcase_small),
       },
     },
     {
@@ -186,14 +173,7 @@ export function shapeCamperDetail(camper, lang) {
       key: "depots",
       group: "main",
       value: (camper.depots_selected ?? [])
-        .map((d) =>
-          shapeDepot(
-            d.rental_depots_id,
-            rentalCompany?.id,
-            rentalCompany?.name_company,
-            lang,
-          ),
-        )
+        .map((d) => shapeDepot(d.rental_depots_id, lang))
         .filter(Boolean),
     },
     {
@@ -205,6 +185,7 @@ export function shapeCamperDetail(camper, lang) {
         camper.rental_periods,
         camper.prices,
         priceCalc,
+        buildDepotZones(camper.depots_selected),
       ),
     },
     {
@@ -220,68 +201,37 @@ export function shapeCamperDetail(camper, lang) {
     {
       key: "image_badge",
       group: "main",
-      value: camper.image_badge_status
-        ? {
-            teaser: badgeMap?.[lang]?.image_badge_teaser ?? null,
-            details: badgeMap?.[lang]?.image_badge_details ?? null,
-            start_date: camper.image_badge_start_date ?? null,
-            end_date: camper.image_badge_end_date ?? null,
-            status: camper.image_badge_status ?? null,
-          }
-        : null,
+      value: buildImageBadge(camper, badgeMap?.[lang]),
     },
     { key: "media", group: "main", value: buildImageUrls(camper.media, lang) },
     {
       key: "pricing_config",
       group: "main",
-      value: {
-        buy_price_type: priceCalc?.buy_price_type ?? null,
-        sell_price_type: priceCalc?.sell_price_type ?? null,
-        percentage_type: priceCalc?.percentage_type ?? null,
-        provision_percentage:
-          priceCalc?.provision_percentage !== undefined &&
-          priceCalc?.provision_percentage !== null
-            ? Number(priceCalc.provision_percentage)
-            : null,
-        margin_percentage:
-          priceCalc?.margin_percentage !== undefined &&
-          priceCalc?.margin_percentage !== null
-            ? Number(priceCalc.margin_percentage)
-            : null,
-        exchange_rate: toExchangeRateObject(priceCalc?.exchange_rate),
-        from_price:
-          priceCalc?.from_price !== undefined && priceCalc?.from_price !== null
-            ? Number(priceCalc.from_price)
-            : null,
-        surcharge_percentage_type:
-          surchargeCalc?.surcharge_percentage_type ?? null,
-        surcharge_provision_percentage:
-          surchargeCalc?.surcharge_provision_percentage !== undefined &&
-          surchargeCalc?.surcharge_provision_percentage !== null
-            ? Number(surchargeCalc.surcharge_provision_percentage)
-            : null,
-        surcharge_margin_percentage:
-          surchargeCalc?.surcharge_margin_percentage !== undefined &&
-          surchargeCalc?.surcharge_margin_percentage !== null
-            ? Number(surchargeCalc.surcharge_margin_percentage)
-            : null,
-        surcharge_exchange_rate: toExchangeRateObject(
+      visibleTo: ["backoffice"],
+      value: buildPricingConfig({
+        settings: fromRawPriceCalc(priceCalc),
+        surchargeSettings: fromRawSurchargeCalc(surchargeCalc),
+        exchangeRate: toExchangeRateObject(priceCalc?.exchange_rate),
+        fromPrice: toNumOrNull(priceCalc?.from_price),
+        surchargeExchangeRate: toExchangeRateObject(
           surchargeCalc?.surcharge_exchange_rate,
         ),
-      },
+      }),
     },
     {
       key: "sell_prices_status",
       group: "main",
       value: rentalCompany?.sell_prices_status ?? null,
+      visibleTo: ["backoffice"],
     },
     {
       key: "sell_prices_updated_at",
       group: "main",
       value: ensureUtcSuffix(rentalCompany?.sell_prices_updated_at),
+      visibleTo: ["backoffice"],
     },
 
-    // CamperDetails
+    /* Camper-specific physical details and conditions mapped for the client output. */
     {
       key: "camper",
       group: "main",
@@ -296,8 +246,6 @@ export function shapeCamperDetail(camper, lang) {
   return assembleResponse({
     fieldDefs,
     groupOrder: CAMPER_GROUP_ORDER,
-    rawItem: camper,
-    consumedSourceKeys: CONSUMED_SOURCE_KEYS,
-    denylist: CAMPER_DENYLIST,
+    audience,
   });
 }

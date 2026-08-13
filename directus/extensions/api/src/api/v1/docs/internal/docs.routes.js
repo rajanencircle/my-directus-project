@@ -1,5 +1,14 @@
 import { openapiSpec } from "./openapi.spec.js";
 import { setRedocCsp, setSwaggerCsp } from "../shared/docsCsp.js";
+import {
+  BASE_DOCS_BODY_STYLE,
+  API_BANNER_BASE_STYLE,
+  API_BANNER_JSON_LINK_STYLE,
+  API_BANNER_SWAGGER_LINK_STYLE,
+  REDOC_CDN_SCRIPT,
+  SWAGGER_CDN_CSS,
+  SWAGGER_CDN_SCRIPTS,
+} from "../shared/docsAssets.js";
 
 // Derive the displayed version from the spec itself so the banner can't drift
 // from the contract's info.version again (it used to be hardcoded as v1.2.0).
@@ -15,52 +24,11 @@ const REDOC_HTML = `<!DOCTYPE html>
   <meta name="description" content="BOTG REST API internal documentation — hotels, products, and more.">
 
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
+    ${BASE_DOCS_BODY_STYLE}
 
-    /* Top banner */
-    #api-banner {
-      background: #1a1a2e;
-      color: #fff;
-      padding: 10px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      letter-spacing: 0.02em;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
+    ${API_BANNER_BASE_STYLE}
 
-    #api-banner .api-title {
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    #api-banner .api-version {
-      background: #4f8ef7;
-      color: #fff;
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    #api-banner .api-json-link {
-      margin-left: auto;
-      color: #a0b4cc;
-      text-decoration: none;
-      font-size: 13px;
-    }
-
-    #api-banner .api-json-link:hover {
-      color: #fff;
-    }
+    ${API_BANNER_JSON_LINK_STYLE}
 
     #api-banner .api-contract-link {
       color: #a0b4cc;
@@ -72,15 +40,7 @@ const REDOC_HTML = `<!DOCTYPE html>
       color: #fff;
     }
 
-    #api-banner .api-swagger-link {
-      color: #a0b4cc;
-      text-decoration: none;
-      font-size: 13px;
-    }
-
-    #api-banner .api-swagger-link:hover {
-      color: #fff;
-    }
+    ${API_BANNER_SWAGGER_LINK_STYLE}
   </style>
 </head>
 
@@ -105,12 +65,7 @@ const REDOC_HTML = `<!DOCTYPE html>
     no-auto-auth
   ></redoc>
 
-  <!-- Pinned to 2.1.5 for stability -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/redoc@2.1.5/bundles/redoc.standalone.js"
-    integrity="sha384-0GrsyTQc9Oqd8h+b2dbc4XdR2T/DYpy0tLNNstyx+LBMUyiBbcWPbEs9aRmUcaxD"
-    crossorigin="anonymous"
-  ></script>
+  ${REDOC_CDN_SCRIPT}
 </body>
 </html>`;
 
@@ -124,11 +79,7 @@ const SWAGGER_HTML = `<!DOCTYPE html>
   <meta name="description" content="BOTG REST API internal documentation (Swagger UI) — hotels, products, and more.">
 
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
+    ${BASE_DOCS_BODY_STYLE}
 
     /* Force the servers label to say "API version" */
     .swagger-ui .servers > label {
@@ -154,13 +105,7 @@ const SWAGGER_HTML = `<!DOCTYPE html>
     }
   </style>
 
-  <!-- Pinned to 5.17.14 for stability -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui.css"
-    integrity="sha384-wxLW6kwyHktdDGr6Pv1zgm/VGJh99lfUbzSn6HNHBENZlCN7W602k9VkGdxuFvPn"
-    crossorigin="anonymous"
-  />
+  ${SWAGGER_CDN_CSS}
 </head>
 
 <body>
@@ -168,17 +113,7 @@ const SWAGGER_HTML = `<!DOCTYPE html>
 
   <div id="swagger-ui"></div>
 
-  <!-- Pinned to 5.17.14 for stability -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"
-    integrity="sha384-wmyclcVGX/WhUkdkATwhaK1X1JtiNrr2EoYJ+diV3vj4v6OC5yCeSu+yW13SYJep"
-    crossorigin="anonymous"
-  ></script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"
-    integrity="sha384-2YH8WDRaj7V2OqU/trsmzSagmk/E2SutiCsGkdgoQwC9pNUJV1u/141DHB6jgs8t"
-    crossorigin="anonymous"
-  ></script>
+  ${SWAGGER_CDN_SCRIPTS}
   <script>
     window.onload = function () {
       window.ui = SwaggerUIBundle({
@@ -219,11 +154,11 @@ const SWAGGER_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export function setupInternalDocsRoutes(router) {
+export function setupInternalDocsRoutes(router, requireDocsAuth) {
   /**
    * OpenAPI JSON (our implementation-derived spec)
    */
-  router.get("/v1/internal-openapi.json", (req, res) => {
+  router.get("/v1/internal-openapi.json", requireDocsAuth, (req, res) => {
     const spec = {
       ...openapiSpec,
       servers: [
@@ -238,7 +173,7 @@ export function setupInternalDocsRoutes(router) {
   /**
    * ReDoc page
    */
-  router.get("/v1/internal-docs", (_req, res) => {
+  router.get("/v1/internal-docs", requireDocsAuth, (_req, res) => {
     setRedocCsp(res);
     res.setHeader("Content-Type", "text/html");
     res.send(REDOC_HTML);
@@ -247,7 +182,7 @@ export function setupInternalDocsRoutes(router) {
   /**
    * Swagger UI page (sandbox — "try it out" with a token)
    */
-  router.get("/v1/internal-docs/swagger", (_req, res) => {
+  router.get("/v1/internal-docs/swagger", requireDocsAuth, (_req, res) => {
     setSwaggerCsp(res);
     res.setHeader("Content-Type", "text/html");
     res.send(SWAGGER_HTML);

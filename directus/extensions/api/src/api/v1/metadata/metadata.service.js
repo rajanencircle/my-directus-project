@@ -1,12 +1,14 @@
 import { ISO_TO_LOCALE } from "../../../maps/language-code.map.js";
-import { DEFAULT_PRIMARIX_STATUS } from "../../shared/constants.js";
+import { DEFAULT_PRIMARIX_STATUS, FIELD_MAP_STATUSES } from "../../shared/constants.js";
 
 const FIELD_DICTIONARY_COLLECTION = "field_dictionary";
 
 // The API-facing product-type collection names (used by /metadata/labels' `collection`
 // param and /metadata/product-types) don't all map 1:1 to Directus collection names —
-// rental_cars/campers both live in the single `vehicles` Directus collection.
-const LABEL_COLLECTION_TO_DIRECTUS = {
+// rental_cars/campers both live in the single `vehicles` Directus collection. Exported so
+// metadata.validation.js can validate the `collection` query param against these same keys
+// instead of maintaining a separate duplicate list.
+export const LABEL_COLLECTION_TO_DIRECTUS = {
   hotels: "hotels",
   cruises: "cruises",
   excursions: "excursions",
@@ -49,7 +51,7 @@ function resolveExposedAudience(audience) {
 // own description of what `new`/`outdated` rows look like. Falls back to "active" for a
 // normally-mapped row, since "renamed" isn't derivable from the data available. Any
 // stored value outside the contract enum is ignored so the response always conforms.
-const FIELD_MAP_STATUSES = ["active", "renamed", "new", "outdated"];
+// (FIELD_MAP_STATUSES itself now lives in shared/constants.js — imported above.)
 
 function resolveStatus(row) {
   if (row.status && FIELD_MAP_STATUSES.includes(row.status)) return row.status;

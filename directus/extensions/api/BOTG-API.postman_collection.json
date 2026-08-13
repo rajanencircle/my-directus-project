@@ -200,12 +200,6 @@
                   "key": "lang",
                   "value": "{{lang}}",
                   "description": "ISO 639-1 code (de | en | nl) \u2014 REQUIRED"
-                },
-                {
-                  "key": "language",
-                  "value": "",
-                  "description": "Alias for lang",
-                  "disabled": true
                 }
               ]
             },
@@ -339,12 +333,6 @@
                   "key": "lang",
                   "value": "{{lang}}",
                   "description": "ISO 639-1 code (de | en | nl) \u2014 REQUIRED"
-                },
-                {
-                  "key": "language",
-                  "value": "",
-                  "description": "Alias for lang",
-                  "disabled": true
                 }
               ]
             },
@@ -490,12 +478,6 @@
                   "key": "lang",
                   "value": "{{lang}}",
                   "description": "ISO 639-1 code (de | en | nl) \u2014 REQUIRED"
-                },
-                {
-                  "key": "language",
-                  "value": "",
-                  "description": "Alias for lang",
-                  "disabled": true
                 }
               ]
             },
@@ -641,12 +623,6 @@
                   "key": "lang",
                   "value": "{{lang}}",
                   "description": "ISO 639-1 code (de | en | nl) \u2014 REQUIRED"
-                },
-                {
-                  "key": "language",
-                  "value": "",
-                  "description": "Alias for lang",
-                  "disabled": true
                 }
               ]
             },
@@ -792,12 +768,6 @@
                   "key": "lang",
                   "value": "{{lang}}",
                   "description": "ISO 639-1 code (de | en | nl) \u2014 REQUIRED"
-                },
-                {
-                  "key": "language",
-                  "value": "",
-                  "description": "Alias for lang",
-                  "disabled": true
                 }
               ]
             },
@@ -943,12 +913,6 @@
                   "key": "lang",
                   "value": "{{lang}}",
                   "description": "ISO 639-1 code (de | en | nl) \u2014 REQUIRED"
-                },
-                {
-                  "key": "language",
-                  "value": "",
-                  "description": "Alias for lang",
-                  "disabled": true
                 }
               ]
             },
@@ -1094,12 +1058,6 @@
                   "key": "lang",
                   "value": "{{lang}}",
                   "description": "ISO 639-1 code (de | en | nl) \u2014 REQUIRED"
-                },
-                {
-                  "key": "language",
-                  "value": "",
-                  "description": "Alias for lang",
-                  "disabled": true
                 }
               ]
             },

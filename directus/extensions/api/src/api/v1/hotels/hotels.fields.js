@@ -1,3 +1,9 @@
+/**
+ * Defines the raw fields retrieved from Directus for the hotels collection queries.
+ * This determines only the database fetch scope. The final API response structure and audience
+ * visibility (backoffice vs. web) are independently controlled by the transformer's `fieldDefs`.
+ * Field lists are maintained per-collection to allow independent schema evolution.
+ */
 export const LIST_FIELDS = [
   // Base (px_source_id excluded — strip field, never in output)
   "id",
@@ -6,6 +12,7 @@ export const LIST_FIELDS = [
   "status_primarix",
   "date_created",
   "date_updated",
+  "source_updated_at",
   // Descriptions
   "hotel_descriptions_translations.translations_id.code",
   "hotel_descriptions_translations.teaser",
@@ -48,7 +55,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",
@@ -188,14 +195,14 @@ export const DETAIL_FIELDS = [
   // Room categories with translations
   "room_categories.id",
   "room_categories.sort",
-  "room_categories.room_category",
+  "room_categories.room_category.id",
+  "room_categories.room_category.translations.translations_id.code",
+  "room_categories.room_category.translations.name",
   "room_categories.room_category_calc_type",
   "room_categories.room_category_booking_code",
   "room_categories.room_category_tour32_name",
   "room_categories.room_category_catering.id",
   "room_categories.room_category_catering.designation",
-  "room_categories.days_repeater",
-  "room_categories.price_start",
   "room_categories.status",
   "room_categories.publish_start",
   "room_categories.publish_end",
@@ -206,8 +213,6 @@ export const DETAIL_FIELDS = [
   // Room occupancies (name/value used to key rooms[].prices[].occupancies{})
   "room_occupancies.id",
   "room_occupancies.occupancies_id.id",
-  "room_occupancies.occupancies_id.value",
-  "room_occupancies.occupancies_id.name",
   "room_occupancies.occupancies_id.translations.translations_id.code",
   "room_occupancies.occupancies_id.translations.occupancy",
   // Price date windows
@@ -225,6 +230,7 @@ export const DETAIL_FIELDS = [
   "room_prices.price_date_id",
   "room_prices.room_occupancy_id",
   "room_prices.buy_price",
+  "room_prices.date_updated",
   "room_prices.room_prices_translations.translations_id.code",
   "room_prices.room_prices_translations.sell_price",
   // Media / images
@@ -236,7 +242,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",
@@ -253,10 +259,9 @@ export const DETAIL_FIELDS = [
   // Offers / specials (per-language JSON repeater — filtered in transformer)
   "specials_translations.translations_id.code",
   "specials_translations.specials",
-  // Surcharge margin settings per language (hotels' "surcharges" field alias resolves to
-  // the hotels_surcharges_translations collection — a per-market settings row, distinct
-  // from the real surcharge line items collection, which is fetched separately below via
-  // its own ItemsService query to avoid Directus nested-translation resolution issues).
+  /* Surcharge margin settings per language. 
+   * Note: This alias resolves to `hotels_surcharges_translations` for per-market settings.
+   * Actual surcharge line items are fetched separately to avoid nested-translation resolution issues. */
   "surcharges.translations_id.code",
   "surcharges.surcharge_percentage_type",
   "surcharges.surcharge_provision_percentage",
@@ -265,23 +270,10 @@ export const DETAIL_FIELDS = [
 ];
 
 export const CHILD_RC_FIELDS = [
+  /* Contains only unique child row fields; rich metadata is always inherited from the parent. */
   "id",
   "sharedId",
   "sort",
-  "room_category",
-  "room_category_calc_type",
-  "room_category_booking_code",
-  "room_category_tour32_name",
-  "room_category_catering.id",
-  "room_category_catering.designation",
-  "days_repeater",
-  "price_start",
-  "status",
-  "publish_start",
-  "publish_end",
-  "translations.translations_id.code",
-  "translations.room_category_additions",
-  "translations.room_category_description",
 ];
 
 export const SURCHARGE_FIELDS = [

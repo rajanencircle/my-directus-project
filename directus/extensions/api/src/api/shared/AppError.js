@@ -3,7 +3,7 @@ export class AppError extends Error {
     super(message);
     this.name = 'AppError';
     this.statusCode = statusCode;
-    this.errors = errors;
+    this.errors = errors ?? [message];
     this.isOperational = true;
   }
 }

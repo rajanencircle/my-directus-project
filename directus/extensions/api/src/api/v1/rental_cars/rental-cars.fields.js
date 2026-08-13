@@ -6,10 +6,13 @@ export const LIST_FIELDS = [
   "rental_type",
   "date_created",
   "date_updated",
+  "source_updated_at",
   "descriptions_translations.translations_id.code",
   "descriptions_translations.teaser",
-  // geo (list): country/place per the contract's RentalListItem.geo shape — vehicles have
-  // no country/place of their own, only their rental company does.
+  /* 
+   * Geolocation mapping for list items. Note that individual vehicles do not possess intrinsic
+   * country or place attributes; these are inherited from the parent rental company.
+   */
   "rental_company.country.id",
   "rental_company.country.ISO",
   "rental_company.country.translations.name",
@@ -26,7 +29,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",
@@ -91,6 +94,8 @@ export const DETAIL_FIELDS = [
   "rental_company.minimum_rental_days",
   "rental_company.conditions_calculation_day",
   "rental_company.conditions_calculation_season",
+  "rental_company.season.id",
+  "rental_company.season.season",
   "rental_company.has_multi_rental_discount",
   "rental_company.sell_prices_status",
   "rental_company.sell_prices_updated_at",
@@ -101,6 +106,7 @@ export const DETAIL_FIELDS = [
   "rental_company.booking_channel",
   "rental_company.booking_partner.id",
   "rental_company.booking_partner.name_agency",
+  "rental_company.booking_partner.internal_remarks_reservation",
   "rental_company.email_booking",
   "rental_company.internal_remarks_reservation",
   "rental_company.descriptions_translations.translations_id.code",
@@ -183,9 +189,13 @@ export const DETAIL_FIELDS = [
   "depots_selected.rental_depots_id.country.translations.translations_id.code",
   "depots_selected.rental_depots_id.phone_general",
   "depots_selected.rental_depots_id.email",
-  // office_hours_translations has no Directus relation on rental_depots_translations, so
-  // Directus drops the translations_id.code join — fetched directly via knex in the
-  // service (see utils/depotOfficeHours.js) and attached to each depot row.
+  "depots_selected.rental_depots_id.rental_company.id",
+  "depots_selected.rental_depots_id.rental_company.name_company",
+  /* 
+   * `office_hours_translations` lacks a formal Directus relation on `rental_depots_translations`. 
+   * Consequently, translations are retrieved directly via Knex in the service layer 
+   * and subsequently appended to each depot row.
+   */
   "partner_selected.partner_id.primarix_id",
   // Media
   "media.sort",
@@ -196,7 +206,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",
@@ -208,9 +218,11 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.translations.caption_i18n",
 ];
 
-// vehicles_surcharges/vehicles_rental_zones/vehicles_price_periods/vehicles_rental_periods are
-// scoped by rental_company (shared across all its vehicles), not by vehicle — fetched as
-// separate queries filtered by rental_company id.
+/**
+ * Shared entities (`vehicles_surcharges`, `vehicles_rental_zones`, `vehicles_price_periods`, `vehicles_rental_periods`) 
+ * are scoped to the `rental_company` rather than the individual vehicle. 
+ * These are fetched via dedicated queries filtered by `rental_company_id`.
+ */
 export const SURCHARGE_FIELDS = [
   "id",
   "surcharge_booking_name",
@@ -235,8 +247,10 @@ export const RENTAL_PERIOD_FIELDS = [
   "rental_period_depot_category.name",
 ];
 
-// vehicles_prices/vehicles_price_calculation/vehicles_surcharges_calculation are scoped by
-// vehicle_id directly — fetched as separate queries filtered by vehicle id.
+/**
+ * Vehicle-specific pricing and calculations (`vehicles_prices`, `vehicles_price_calculation`, `vehicles_surcharges_calculation`) 
+ * are directly scoped to the `vehicle_id` and are retrieved via dedicated queries.
+ */
 export const PRICE_FIELDS = ["id", "rental_zone", "price_period", "rental_period", "buy_price"];
 
 export const PRICE_CALCULATION_FIELDS = [
@@ -256,9 +270,11 @@ export const SURCHARGE_CALCULATION_FIELDS = [
   "surcharge_exchange_rate",
 ];
 
-// camper_specs has no reverse alias on `rental-cars` (O2O via camper_specs.vehicle, one_field
-// is null) — fetched as a separate query filtered by rentalCar id, same pattern as
-// tours_surcharges/excursions_surcharges. Only populated for rental_type=Camper rental-cars.
+/**
+ * `camper_specs` does not possess a reverse alias on `rental-cars` (O2O via `camper_specs.vehicle`).
+ * Thus, it is retrieved via a separate query filtered by `rentalCar.id`. 
+ * Note: Only populated when `rental_type` is 'Camper'.
+ */
 export const CAMPER_SPECS_FIELDS = [
   "id",
   "berths_adults",

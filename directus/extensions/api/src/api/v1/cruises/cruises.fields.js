@@ -4,6 +4,7 @@ export const LIST_FIELDS = [
   "status_primarix",
   "date_created",
   "date_updated",
+  "source_updated_at",
   "descriptions_translations.translations_id.code",
   "descriptions_translations.headline",
   "descriptions_translations.subline",
@@ -19,7 +20,7 @@ export const LIST_FIELDS = [
   "countries.countries_id.destination_id.id",
   "countries.countries_id.destination_id.translations.name",
   "countries.countries_id.destination_id.translations.translations_id.code",
-  // Price info translations — display name for the list item
+  /* Price info translations, which provide the display name for list items. */
   "price_infos_translations.translations_id.code",
   "price_infos_translations.name_cruise",
   // Media fields for thumbnail
@@ -31,7 +32,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",
@@ -55,8 +56,6 @@ export const DETAIL_FIELDS = [
   "participants_min",
   "participants_max",
   "week_min_before_start",
-  "special_valid_from",
-  "special_valid_to",
   "image_badge_status",
   "image_badge_start_date",
   "image_badge_end_date",
@@ -97,8 +96,7 @@ export const DETAIL_FIELDS = [
   "price_infos_translations.good_to_know",
   "price_infos_translations.occupancy_single",
   "price_infos_translations.participants_legacy",
-  // Fields on this collection are `deviating_cancellation_terms_selector` (json) and
-  // `deviating_cancellation_terms_text` (text).
+  /* Custom cancellation terms defined via a JSON selector and/or free text. */
   "price_infos_translations.deviating_cancellation_terms_selector",
   "price_infos_translations.deviating_cancellation_terms_text",
   "price_infos_translations.mobility_advice_text",
@@ -152,12 +150,12 @@ export const DETAIL_FIELDS = [
   "occupancies.occupancy.id",
   "occupancies.occupancy.name",
   "occupancies.occupancy.status",
-  "occupancies.occupancy.translations.translations_id.code",
-  "occupancies.occupancy.translations.occupancy",
   "occupancies.occupancy_from",
-  // Price calculation — per-market pricing settings + from_price. This is a settings row
-  // (like hotels' hotel_prices), separate from the actual per-cabin/date/occupancy price
-  // matrix which lives in cruises_prices (fetched separately below, no alias on cruises).
+  /* 
+   * Price calculation settings per market, including margins and the 'from' price. 
+   * Note: This is a settings row only; the actual per-cabin/date/occupancy price matrix
+   * lives in `cruises_prices` and is fetched separately.
+   */
   "price_calculation.buy_price_type",
   "price_calculation.sell_price_type",
   "price_calculation.percentage_type",
@@ -165,11 +163,10 @@ export const DETAIL_FIELDS = [
   "price_calculation.margin_percentage",
   "price_calculation.exchange_rate",
   "price_calculation.from_price",
-  "price_calculation.translations.translations_id.code",
-  "price_calculation.translations.sell_price",
-  // Media — is_map/tour32_export are junction-level fields on cruises_directus_files
-  // (per-product, can differ across products sharing the same file), NOT fields on the
-  // shared directus_files record.
+  /* 
+   * Media mappings. Note that `is_map` and `tour32_export` are junction-level fields
+   * on `cruises_directus_files`, allowing overrides per product for the same file.
+   */
   "media.sort",
   "media.directus_files_id.id",
   "media.directus_files_id.primarix_picid",
@@ -178,7 +175,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.is_map",
   "media.tour32_export",
@@ -190,11 +187,11 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.translations.caption_i18n",
 ];
 
-// cruises_prices (the real per-cabin_category x price_date x occupancy price matrix) has
-// no o2m alias on `cruises` — fetched as a separate query filtered by cruises_id, same
-// pattern as tours/excursions surcharges. No sell_price/translations junction exists for
-// cruises_prices (only buy_price), so `sell` is always null once grouped — same honest
-// degradation as tours' pricing.
+/**
+ * Defines fields for `cruises_prices`, the actual price matrix per cabin category, date, and occupancy.
+ * Fetched as a separate query filtered by `cruises_id` as no o2m alias exists on `cruises`.
+ * Note: No translation/sell_price junction exists, so sell prices remain null after grouping.
+ */
 export const CRUISES_PRICES_FIELDS = [
   "id",
   "cabin_category",

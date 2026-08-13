@@ -6,7 +6,7 @@ export function validate(schema) {
     await Promise.all(schema.map(rule => rule.run(req)));
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(HTTP_STATUS.UNPROCESSABLE_ENTITY).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: 'Validation Error',
         errors: errors.array().map(e => `${e.path}: ${e.msg}`),

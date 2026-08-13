@@ -1,11 +1,17 @@
 import { query } from 'express-validator';
+import {
+  VALID_LANG_CODES,
+  VALID_MAP_COLLECTIONS,
+  FIELD_MAP_STATUSES as VALID_STATUS_VALUES,
+  VALID_SHAPE_VALUES,
+  PRIMARIX_STATUS_QUERY_VALUES as VALID_PUBLISHING_STATUS,
+} from '../../shared/constants.js';
+import { LABEL_COLLECTION_TO_DIRECTUS } from './metadata.service.js';
 
-const VALID_LANG_CODES = ['de', 'en', 'nl'];
-const VALID_MAP_COLLECTIONS = ['hotels', 'tours', 'excursions', 'vehicles', 'cruises', 'rental_companies', 'rental_depots'];
-const VALID_LABEL_COLLECTIONS = ['hotels', 'cruises', 'excursions', 'tours', 'rental_cars', 'campers'];
-const VALID_STATUS_VALUES = ['active', 'renamed', 'new', 'outdated'];
-const VALID_SHAPE_VALUES = ['flat', 'nested'];
-const VALID_PUBLISHING_STATUS = ['draft', 'published', 'unpublished', 'archived', 'deleted', 'all'];
+// Derived from the same source metadata.service.js's /metadata/labels handler actually
+// uses to resolve a `collection` param, instead of maintaining a separate duplicate list
+// that could silently drift from it.
+const VALID_LABEL_COLLECTIONS = Object.keys(LABEL_COLLECTION_TO_DIRECTUS);
 
 export const getFieldMapSchema = [
   query('collection')

@@ -29,11 +29,12 @@ export function sendPaginated(res, { data, total, page, limit }) {
 const DEFAULT_ERROR_META = { page: 1, limit: 0, total: 0, returned: 0 };
 
 export function sendError(res, { status = HTTP_STATUS.INTERNAL_SERVER_ERROR, message, errors } = {}) {
+  const resolvedMessage = message ?? HTTP_MESSAGE[status] ?? 'An error occurred';
   const body = {
     success: false,
-    message: message ?? HTTP_MESSAGE[status] ?? 'An error occurred',
+    message: resolvedMessage,
+    errors: errors ?? [resolvedMessage],
     meta: DEFAULT_ERROR_META,
   };
-  if (errors) body.errors = errors;
   return res.status(status).json(body);
 }

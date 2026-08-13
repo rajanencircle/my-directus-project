@@ -1,12 +1,15 @@
-import { asyncWrapper } from "../../shared/asyncWrapper.js";
-import { validate } from "../../shared/validate.js";
-import { listSlimHotelsSchema, listFullHotelsSchema, getHotelDetailSchema } from "./hotels.validation.js";
-import { createHotelsController } from "./hotels.controller.js";
+import { createCollectionResource } from "../../shared/createCollectionResource.js";
+import { hotels as filters } from "../../shared/collectionFilters.js";
+import { LIST_FIELDS } from "./hotels.fields.js";
+import { shapeHotelListItem, shapeHotelDetail } from "../../../transformers/hotel.transformer.js";
+import { getHotelDetails } from "./hotels.service.js";
 
-export function setupHotelsRoutes(router, prefix, context) {
-  const { index, fullList, detail } = createHotelsController(context);
-
-  router.get(prefix, validate(listSlimHotelsSchema), asyncWrapper(index));
-  router.get(`${prefix}/full`, validate(listFullHotelsSchema), asyncWrapper(fullList));
-  router.get(`${prefix}/:id`, validate(getHotelDetailSchema), asyncWrapper(detail));
-}
+export const setupHotelsRoutes = createCollectionResource({
+  collection: "hotels",
+  resourceLabel: "hotel",
+  listFields: LIST_FIELDS,
+  filters: filters,
+  getDetails: getHotelDetails,
+  shapeListItem: shapeHotelListItem,
+  shapeDetail: shapeHotelDetail,
+});

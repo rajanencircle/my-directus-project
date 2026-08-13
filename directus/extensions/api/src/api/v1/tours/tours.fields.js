@@ -4,8 +4,8 @@ export const LIST_FIELDS = [
   "status_primarix",
   "date_created",
   "date_updated",
-  // Descriptions — tours has no top-level `name` field; the display name only exists
-  // per-language on descriptions_translations.name_tour.
+  "source_updated_at",
+  /* Tours lack a top-level `name` field; display names are exclusively sourced from `descriptions_translations.name_tour`. */
   "descriptions_translations.translations_id.code",
   "descriptions_translations.name_tour",
   "descriptions_translations.teaser",
@@ -25,8 +25,9 @@ export const LIST_FIELDS = [
   "place.translations.translations_id.code",
   "location_tour32.id",
   "location_tour32.name",
-  // Departure dates (real o2m alias on tours is `departure_times`, NOT `dates`)
+  /* Departure dates resolved via `departure_times` (alias for `tours_dates`). */
   "departure_times.id",
+  "departure_times.sort",
   "departure_times.available_from",
   "departure_times.available_to",
   "departure_times.trip_duration",
@@ -54,7 +55,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",
@@ -69,7 +70,6 @@ export const LIST_FIELDS = [
 export const DETAIL_FIELDS = [
   "id",
   "object_id",
-  "status",
   "status_primarix",
   "partner_visibility",
   "internal_remarks",
@@ -89,6 +89,27 @@ export const DETAIL_FIELDS = [
   "operator_direct",
   "operator_linked.id",
   "operator_linked.name_agency",
+  "operator_linked.street",
+  "operator_linked.street_number",
+  "operator_linked.postcode",
+  "operator_linked.phone_general",
+  "operator_linked.phone_after_hours",
+  "operator_linked.email_general",
+  "operator_linked.website",
+  "operator_linked.country.id",
+  "operator_linked.country.ISO",
+  "operator_linked.country.id_primarix",
+  "operator_linked.country.translations.name",
+  "operator_linked.country.translations.translations_id.code",
+  "operator_linked.state.id",
+  "operator_linked.state.ISO",
+  "operator_linked.state.translations.name",
+  "operator_linked.state.translations.translations_id.code",
+  "operator_linked.place.id",
+  "operator_linked.place.translations.name",
+  "operator_linked.place.translations.translations_id.code",
+  "operator_linked.location_tour32.id",
+  "operator_linked.location_tour32.name",
   "name_operator",
   "street",
   "street_number",
@@ -112,8 +133,9 @@ export const DETAIL_FIELDS = [
   "booking_partner.contact_greeting",
   "booking_partner.contact_first_name",
   "booking_partner.contact_name",
-  "service_provider_id_tour32",
-  "main_service_provider_id_tour32",
+  "booking_partner.internal_remarks_reservation",
+  "id_service_provider_tour32",
+  "id_main_service_provider_tour32",
   "supplier_product_code",
   "price_subline",
   "participants_min",
@@ -124,10 +146,6 @@ export const DETAIL_FIELDS = [
   "image_badge_status",
   "image_badge_start_date",
   "image_badge_end_date",
-  // Mobility advice text (m2o to global mobility_advice_text collection)
-  "mobility_advice_text.id",
-  "mobility_advice_text.hotel_translations.translations_id.code",
-  "mobility_advice_text.hotel_translations.hotel_mobility_advice_text",
   // Descriptions translations
   "descriptions_translations.translations_id.code",
   "descriptions_translations.name_tour",
@@ -150,6 +168,7 @@ export const DETAIL_FIELDS = [
   "price_info_translations.children_policy",
   "price_info_translations.participants_text",
   "price_info_translations.price_info_supplementary",
+  "price_info_translations.mobility_advice_text",
   // Programme translations
   "programme_translations.translations_id.code",
   "programme_translations.tour_programme_disclaimer",
@@ -180,18 +199,23 @@ export const DETAIL_FIELDS = [
   "airlines.name",
   // Departure dates (real o2m alias on tours is `departure_times`, NOT `dates`)
   "departure_times.id",
+  "departure_times.sort",
   "departure_times.available_from",
   "departure_times.available_to",
   "departure_times.trip_duration",
-  // departure_frequencies is an m2m on tours_dates → trips_frequencies (name holds the
-  // frequency/weekday label). Always empty in current dev data.
+  /* 
+   * Frequency mapped through the `tours_dates` to `trips_frequencies` junction. 
+   * Note: This is frequently empty in the current dev data. 
+   */
   "departure_times.departure_frequencies.trips_frequencies_id.id",
   "departure_times.departure_frequencies.trips_frequencies_id.name",
   // departures_text lives on the top-level tours alias `dates_translations` (→ tours_dates_translations)
   "dates_translations.translations_id.code",
   "dates_translations.departures_text",
-  // Travel routes (o2m → tours_routes; tour_departure / tour_arrival → places) —
-  // resolve the localized place name for the contract's TourDate.departure_place.
+  /* 
+   * Travel routes (o2m mapped to `tours_routes`). Resolves the localized place names 
+   * required for the `TourDate.departure_place` / `arrival_place` payloads.
+   */
   "travel_routes.id",
   "travel_routes.tour_departure.id",
   "travel_routes.tour_departure.translations.translations_id.code",
@@ -206,8 +230,10 @@ export const DETAIL_FIELDS = [
   "travel_categories.travel_categories_id.id",
   "travel_categories.travel_categories_id.name",
   "travel_categories.travel_categories_id.status",
-  // travel_categories_translations uses a raw `languages_code` string (e.g. "de-DE"),
-  // not the usual translations_id → translations FK pattern used elsewhere.
+  /* 
+   * Note: `travel_categories_translations` uses a raw `languages_code` string directly 
+   * (e.g., 'de-DE'), deviating from the standard `translations_id` FK pattern.
+   */
   "travel_categories.travel_categories_id.translations.languages_code",
   "travel_categories.travel_categories_id.translations.name",
   "accommodation_types.accommodation_types_id.id",
@@ -237,15 +263,13 @@ export const DETAIL_FIELDS = [
   "categories.id",
   "categories.tour_category_type.id",
   "categories.tour_category_type.name",
-  // tour_category_types_translations uses the standard translations_id → code pattern
-  // (no raw `languages_code` column — that path doesn't exist and breaks /products/full).
+  /* `tour_category_types_translations` strictly adheres to the standard `translations_id` pattern. */
   "categories.tour_category_type.translations.translations_id.code",
   "categories.tour_category_type.translations.name",
   "categories.category_supplier_code",
   "categories.category_from",
   "categories.translations.translations_id.code",
-  // tours_categories_translations stores the localized name as `category_original` (not
-  // `original`), and uses translations_id → code, not a raw `languages_code` column.
+  /* Localized names are stored natively in `category_original` via the standard `translations_id` pattern. */
   "categories.translations.category_original",
   "categories.translations.category_text",
   // Occupancies
@@ -255,7 +279,7 @@ export const DETAIL_FIELDS = [
   "occupancies.occupancy.translations.name",
   "occupancies.occupancy.translations.translations_id.code",
   "occupancies.occupancy_from",
-  // Prices (buy_price only — no sell_price/translations wired for tours yet, see transformer note)
+  /* Pricing metrics. Note: Contains `buy_price` only, as `sell_price` translation joins are not currently wired for tours. */
   "prices.id",
   "prices.tours_category_id",
   "prices.price_period_id",
@@ -266,9 +290,10 @@ export const DETAIL_FIELDS = [
   "price_periods.price_period_start",
   "price_periods.price_period_end",
   "price_periods.price_period_from",
-  // Price calculation settings (margin/buy-type per language) — internal, feeds
-  // categories[].prices margin/unit and top-level from_price, same as hotels'
-  // hotel_prices/activeSettings.
+  /* 
+   * Price calculation settings per market. These internal values drive 
+   * the `categories[].prices` calculations and the top-level `from_price`.
+   */
   "price_calculation_translations.translations_id.code",
   "price_calculation_translations.buy_price_type",
   "price_calculation_translations.sell_price_type",
@@ -277,8 +302,7 @@ export const DETAIL_FIELDS = [
   "price_calculation_translations.margin_percentage",
   "price_calculation_translations.exchange_rate",
   "price_calculation_translations.from_price",
-  // Surcharge calculation settings (margin per language) — internal, feeds
-  // surcharges[].margin.
+  /* Surcharge calculation settings per market, establishing base margins for `surcharges[].margin`. */
   "surcharges_calculation_translations.translations_id.code",
   "surcharges_calculation_translations.surcharge_percentage_type",
   "surcharges_calculation_translations.surcharge_provision_percentage",
@@ -293,7 +317,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",

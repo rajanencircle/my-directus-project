@@ -4,8 +4,8 @@ export const LIST_FIELDS = [
   "status_primarix",
   "date_created",
   "date_updated",
-  // excursions has no top-level `name` field — the display name only exists
-  // per-language on descriptions_translations.name_excursion.
+  "source_updated_at",
+  /* Excursions lack a top-level `name` field; display names are exclusively sourced from `descriptions_translations.name_excursion`. */
   "descriptions_translations.translations_id.code",
   "descriptions_translations.name_excursion",
   "descriptions_translations.teaser",
@@ -35,7 +35,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",
@@ -69,6 +69,27 @@ export const DETAIL_FIELDS = [
   "operator_direct",
   "operator_linked.id",
   "operator_linked.name_agency",
+  "operator_linked.street",
+  "operator_linked.street_number",
+  "operator_linked.postcode",
+  "operator_linked.phone_general",
+  "operator_linked.phone_after_hours",
+  "operator_linked.email_general",
+  "operator_linked.website",
+  "operator_linked.country.id",
+  "operator_linked.country.ISO",
+  "operator_linked.country.id_primarix",
+  "operator_linked.country.translations.name",
+  "operator_linked.country.translations.translations_id.code",
+  "operator_linked.state.id",
+  "operator_linked.state.ISO",
+  "operator_linked.state.translations.name",
+  "operator_linked.state.translations.translations_id.code",
+  "operator_linked.place.id",
+  "operator_linked.place.translations.name",
+  "operator_linked.place.translations.translations_id.code",
+  "operator_linked.location_tour32.id",
+  "operator_linked.location_tour32.name",
   "name_operator",
   "street",
   "street_number",
@@ -87,8 +108,9 @@ export const DETAIL_FIELDS = [
   "booking_partner.contact_greeting",
   "booking_partner.contact_first_name",
   "booking_partner.contact_name",
-  "id_service_provider_tour32",
-  "id_main_service_provider_tour32",
+  "booking_partner.internal_remarks_reservation",
+  "service_provider_id_tour32",
+  "main_service_provider_id_tour32",
   "supplier_product_code",
   "price_subline",
   "participants_min",
@@ -135,24 +157,24 @@ export const DETAIL_FIELDS = [
   "surcharges_translations.surcharge_provision_percentage",
   "surcharges_translations.surcharge_margin_percentage",
   "surcharges_translations.surcharge_exchange_rate",
-  // Departure dates (real o2m alias on excursions is `departure_times` → excursions_dates)
+  /* Departure dates resolved via `departure_times` (alias for `excursions_dates`) */
   "departure_times.id",
   "departure_times.available_from",
   "departure_times.available_to",
-  // Frequency is an m2m on excursions_dates → trips_frequencies (name holds the label)
+  /* Frequency mapped through the `excursions_dates` to `trips_frequencies` junction. */
   "departure_times.departure_frequencies.trips_frequencies_id.id",
   "departure_times.departure_frequencies.trips_frequencies_id.name",
-  // Departure/arrival places come from the first travel route (excursions_routes → places)
+  /* Primary travel route fields, providing the foundational departure/arrival locations. */
   "travel_routes.tour_departure.id",
   "travel_routes.tour_departure.translations.translations_id.code",
   "travel_routes.tour_departure.translations.name",
   "travel_routes.tour_arrival.id",
   "travel_routes.tour_arrival.translations.translations_id.code",
   "travel_routes.tour_arrival.translations.name",
-  // departures_text lives on the top-level excursions alias `dates_translations` (→ excursions_dates_translations)
+  /* Free-text departure schedules sourced from `dates_translations`. */
   "dates_translations.translations_id.code",
   "dates_translations.departures_text",
-  // Specials content is stored per-language as JSON on `specials_translations` (→ excursions_specials_translations)
+  /* Special offers natively stored as localized JSON blocks in `specials_translations`. */
   "specials_translations.translations_id.code",
   "specials_translations.specials",
   // Image badge translations
@@ -181,6 +203,8 @@ export const DETAIL_FIELDS = [
   // m2m
   "travel_categories.travel_categories_id.id",
   "travel_categories.travel_categories_id.name",
+  "travel_categories.travel_categories_id.translations.languages_code",
+  "travel_categories.travel_categories_id.translations.name",
   "countries.countries_id.id",
   "countries.countries_id.ISO",
   "countries.countries_id.translations.name",
@@ -226,7 +250,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.draft_status",
   "media.directus_files_id.copyright",
   "media.directus_files_id.primarix_workspace",
-  "media.directus_files_id.alt_text",
+  "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
   "media.directus_files_id.tour32_export",
@@ -236,7 +260,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.folder.name",
   "media.directus_files_id.translations.translations_id.code",
   "media.directus_files_id.translations.caption_i18n",
-  // Surcharges — fetched separately to avoid Directus nested-translation resolution issues
+  /* Surcharge line items are fetched in an isolated secondary query to bypass Directus nested-translation limitations. */
   "surcharges_items.id",
 ];
 

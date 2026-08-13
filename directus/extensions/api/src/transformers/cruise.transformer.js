@@ -3,70 +3,25 @@ import { ensureUtcSuffix } from "../utils/timestamps.js";
 import { groupPrices2 } from "../utils/grouping.js";
 import { toExchangeRateObject } from "../utils/prices.js";
 import { buildImageUrls } from "../utils/images.js";
-import { extractSpecialsDescription } from "../utils/supplementary.js";
+import { extractSpecialsDescription, extractSpecialsValidity } from "../utils/supplementary.js";
 import { assembleResponse } from "../shared/response/assembleResponse.js";
-import { getGroupOrder } from "../shared/response/groupOrder.js";
-import { buildDenylist } from "../shared/response/denylist.js";
+import { restrictTo } from "../shared/response/visibility.js";
+import { buildTranslationsMap, pickFromMap } from "./shared/i18n.js";
+import { shapeGeoRefs } from "./shared/geo.js";
+import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
+import { toNumOrNull } from "./shared/numeric.js";
 
 const CRUISE_GROUP_ORDER = ["main"];
-const CRUISE_DENYLIST = buildDenylist("cruise");
 
-const CONSUMED_SOURCE_KEYS = [
-  "id", "object_id", "status_primarix", "date_created", "date_updated",
-  "travel_id_karawane", "id_tour32", "real_url",
-  "participants_min", "participants_max", "week_min_before_start",
-  "special_valid_from", "special_valid_to", "partner_visibility",
-  "cruise_types", "countries", "destinations", "partner_selected",
-  "descriptions_translations", "programme_translations", "price_infos_translations",
-  "specials_translations", "image_badge_translations",
-  "cabin_categories", "price_dates", "prices", "occupancies",
-  "image_badge_status", "image_badge_start_date", "image_badge_end_date",
-  "media", "user_created", "user_updated", "season", "object_info_primarix",
-  "price_calculation", "sell_prices_status", "sell_prices_updated_at",
-];
 
-function getLocaleCode(translationsId) {
-  return typeof translationsId === "object" ? translationsId?.code : translationsId;
-}
 
-function buildTranslationsMap(rows, pickFields) {
-  const map = {};
-  for (const row of rows ?? []) {
-    const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale];
-    if (!iso) continue;
-    map[iso] = pickFields(row);
-  }
-  return map;
-}
-
-function pickFromMap(translationsMap, lang) {
-  if (!translationsMap || Object.keys(translationsMap).length === 0)
-    return null;
-  if (lang && translationsMap[lang]) return translationsMap[lang];
-  return null;
-}
-
-function shapeDestinations(rows, idKey, lang) {
-  return (rows ?? [])
-    .map((r) => r[idKey])
-    .filter(Boolean)
-    .map((d) => {
-      const nameMap = buildTranslationsMap(d.translations, (t) => t.name ?? null);
-      return { id: d.id, name: pickFromMap(nameMap, lang), code: d.media_code ?? null };
-    });
-}
-
-function shapeCountries(rows, idKey, lang) {
-  return (rows ?? [])
-    .map((r) => r[idKey])
-    .filter(Boolean)
-    .map((c) => {
-      const nameMap = buildTranslationsMap(c.translations, (t) => t.name ?? null);
-      return { id: c.id, name: pickFromMap(nameMap, lang), code: c.ISO ?? null };
-    });
-}
-
+/**
+ * Shapes the raw cruise data into a summarized list item format.
+ *
+ * @param {Object} cruise - The raw cruise data from the database.
+ * @param {string} lang - The language code for translations.
+ * @returns {Object} The formatted cruise list item payload.
+ */
 export function shapeCruiseListItem(cruise, lang) {
   const descMap = buildTranslationsMap(cruise.descriptions_translations, (t) => ({
     headline: t.headline ?? null,
@@ -83,16 +38,26 @@ export function shapeCruiseListItem(cruise, lang) {
     name: name_cruise,
     title: headline,
     geo: {
-      countries: shapeCountries(cruise.countries, "countries_id", lang),
-      destinations: shapeDestinations(cruise.destinations, "destinations_id", lang),
+      countries: shapeGeoRefs(cruise.countries, "countries_id", lang, { emptyValue: [] }),
+      destinations: shapeGeoRefs(cruise.destinations, "destinations_id", lang, { codeKey: "media_code", emptyValue: [] }),
     },
-    thumbnail: (() => { const u = buildImageUrls(cruise.media, lang)?.[0]?.url; return u ? `${u}?width=400&height=300&fit=cover` : null; })(),
+    thumbnail: buildThumbnailUrl(cruise.media, lang),
     publishing_status: cruise.status_primarix ?? null,
-    date_updated: ensureUtcSuffix(cruise.date_updated),
+    date_updated: ensureUtcSuffix(cruise.source_updated_at),
   };
 }
 
-export function shapeCruiseDetail(cruise, lang) {
+/**
+ * Shapes the raw cruise data into a comprehensive detail format.
+ * Aggregates translations, pricing, cabin categories, schedules, and metadata.
+ *
+ * @param {Object} cruise - The raw cruise data from the database.
+ * @param {string} lang - The language code for translations.
+ * @param {Object} [options] - Configuration options.
+ * @param {string} [options.audience] - The target audience (e.g., 'web', 'backoffice') to restrict data visibility.
+ * @returns {Object} The formatted cruise detail payload.
+ */
+export function shapeCruiseDetail(cruise, lang, { audience } = {}) {
   const descMap = buildTranslationsMap(cruise.descriptions_translations, (t) => ({
     headline: t.headline ?? null,
     subline: t.subline ?? null,
@@ -119,8 +84,8 @@ export function shapeCruiseDetail(cruise, lang) {
     important_information: t.important_information ?? null,
     good_to_know: t.good_to_know ?? null,
     occupancy_single: t.occupancy_single ?? null,
-    deviating_cancellation_terms: t.deviating_cancellation_terms_selector ?? t.deviating_cancellation_terms ?? null,
-    deviating_cancellation_terms_additions: t.deviating_cancellation_terms_text ?? t.deviating_cancellation_terms_additions ?? null,
+    deviating_cancellation_terms: t.deviating_cancellation_terms_selector ?? null,
+    deviating_cancellation_terms_additions: t.deviating_cancellation_terms_text ?? null,
     mobility_advice_text: t.mobility_advice_text ?? null,
     participants_legacy: t.participants_legacy ?? null,
   }));
@@ -139,32 +104,20 @@ export function shapeCruiseDetail(cruise, lang) {
   const specials_translations = pickFromMap(specialsMap, lang);
 
   const priceCalc = cruise.price_calculation?.[0] ?? null;
-  const sellByLang = {};
-  for (const t of priceCalc?.translations ?? []) {
-    const code = t.translations_id?.code ?? t.translations_id;
-    const iso = LOCALE_TO_ISO[code];
-    if (!iso) continue;
-    sellByLang[iso] = t.sell_price ?? null;
-  }
-  const from_price = priceCalc?.from_price ?? (lang ? (sellByLang[lang] ?? null) : (Object.values(sellByLang)[0] ?? null));
+  const from_price = priceCalc?.from_price ?? null;
 
   const cabins = groupPrices2(
     cruise.cabin_categories ?? [],
     cruise.price_dates ?? [],
     cruise.prices ?? [],
+    /* Occupancy naming is structured as a single flat `name` field rather than per-language translations. */
     (cruise.occupancies ?? [])
       .map((o) => {
         if (!o.occupancy) return null;
-        const occTrans = o.occupancy.translations ?? [];
-        const trans =
-          occTrans.find(
-            (x) =>
-              x.languages_code === lang || x.translations_id?.code === lang,
-          ) || occTrans[0];
         return {
           ...o.occupancy,
           value: o.id,
-          name: trans?.occupancy ?? trans?.name ?? o.occupancy.name ?? null,
+          name: o.occupancy.name ?? null,
         };
       })
       .filter(Boolean),
@@ -186,8 +139,9 @@ export function shapeCruiseDetail(cruise, lang) {
         category: cc.cabin_category ? { id: cc.cabin_category.id, name: cc.cabin_category.name } : null,
         additions: trans?.cabin_category_additions ?? null,
         description: trans?.cabin_category_description ?? null,
-        booking_code: cc.cabin_category_booking_code ?? null,
-        tour32_name: cc.cabin_category_tour32_name ?? null,
+        /* Restrict sensitive internal booking codes and tour names to backoffice visibility only. */
+        booking_code: restrictTo(cc.cabin_category_booking_code ?? null, "backoffice"),
+        tour32_name: restrictTo(cc.cabin_category_tour32_name ?? null, "backoffice"),
         from: !!cc.cabin_category_from,
       };
     },
@@ -212,15 +166,17 @@ export function shapeCruiseDetail(cruise, lang) {
   );
 
   const fieldDefs = [
-    { key: "id", group: "main", value: cruise.id },
-    { key: "object_id", group: "main", value: cruise.object_id ?? null },
-    { key: "publishing_status", group: "main", value: cruise.status_primarix ?? null },
-    { key: "date_updated", group: "main", value: ensureUtcSuffix(cruise.date_updated) },
+    /* Top-level metadata is restricted to backoffice endpoints to prevent exposing internal system state to the public web. */
+    { key: "id", group: "main", value: cruise.id, visibleTo: ["backoffice"] },
+    { key: "object_id", group: "main", value: cruise.object_id ?? null, visibleTo: ["backoffice"] },
+    { key: "publishing_status", group: "main", value: cruise.status_primarix ?? null, visibleTo: ["backoffice"] },
+    { key: "date_updated", group: "main", value: ensureUtcSuffix(cruise.source_updated_at), visibleTo: ["backoffice"] },
     { key: "season", group: "main", value: cruise.season ? { id: cruise.season.id, name: cruise.season.season } : null },
-    { key: "name", group: "main", value: price_info_translations?.name_cruise ?? null },
+    /* Explicitly reorder `name` to appear first in the response structure for web clients. */
+    { key: "name", group: "main", value: price_info_translations?.name_cruise ?? null, order: { web: -20 } },
     { key: "classification", group: "main", value: {
-        countries: shapeCountries(cruise.countries, "countries_id", lang),
-        destinations: shapeDestinations(cruise.destinations, "destinations_id", lang),
+        countries: shapeGeoRefs(cruise.countries, "countries_id", lang, { emptyValue: [] }),
+        destinations: shapeGeoRefs(cruise.destinations, "destinations_id", lang, { codeKey: "media_code", emptyValue: [] }),
         cruise_types: (cruise.cruise_types ?? []).map((t) => t.cruise_types_id).filter(Boolean).map(t => ({ id: t.id, name: t.name })),
     } },
     { key: "descriptions", group: "main", value: {
@@ -239,7 +195,7 @@ export function shapeCruiseDetail(cruise, lang) {
     } },
     { key: "price_info", group: "main", value: {
         departure_arrival: price_info_translations?.departure_arrival ?? null,
-        // DB stores bord_languages as an array of strings already (['Deutsch', 'Englisch']).
+        /* `bord_languages` is expected to be an array of strings natively from the database. */
         bord_languages: Array.isArray(price_info_translations?.bord_languages)
           ? price_info_translations.bord_languages
           : price_info_translations?.bord_languages
@@ -249,7 +205,7 @@ export function shapeCruiseDetail(cruise, lang) {
         surcharges: price_info_translations?.surcharges ?? null,
         services_included: price_info_translations?.services_included ?? null,
         services_not_included: price_info_translations?.services_not_included ?? null,
-        // Contract: array of objects (TBD exact shape). Source is a string[] — wrap each in { text }.
+        /* Map `onboard_gratuities` from a flat string array into an array of objects to fulfill the contract shape. */
         onboard_gratuities: Array.isArray(price_info_translations?.onboard_gratuities)
           ? price_info_translations.onboard_gratuities.map((g) =>
               typeof g === "string" ? { text: g } : g,
@@ -260,7 +216,7 @@ export function shapeCruiseDetail(cruise, lang) {
         good_to_know: price_info_translations?.good_to_know ?? null,
         occupancy_single: price_info_translations?.occupancy_single ?? null,
         participants_legacy: price_info_translations?.participants_legacy ?? null,
-        // Contract: array of objects (TBD exact shape). Source is a string[] of codes — wrap each in { value }.
+        /* Map `deviating_cancellation_terms` from a flat string array of codes into an array of objects to fulfill the contract shape. */
         deviating_cancellation_terms_select: Array.isArray(price_info_translations?.deviating_cancellation_terms)
           ? price_info_translations.deviating_cancellation_terms.map((t) =>
               typeof t === "string" ? { value: t } : t,
@@ -270,36 +226,30 @@ export function shapeCruiseDetail(cruise, lang) {
         mobility_advice: price_info_translations?.mobility_advice_text ? { id: null, name: price_info_translations.mobility_advice_text } : null,
     } },
     { key: "attributes", group: "main", value: {
-        participants_min: cruise.participants_min !== undefined && cruise.participants_min !== null ? Number(cruise.participants_min) : null,
-        participants_max: cruise.participants_max !== undefined && cruise.participants_max !== null ? Number(cruise.participants_max) : null,
-        week_min_before_start: cruise.week_min_before_start !== undefined && cruise.week_min_before_start !== null ? Number(cruise.week_min_before_start) : null,
+        participants_min: toNumOrNull(cruise?.participants_min),
+        participants_max: toNumOrNull(cruise?.participants_max),
+        week_min_before_start: toNumOrNull(cruise?.week_min_before_start),
     } },
     { key: "cabin_categories", group: "main", value: cabins },
     { key: "specials", group: "main", value: {
         special_description: specials_translations?.specials != null
           ? extractSpecialsDescription(specials_translations.specials)
           : null,
-        valid_from: cruise.special_valid_from ?? null,
-        valid_to: cruise.special_valid_to ?? null,
+        /* Extract validity windows directly from the `specials` translation entries, as top-level columns are no longer used. */
+        ...extractSpecialsValidity(specials_translations?.specials ?? null),
     } },
-    { key: "image_badge", group: "main", value: cruise.image_badge_status ? {
-        teaser: badgeMap?.[lang]?.image_badge_teaser ?? null,
-        details: badgeMap?.[lang]?.image_badge_details ?? null,
-        start_date: cruise.image_badge_start_date ?? null,
-        end_date: cruise.image_badge_end_date ?? null,
-        status: cruise.image_badge_status ?? null,
-    } : null },
+    { key: "image_badge", group: "main", value: buildImageBadge(cruise, badgeMap?.[lang]) },
     { key: "media", group: "main", value: buildImageUrls(cruise.media, lang) },
-    { key: "pricing_config", group: "main", value: {
+    { key: "pricing_config", group: "main", visibleTo: ["backoffice"], value: {
         buy_price_type: priceCalc?.buy_price_type ?? null,
         sell_price_type: priceCalc?.sell_price_type ?? null,
         percentage_type: priceCalc?.percentage_type ?? null,
-        provision_percentage: priceCalc?.provision_percentage !== undefined && priceCalc?.provision_percentage !== null ? Number(priceCalc.provision_percentage) : null,
-        margin_percentage: priceCalc?.margin_percentage !== undefined && priceCalc?.margin_percentage !== null ? Number(priceCalc.margin_percentage) : null,
+        provision_percentage: toNumOrNull(priceCalc?.provision_percentage),
+        margin_percentage: toNumOrNull(priceCalc?.margin_percentage),
         exchange_rate: toExchangeRateObject(priceCalc?.exchange_rate),
-        from_price: from_price !== undefined && from_price !== null ? Number(from_price) : null,
+        from_price: toNumOrNull(from_price),
     } },
-    { key: "internal", group: "main", value: {
+    { key: "internal", group: "main", visibleTo: ["backoffice"], value: {
         object_info_primarix: cruise.object_info_primarix ?? null,
         travel_id_karawane: cruise.travel_id_karawane ?? null,
         id_tour32: cruise.id_tour32 ?? null,
@@ -312,8 +262,6 @@ export function shapeCruiseDetail(cruise, lang) {
   return assembleResponse({
     fieldDefs,
     groupOrder: CRUISE_GROUP_ORDER,
-    rawItem: cruise,
-    consumedSourceKeys: CONSUMED_SOURCE_KEYS,
-    denylist: CRUISE_DENYLIST,
+    audience,
   });
 }

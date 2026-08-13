@@ -37,3 +37,26 @@ export const HTTP_MESSAGE = {
   501: 'Not Implemented',
   503: 'Service Unavailable',
 };
+
+// Supported response languages, shared by every `lang` query-param validator across the
+// API (products, per-collection resources, metadata/labels). Previously declared
+// independently in createStandardValidation.js, products.validation.js, and
+// metadata.validation.js — single-sourced here.
+export const VALID_LANG_CODES = ['de', 'en', 'nl'];
+
+// Allowed values of /metadata/field-map's `status` query param. Previously duplicated
+// (as VALID_STATUS_VALUES) in metadata.validation.js — kept here under the same name
+// metadata.service.js already used it under (FIELD_MAP_STATUSES), since that's also where
+// resolveStatus() derives and validates against the same values.
+export const FIELD_MAP_STATUSES = ['active', 'renamed', 'new', 'outdated'];
+
+// Allowed values of /metadata/field-map's `shape` query param — not duplicated elsewhere,
+// relocated here for consistency with the rest of this feature's validation enums.
+export const VALID_SHAPE_VALUES = ['flat', 'nested'];
+
+// Allowed `collection` values for /metadata/field-map. Not duplicated elsewhere in code —
+// relocated here (from metadata.validation.js) for consistency of "where do constants
+// live," not because of a fixed duplicate.
+export const VALID_MAP_COLLECTIONS = [
+  'hotels', 'tours', 'excursions', 'vehicles', 'cruises', 'rental_companies', 'rental_depots',
+];

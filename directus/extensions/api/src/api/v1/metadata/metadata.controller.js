@@ -23,10 +23,7 @@ export function createMetadataController(context) {
     async productTypes(req, res) {
       const { publishing_status } = req.query;
       const data = await getProductTypesCatalog(context, { publishing_status });
-      // ProductTypesResponse is intentionally NOT the standard { success, message, ... }
-      // envelope — the contract defines only { data, meta } at the top level.
-      return res.status(200).json({
-        data,
+      return sendSuccess(res, data, {
         meta: { page: 1, limit: data.length, total: data.length, returned: data.length },
       });
     },

@@ -8,15 +8,22 @@ import { setupCampersRoutes } from "./v1/campers/campers.routes.js";
 import { setupMetadataRoutes } from "./v1/metadata/metadata.routes.js";
 import { setupContractDocsRoutes } from "./v1/docs/contract/docs.routes.js";
 import { setupInternalDocsRoutes } from "./v1/docs/internal/docs.routes.js";
+import { setupDocsLoginRoutes } from "./v1/docs/internal/login.routes.js";
 import { errorHandler } from "./shared/errorHandler.js";
 import { requestIdMiddleware } from "./shared/requestId.js";
+import { apiVersionMiddleware } from "./shared/apiVersion.js";
+import { baseUrlMiddleware } from "./shared/requestContext.js";
 import { rateLimiter } from "./shared/rateLimiter.js";
 import { createAuthMiddleware } from "./shared/authMiddleware.js";
+import { createDocsAuthMiddleware } from "./shared/docsAuthMiddleware.js";
 
-export function setupRouter(router, context, keyState) {
+export function setupRouter(router, context, keyState, docsAuthState) {
   router.use(requestIdMiddleware);
+  router.use(apiVersionMiddleware);
+  router.use(baseUrlMiddleware);
   setupContractDocsRoutes(router);
-  setupInternalDocsRoutes(router);
+  setupDocsLoginRoutes(router, docsAuthState);
+  setupInternalDocsRoutes(router, createDocsAuthMiddleware(docsAuthState));
   router.use(createAuthMiddleware(keyState));
   router.use(rateLimiter);
 

@@ -7,105 +7,49 @@ import {
   buildIdFilter,
   buildUpdatedAfterFilter,
 } from "./excursions.filters.js";
+import { buildPublicationDateRangeFilter } from "../../shared/collectionFilters.js";
 import { enrichExchangeRates } from "../../../utils/ratesResolver.js";
 import { AppError } from "../../shared/AppError.js";
 import { HTTP_STATUS } from "../../shared/constants.js";
 import { buildDetailFields } from "../../../shared/query/buildQueryFields.js";
-import { computeUpdatedAtMax } from "../../../utils/delta.js";
+import { createCollectionService } from "../../shared/createCollectionService.js";
 
 const COLLECTION = "excursions";
 const SURCHARGES_COLLECTION = "excursions_surcharges";
 
-function pickListName(translations) {
-  if (!translations?.length) return null;
-  const preferred = translations.find((t) => t.translations_id?.code === "de-DE") ?? translations[0];
-  return preferred?.name_excursion ?? null;
-}
+const { listSlim, listFull, detailFields } = createCollectionService({
+  collection: COLLECTION,
+  resourceLabel: "excursion",
+  listFields: LIST_FIELDS,
+  buildListFilter,
+  buildSort,
+  buildUpdatedAfterFilter,
+  getDetails: (params, context) => getExcursionDetails(params, context),
+});
 
-export async function listSlimExcursions(
-  { page, limit, offset, publishing_status },
-  { services, database, getSchema },
-) {
-  const schema = await getSchema();
-  const { ItemsService } = services;
-  const excursionsService = new ItemsService(COLLECTION, { knex: database, schema });
+export const listSlimExcursions = listSlim;
+export const listFullExcursions = listFull;
 
-  const filter = buildListFilter({ publishing_status });
-
-  const [rawItems, countResult] = await Promise.all([
-    excursionsService.readByQuery({
-      fields: LIST_FIELDS,
-      sort: buildSort(),
-      limit,
-      offset,
-      filter,
-    }),
-    excursionsService.readByQuery({
-      aggregate: { count: ["*"] },
-      filter,
-    }),
-  ]);
-
-  const total = parseInt(countResult[0]?.count ?? "0", 10);
-  const items = rawItems.map(({ descriptions_translations, source_updated_at, ...rest }) => ({
-    ...rest,
-    name: pickListName(descriptions_translations),
-  }));
-
-  const updatedAtMax = computeUpdatedAtMax(rawItems);
-  return { data: items, total, page, limit, updatedAtMax };
-}
-
-export async function listFullExcursions(
-  { page, limit, offset, publishing_status, updated_after },
-  context,
-) {
-  const { services, database, getSchema } = context;
-  const schema = await getSchema();
-  const { ItemsService } = services;
-  const excursionsService = new ItemsService(COLLECTION, { knex: database, schema });
-
-  const listFilter = buildListFilter({ publishing_status });
-  const deltaFilter = buildUpdatedAfterFilter(updated_after);
-  const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
-
-  const [rawItems, countResult] = await Promise.all([
-    excursionsService.readByQuery({
-      fields: LIST_FIELDS,
-      sort: buildSort(),
-      limit,
-      offset,
-      filter,
-    }),
-    excursionsService.readByQuery({
-      aggregate: { count: ["*"] },
-      filter,
-    }),
-  ]);
-
-  const total = parseInt(countResult[0]?.count ?? "0", 10);
-  const updatedAtMax = computeUpdatedAtMax(rawItems);
-
-  const data = [];
-  for (const item of rawItems) {
-    try {
-      const detail = await getExcursionDetails({ id: item.id.toString() }, context);
-      data.push(detail);
-    } catch (e) {
-      console.error(`Failed to fetch full detail for excursion ${item.id}`, e);
-    }
-  }
-
-  return { data, total, page, limit, updatedAtMax };
-}
-
-export async function getExcursionDetails({ id }, { services, database, getSchema }) {
+/**
+ * Retrieves and enriches the full details for a specific excursion.
+ *
+ * @param {Object} params - The request parameters.
+ * @param {string|number} params.id - The identifier of the excursion.
+ * @param {string} params.idFilterMode - The mode for filtering by ID (e.g., 'primary', 'object_id').
+ * @param {Object} context - The Directus context.
+ * @param {Object} context.services - Directus services instance.
+ * @param {Object} context.database - Knex database connection.
+ * @param {Function} context.getSchema - Function to retrieve the current schema.
+ * @returns {Promise<Object>} The enriched excursion details.
+ * @throws {AppError} If the excursion is not found.
+ */
+export async function getExcursionDetails({ id, idFilterMode }, { services, database, getSchema }) {
   const schema = await getSchema();
   const { ItemsService } = services;
   const excursionsService = new ItemsService(COLLECTION, { knex: database, schema });
   const surchargesService = new ItemsService(SURCHARGES_COLLECTION, { knex: database, schema });
 
-  const filter = buildIdFilter(id);
+  const filter = buildIdFilter(id, idFilterMode);
 
   const items = await excursionsService.readByQuery({
     fields: buildDetailFields({ schema, rootCollection: ROOT_COLLECTION, relations: DETAIL_RELATIONS }),
@@ -118,14 +62,10 @@ export async function getExcursionDetails({ id }, { services, database, getSchem
     throw new AppError(`Excursion not found: ${id}`, HTTP_STATUS.NOT_FOUND);
   }
 
-  const today = new Date().toISOString().slice(0, 10);
-  const dateRangeFilter = [
-    { _or: [{ publish_start: { _null: true } }, { publish_start: { _lte: today } }] },
-    { _or: [{ publish_end: { _null: true } }, { publish_end: { _gte: today } }] },
-  ];
+  const dateRangeFilter = buildPublicationDateRangeFilter();
 
   const surcharges = await surchargesService.readByQuery({
-    fields: SURCHARGE_FIELDS,
+    fields: detailFields(schema, SURCHARGES_COLLECTION, SURCHARGE_FIELDS),
     filter: {
       _and: [
         { excursion_id: { _eq: excursion.id } },

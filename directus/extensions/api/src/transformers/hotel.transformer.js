@@ -1,6 +1,6 @@
 import { LOCALE_TO_ISO } from "../maps/language-code.map.js";
 import { ensureUtcSuffix } from "../utils/timestamps.js";
-import { groupPrices } from "../utils/prices.js";
+import { groupPrices2 } from "../utils/grouping.js";
 import { toExchangeRateObject } from "../utils/prices.js";
 import { buildImageUrls } from "../utils/images.js";
 import {
@@ -8,182 +8,45 @@ import {
   extractSpecialsDescription,
 } from "../utils/supplementary.js";
 import { assembleResponse } from "../shared/response/assembleResponse.js";
-import { getGroupOrder } from "../shared/response/groupOrder.js";
-import { buildDenylist } from "../shared/response/denylist.js";
+import { restrictTo } from "../shared/response/visibility.js";
+import {
+  getLocaleCode,
+  buildTranslationsMap,
+  pickFromMap,
+} from "./shared/i18n.js";
+import { getGeoName } from "./shared/geo.js";
+import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
+import { toNumOrNull } from "./shared/numeric.js";
+import {
+  buildPricingConfig,
+  buildPriceSettingsMap,
+  buildSurchargeSettingsMap,
+} from "./shared/pricing.js";
 
-const HOTEL_GROUP_ORDER = getGroupOrder("hotel");
-const HOTEL_DENYLIST = buildDenylist("hotel");
-
-const CONSUMED_SOURCE_KEYS = [
-  "id",
-  "object_id",
-  "status_primarix",
-  "date_created",
-  "date_updated",
-  "name",
-  "hotel_classification",
-  "accommodation_type",
-  "booking_partner",
-  "id_tour_user",
-  "haupt_id_tour_user",
-  "booking",
-  "booking_email",
-  "booking_info",
-  "partner_type",
-  "partner",
-  "street",
-  "street_number",
-  "zip_code",
-  "place",
-  "state",
-  "region",
-  "country",
-  "location_tour32",
-  "phone_general",
-  "phone_ah",
-  "email_general",
-  "website",
-  "hotel_descriptions_translations",
-  "price_info_translations",
-  "hotel_prices",
-  "surcharges",
-  "surcharge_settings",
-  "room_categories",
-  "price_dates",
-  "room_prices",
-  "room_occupancies",
-  "surcharges",
-  "image_badge_status",
-  "image_badge_start_date",
-  "image_badge_end_date",
-  "image_badge_translations",
-  "hotel_activities",
-  "media",
-  "user_created",
-  "user_updated",
-  "season",
-  "object_info",
-  "internal_remarks",
-  "hotels_surcharges",
-  "hotel_group",
-  "specials_translations",
-];
-
-function getLocaleCode(translationsId) {
-  return typeof translationsId === "object"
-    ? translationsId?.code
-    : translationsId;
-}
-
-function buildTranslationsMap(rows, pickFields) {
-  const map = {};
-  for (const row of rows ?? []) {
-    const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale];
-    if (!iso) continue;
-    map[iso] = pickFields(row);
-  }
-  return map;
-}
-
-function pickFromMap(translationsMap, lang) {
-  if (!translationsMap || Object.keys(translationsMap).length === 0)
-    return null;
-  if (lang && translationsMap[lang]) return translationsMap[lang];
-  if (translationsMap["de-DE"]) return translationsMap["de-DE"];
-  if (translationsMap["en-GB"]) return translationsMap["en-GB"];
-  const firstKey = Object.keys(translationsMap)[0];
-  return translationsMap[firstKey];
-}
-
-function shapeGeo(geo, lang) {
-  if (!geo) return null;
-  const transMap = buildTranslationsMap(geo.translations, (t) => ({
-    name: t.name ?? null,
-  }));
-  const filteredTransMap = lang
-    ? transMap[lang]
-      ? { [lang]: transMap[lang] }
-      : {}
-    : transMap;
-  return {
-    id: geo.id,
-    ...(geo.ISO !== undefined && { iso: geo.ISO }),
-    ...(geo.id_primarix !== undefined && { id_primarix: geo.id_primarix }),
-    ...(geo.location_tour32 !== undefined && {
-      location_tour32: geo.location_tour32,
-    }),
-    translations: filteredTransMap,
-  };
-}
-
-function getGeoName(geo, lang) {
-  if (!geo) return null;
-  const map = buildTranslationsMap(geo.translations, (t) => t.name ?? null);
-  return pickFromMap(map, lang);
-}
-
-function isPublicationActive(item, today) {
+/**
+ * Determines if a given item is currently active for publication.
+ * Validates the status and checks if the current timestamp falls within
+ * the allowed `publish_start` and `publish_end` timeframe.
+ *
+ * @param {Object} item - The item to evaluate, expecting `status`, `publish_start`, and `publish_end`.
+ * @param {string|Date} now - The current timestamp for comparison.
+ * @returns {boolean} True if the item is published and within the active time range.
+ */
+function isPublicationActive(item, now) {
   if (item.status === "unpublished") return false;
-  const start = item.publish_start ? item.publish_start.slice(0, 10) : null;
-  const end = item.publish_end ? item.publish_end.slice(0, 10) : null;
-  if (end && today > end) return false;
-  if (start && today < start) return false;
+
+  if (item.publish_end && now > item.publish_end) return false;
+  if (item.publish_start && now < item.publish_start) return false;
   return true;
 }
 
-const SUPPLIER_TYPE_MAP = { Yes: "Independent", No: "Partner" };
-
-function buildPriceSettingsMap(hotelPricesRows) {
-  const map = {};
-  for (const row of hotelPricesRows ?? []) {
-    const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale];
-    if (!iso) continue;
-    let fromPrice = null;
-    for (const t of row.from_price?.room_prices_translations ?? []) {
-      const tLocale = getLocaleCode(t.translations_id);
-      const tIso = LOCALE_TO_ISO[tLocale];
-      if (tIso === iso) {
-        fromPrice = t.sell_price ?? null;
-        break;
-      }
-    }
-    map[iso] = {
-      marginPct: row.margin_percentage ?? null,
-      unit:
-        row.buy_price_type === "per_person"
-          ? "person"
-          : row.buy_price_type === "per_unit"
-            ? "unit"
-            : null,
-      fromPrice,
-      buyPriceType: row.buy_price_type ?? null,
-      sellPriceType: row.sell_price_type ?? null,
-      percentageType: row.percentage_type ?? null,
-      provisionPercentage: row.provision_percentage ?? null,
-      exchangeRate: toExchangeRateObject(row.exchange_rate),
-    };
-  }
-  return map;
-}
-
-function buildSurchargeSettingsMap(surchargeSettingsRows) {
-  const map = {};
-  for (const row of surchargeSettingsRows ?? []) {
-    const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale];
-    if (!iso) continue;
-    map[iso] = {
-      marginPct: row.surcharge_margin_percentage ?? null,
-      percentageType: row.surcharge_percentage_type ?? null,
-      provisionPercentage: row.surcharge_provision_percentage ?? null,
-      exchangeRate: toExchangeRateObject(row.surcharge_exchange_rate),
-    };
-  }
-  return map;
-}
-
+/**
+ * Shapes the raw hotel data into a summarized list item format.
+ *
+ * @param {Object} hotel - The raw hotel data from the database.
+ * @param {string} lang - The language code for translations.
+ * @returns {Object} The formatted hotel list item payload.
+ */
 export function shapeHotelListItem(hotel, lang) {
   const classification = hotel.hotel_classification
     ? {
@@ -213,16 +76,23 @@ export function shapeHotelListItem(hotel, lang) {
           }
         : null,
     },
-    thumbnail: (() => {
-      const u = buildImageUrls(hotel.media, lang)?.[0]?.url;
-      return u ? `${u}?width=400&height=300&fit=cover` : null;
-    })(),
+    thumbnail: buildThumbnailUrl(hotel.media, lang),
     publishing_status: hotel.status_primarix ?? null,
-    date_updated: ensureUtcSuffix(hotel.date_updated),
+    date_updated: ensureUtcSuffix(hotel.source_updated_at),
   };
 }
 
-export function shapeHotelDetail(hotel, lang) {
+/**
+ * Shapes the raw hotel data into a comprehensive detail format.
+ * Aggregates translations, pricing, rooms, surcharges, and metadata based on the requested language and audience.
+ *
+ * @param {Object} hotel - The raw hotel data from the database.
+ * @param {string} lang - The language code for translations.
+ * @param {Object} [options] - Configuration options.
+ * @param {string} [options.audience] - The target audience (e.g., 'web', 'backoffice') to restrict data visibility.
+ * @returns {Object} The formatted hotel detail payload.
+ */
+export function shapeHotelDetail(hotel, lang, { audience } = {}) {
   const descMap = buildTranslationsMap(
     hotel.hotel_descriptions_translations,
     (t) => ({
@@ -283,27 +153,96 @@ export function shapeHotelDetail(hotel, lang) {
   const activeSpecials = pickFromMap(specialsMap, lang) ?? [];
   const special_description = extractSpecialsDescription(activeSpecials);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date().toISOString();
 
   const roomCategories = (hotel.room_categories ?? []).filter((rc) =>
-    isPublicationActive(rc, today),
+    isPublicationActive(rc, now),
   );
-  const priceDates = (hotel.price_dates ?? []).filter((pd) =>
-    isPublicationActive(pd, today),
+  // A price period can be `status: "published"` with no publish window set and
+  // still have already ended (its own `end_date` is in the past) — isPublicationActive
+  // only checks the CMS publish window, not whether the booking period itself is over.
+  const today = now.slice(0, 10);
+  const priceDates = (hotel.price_dates ?? []).filter(
+    (pd) => isPublicationActive(pd, now) && (!pd.end_date || pd.end_date >= today),
   );
   const roomPrices = hotel.room_prices ?? [];
+  
+  /*
+   * Resolves and formats room occupancies, ensuring translations are applied.
+   * The `value` key explicitly maps to the junction row ID, aligning with `room_prices` references.
+   */
   const occupancies = (hotel.room_occupancies ?? [])
-    .map((r) =>
-      r.occupancies_id ? { ...r.occupancies_id, junction_id: r.id } : null,
-    )
+    .map((r) => {
+      if (!r.occupancies_id) return null;
+      const nameMap = buildTranslationsMap(
+        r.occupancies_id.translations,
+        (t) => t.occupancy ?? null,
+      );
+      return {
+        id: r.occupancies_id.id,
+        value: r.id,
+        name: pickFromMap(nameMap, lang),
+      };
+    })
     .filter(Boolean);
   const rooms = hotel.room_categories
-    ? groupPrices(
+    ? groupPrices2(
         roomCategories,
         priceDates,
         roomPrices,
         occupancies,
         LOCALE_TO_ISO,
+        {
+          categoryIdKey: "room_category_id",
+          dateIdKey: "price_date_id",
+          occupancyIdKey: "room_occupancy_id",
+          translationsKey: "room_prices_translations",
+          sellPriceKey: "sell_price",
+        },
+        (cat) => {
+          const catMap = buildTranslationsMap(cat.translations, (t) => ({
+            additions: t.room_category_additions ?? null,
+            description: t.room_category_description ?? null,
+          }));
+          const active = pickFromMap(catMap, lang) ?? {};
+
+          const categoryNameMap = buildTranslationsMap(
+            cat.room_category?.translations,
+            (t) => t.name ?? null,
+          );
+          const categoryName = pickFromMap(categoryNameMap, lang);
+
+          return {
+            category: cat.room_category
+              ? { id: cat.room_category.id, name: categoryName }
+              : null,
+            sort: cat.sort ?? null,
+            additions: active.additions ?? null,
+            description: active.description ?? null,
+            /* Restrict sensitive internal supplier codes to backoffice visibility only */
+            booking_code: restrictTo(
+              cat.room_category_booking_code ?? null,
+              "backoffice",
+            ),
+            catering: restrictTo(
+              cat.room_category_catering
+                ? {
+                    id: cat.room_category_catering.id,
+                    name: cat.room_category_catering.designation,
+                  }
+                : null,
+              "backoffice",
+            ),
+            calc_type: restrictTo(
+              cat.room_category_calc_type ?? null,
+              "backoffice",
+            ),
+            tour32_name: restrictTo(
+              cat.room_category_tour32_name ?? null,
+              "backoffice",
+            ),
+          };
+        },
         {
           lang,
           marginPct: activeSettings.marginPct,
@@ -314,7 +253,7 @@ export function shapeHotelDetail(hotel, lang) {
 
   const price_options = hotel.surcharges
     ? (hotel.surcharges ?? [])
-        .filter((s) => isPublicationActive(s, today))
+        .filter((s) => isPublicationActive(s, now))
         .map((s) => {
           const translationsMap = buildTranslationsMap(s.translations, (t) => ({
             description: t.surcharge_description ?? null,
@@ -331,6 +270,11 @@ export function shapeHotelDetail(hotel, lang) {
           }));
           const active = pickFromMap(translationsMap, lang) ?? {};
           const buy = s.buy_price ? parseFloat(s.buy_price) : null;
+          const margin =
+            activeSurchargeSettings.marginPct !== undefined &&
+            activeSurchargeSettings.marginPct !== null
+              ? parseFloat(activeSurchargeSettings.marginPct)
+              : null;
           return {
             booking_name: active.booking_name ?? null,
             description: active.description ?? null,
@@ -338,31 +282,37 @@ export function shapeHotelDetail(hotel, lang) {
               active.sell_price !== undefined && active.sell_price !== null
                 ? parseFloat(active.sell_price)
                 : null,
-            type: active.type ?? null,
-            catering: active.catering ?? null,
-            calc_type: active.calc_type ?? null,
-            buy,
-            margin:
-              activeSurchargeSettings.marginPct !== undefined &&
-              activeSurchargeSettings.marginPct !== null
-                ? parseFloat(activeSurchargeSettings.marginPct)
-                : null,
+            /* Restrict internal pricing, margins, and calculation details to backoffice visibility.
+             * The public web payload is limited to `booking_name`, `description`, and `sell` price. */
+            type: restrictTo(active.type ?? null, "backoffice"),
+            catering: restrictTo(active.catering ?? null, "backoffice"),
+            calc_type: restrictTo(active.calc_type ?? null, "backoffice"),
+            buy: restrictTo(buy, "backoffice"),
+            margin: restrictTo(margin, "backoffice"),
           };
         })
     : null;
 
   const fieldDefs = [
-    { key: "id", group: "main", value: hotel.id },
-    { key: "object_id", group: "main", value: hotel.object_id ?? null },
+    /* Top-level metadata is restricted to backoffice endpoints to prevent exposing internal system state to the public web. */
+    { key: "id", group: "main", value: hotel.id, visibleTo: ["backoffice"] },
+    {
+      key: "object_id",
+      group: "main",
+      value: hotel.object_id ?? null,
+      visibleTo: ["backoffice"],
+    },
     {
       key: "publishing_status",
       group: "main",
       value: hotel.status_primarix ?? null,
+      visibleTo: ["backoffice"],
     },
     {
       key: "date_updated",
       group: "main",
-      value: ensureUtcSuffix(hotel.date_updated),
+      value: ensureUtcSuffix(hotel.source_updated_at),
+      visibleTo: ["backoffice"],
     },
     {
       key: "season",
@@ -371,13 +321,20 @@ export function shapeHotelDetail(hotel, lang) {
         ? { id: hotel.season.id, name: hotel.season.season }
         : null,
     },
-    { key: "name", group: "main", value: hotel.name ?? null },
+    /* Explicitly reorder `name` and `hotel_group` to appear first in the response structure for web clients. */
+    {
+      key: "name",
+      group: "main",
+      value: hotel.name ?? null,
+      order: { web: -20 },
+    },
     {
       key: "hotel_group",
       group: "main",
       value: hotel.hotel_group
         ? { id: hotel.hotel_group.id, name: hotel.hotel_group.label }
         : null,
+      order: { web: -10 },
     },
     {
       key: "address",
@@ -463,11 +420,7 @@ export function shapeHotelDetail(hotel, lang) {
         description_surrounding: translations?.description_surrounding ?? null,
         description_rooms: translations?.description_rooms ?? null,
         remarks_arrival: translations?.remarks_arrival ?? null,
-        total_number_of_rooms:
-          translations?.total_number_of_rooms !== undefined &&
-          translations?.total_number_of_rooms !== null
-            ? Number(translations.total_number_of_rooms)
-            : null,
+        total_number_of_rooms: toNumOrNull(translations?.total_number_of_rooms),
         supplementary: toSupplementaryBlocks(
           translations?.description_supplementary,
         ),
@@ -488,16 +441,12 @@ export function shapeHotelDetail(hotel, lang) {
         deviating_cancellation_terms:
           price_info_translations?.deviating_cancelation_terms ?? null,
         children_policy: price_info_translations?.children_policy ?? null,
-        children_free_age:
-          price_info_translations?.children_free_age !== undefined &&
-          price_info_translations?.children_free_age !== null
-            ? Number(price_info_translations.children_free_age)
-            : null,
-        children_free_number:
-          price_info_translations?.children_free_number !== undefined &&
-          price_info_translations?.children_free_number !== null
-            ? Number(price_info_translations.children_free_number)
-            : null,
+        children_free_age: toNumOrNull(
+          price_info_translations?.children_free_age,
+        ),
+        children_free_number: toNumOrNull(
+          price_info_translations?.children_free_number,
+        ),
         important_information:
           price_info_translations?.important_information ?? null,
         mobility_advice: price_info_translations?.mobility_advice_text
@@ -521,17 +470,7 @@ export function shapeHotelDetail(hotel, lang) {
     {
       key: "image_badge",
       group: "main",
-      value: hotel.image_badge_status
-        ? {
-            teaser:
-              pickFromMap(badgeTranslations, lang)?.image_badge_teaser ?? null,
-            details:
-              pickFromMap(badgeTranslations, lang)?.image_badge_details ?? null,
-            start_date: hotel.image_badge_start_date ?? null,
-            end_date: hotel.image_badge_end_date ?? null,
-            status: hotel.image_badge_status ?? null,
-          }
-        : null,
+      value: buildImageBadge(hotel, pickFromMap(badgeTranslations, lang)),
     },
     {
       key: "media",
@@ -541,6 +480,7 @@ export function shapeHotelDetail(hotel, lang) {
     {
       key: "booking",
       group: "main",
+      visibleTo: ["backoffice"],
       value: {
         booking_channel: hotel.booking_partner ?? null,
         booking_partner: hotel.booking
@@ -566,48 +506,21 @@ export function shapeHotelDetail(hotel, lang) {
     {
       key: "pricing_config",
       group: "main",
-      value: {
-        buy_price_type: activeSettings.buyPriceType ?? null,
-        sell_price_type: activeSettings.sellPriceType ?? null,
-        percentage_type: activeSettings.percentageType ?? null,
-        provision_percentage:
-          activeSettings.provisionPercentage !== undefined &&
-          activeSettings.provisionPercentage !== null
-            ? Number(activeSettings.provisionPercentage)
-            : null,
-        margin_percentage:
-          activeSettings.marginPct !== undefined &&
-          activeSettings.marginPct !== null
-            ? Number(activeSettings.marginPct)
-            : null,
-        exchange_rate:
-          activeSettings.exchangeRate?.rate !== undefined &&
-          activeSettings.exchangeRate?.rate !== null
-            ? Number(activeSettings.exchangeRate.rate)
-            : null,
-        from_price: activeSettings.fromPrice ?? null,
-        surcharge_percentage_type:
-          activeSurchargeSettings.percentageType ?? null,
-        surcharge_provision_percentage:
-          activeSurchargeSettings.provisionPercentage !== undefined &&
-          activeSurchargeSettings.provisionPercentage !== null
-            ? Number(activeSurchargeSettings.provisionPercentage)
-            : null,
-        surcharge_margin_percentage:
-          activeSurchargeSettings.marginPct !== undefined &&
-          activeSurchargeSettings.marginPct !== null
-            ? Number(activeSurchargeSettings.marginPct)
-            : null,
-        surcharge_exchange_rate:
-          activeSurchargeSettings.exchangeRate?.rate !== undefined &&
-          activeSurchargeSettings.exchangeRate?.rate !== null
-            ? Number(activeSurchargeSettings.exchangeRate.rate)
-            : null,
-      },
+      visibleTo: ["backoffice"],
+      value: buildPricingConfig({
+        settings: activeSettings,
+        surchargeSettings: activeSurchargeSettings,
+        exchangeRate: toNumOrNull(activeSettings?.exchangeRate?.rate),
+        fromPrice: activeSettings.fromPrice ?? null,
+        surchargeExchangeRate: toNumOrNull(
+          activeSurchargeSettings?.exchangeRate?.rate,
+        ),
+      }),
     },
     {
       key: "internal",
       group: "main",
+      visibleTo: ["backoffice"],
       value: {
         internal_remarks: hotel.internal_remarks ?? null,
         object_info_primarix: hotel.object_info ?? null,
@@ -625,8 +538,6 @@ export function shapeHotelDetail(hotel, lang) {
   return assembleResponse({
     fieldDefs,
     groupOrder: ["main"],
-    rawItem: hotel,
-    consumedSourceKeys: CONSUMED_SOURCE_KEYS,
-    denylist: HOTEL_DENYLIST,
+    audience,
   });
 }

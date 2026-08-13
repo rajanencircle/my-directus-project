@@ -1,109 +1,45 @@
-import { LIST_FIELDS } from "./hotels.fields.js";
-import {
-  SURCHARGE_FIELDS,
-  CHILD_RC_FIELDS,
-} from "./hotels.fields.js";
-import { ROOT_COLLECTION, DETAIL_RELATIONS } from "./hotels.query-config.js";
-import {
-  buildListFilter,
-  buildSort,
-  buildIdFilter,
-  buildUpdatedAfterFilter,
-  buildPublicationDeepFilter,
-} from "./hotels.filters.js";
+import { DETAIL_FIELDS, SURCHARGE_FIELDS, CHILD_RC_FIELDS } from "./hotels.fields.js";
+import { hotels as hotelFilters } from "../../shared/collectionFilters.js";
+const { buildIdFilter, buildPublicationDeepFilter } = hotelFilters;
+import { buildPublicationDateRangeFilter } from "../../shared/collectionFilters.js";
 import { enrichExchangeRates } from "../../../utils/ratesResolver.js";
 import { AppError } from "../../shared/AppError.js";
 import { HTTP_STATUS } from "../../shared/constants.js";
 import { buildDetailFields } from "../../../shared/query/buildQueryFields.js";
-import { computeUpdatedAtMax } from "../../../utils/delta.js";
+import { createQueryConfig } from "../../shared/createQueryConfig.js";
 
 const COLLECTION = "hotels";
 const SURCHARGES_COLLECTION = "surcharges";
+const ROOM_CATEGORIES_COLLECTION = "room_categories";
 
-export async function listSlimHotels(
-  { page, limit, offset, publishing_status },
-  { services, database, getSchema },
-) {
-  const schema = await getSchema();
-  const { ItemsService } = services;
-  const hotelsService = new ItemsService(COLLECTION, {
-    knex: database,
+export const { ROOT_COLLECTION, DETAIL_RELATIONS } = createQueryConfig(
+  COLLECTION,
+  DETAIL_FIELDS,
+);
+
+function detailFields(schema, rootCollection, fieldList) {
+  return buildDetailFields({
     schema,
+    rootCollection,
+    relations: fieldList.filter((f) => f.includes(".")),
   });
-
-  const filter = buildListFilter({ publishing_status });
-
-  const [rawItems, countResult] = await Promise.all([
-    hotelsService.readByQuery({
-      fields: LIST_FIELDS,
-      sort: buildSort(),
-      limit,
-      offset,
-      filter,
-    }),
-    hotelsService.readByQuery({
-      aggregate: { count: ["*"] },
-      filter,
-    }),
-  ]);
-
-  const total = parseInt(countResult[0]?.count ?? "0", 10);
-  const items = rawItems.map(({ source_updated_at, ...rest }) => rest);
-
-  const updatedAtMax = computeUpdatedAtMax(rawItems);
-  return { data: items, total, page, limit, updatedAtMax };
 }
 
-export async function listFullHotels(
-  { page, limit, offset, publishing_status, updated_after },
-  context,
-) {
-  const { services, database, getSchema } = context;
-  const schema = await getSchema();
-  const { ItemsService } = services;
-  const hotelsService = new ItemsService(COLLECTION, {
-    knex: database,
-    schema,
-  });
-
-  const listFilter = buildListFilter({ publishing_status });
-  const deltaFilter = buildUpdatedAfterFilter(updated_after);
-  const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
-
-  const [rawItems, countResult] = await Promise.all([
-    hotelsService.readByQuery({
-      fields: LIST_FIELDS,
-      sort: buildSort(),
-      limit,
-      offset,
-      filter,
-    }),
-    hotelsService.readByQuery({
-      aggregate: { count: ["*"] },
-      filter,
-    }),
-  ]);
-
-  const total = parseInt(countResult[0]?.count ?? "0", 10);
-  const updatedAtMax = computeUpdatedAtMax(rawItems);
-
-  // Reusing getHotelDetails for each ID to ensure all nested queries (surcharges, etc) are built identically.
-  // In a high-traffic production system this should be optimized to batch queries, but for now we reuse existing logic.
-  const data = [];
-  for (const item of rawItems) {
-    try {
-      const detail = await getHotelDetails({ id: item.id.toString() }, context);
-      data.push(detail);
-    } catch (e) {
-      console.error(`Failed to fetch full detail for hotel ${item.id}`, e);
-    }
-  }
-
-  return { data, total, page, limit, updatedAtMax };
-}
-
+/**
+ * Retrieves and enriches the full details for a specific hotel.
+ *
+ * @param {Object} params - The request parameters.
+ * @param {string|number} params.id - The identifier of the hotel.
+ * @param {string} params.idFilterMode - The mode for filtering by ID (e.g., 'primary', 'object_id').
+ * @param {Object} context - The Directus context.
+ * @param {Object} context.services - Directus services instance.
+ * @param {Object} context.database - Knex database connection.
+ * @param {Function} context.getSchema - Function to retrieve the current schema.
+ * @returns {Promise<Object>} The enriched hotel details.
+ * @throws {AppError} If the hotel is not found.
+ */
 export async function getHotelDetails(
-  { id },
+  { id, idFilterMode },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
@@ -116,28 +52,21 @@ export async function getHotelDetails(
     knex: database,
     schema,
   });
-  const roomCategoriesService = new ItemsService("room_categories", {
+  const roomCategoriesService = new ItemsService(ROOM_CATEGORIES_COLLECTION, {
     knex: database,
     schema,
   });
 
-  const filter = buildIdFilter(id);
+  const filter = buildIdFilter(id, idFilterMode);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const dateRangeFilter = [
-    {
-      _or: [
-        { publish_start: { _null: true } },
-        { publish_start: { _lte: today } },
-      ],
-    },
-    {
-      _or: [{ publish_end: { _null: true } }, { publish_end: { _gte: today } }],
-    },
-  ];
+  const dateRangeFilter = buildPublicationDateRangeFilter();
 
   const items = await hotelsService.readByQuery({
-    fields: buildDetailFields({ schema, rootCollection: ROOT_COLLECTION, relations: DETAIL_RELATIONS }),
+    fields: buildDetailFields({
+      schema,
+      rootCollection: ROOT_COLLECTION,
+      relations: DETAIL_RELATIONS,
+    }),
     filter,
     limit: 1,
     deep: buildPublicationDeepFilter(),
@@ -154,7 +83,7 @@ export async function getHotelDetails(
   let childCategories = [];
   if (parentIds.length > 0) {
     childCategories = await roomCategoriesService.readByQuery({
-      fields: CHILD_RC_FIELDS,
+      fields: detailFields(schema, ROOM_CATEGORIES_COLLECTION, CHILD_RC_FIELDS),
       filter: {
         _and: [
           { sharedId: { _in: parentIds } },
@@ -167,14 +96,41 @@ export async function getHotelDetails(
     });
   }
 
-  const splitParentIds = new Set(childCategories.map((c) => c.sharedId));
+  /*
+   * Construct a map of parent categories. Child rows only carry their own structural identifiers,
+   * while all rich metadata is sourced from the parent, ensuring a single canonical source of truth.
+   */
+  const parentCatMap = new Map(
+    (hotel.room_categories ?? []).map((rc) => [rc.id, rc]),
+  );
+  const enrichedChildCategories = childCategories.map((child) => {
+    const parent = parentCatMap.get(child.sharedId);
+    if (!parent) return child;
+    return {
+      ...child,
+      /* Populate child row with parent metadata, as child rows act merely as weekday-split artifacts. */
+      room_category: parent.room_category,
+      room_category_catering: parent.room_category_catering,
+      room_category_calc_type: parent.room_category_calc_type,
+      room_category_booking_code: parent.room_category_booking_code,
+      room_category_tour32_name: parent.room_category_tour32_name,
+      translations: parent.translations,
+      status: parent.status,
+      publish_start: parent.publish_start,
+      publish_end: parent.publish_end,
+    };
+  });
+
+  const splitParentIds = new Set(
+    enrichedChildCategories.map((c) => c.sharedId),
+  );
   const roomCategories = [
     ...(hotel.room_categories ?? []).filter((rc) => !splitParentIds.has(rc.id)),
-    ...childCategories,
+    ...enrichedChildCategories,
   ];
 
   const surcharges = await surchargesService.readByQuery({
-    fields: SURCHARGE_FIELDS,
+    fields: detailFields(schema, SURCHARGES_COLLECTION, SURCHARGE_FIELDS),
     filter: {
       _and: [
         { hotel_id: { _eq: hotel.id } },
@@ -185,7 +141,12 @@ export async function getHotelDetails(
     limit: -1,
   });
 
-  const hotelData = { ...hotel, room_categories: roomCategories, surcharges, surcharge_settings: surchargeSettings };
+  const hotelData = {
+    ...hotel,
+    room_categories: roomCategories,
+    surcharges,
+    surcharge_settings: surchargeSettings,
+  };
   const enrichedHotel = await enrichExchangeRates(hotelData, database);
   return enrichedHotel;
 }

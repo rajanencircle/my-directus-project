@@ -8,28 +8,8 @@
 export function toSupplementaryBlocks(value) {
   const extractBlock = (item) => {
     if (typeof item === "object" && item !== null) {
-      const rawHeadline =
-        item.headline !== undefined && item.headline !== null
-          ? item.headline
-          : item.heading !== undefined && item.heading !== null
-            ? item.heading
-            : item.title !== undefined && item.title !== null
-              ? item.title
-              : item.header !== undefined && item.header !== null
-                ? item.header
-                : item.name !== undefined && item.name !== null
-                  ? item.name
-                  : null;
-      const rawText =
-        item.text !== undefined && item.text !== null
-          ? item.text
-          : item.content !== undefined && item.content !== null
-            ? item.content
-            : item.description !== undefined && item.description !== null
-              ? item.description
-              : item.body !== undefined && item.body !== null
-                ? item.body
-                : null;
+      const rawHeadline = item.headline ?? null;
+      const rawText = item.text ?? null;
 
       const headline =
         typeof rawHeadline === "string"
@@ -77,12 +57,12 @@ export function toSupplementaryBlocks(value) {
 
 // Extracts the description text from a specials JSON value directly, without the
 // extra name/headline/title field. Accepts an array of items, a single object, or a
-// plain string. Reads the description field (`text`, falling back to `special_description`).
+// plain string. Reads the `special_description` field.
 export function extractSpecialsDescription(value) {
   const pick = (item) => {
     if (typeof item === "string") return item.trim() || null;
     if (!item || typeof item !== "object") return null;
-    const desc = item.text ?? item.special_description ?? item.description;
+    const desc = item.special_description ?? null;
     if (typeof desc === "string") return desc.trim() || null;
     return null;
   };
@@ -92,4 +72,23 @@ export function extractSpecialsDescription(value) {
     return texts.length > 0 ? texts.join("\n\n") : null;
   }
   return pick(value);
+}
+
+// Extracts a single validity window from a specials JSON value (array of
+// { valid_from, valid_to } entries, or a single such object). The contract's
+// specials.valid_from/valid_to is one flat pair per product, but the source
+// data can carry several specials each with their own window — the first entry that
+// actually has one of the two dates set wins.
+export function extractSpecialsValidity(value) {
+  const items = Array.isArray(value) ? value : [value];
+  for (const item of items) {
+    if (!item || typeof item !== "object") continue;
+    if (item.special_valid_from != null || item.special_valid_to != null) {
+      return {
+        valid_from: item.special_valid_from ?? null,
+        valid_to: item.special_valid_to ?? null,
+      };
+    }
+  }
+  return { valid_from: null, valid_to: null };
 }

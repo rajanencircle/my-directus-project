@@ -3,189 +3,41 @@ import { ensureUtcSuffix } from "../utils/timestamps.js";
 import { groupPrices2 } from "../utils/grouping.js";
 import { toExchangeRateObject } from "../utils/prices.js";
 import { buildImageUrls } from "../utils/images.js";
-import { toSupplementaryBlocks, extractSpecialsDescription } from "../utils/supplementary.js";
+import {
+  toSupplementaryBlocks,
+  extractSpecialsDescription,
+} from "../utils/supplementary.js";
 import { assembleResponse } from "../shared/response/assembleResponse.js";
-import { getGroupOrder } from "../shared/response/groupOrder.js";
-import { buildDenylist } from "../shared/response/denylist.js";
+import { restrictTo } from "../shared/response/visibility.js";
+import {
+  getLocaleCode,
+  buildTranslationsMap,
+  pickFromMap,
+} from "./shared/i18n.js";
+import { getGeoName, shapeGeoRefs } from "./shared/geo.js";
+import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
+import { toNumOrNull } from "./shared/numeric.js";
+import {
+  buildPricingConfig,
+  buildPriceSettingsMap,
+  buildSurchargeSettingsMap,
+} from "./shared/pricing.js";
+import { shapeOperatorAddress } from "./shared/address.js";
+import {
+  shapeFrequency as sharedShapeFrequency,
+  parseTravelRoutes,
+  shapeRoutePlace as sharedShapeRoutePlace,
+} from "./shared/departures.js";
 
 const TOUR_GROUP_ORDER = ["main"];
-const TOUR_DENYLIST = buildDenylist("tour");
 
-const CONSUMED_SOURCE_KEYS = [
-  "id",
-  "object_id",
-  "name_tour",
-  "partner",
-  "tour_types",
-  "activities",
-  "sustainability_certifications",
-  "departures",
-  "tours_prices",
-  "status_primarix",
-  "status",
-  "partner_visibility",
-  "date_created",
-  "date_updated",
-  "descriptions_translations",
-  "operator_direct",
-  "operator_linked",
-  "name_operator",
-  "booking_partner",
-  "partner_selected",
-  "street",
-  "street_number",
-  "postcode",
-  "place",
-  "state",
-  "country",
-  "location_tour32",
-  "destinations",
-  "countries",
-  "phone_general",
-  "phone_after_hours",
-  "email_general",
-  "website",
-  "booking_channel",
-  "email_booking",
-  "service_provider_id_tour32",
-  "main_service_provider_id_tour32",
-  "supplier_product_code",
-  "price_subline",
-  "participants_min",
-  "participants_max",
-  "children_free_number",
-  "children_free_age",
-  "week_min_before_start",
-  "mobility_advice_text",
-  "flight_service",
-  "airlines",
-  "travel_routes",
-  "departure_times",
-  "dates_translations",
-  "travel_categories",
-  "accommodation_types",
-  "departure_airports",
-  "price_info_translations",
-  "programme_translations",
-  "image_badge_translations",
-  "specials_translations",
-  "price_calculation_translations",
-  "surcharges_calculation_translations",
-  "categories",
-  "price_periods",
-  "prices",
-  "occupancies",
-  "surcharges",
-  "image_badge_status",
-  "image_badge_start_date",
-  "image_badge_end_date",
-  "media",
-  "user_created",
-  "user_updated",
-  "season",
-  "internal_remarks",
-  "internal_remarks_reservation",
-  "sell_prices_status",
-  "sell_prices_updated_at",
-  "object_info_primarix",
-];
-
-function getLocaleCode(translationsId) {
-  return typeof translationsId === "object"
-    ? translationsId?.code
-    : translationsId;
-}
-
-function buildTranslationsMap(rows, pickFields) {
-  const map = {};
-  for (const row of rows ?? []) {
-    const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale];
-    if (!iso) continue;
-    map[iso] = pickFields(row);
-  }
-  return map;
-}
-
-function pickFromMap(translationsMap, lang) {
-  if (!translationsMap || Object.keys(translationsMap).length === 0)
-    return null;
-  if (lang && translationsMap[lang]) return translationsMap[lang];
-  if (translationsMap["de-DE"]) return translationsMap["de-DE"];
-  if (translationsMap["en-GB"]) return translationsMap["en-GB"];
-  const firstKey = Object.keys(translationsMap)[0];
-  return translationsMap[firstKey];
-}
-
-function getGeoName(geo, lang) {
-  if (!geo) return null;
-  const map = buildTranslationsMap(geo.translations, (t) => t.name ?? null);
-  return pickFromMap(map, lang);
-}
-
-function buildPriceSettingsMap(priceCalculationRows) {
-  const map = {};
-  for (const row of priceCalculationRows ?? []) {
-    const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale];
-    if (!iso) continue;
-    map[iso] = {
-      marginPct: row.margin_percentage ?? null,
-      unit:
-        row.buy_price_type === "per_person"
-          ? "person"
-          : row.buy_price_type === "per_unit"
-            ? "unit"
-            : null,
-      fromPrice: row.from_price ?? null,
-      buyPriceType: row.buy_price_type ?? null,
-      sellPriceType: row.sell_price_type ?? null,
-      percentageType: row.percentage_type ?? null,
-      provisionPercentage: row.provision_percentage ?? null,
-      exchangeRate: toExchangeRateObject(row.exchange_rate),
-    };
-  }
-  return map;
-}
-
-function buildSurchargeSettingsMap(surchargesCalculationRows) {
-  const map = {};
-  for (const row of surchargesCalculationRows ?? []) {
-    const locale = getLocaleCode(row.translations_id);
-    const iso = LOCALE_TO_ISO[locale];
-    if (!iso) continue;
-    map[iso] = {
-      marginPct: row.surcharge_margin_percentage ?? null,
-      percentageType: row.surcharge_percentage_type ?? null,
-      provisionPercentage: row.surcharge_provision_percentage ?? null,
-      exchangeRate: toExchangeRateObject(row.surcharge_exchange_rate),
-    };
-  }
-  return map;
-}
-
-function shapeDestinations(rows, idKey, lang) {
-  if (!rows) return null;
-  return rows
-    .filter((r) => r && r[idKey])
-    .map((r) => {
-      const d = r[idKey];
-      return {
-        id: d.id,
-        name: getGeoName(d, lang),
-        code: d.media_code ?? null,
-      };
-    });
-}
-
-function shapeCountries(rows, idKey, lang) {
-  if (!rows) return null;
-  return rows
-    .map((r) => r[idKey])
-    .filter(Boolean)
-    .map((c) => ({ id: c.id, name: getGeoName(c, lang), code: c.ISO ?? null }));
-}
-
+/**
+ * Shapes the raw tour data into a summarized list item format.
+ *
+ * @param {Object} tour - The raw tour data from the database.
+ * @param {string} lang - The language code for translations.
+ * @returns {Object} The formatted tour list item payload.
+ */
 export function shapeTourListItem(tour, lang) {
   const descMap = buildTranslationsMap(tour.descriptions_translations, (t) => ({
     name_tour: t.name_tour ?? null,
@@ -195,25 +47,30 @@ export function shapeTourListItem(tour, lang) {
   return {
     id: tour.id,
     object_id: tour.object_id ?? null,
-    name: name_tour ?? tour.name ?? null,
+    name: name_tour ?? null,
     geo: {
-      countries: shapeCountries(tour.countries, "countries_id", lang),
-      destinations: shapeDestinations(
-        tour.destinations,
-        "destinations_id",
-        lang,
-      ),
+      countries: shapeGeoRefs(tour.countries, "countries_id", lang),
+      destinations: shapeGeoRefs(tour.destinations, "destinations_id", lang, {
+        codeKey: "media_code",
+      }),
     },
-    thumbnail: (() => {
-      const u = buildImageUrls(tour.media, lang)?.[0]?.url;
-      return u ? `${u}?width=400&height=300&fit=cover` : null;
-    })(),
+    thumbnail: buildThumbnailUrl(tour.media, lang),
     publishing_status: tour.status_primarix ?? null,
-    date_updated: ensureUtcSuffix(tour.date_updated),
+    date_updated: ensureUtcSuffix(tour.source_updated_at),
   };
 }
 
-export function shapeTourDetail(tour, lang) {
+/**
+ * Shapes the raw tour data into a comprehensive detail format.
+ * Aggregates translations, pricing, schedules, flight info, categories, surcharges, and metadata.
+ *
+ * @param {Object} tour - The raw tour data from the database.
+ * @param {string} lang - The language code for translations.
+ * @param {Object} [options] - Configuration options.
+ * @param {string} [options.audience] - The target audience (e.g., 'web', 'backoffice') to restrict data visibility.
+ * @returns {Object} The formatted tour detail payload.
+ */
+export function shapeTourDetail(tour, lang, { audience } = {}) {
   const descMap = buildTranslationsMap(tour.descriptions_translations, (t) => ({
     name_tour: t.name_tour ?? null,
     subline: t.subline ?? null,
@@ -236,6 +93,7 @@ export function shapeTourDetail(tour, lang) {
     children_policy: t.children_policy ?? null,
     participants_text: t.participants_text ?? null,
     price_info_supplementary: t.price_info_supplementary ?? null,
+    mobility_advice_text: t.mobility_advice_text ?? null,
   }));
 
   const programmeMap = buildTranslationsMap(
@@ -276,73 +134,32 @@ export function shapeTourDetail(tour, lang) {
   const programme_translations = pickFromMap(programmeMap, lang);
   const specials_translations = pickFromMap(specialsMap, lang);
 
-  const formatFrequencyName = (freq) => {
-    if (!freq) return null;
-    let parsed = freq;
-    if (typeof freq === "string") {
-      try {
-        parsed = JSON.parse(freq);
-      } catch (e) {
-        return freq;
-      }
-    }
-    if (typeof parsed !== "object" || parsed === null) return String(parsed);
-    const days = [];
-    if (parsed.monday) days.push("Monday");
-    if (parsed.tuesday) days.push("Tuesday");
-    if (parsed.wednesday) days.push("Wednesday");
-    if (parsed.thursday) days.push("Thursday");
-    if (parsed.friday) days.push("Friday");
-    if (parsed.saturday) days.push("Saturday");
-    if (parsed.sunday) days.push("Sunday");
-    return days.length > 0 ? days.join(", ") : null;
-  };
-
-  let parsedRoutes = [];
-  if (typeof tour.travel_routes === "string") {
-    try {
-      parsedRoutes = JSON.parse(tour.travel_routes);
-    } catch (e) {}
-  } else if (Array.isArray(tour.travel_routes)) {
-    parsedRoutes = tour.travel_routes;
-  }
+  const parsedRoutes = parseTravelRoutes(tour.travel_routes);
   const firstRoute = parsedRoutes?.[0] || {};
-  const shapeRoutePlace = (place) =>
-    place ? { id: place.id ?? null, name: getGeoName(place, lang) ?? null, code: null } : null;
   const tourDeparturePlace =
-    shapeRoutePlace(firstRoute.tour_departure) ??
-    (firstRoute.from ? { id: null, name: String(firstRoute.from), code: null } : null);
+    sharedShapeRoutePlace(firstRoute.tour_departure, lang) ??
+    (firstRoute.from
+      ? { id: null, name: String(firstRoute.from), code: null }
+      : null);
   const tourArrivalPlace =
-    shapeRoutePlace(firstRoute.tour_arrival) ??
-    (firstRoute.to ? { id: null, name: String(firstRoute.to), code: null } : null);
+    sharedShapeRoutePlace(firstRoute.tour_arrival, lang) ??
+    (firstRoute.to
+      ? { id: null, name: String(firstRoute.to), code: null }
+      : null);
 
-  // Format a frequency value. The m2m resolves to { trips_frequencies_id: { id, name } };
-  // fall back to the legacy free-text/JSON shape for old data. Preserves `formatFrequencyName`
-  // for the free-text weekday parser where a plain string/JSON object is present.
-  // Emits an array of refs so every selected frequency is surfaced.
-  const shapeFrequency = (freq) => {
-    if (!freq) return null;
-    if (Array.isArray(freq)) {
-      const refs = freq
-        .map((row) => row?.trips_frequencies_id ?? row ?? null)
-        .filter(Boolean)
-        .map((first) =>
-          first.name ? { id: first.id ?? null, name: first.name } : null,
-        )
-        .filter(Boolean);
-      return refs.length > 0 ? refs : null;
-    }
-    const parsed = formatFrequencyName(freq);
-    return parsed ? [{ id: null, name: parsed }] : null;
-  };
+  const sortedDepartureTimes = tour.departure_times
+    ? [...tour.departure_times].sort(
+        (a, b) => (a.sort ?? 9999) - (b.sort ?? 9999),
+      )
+    : null;
 
-  const departure_dates = tour.departure_times
-    ? tour.departure_times.map((d) => {
+  const departure_dates = sortedDepartureTimes
+    ? sortedDepartureTimes.map((d) => {
         return {
           available_from: d.available_from ?? null,
           available_to: d.available_to ?? null,
           frequency: d.departure_frequencies
-            ? shapeFrequency(d.departure_frequencies)
+            ? sharedShapeFrequency(d.departure_frequencies)
             : null,
           trip_duration: d.trip_duration ?? null,
           departure_place: tourDeparturePlace,
@@ -368,53 +185,60 @@ export function shapeTourDetail(tour, lang) {
         (tour.occupancies ?? [])
           .map((o) => {
             if (!o.occupancy) return null;
-            const occTrans = o.occupancy.translations ?? [];
-        const trans =
-          occTrans.find(
-            (x) =>
-              x.languages_code === lang || x.translations_id?.code === lang,
-          ) || occTrans[0];
-        return {
-          ...o.occupancy,
-          value: o.id,
-          name: trans?.name ?? o.occupancy.name ?? null,
-        };
-      })
-      .filter(Boolean),
-    LOCALE_TO_ISO,
-    {
-      categoryIdKey: "tours_category_id",
-      dateIdKey: "price_period_id",
-      occupancyIdKey: "occupancy_id",
-      dateStartKey: "price_period_start",
-      dateEndKey: "price_period_end",
-      dateFromKey: "price_period_from",
-    },
-    (cat) => {
-      const catMap = buildTranslationsMap(cat.translations, (t) => ({
-        text: t.category_text ?? null,
-        original: t.category_original ?? null,
-      }));
-      const catTrans = pickFromMap(catMap, lang);
+            const occTransMap = buildTranslationsMap(
+              o.occupancy.translations,
+              (t) => ({ name: t.name }),
+            );
+            const occTrans = pickFromMap(occTransMap, lang);
+            return {
+              ...o.occupancy,
+              value: o.id,
+              name: occTrans?.name ?? null,
+            };
+          })
+          .filter(Boolean),
+        LOCALE_TO_ISO,
+        {
+          categoryIdKey: "tours_category_id",
+          dateIdKey: "price_period_id",
+          occupancyIdKey: "occupancy_id",
+          dateStartKey: "price_period_start",
+          dateEndKey: "price_period_end",
+          dateFromKey: "price_period_from",
+        },
+        (cat) => {
+          const catMap = buildTranslationsMap(cat.translations, (t) => ({
+            text: t.category_text ?? null,
+            original: t.category_original ?? null,
+          }));
+          const catTrans = pickFromMap(catMap, lang);
 
-      const typeTranslations = cat.tour_category_type?.translations ?? [];
-      const typeTrans =
-        typeTranslations.find(
-          (x) => x.languages_code === lang || x.translations_id?.code === lang,
-        ) || typeTranslations[0];
-      const typeName = typeTrans?.name ?? cat.tour_category_type?.name ?? null;
+          const typeTransMap = buildTranslationsMap(
+            cat.tour_category_type?.translations,
+            (t) => ({ name: t.name }),
+          );
+          const typeTrans = pickFromMap(typeTransMap, lang);
+          const typeName = typeTrans?.name ?? null;
 
-      return {
-        type: cat.tour_category_type
-          ? { id: cat.tour_category_type.id, name: typeName }
-          : null,
-        text: catTrans?.text ?? null,
-        original: catTrans?.original ?? null,
-        supplier_code: cat.category_supplier_code ?? null,
-        from: !!cat.category_from,
-      };
-    },
-    { lang, marginPct: activeSettings.marginPct, unit: activeSettings.unit },
+          return {
+            type: cat.tour_category_type
+              ? { id: cat.tour_category_type.id, name: typeName }
+              : null,
+            text: catTrans?.text ?? null,
+            /* Restrict sensitive internal supplier codes and original text to backoffice visibility only. */
+            original: restrictTo(catTrans?.original ?? null, "backoffice"),
+            supplier_code: restrictTo(
+              cat.category_supplier_code ?? null,
+              "backoffice",
+            ),
+            from: !!cat.category_from,
+          };
+        },
+        {
+          lang,
+          marginPct: activeSettings.marginPct,
+          unit: activeSettings.unit,
+        },
       )
     : null;
 
@@ -428,40 +252,58 @@ export function shapeTourDetail(tour, lang) {
           booking_name: s.surcharge_booking_name ?? null,
           description: active.description ?? null,
           sell: null,
-          type: s.surcharge_type
-            ? {
-                id: s.surcharge_type.id,
-                name: s.surcharge_type.designation ?? null,
-              }
-            : null,
-          calculation_method: s.calculation_method
-            ? {
-                id: s.calculation_method.id,
-                name: s.calculation_method.designation ?? null,
-              }
-            : null,
-          buy: null,
-          margin:
+          /* Restrict internal pricing, margins, and calculation details to backoffice visibility.
+           * The public web payload is limited to `booking_name`, `description`, and `sell` price. */
+          type: restrictTo(
+            s.surcharge_type
+              ? {
+                  id: s.surcharge_type.id,
+                  name: s.surcharge_type.designation ?? null,
+                }
+              : null,
+            "backoffice",
+          ),
+          calculation_method: restrictTo(
+            s.calculation_method
+              ? {
+                  id: s.calculation_method.id,
+                  name: s.calculation_method.designation ?? null,
+                }
+              : null,
+            "backoffice",
+          ),
+          buy: restrictTo(null, "backoffice"),
+          margin: restrictTo(
             activeSurchargeSettings.marginPct !== undefined &&
-            activeSurchargeSettings.marginPct !== null
+              activeSurchargeSettings.marginPct !== null
               ? parseFloat(activeSurchargeSettings.marginPct)
               : null,
-    };
-    })
+            "backoffice",
+          ),
+        };
+      })
     : null;
 
   const fieldDefs = [
-    { key: "id", group: "main", value: tour.id },
-    { key: "object_id", group: "main", value: tour.object_id ?? null },
+    /* Top-level metadata is restricted to backoffice endpoints to prevent exposing internal system state to the public web. */
+    { key: "id", group: "main", value: tour.id, visibleTo: ["backoffice"] },
+    {
+      key: "object_id",
+      group: "main",
+      value: tour.object_id ?? null,
+      visibleTo: ["backoffice"],
+    },
     {
       key: "publishing_status",
       group: "main",
       value: tour.status_primarix ?? null,
+      visibleTo: ["backoffice"],
     },
     {
       key: "date_updated",
       group: "main",
-      value: ensureUtcSuffix(tour.date_updated),
+      value: ensureUtcSuffix(tour.source_updated_at),
+      visibleTo: ["backoffice"],
     },
     {
       key: "season",
@@ -470,78 +312,43 @@ export function shapeTourDetail(tour, lang) {
         ? { id: tour.season.id, name: tour.season.season }
         : null,
     },
+    /* For web clients, the tour name is provided via the product envelope rather than the type-specific body.
+     * Therefore, this field is restricted to backoffice visibility. */
     {
       key: "name",
       group: "main",
-      value: translations?.name_tour ?? tour.name ?? null,
+      value: translations?.name_tour ?? null,
+      visibleTo: ["backoffice"],
     },
     {
       key: "operator",
       group: "main",
-      value: {
-        operator_direct: tour.operator_direct ?? null,
-        operator_linked: tour.operator_linked
-          ? {
-              id: tour.operator_linked.id,
-              name: tour.operator_linked.name_agency ?? null,
-            }
-          : null,
-        name_operator: tour.name_operator ?? null,
-        street: tour.street ?? null,
-        street_number: tour.street_number ?? null,
-        postcode: tour.postcode ?? null,
-        place: tour.place
-          ? {
-              id: tour.place.id,
-              name: getGeoName(tour.place, lang) ?? null,
-              code: null,
-            }
-          : null,
-        state: tour.state
-          ? {
-              id: tour.state.id,
-              name: getGeoName(tour.state, lang) ?? null,
-              code: tour.state.ISO ?? null,
-            }
-          : null,
-        country: tour.country
-          ? {
-              id: tour.country.id,
-              name: getGeoName(tour.country, lang) ?? null,
-              code: tour.country.ISO ?? null,
-            }
-          : null,
-        location_tour32: tour.location_tour32
-          ? {
-              id: tour.location_tour32.id,
-              name: tour.location_tour32.name ?? null,
-            }
-          : null,
-        phone_general: tour.phone_general ?? null,
-        phone_after_hours: tour.phone_after_hours ?? null,
-        email_general: tour.email_general ?? null,
-        website: tour.website ?? null,
-      },
+      visibleTo: ["backoffice"],
+      value: shapeOperatorAddress({
+        operatorLinked: tour.operator_linked,
+        operatorDirect: tour.operator_direct,
+        nameOperator: tour.name_operator,
+        lang,
+      }),
     },
     {
       key: "classification",
       group: "main",
       value: {
-        destinations: shapeDestinations(
-          tour.destinations,
-          "destinations_id",
-          lang,
-        ),
-        countries: shapeCountries(tour.countries, "countries_id", lang),
+        destinations: shapeGeoRefs(tour.destinations, "destinations_id", lang, {
+          codeKey: "media_code",
+        }),
+        countries: shapeGeoRefs(tour.countries, "countries_id", lang),
         travel_categories: tour.travel_categories
           ? tour.travel_categories
               .map((t) => t.travel_categories_id)
               .filter(Boolean)
               .map((t) => {
-                const tr = (t.translations ?? []).find(
-                  (x) => x.languages_code === lang,
-                );
-                return { id: t.id, name: tr?.name ?? t.name ?? null };
+                const trMap = buildTranslationsMap(t.translations, (x) => ({
+                  name: x.name,
+                }));
+                const tr = pickFromMap(trMap, lang);
+                return { id: t.id, name: tr?.name ?? null };
               })
           : null,
         accommodation_types: tour.accommodation_types
@@ -575,7 +382,7 @@ export function shapeTourDetail(tour, lang) {
           : null,
         airlines: tour.airlines
           ? [{ id: tour.airlines.id, name: tour.airlines.name }]
-          : null,
+          : [],
         departure_airports: tour.departure_airports
           ? tour.departure_airports
               .map((a) => a.airports_id)
@@ -598,7 +405,7 @@ export function shapeTourDetail(tour, lang) {
               day_description: d.day_description ?? null,
               day_accommodation_note: d.day_accommodation_note ?? null,
             }))
-          : null,
+          : [],
       },
     },
     {
@@ -617,17 +424,9 @@ export function shapeTourDetail(tour, lang) {
         departure: price_info_translations?.departure ?? null,
         children_policy: price_info_translations?.children_policy ?? null,
         participants_text: price_info_translations?.participants_text ?? null,
-        mobility_advice: tour.mobility_advice_text?.id
-          ? {
-              id: tour.mobility_advice_text.id,
-              name: pickFromMap(
-                buildTranslationsMap(
-                  tour.mobility_advice_text.hotel_translations,
-                  (t) => t.hotel_mobility_advice_text ?? null,
-                ),
-                lang,
-              ),
-            }
+        /* Tours map `mobility_advice_text` as a flat per-language string, so the `id` is explicitly null. */
+        mobility_advice: price_info_translations?.mobility_advice_text
+          ? { id: null, name: price_info_translations.mobility_advice_text }
           : null,
         supplementary: toSupplementaryBlocks(
           price_info_translations?.price_info_supplementary,
@@ -639,29 +438,11 @@ export function shapeTourDetail(tour, lang) {
       key: "attributes",
       group: "main",
       value: {
-        children_free_age:
-          tour.children_free_age !== undefined &&
-          tour.children_free_age !== null
-            ? Number(tour.children_free_age)
-            : null,
-        children_free_number:
-          tour.children_free_number !== undefined &&
-          tour.children_free_number !== null
-            ? Number(tour.children_free_number)
-            : null,
-        participants_min:
-          tour.participants_min !== undefined && tour.participants_min !== null
-            ? Number(tour.participants_min)
-            : null,
-        participants_max:
-          tour.participants_max !== undefined && tour.participants_max !== null
-            ? Number(tour.participants_max)
-            : null,
-        week_min_before_start:
-          tour.week_min_before_start !== undefined &&
-          tour.week_min_before_start !== null
-            ? Number(tour.week_min_before_start)
-            : null,
+        children_free_age: toNumOrNull(tour?.children_free_age),
+        children_free_number: toNumOrNull(tour?.children_free_number),
+        participants_min: toNumOrNull(tour?.participants_min),
+        participants_max: toNumOrNull(tour?.participants_max),
+        week_min_before_start: toNumOrNull(tour?.week_min_before_start),
       },
     },
     {
@@ -678,28 +459,26 @@ export function shapeTourDetail(tour, lang) {
       key: "specials",
       group: "main",
       value: {
-        special_description: specials_translations?.specials != null
-          ? extractSpecialsDescription(specials_translations.specials)
-          : null,
+        special_description:
+          specials_translations?.specials != null
+            ? extractSpecialsDescription(specials_translations.specials)
+            : null,
       },
     },
     {
       key: "image_badge",
       group: "main",
-      value: tour.image_badge_status
-        ? {
-            teaser: badgeMap?.[lang]?.image_badge_teaser ?? null,
-            details: badgeMap?.[lang]?.image_badge_details ?? null,
-            start_date: tour.image_badge_start_date ?? null,
-            end_date: tour.image_badge_end_date ?? null,
-            status: tour.image_badge_status ?? null,
-          }
-        : null,
+      value: buildImageBadge(tour, badgeMap?.[lang]),
     },
-    { key: "media", group: "main", value: tour.media ? buildImageUrls(tour.media, lang) : null },
+    {
+      key: "media",
+      group: "main",
+      value: tour.media ? buildImageUrls(tour.media, lang) : null,
+    },
     {
       key: "booking",
       group: "main",
+      visibleTo: ["backoffice"],
       value: {
         booking_channel: tour.booking_channel ?? null,
         booking_partner: tour.booking_partner
@@ -708,9 +487,9 @@ export function shapeTourDetail(tour, lang) {
               name: tour.booking_partner.name_agency ?? null,
             }
           : null,
-        id_service_provider_tour32: tour.service_provider_id_tour32 ?? null,
+        id_service_provider_tour32: tour.id_service_provider_tour32 ?? null,
         id_main_service_provider_tour32:
-          tour.main_service_provider_id_tour32 ?? null,
+          tour.id_main_service_provider_tour32 ?? null,
         res_phone: tour.booking_partner?.phone_reservation ?? null,
         res_email2: tour.booking_partner?.email_reservation ?? null,
         email_booking: tour.email_booking ?? null,
@@ -718,46 +497,26 @@ export function shapeTourDetail(tour, lang) {
         contact_greeting: tour.booking_partner?.contact_greeting ?? null,
         contact_firstname: tour.booking_partner?.contact_first_name ?? null,
         contact_name: tour.booking_partner?.contact_name ?? null,
-        internal_remarks_reservation: tour.internal_remarks_reservation ?? null,
+        internal_remarks_reservation:
+          tour.booking_partner?.internal_remarks_reservation ?? null,
       },
     },
     {
       key: "pricing_config",
       group: "main",
-      value: {
-        buy_price_type: activeSettings.buyPriceType ?? null,
-        sell_price_type: activeSettings.sellPriceType ?? null,
-        percentage_type: activeSettings.percentageType ?? null,
-        provision_percentage:
-          activeSettings.provisionPercentage !== undefined &&
-          activeSettings.provisionPercentage !== null
-            ? Number(activeSettings.provisionPercentage)
-            : null,
-        margin_percentage:
-          activeSettings.marginPct !== undefined &&
-          activeSettings.marginPct !== null
-            ? Number(activeSettings.marginPct)
-            : null,
-        exchange_rate: activeSettings.exchangeRate ?? null,
-        from_price: activeSettings.fromPrice ?? null,
-        surcharge_percentage_type:
-          activeSurchargeSettings.percentageType ?? null,
-        surcharge_provision_percentage:
-          activeSurchargeSettings.provisionPercentage !== undefined &&
-          activeSurchargeSettings.provisionPercentage !== null
-            ? Number(activeSurchargeSettings.provisionPercentage)
-            : null,
-        surcharge_margin_percentage:
-          activeSurchargeSettings.marginPct !== undefined &&
-          activeSurchargeSettings.marginPct !== null
-            ? Number(activeSurchargeSettings.marginPct)
-            : null,
-        surcharge_exchange_rate: activeSurchargeSettings.exchangeRate ?? null,
-      },
+      visibleTo: ["backoffice"],
+      value: buildPricingConfig({
+        settings: activeSettings,
+        surchargeSettings: activeSurchargeSettings,
+        exchangeRate: activeSettings.exchangeRate ?? null,
+        fromPrice: activeSettings.fromPrice ?? null,
+        surchargeExchangeRate: activeSurchargeSettings.exchangeRate ?? null,
+      }),
     },
     {
       key: "internal",
       group: "main",
+      visibleTo: ["backoffice"],
       value: {
         object_info_primarix: tour.object_info_primarix ?? null,
         internal_remarks: tour.internal_remarks ?? null,
@@ -772,8 +531,6 @@ export function shapeTourDetail(tour, lang) {
   return assembleResponse({
     fieldDefs,
     groupOrder: TOUR_GROUP_ORDER,
-    rawItem: tour,
-    consumedSourceKeys: CONSUMED_SOURCE_KEYS,
-    denylist: TOUR_DENYLIST,
+    audience,
   });
 }
