@@ -40,8 +40,8 @@ main: https://directus-prod-botg.func.team
 
 const env = {
   // PROD (main)
-  DIRECTUS_URL: "https://directus-prod-botg.func.team",
-  DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
+  DIRECTUS_URL: "https://dev.content.botg.cloud",
+  DIRECTUS_TOKEN: "1ecR7PLJIpOZZOMUUaOERZWkKv0YT14q",
   // // staging
   // DIRECTUS_URL: "https://directus-staging-botg.func.team",
   // DIRECTUS_TOKEN: "OSKnNsUKU2S2bpi0niaZ_HMpLr8q5cnN",
@@ -125,9 +125,9 @@ async function transformCollectionData(
 
     const response = await directusRequest("GET", path);
 
-    console.log("response", response);
+    // console.log("response", response);
     const items = response.data || [];
-    console.log("items", items);
+    // console.log("items", items);
 
     console.log(`Found ${items.length} items. Starting transformation...`);
 
@@ -258,9 +258,9 @@ const endIdArg = process.argv[3] ? parseInt(process.argv[3]) : null;
 
 // Run the script
 transformCollectionData(
-  "hotels", // Collection Name
-  "season_2", // Field to read from
-  "season", // Field to update (can be the same or different)
+  "agencies", // Collection Name
+  "object_id", // Field to read from
+  "object_id_primarix", // Field to update (can be the same or different)
   myTransformFunction, // Your transformation function
   // startIdArg, // Optional Start ID
   // startIdArg, // Optional End ID
