@@ -5,6 +5,7 @@ import {
 	downloadManyAsZipForChoice,
 } from './downloadExecute'
 import type { DownloadFileMeta, SaveTarget } from './zipDownloadShared'
+import { filesPartnerOrFilter } from '../composables/usePartnerScope'
 
 export type AlbumDownloadResult =
 	| { ok: true; count: number }
@@ -27,13 +28,14 @@ async function fetchAlbumFileIds(api: DownloadApiClient, albumId: string): Promi
 async function fetchFileMeta(
 	api: DownloadApiClient,
 	fileIds: string[],
-	partnerScopeId?: string | null,
+	partnerScopeIds?: string[] | null,
 ): Promise<DownloadFileMeta[]> {
 	if (!fileIds.length) return []
 	const base = { id: { _in: fileIds } }
-	const filter = partnerScopeId
-		? { _and: [base, { uploaded_by: { partner_selected: { _eq: partnerScopeId } } }] }
-		: base
+	const filter =
+		partnerScopeIds && partnerScopeIds.length > 0
+			? { _and: [base, filesPartnerOrFilter(partnerScopeIds)] }
+			: base
 	const res = await api.get('/files', {
 		params: {
 			filter,
@@ -70,17 +72,17 @@ function toDownloadModalFile(file: DownloadFileMeta): DownloadModalFile {
 export async function fetchAlbumDownloadFiles(
 	api: DownloadApiClient,
 	albumId: string,
-	partnerScopeId?: string | null,
+	partnerScopeIds?: string[] | null,
 ): Promise<DownloadModalFile[]> {
 	const fileIds = await fetchAlbumFileIds(api, albumId)
 	if (!fileIds.length) return []
-	const files = await fetchFileMeta(api, fileIds, partnerScopeId)
+	const files = await fetchFileMeta(api, fileIds, partnerScopeIds)
 	return files.map(toDownloadModalFile)
 }
 
 /**
  * Download album as ZIP — images use chosen transform; videos stay original.
- * When partnerScopeId is set, only same-partner uploads are included.
+ * When partnerScopeIds is set, only files visible to one of those partners are included.
  */
 export async function downloadAlbumAsZip(
 	api: DownloadApiClient,
@@ -88,13 +90,13 @@ export async function downloadAlbumAsZip(
 	albumName: string,
 	choice: DownloadChoice,
 	saveTarget: SaveTarget,
-	partnerScopeId?: string | null,
+	partnerScopeIds?: string[] | null,
 ): Promise<AlbumDownloadResult> {
 	try {
 		const fileIds = await fetchAlbumFileIds(api, albumId)
 		if (!fileIds.length) return { ok: false, reason: 'empty' }
 
-		const files = await fetchFileMeta(api, fileIds, partnerScopeId)
+		const files = await fetchFileMeta(api, fileIds, partnerScopeIds)
 		if (!files.length) return { ok: false, reason: 'empty' }
 
 		return downloadManyAsZipForChoice(api, files, albumName, choice, saveTarget)

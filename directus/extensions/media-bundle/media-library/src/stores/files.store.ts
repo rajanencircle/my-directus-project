@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useApi, useStores } from '@directus/extensions-sdk'
-import { usePartnerScope } from '../composables/usePartnerScope'
+import { usePartnerScope, filesPartnerOrFilter } from '../composables/usePartnerScope'
+
+type PartnerJunctionRow = { partner_id?: { id?: string; visually?: string | null; label?: string | null } | null }
 
 export interface DirectusFile {
   id: string
@@ -21,8 +23,10 @@ export interface DirectusFile {
     first_name: string
     last_name: string
     avatar: string | null
-    partner_selected?: string | { id?: string; visually?: string | null } | null
+    partner_selected?: PartnerJunctionRow[] | null
   } | null
+  /** M2M — this file's own partner scope. Empty/absent = visible to all partners. */
+  partner_selected?: PartnerJunctionRow[] | null
   modified_on?: string | null
   modified_by?: string | { id: string; first_name: string; last_name: string; avatar?: string | null } | null
   folder: string | null
@@ -75,9 +79,12 @@ const FILE_FIELDS = [
   'uploaded_by.first_name',
   'uploaded_by.last_name',
   'uploaded_by.avatar',
-  'uploaded_by.partner_selected.id',
-  'uploaded_by.partner_selected.visually',
-  'uploaded_by.partner_selected.label',
+  'uploaded_by.partner_selected.partner_id.id',
+  'uploaded_by.partner_selected.partner_id.visually',
+  'uploaded_by.partner_selected.partner_id.label',
+  'partner_selected.partner_id.id',
+  'partner_selected.partner_id.visually',
+  'partner_selected.partner_id.label',
   'modified_by.id',
   'modified_by.first_name',
   'modified_by.last_name',
@@ -100,7 +107,7 @@ export const useFilesStore = defineStore('media-library-files', () => {
   const api = useApi()
   const { useUserStore } = useStores()
   const userStore = useUserStore()
-  const { partnerScopeId, isPartnerScoped } = usePartnerScope()
+  const { partnerScopeIds, isPartnerScoped } = usePartnerScope()
 
   const files = ref<DirectusFile[]>([])
   const totalCount = ref(0)
@@ -268,7 +275,7 @@ export const useFilesStore = defineStore('media-library-files', () => {
         builtIn['uploaded_by'] = { _eq: currentUserId }
       }
     } else if (isPartnerScoped.value) {
-      builtIn['uploaded_by'] = { partner_selected: { _eq: partnerScopeId.value } }
+      Object.assign(builtIn, filesPartnerOrFilter(partnerScopeIds.value ?? []))
     }
 
     if (activeFilter.value === 'all' && folderTarget !== undefined) {

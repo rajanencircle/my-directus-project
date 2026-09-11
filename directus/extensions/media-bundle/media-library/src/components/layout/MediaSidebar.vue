@@ -423,10 +423,10 @@ watch(deleteDialogOpen, (open) => {
   }
 })
 
-const { isPartnerScoped, partnerScopeId, init: initPartnerScope } = usePartnerScope()
+const { isPartnerScoped, partnerScopeIds, init: initPartnerScope } = usePartnerScope()
 
 const downloadPartnerScopeId = computed(() =>
-	isPartnerScoped.value ? partnerScopeId.value : null,
+	isPartnerScoped.value ? partnerScopeIds.value : null,
 )
 
 const navItems = computed(() => {

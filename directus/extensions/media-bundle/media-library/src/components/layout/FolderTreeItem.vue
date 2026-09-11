@@ -112,7 +112,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import type { FolderNode } from '../../stores/folders.store'
-import { partnerAccentStyle } from '../../utils/partnerAccent'
+import { partnerAccentStyleForList } from '../../utils/partnerAccent'
 
 const props = withDefaults(
 	defineProps<{
@@ -143,7 +143,7 @@ const isThisFolderDownloading = computed(() =>
 	props.downloadingFolderIds.includes(props.node.id),
 )
 
-const accentStyle = computed(() => partnerAccentStyle(props.node.createdByPartnerVisually))
+const accentStyle = computed(() => partnerAccentStyleForList(props.node.createdByPartnerVisuallyList))
 
 function clampMenuPosition(x: number, y: number) {
 	const pad = 8

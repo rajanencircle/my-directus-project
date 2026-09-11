@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
 import { computed, inject } from 'vue'
-import { partnerAccentStyle } from '../../utils/partnerAccent'
+import { partnerAccentStyleForList } from '../../utils/partnerAccent'
 
 export interface FolderTreeNode {
   id: string
   name: string
   parent: string | null
   children: FolderTreeNode[]
-  createdByPartnerVisually?: string | null
+  createdByPartnerVisuallyList?: string[]
 }
 
 const props = defineProps<{
@@ -26,7 +26,7 @@ defineEmits<{
 const expandedInjected = inject<Ref<Set<string>>>('folderDropdownExpanded')
 const statsLabelFn = inject<(folderId: string | null) => string | null>('folderDropdownStatsLabel')
 
-const accentStyle = computed(() => partnerAccentStyle(props.node.createdByPartnerVisually))
+const accentStyle = computed(() => partnerAccentStyleForList(props.node.createdByPartnerVisuallyList))
 
 function statsLabel(id: string): string | null {
   return statsLabelFn?.(id) ?? null

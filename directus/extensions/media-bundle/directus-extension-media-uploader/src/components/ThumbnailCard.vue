@@ -17,9 +17,9 @@ import {
 import type { SaveTarget } from '../../../media-library/src/utils/zipDownloadShared';
 import FileThumbPreview from './FileThumbPreview.vue';
 import {
-  partnerAccentStyle,
-  partnerLabelFromUser,
-  partnerVisuallyFromUser,
+  partnerAccentStyleForList,
+  partnerLabelListFromRelation,
+  partnerVisuallyListFromRelation,
   userDisplayName,
 } from '../../../media-library/src/utils/partnerAccent';
 
@@ -39,6 +39,8 @@ interface DirectusFile {
   description?: string | null;
   copyright?: string | null;
   uploaded_by?: unknown;
+  /** M2M — this file's own partner scope. Empty/absent = visible to all partners. */
+  partner_selected?: unknown;
 }
 
 interface JunctionRow {
@@ -72,7 +74,7 @@ const file = computed(() => props.row[props.filesFkField] as DirectusFile);
 const expired = computed(() => isExpired(file.value?.expiry_date ?? null));
 
 const accentStyle = computed(() =>
-  partnerAccentStyle(partnerVisuallyFromUser(file.value?.uploaded_by)),
+  partnerAccentStyleForList(partnerVisuallyListFromRelation(file.value?.partner_selected)),
 );
 
 const partnerInfoImageName = computed(
@@ -87,9 +89,10 @@ const partnerInfoUploadedBy = computed(
   () => userDisplayName(file.value?.uploaded_by) || '',
 );
 
-const partnerInfoPartnerName = computed(
-  () => partnerLabelFromUser(file.value?.uploaded_by) || '',
-);
+const partnerInfoPartnerName = computed(() => {
+  const labels = partnerLabelListFromRelation(file.value?.partner_selected);
+  return labels.length > 0 ? labels.join(', ') : 'All partners';
+});
 
 const partnerInfoUploadedDate = computed(() => {
   const iso = file.value?.uploaded_on ?? file.value?.created_on ?? null;

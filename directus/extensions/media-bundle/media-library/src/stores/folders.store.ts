@@ -3,8 +3,8 @@ import { ref, computed } from 'vue'
 import { useApi } from '@directus/extensions-sdk'
 import {
   collectPartnerFolderIds,
-  partnerIdFromCreatedBy,
-  partnerVisuallyFromCreatedBy,
+  partnerIdsFromCreatedBy,
+  partnerVisuallyListFromCreatedBy,
   usePartnerScope,
 } from '../composables/usePartnerScope'
 
@@ -13,16 +13,16 @@ export interface FolderNode {
   name: string
   parent: string | null
   children: FolderNode[]
-  createdByPartnerId?: string | null
-  createdByPartnerVisually?: string | null
+  createdByPartnerIds?: string[]
+  createdByPartnerVisuallyList?: string[]
 }
 
 interface RawFolder {
   id: string
   name: string
   parent: string | null
-  createdByPartnerId?: string | null
-  createdByPartnerVisually?: string | null
+  createdByPartnerIds?: string[]
+  createdByPartnerVisuallyList?: string[]
 }
 
 function buildTree(flat: RawFolder[], parentId: string | null = null): FolderNode[] {
@@ -32,8 +32,8 @@ function buildTree(flat: RawFolder[], parentId: string | null = null): FolderNod
       id: f.id,
       name: f.name,
       parent: f.parent,
-      createdByPartnerId: f.createdByPartnerId,
-      createdByPartnerVisually: f.createdByPartnerVisually,
+      createdByPartnerIds: f.createdByPartnerIds,
+      createdByPartnerVisuallyList: f.createdByPartnerVisuallyList,
       children: buildTree(flat, f.id),
     }))
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -55,15 +55,15 @@ function mapFolderRows(rows: unknown[]): RawFolder[] {
       id: String(f.id),
       name: String(f.name ?? ''),
       parent: normalizeParent(f.parent),
-      createdByPartnerId: partnerIdFromCreatedBy(f.created_by),
-      createdByPartnerVisually: partnerVisuallyFromCreatedBy(f.created_by),
+      createdByPartnerIds: partnerIdsFromCreatedBy(f.created_by),
+      createdByPartnerVisuallyList: partnerVisuallyListFromCreatedBy(f.created_by),
     }
   })
 }
 
 export const useFoldersStore = defineStore('media-library-folders', () => {
   const api = useApi()
-  const { partnerScopeId, currentUserId, isPartnerScoped, init: initPartnerScope } = usePartnerScope()
+  const { partnerScopeIds, currentUserId, isPartnerScoped, init: initPartnerScope } = usePartnerScope()
 
   const rawFolders = ref<RawFolder[]>([])
   const selectedFolderId = ref<string | null>(null)
@@ -86,8 +86,8 @@ export const useFoldersStore = defineStore('media-library-folders', () => {
         id: f.id,
         name: f.name,
         parent: f.parent,
-        createdByPartnerId: f.createdByPartnerId,
-        createdByPartnerVisually: f.createdByPartnerVisually,
+        createdByPartnerIds: f.createdByPartnerIds,
+        createdByPartnerVisuallyList: f.createdByPartnerVisuallyList,
         children: getSubfolders(f.id),
       }))
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -111,8 +111,12 @@ export const useFoldersStore = defineStore('media-library-folders', () => {
   }
 
   async function applyPartnerPrune(all: RawFolder[]): Promise<void> {
-    if (isPartnerScoped.value && partnerScopeId.value) {
-      const allowed = await collectPartnerFolderIds(api, partnerScopeId.value, all)
+    if (isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0) {
+      const allowed = await collectPartnerFolderIds(
+        api,
+        partnerScopeIds.value ?? [],
+        all.map((f) => ({ id: f.id, parent: f.parent, createdByPartnerIds: f.createdByPartnerIds })),
+      )
       rawFolders.value = all.filter((f) => allowed.has(f.id))
     } else {
       rawFolders.value = all
@@ -132,7 +136,13 @@ export const useFoldersStore = defineStore('media-library-folders', () => {
       try {
         const response = await api.get('/folders', {
           params: {
-            fields: ['id', 'name', 'parent', 'created_by.partner_selected.id', 'created_by.partner_selected.visually'],
+            fields: [
+              'id',
+              'name',
+              'parent',
+              'created_by.partner_selected.partner_id.id',
+              'created_by.partner_selected.partner_id.visually',
+            ],
             limit: -1,
           },
         })

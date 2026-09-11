@@ -2,7 +2,7 @@
 import { ref, computed, inject, onMounted, onBeforeUnmount, watch, provide } from 'vue';
 import type { ComputedRef } from 'vue';
 import { useApi } from '@directus/extensions-sdk';
-import { collectPartnerFolderIds, partnerIdFromCreatedBy, partnerVisuallyFromCreatedBy, usePartnerScope } from '../../../media-library/src/composables/usePartnerScope';
+import { collectPartnerFolderIds, partnerIdsFromCreatedBy, partnerVisuallyListFromCreatedBy, usePartnerScope } from '../../../media-library/src/composables/usePartnerScope';
 import FolderTreeItem from './FolderTreeItem.vue';
 
 type UploaderLabels = Record<string, string>
@@ -13,8 +13,10 @@ interface DirectusFolder {
   id: string;
   name: string;
   parent: string | null;
-  createdByPartnerId?: string | null;
-  createdByPartnerVisually?: string | null;
+  createdByPartnerIds?: string[];
+  createdByPartnerVisuallyList?: string[];
+  /** M2O -> destinations_cluster. Set = destination-cluster folder; null = non-destination (e.g. Portraits). */
+  destinationsCluster?: number | null;
 }
 
 type FolderNode = DirectusFolder & { children: FolderNode[] };
@@ -22,6 +24,8 @@ type FolderNode = DirectusFolder & { children: FolderNode[] };
 const props = defineProps<{
   modelValue: string | null;
   excludeId?: string | null;
+  /** "Other Upload" mode (Ticket 2) — only show folders NOT tied to a destinations_cluster. */
+  nonDestinationOnly?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -29,7 +33,7 @@ const emit = defineEmits<{
 }>();
 
 const api = useApi();
-const { partnerScopeId, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
+const { partnerScopeIds, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
 
 const folders = ref<DirectusFolder[]>([]);
 const loading = ref(false);
@@ -47,19 +51,30 @@ function normalizeParentId(parent: unknown): string | null {
   return String(parent);
 }
 
+function normalizeDestinationsCluster(value: unknown): number | null {
+  if (value == null || value === '') return null;
+  const raw = typeof value === 'object' ? (value as { id?: unknown }).id : value;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
 function normalizeFolderRaw(item: Record<string, unknown>): DirectusFolder {
   return {
     id: String(item.id ?? ''),
     name: String(item.name ?? ''),
     parent: normalizeParentId(item.parent),
-    createdByPartnerId: partnerIdFromCreatedBy(item.created_by),
-    createdByPartnerVisually: partnerVisuallyFromCreatedBy(item.created_by),
+    createdByPartnerIds: partnerIdsFromCreatedBy(item.created_by),
+    createdByPartnerVisuallyList: partnerVisuallyListFromCreatedBy(item.created_by),
+    destinationsCluster: normalizeDestinationsCluster(item.destinations_cluster),
   };
 }
 
-const visibleFolders = computed(() =>
-  props.excludeId ? folders.value.filter((f) => f.id !== props.excludeId) : folders.value
-);
+const visibleFolders = computed(() => {
+  let list = folders.value;
+  if (props.excludeId) list = list.filter((f) => f.id !== props.excludeId);
+  if (props.nonDestinationOnly) list = list.filter((f) => f.destinationsCluster == null);
+  return list;
+});
 
 const folderMap = computed(() => new Map(visibleFolders.value.map((f) => [String(f.id), f])));
 
@@ -149,7 +164,14 @@ async function fetchFolders(opts?: { silent?: boolean }) {
       const res = await api.get('/folders', {
         params: {
           limit: -1,
-          fields: ['id', 'name', 'parent', 'created_by.partner_selected.id', 'created_by.partner_selected.visually'],
+          fields: [
+            'id',
+            'name',
+            'parent',
+            'destinations_cluster',
+            'created_by.partner_selected.partner_id.id',
+            'created_by.partner_selected.partner_id.visually',
+          ],
         },
       });
       rows = Array.isArray(res.data?.data) ? res.data.data : [];
@@ -157,14 +179,14 @@ async function fetchFolders(opts?: { silent?: boolean }) {
       const res = await api.get('/folders', {
         params: {
           limit: -1,
-          fields: 'id,name,parent',
+          fields: 'id,name,parent,destinations_cluster',
         },
       });
       rows = Array.isArray(res.data?.data) ? res.data.data : [];
     }
     const all = rows.map((r: Record<string, unknown>) => normalizeFolderRaw(r));
-    if (isPartnerScoped.value && partnerScopeId.value) {
-      const allowed = await collectPartnerFolderIds(api, partnerScopeId.value, all);
+    if (isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0) {
+      const allowed = await collectPartnerFolderIds(api, partnerScopeIds.value ?? [], all);
       folders.value = all.filter((f) => allowed.has(f.id));
     } else {
       folders.value = all;

@@ -1,6 +1,7 @@
 import type { DownloadChoice } from './downloadVariants'
 import type { DownloadModalFile } from './downloadVariants'
 import { collectDescendantFolderIds, type FolderRef } from './deleteFolder'
+import { filesPartnerOrFilter } from '../composables/usePartnerScope'
 import {
 	type DownloadApiClient,
 	downloadManyAsZipForChoice,
@@ -24,11 +25,11 @@ function toDownloadModalFile(file: FileRow): DownloadModalFile {
 	}
 }
 
-function folderFilesFilter(folderIds: string[], partnerScopeId?: string | null) {
+function folderFilesFilter(folderIds: string[], partnerScopeIds?: string[] | null) {
 	const base = { folder: { _in: folderIds } }
-	if (!partnerScopeId) return base
+	if (!partnerScopeIds || partnerScopeIds.length === 0) return base
 	return {
-		_and: [base, { uploaded_by: { partner_selected: { _eq: partnerScopeId } } }],
+		_and: [base, filesPartnerOrFilter(partnerScopeIds)],
 	}
 }
 
@@ -37,12 +38,12 @@ export async function fetchFolderDownloadFiles(
 	api: DownloadApiClient,
 	folderId: string,
 	allFolders: FolderRef[],
-	partnerScopeId?: string | null,
+	partnerScopeIds?: string[] | null,
 ): Promise<DownloadModalFile[]> {
 	const folderIds = collectDescendantFolderIds(allFolders, [folderId])
 	const filesRes = await api.get('/files', {
 		params: {
-			filter: folderFilesFilter(folderIds, partnerScopeId),
+			filter: folderFilesFilter(folderIds, partnerScopeIds),
 			fields: [
 				'id',
 				'filename_download',
@@ -72,7 +73,7 @@ export type FolderDownloadResult =
 /**
  * Download folder (+ nested) as ZIP.
  * Images → selected choice transform; videos/other stay original.
- * When partnerScopeId is set, only same-partner uploads are included.
+ * When partnerScopeIds is set, only files visible to one of those partners are included.
  */
 export async function downloadFolderAsZip(
 	api: DownloadApiClient,
@@ -81,13 +82,13 @@ export async function downloadFolderAsZip(
 	allFolders: FolderRef[],
 	choice: DownloadChoice,
 	saveTarget: SaveTarget,
-	partnerScopeId?: string | null,
+	partnerScopeIds?: string[] | null,
 ): Promise<FolderDownloadResult> {
 	try {
 		const folderIds = collectDescendantFolderIds(allFolders, [folderId])
 		const filesRes = await api.get('/files', {
 			params: {
-				filter: folderFilesFilter(folderIds, partnerScopeId),
+				filter: folderFilesFilter(folderIds, partnerScopeIds),
 				fields: [
 					'id',
 					'filename_download',

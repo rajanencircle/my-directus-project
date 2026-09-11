@@ -3,11 +3,11 @@ import { computed, inject, onMounted, ref, watch } from "vue";
 import type { ComputedRef } from "vue";
 import { useApi } from "@directus/extensions-sdk";
 import { useT } from "../composables/useT";
-import { partnerAlbumOrFilter, usePartnerScope } from "../../../media-library/src/composables/usePartnerScope";
+import { partnerAlbumOrFilter, filesPartnerOrFilter, usePartnerScope } from "../../../media-library/src/composables/usePartnerScope";
 import {
-  partnerAccentStyle,
-  partnerLabelFromUser,
-  partnerVisuallyFromUser,
+  partnerAccentStyleForList,
+  partnerLabelListFromRelation,
+  partnerVisuallyListFromRelation,
   userDisplayName,
 } from "../../../media-library/src/utils/partnerAccent";
 
@@ -42,6 +42,8 @@ interface DirectusFile {
   description?: string | null;
   copyright?: string | null;
   uploaded_by?: unknown;
+  /** M2M — this file's own partner scope. Empty/absent = visible to all partners. */
+  partner_selected?: unknown;
 }
 
 const props = withDefaults(
@@ -72,7 +74,7 @@ const emit = defineEmits<{
 }>();
 
 const api = useApi();
-const { partnerScopeId, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
+const { partnerScopeIds, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
 
 const loading = ref(false);
 const linking = ref(false);
@@ -131,7 +133,8 @@ function partnerInfoUploadedBy(file: DirectusFile | null): string {
 }
 
 function partnerInfoPartnerName(file: DirectusFile | null): string {
-  return partnerLabelFromUser(file?.uploaded_by) || "";
+  const labels = partnerLabelListFromRelation(file?.partner_selected);
+  return labels.length > 0 ? labels.join(", ") : "All partners";
 }
 
 function partnerInfoUploadedDate(file: DirectusFile | null): string {
@@ -157,8 +160,8 @@ async function loadAlbums() {
   try {
     await initPartnerScope();
     const params: Record<string, unknown> = { limit: -1, sort: ["name"], fields: ["id", "name"] };
-    if (isPartnerScoped.value && partnerScopeId.value) {
-      params.filter = partnerAlbumOrFilter(partnerScopeId.value);
+    if (isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0) {
+      params.filter = partnerAlbumOrFilter(partnerScopeIds.value ?? []);
     }
     const res = await api.get("/items/albums_directus", { params });
     albums.value = (res.data?.data ?? []) as Album[];
@@ -266,7 +269,7 @@ function displayName(file: DirectusFile): string {
 }
 
 function filePartnerAccent(file: DirectusFile) {
-  return partnerAccentStyle(partnerVisuallyFromUser(file.uploaded_by));
+  return partnerAccentStyleForList(partnerVisuallyListFromRelation(file.partner_selected));
 }
 
 function fileDescription(file: DirectusFile): string {
@@ -358,8 +361,8 @@ async function fetchPage() {
     await initPartnerScope();
     const filterClauses: Record<string, unknown>[] = [];
 
-    if (isPartnerScoped.value) {
-      filterClauses.push({ uploaded_by: { partner_selected: { _eq: partnerScopeId.value } } });
+    if (isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0) {
+      filterClauses.push(filesPartnerOrFilter(partnerScopeIds.value ?? []));
     }
 
     const q = search.value.trim();
@@ -401,9 +404,12 @@ async function fetchPage() {
         "uploaded_by.first_name",
         "uploaded_by.last_name",
         "uploaded_by.email",
-        "uploaded_by.partner_selected.id",
-        "uploaded_by.partner_selected.visually",
-        "uploaded_by.partner_selected.label",
+        "uploaded_by.partner_selected.partner_id.id",
+        "uploaded_by.partner_selected.partner_id.visually",
+        "uploaded_by.partner_selected.partner_id.label",
+        "partner_selected.partner_id.id",
+        "partner_selected.partner_id.visually",
+        "partner_selected.partner_id.label",
       ],
       sort: ["-uploaded_on"],
       limit: perPage.value,

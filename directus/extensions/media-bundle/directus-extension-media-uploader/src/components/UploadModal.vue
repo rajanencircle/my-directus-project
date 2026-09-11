@@ -26,6 +26,8 @@ import {
   DEFAULT_UPLOAD_VALIDATION,
 } from '../utils/uploadValidationSettings';
 import { validateUploadFile } from '../utils/validateUploadFile';
+import { usePartnerScope } from '../../../media-library/src/composables/usePartnerScope';
+import { resolveDestinationFolder } from '../composables/useDestinationFolderResolver';
 
 type UploaderLabels = Record<string, string>
 const labels = inject<ComputedRef<UploaderLabels>>('uploaderLabels')
@@ -107,6 +109,71 @@ const showRequiredErrors = ref(false);
 
 const fileFieldValues = ref<Record<string, unknown>>({});
 
+// ------------------------------------------------------------------
+// Ticket 1 — Partner Selected (multi-partner media scoping)
+// ------------------------------------------------------------------
+
+interface UserPartnerOption {
+  id: string;
+  label: string;
+}
+
+const { init: initPartnerScope } = usePartnerScope();
+const userPartnerOptions = ref<UserPartnerOption[]>([]);
+/** Empty selection = visible to all partners (matches directus_files.partner_selected semantics). */
+const selectedPartnerIds = ref<string[]>([]);
+
+async function loadUserPartnerOptions() {
+  try {
+    await initPartnerScope();
+    const res = await api.get('/users/me', {
+      params: { fields: ['partner_selected.partner_id.id', 'partner_selected.partner_id.label'] },
+    });
+    const rows = res.data?.data?.partner_selected;
+    const options: UserPartnerOption[] = Array.isArray(rows)
+      ? rows
+          .map((row: any) => row?.partner_id)
+          .filter((p: any) => p && p.id != null)
+          .map((p: any) => ({ id: String(p.id), label: String(p.label ?? p.id) }))
+      : [];
+    userPartnerOptions.value = options;
+    // Default: every partner assigned to the current user (client spec) — editor narrows down from there.
+    selectedPartnerIds.value = options.map((o) => o.id);
+  } catch (err) {
+    console.warn('[media-uploader] Failed to load current user partners', err);
+    userPartnerOptions.value = [];
+    selectedPartnerIds.value = [];
+  }
+}
+
+function togglePartner(id: string) {
+  const set = new Set(selectedPartnerIds.value);
+  if (set.has(id)) set.delete(id);
+  else set.add(id);
+  selectedPartnerIds.value = Array.from(set);
+}
+
+const showPartnerSection = computed(() => userPartnerOptions.value.length > 0);
+
+async function persistFilePartners(fileId: string, partnerIds: string[]) {
+  if (partnerIds.length === 0) return;
+  try {
+    await Promise.all(
+      partnerIds.map((partnerId) =>
+        api.post('/items/files_partner', { directus_files_id: fileId, partner_id: partnerId }),
+      ),
+    );
+  } catch (err) {
+    console.warn('[media-uploader] Failed to persist file partner_selected', err);
+  }
+}
+
+type UploadMode = 'destination' | 'other';
+const uploadMode = ref<UploadMode>('destination');
+const isDestinationMode = computed(() => uploadMode.value === 'destination');
+const destinationFolderNote = ref<string | null>(null);
+const resolvingDestinationFolder = ref(false);
+
 /** Merge partial v-form emits — each single-field form would otherwise wipe siblings. */
 function onFileFieldValuesUpdate(next: Record<string, unknown> | null | undefined) {
   if (!next || typeof next !== 'object') return;
@@ -124,10 +191,63 @@ const { levelByField, cascadeFromByField, filterByByField } = useGeographyFieldM
   filterMappings: geoFilterMappingsInput,
 });
 
+/** Effective geo section visibility — only in Destination Upload mode. */
+const effectiveGeoEnabled = computed(() => Boolean(props.geoEnabled) && isDestinationMode.value);
+
 const missingGeoLevels = computed(() =>
-  props.geoEnabled ? getMissingRequiredGeoLevels(geoLevels.value, geoValue.value) : []
+  effectiveGeoEnabled.value ? getMissingRequiredGeoLevels(geoLevels.value, geoValue.value) : []
 );
 const geoIsValid = computed(() => missingGeoLevels.value.length === 0);
+
+function destinationLevelField(): string | null {
+  // The geo level whose collection is `destinations` (client brief calls this "Destination").
+  const level = geoLevels.value.find((l) => l.collection === 'destinations');
+  return level?.field ?? null;
+}
+
+async function autoResolveDestinationFolder() {
+  const field = destinationLevelField();
+  if (!field) return;
+  const destinationId = geoValue.value[field]?.id;
+  if (!destinationId) {
+    destinationFolderNote.value = null;
+    return;
+  }
+  resolvingDestinationFolder.value = true;
+  destinationFolderNote.value = null;
+  try {
+    const result = await resolveDestinationFolder(api, destinationId);
+    if (result.status === 'resolved') {
+      selectedFolder.value = result.folderId;
+    } else {
+      selectedFolder.value = null;
+      destinationFolderNote.value =
+        result.status === 'no-cluster'
+          ? 'This destination has no cluster assigned — pick a folder manually or contact an admin.'
+          : result.status === 'no-folder-for-cluster'
+            ? 'No destination folder exists for this cluster yet — pick a folder manually or create one.'
+            : 'Could not resolve a destination folder automatically — pick one manually.';
+    }
+  } finally {
+    resolvingDestinationFolder.value = false;
+  }
+}
+
+watch(
+  () => (isDestinationMode.value ? geoValue.value[destinationLevelField() ?? '']?.id : null),
+  () => {
+    if (isDestinationMode.value) autoResolveDestinationFolder();
+  },
+);
+
+watch(uploadMode, (mode) => {
+  destinationFolderNote.value = null;
+  if (mode === 'other') {
+    selectedFolder.value = null;
+  } else {
+    autoResolveDestinationFolder();
+  }
+});
 
 const appLocale = computed(() => {
   const lang = userStore.currentUser?.language;
@@ -136,7 +256,7 @@ const appLocale = computed(() => {
 });
 
 const geoFieldKeys = computed(() => {
-  if (!props.geoEnabled) return new Set<string>();
+  if (!effectiveGeoEnabled.value) return new Set<string>();
   return new Set(geoLevels.value.map((l) => l.field));
 });
 
@@ -190,7 +310,8 @@ const orderedFileDetailItems = computed((): FileDetailItem[] => {
   const seenGeo = new Set<string>();
 
   // Geography fields first — config order among geo keys, then any remaining geo levels.
-  if (props.geoEnabled) {
+  // Mode-aware: hidden entirely in "Other Upload" mode (Ticket 2).
+  if (effectiveGeoEnabled.value) {
     for (const def of defs) {
       const geoLevel = levelByField.value.get(def.field);
       if (!geoLevel || seenGeo.has(def.field)) continue;
@@ -407,8 +528,8 @@ function uploadFileXhr(item: FileItem): Promise<string | null> {
       formData.append(props.uploadStatusField, props.uploadStatusValue);
     }
 
-    // Geography relations stored directly on directus_files
-    if (props.geoEnabled) {
+    // Geography relations stored directly on directus_files — only in Destination Upload mode.
+    if (effectiveGeoEnabled.value) {
       for (const [field, selected] of Object.entries(geoValue.value ?? {})) {
         if (selected?.id) {
           formData.append(field, String(selected.id));
@@ -417,6 +538,7 @@ function uploadFileXhr(item: FileItem): Promise<string | null> {
     }
 
     // Snapshot form values now — async XHR callback must not race later UI edits.
+    const partnerIdsSnapshot = [...selectedPartnerIds.value];
     const valuesSnapshot = { ...fileFieldValues.value };
     const fieldsSnapshot = [...resolvedUploadFields.value];
     const { formDataFields, patchFields } = splitUploadFieldPayload(
@@ -481,6 +603,8 @@ function uploadFileXhr(item: FileItem): Promise<string | null> {
               return;
             }
           }
+
+          await persistFilePartners(fileId, partnerIdsSnapshot);
 
           item.progress = 100;
           item.status = 'done';
@@ -583,6 +707,7 @@ watch(
 onMounted(async () => {
   selectedFolder.value = props.defaultFolder;
   nextTick(() => lowerDialogZIndex());
+  loadUserPartnerOptions();
   try {
     if (props.initialValidationSettings) {
       validationSettings.value = {
@@ -629,9 +754,57 @@ function lowerDialogZIndex() {
       </v-card-title>
 
       <v-card-text class="card-body">
+        <!-- Ticket 2: Destination Upload vs Other (non-destination) Upload -->
+        <div v-if="props.geoEnabled" class="section upload-mode-section">
+          <div class="upload-mode-radio">
+            <label class="upload-mode-option">
+              <input type="radio" name="upload-mode" value="destination" v-model="uploadMode" :disabled="isUploading" />
+              <span>{{ lbl('uploadModeDestination', 'Destination Upload') }}</span>
+            </label>
+            <label class="upload-mode-option">
+              <input type="radio" name="upload-mode" value="other" v-model="uploadMode" :disabled="isUploading" />
+              <span>{{ lbl('uploadModeOther', 'Other Upload') }}</span>
+            </label>
+          </div>
+        </div>
+
         <div class="section">
-          <div class="label type-label">{{ lbl('uploadToFolder', 'Upload to folder') }}</div>
-          <FolderDropdown v-model="selectedFolder" :exclude-id="props.uploadAreaFolder ?? null" />
+          <template v-if="props.geoEnabled && isDestinationMode">
+            <div class="label type-label">{{ lbl('uploadResolvedFolder', 'Destination folder') }}</div>
+            <div class="resolved-folder-note">
+              <template v-if="resolvingDestinationFolder">{{ t('loading') }}…</template>
+              <template v-else-if="selectedFolder">{{ lbl('uploadResolvedFolderAuto', 'Resolved automatically from the selected destination.') }}</template>
+              <template v-else-if="destinationFolderNote">
+                <v-icon name="info" x-small />
+                {{ destinationFolderNote }}
+              </template>
+              <template v-else>{{ lbl('uploadResolvedFolderPending', 'Select a destination below to resolve the folder.') }}</template>
+            </div>
+          </template>
+          <template v-else>
+            <div class="label type-label">{{ lbl('uploadToFolder', 'Upload to folder') }}</div>
+            <FolderDropdown
+              v-model="selectedFolder"
+              :exclude-id="props.uploadAreaFolder ?? null"
+              :non-destination-only="props.geoEnabled && !isDestinationMode"
+            />
+          </template>
+        </div>
+
+        <!-- Ticket 1: Partner Selected — restricted to the current user's own partners -->
+        <div v-if="showPartnerSection" class="section">
+          <div class="label type-label">{{ lbl('uploadPartnerSelected', 'Partner Selected') }}</div>
+          <div class="partner-selected-list">
+            <label v-for="p in userPartnerOptions" :key="p.id" class="partner-selected-option">
+              <input
+                type="checkbox"
+                :checked="selectedPartnerIds.includes(p.id)"
+                :disabled="isUploading"
+                @change="togglePartner(p.id)"
+              />
+              <span>{{ p.label }}</span>
+            </label>
+          </div>
         </div>
 
         <!-- Drop zone -->
@@ -870,6 +1043,56 @@ function lowerDialogZIndex() {
 
 .section :deep(.trigger) {
   min-height: 40px;
+}
+
+.upload-mode-radio {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.upload-mode-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.upload-mode-option input {
+  cursor: pointer;
+}
+
+.resolved-folder-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  border: var(--theme--border-width, 1px) solid var(--theme--border-color);
+  border-radius: var(--theme--border-radius, 6px);
+  background: var(--theme--background-subdued);
+  color: var(--theme--foreground-subdued);
+  font-size: 13px;
+}
+
+.partner-selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
+.partner-selected-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.partner-selected-option input {
+  cursor: pointer;
 }
 
 .file-fields-section {

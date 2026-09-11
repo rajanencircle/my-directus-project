@@ -12,9 +12,9 @@ import {
   formatRelativeTime,
 } from '../utils/fileCardMeta'
 import {
-  partnerAccentStyle,
-  partnerLabelFromUser,
-  partnerVisuallyFromUser,
+  partnerAccentStyleForList,
+  partnerLabelListFromRelation,
+  partnerVisuallyListFromRelation,
   userDisplayName,
 } from '../utils/partnerAccent'
 
@@ -52,8 +52,12 @@ const uploadedBy = computed(
   () => (props.file as Record<string, unknown>).uploaded_by,
 )
 
+const filePartnerSelected = computed(
+  () => (props.file as Record<string, unknown>).partner_selected,
+)
+
 const accentStyle = computed(() =>
-  partnerAccentStyle(partnerVisuallyFromUser(uploadedBy.value)),
+  partnerAccentStyleForList(partnerVisuallyListFromRelation(filePartnerSelected.value)),
 )
 
 const partnerInfoImageName = computed(
@@ -68,9 +72,10 @@ const partnerInfoUploadedBy = computed(
   () => userDisplayName(uploadedBy.value) || '',
 )
 
-const partnerInfoPartnerName = computed(
-  () => partnerLabelFromUser(uploadedBy.value) || '',
-)
+const partnerInfoPartnerName = computed(() => {
+  const labels = partnerLabelListFromRelation(filePartnerSelected.value)
+  return labels.length > 0 ? labels.join(', ') : 'All partners'
+})
 
 const partnerInfoUploadedDate = computed(() => {
   const iso = props.file.uploaded_on ?? fileCreateIso(props.file)

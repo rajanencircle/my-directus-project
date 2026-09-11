@@ -10,13 +10,13 @@ import {
   formatFolderStats,
   getFolderStats,
 } from '../../utils/folderStats'
-import { partnerVisuallyFromCreatedBy } from '../../composables/usePartnerScope'
+import { partnerVisuallyListFromCreatedBy } from '../../composables/usePartnerScope'
 
 interface DirectusFolder {
   id: string
   name: string
   parent: string | null
-  createdByPartnerVisually?: string | null
+  createdByPartnerVisuallyList?: string[]
 }
 
 type FolderNode = DirectusFolder & { children: FolderNode[] }
@@ -62,7 +62,7 @@ function normalizeFolderRaw(item: Record<string, unknown>): DirectusFolder {
     id: String(item.id ?? ''),
     name: String(item.name ?? ''),
     parent: normalizeParentId(item.parent),
-    createdByPartnerVisually: partnerVisuallyFromCreatedBy(item.created_by),
+    createdByPartnerVisuallyList: partnerVisuallyListFromCreatedBy(item.created_by),
   }
 }
 
@@ -179,8 +179,8 @@ async function fetchFolders(opts?: { silent?: boolean }) {
             'id',
             'name',
             'parent',
-            'created_by.partner_selected.id',
-            'created_by.partner_selected.visually',
+            'created_by.partner_selected.partner_id.id',
+            'created_by.partner_selected.partner_id.visually',
           ],
         },
       })

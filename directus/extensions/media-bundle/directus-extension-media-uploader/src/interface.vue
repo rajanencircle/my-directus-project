@@ -19,7 +19,7 @@ import {
 } from '../../media-library/src/utils/downloadExecute';
 import type { SaveTarget } from '../../media-library/src/utils/zipDownloadShared';
 import { useMediaSettings } from '../../media-library/src/composables/useMediaSettings';
-import { usePartnerScope } from '../../media-library/src/composables/usePartnerScope';
+import { usePartnerScope, partnerIdsFromCreatedBy } from '../../media-library/src/composables/usePartnerScope';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -157,7 +157,7 @@ const appLocale = computed(() => {
 });
 const { t } = useT();
 const { settings, fetchSettings } = useMediaSettings();
-const { partnerScopeId, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
+const { partnerScopeIds, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
 
 const downloadModalLabels = computed(() =>
   buildDownloadModalLabels(t, settings.value as Record<string, string>),
@@ -452,25 +452,31 @@ function initJunction(): boolean {
 
 // ─── Data Loading ─────────────────────────────────────────────────────────────
 
-function fileUploaderPartnerId(file: unknown): string | null {
-  if (file == null || typeof file !== 'object') return null;
+function fileUploaderPartnerIds(file: unknown): string[] {
+  if (file == null || typeof file !== 'object') return [];
   const ub = (file as Record<string, unknown>).uploaded_by;
-  if (ub == null || ub === '') return null;
-  if (typeof ub === 'object' && ub !== null) {
-    const ps = (ub as { partner_selected?: unknown }).partner_selected;
-    if (ps == null || ps === '') return null;
-    if (typeof ps === 'object' && ps !== null && 'id' in ps) {
-      const idVal = (ps as { id?: unknown }).id;
-      return idVal != null && idVal !== '' ? String(idVal) : null;
-    }
-    return String(ps);
-  }
-  return null;
+  return partnerIdsFromCreatedBy(ub);
+}
+
+/** File's own partner_selected (M2M) — empty means visible to everyone. */
+function fileOwnPartnerIds(file: unknown): string[] {
+  if (file == null || typeof file !== 'object') return [];
+  const ps = (file as Record<string, unknown>).partner_selected;
+  if (!Array.isArray(ps)) return [];
+  return ps
+    .map((row) => {
+      const id = row && typeof row === 'object' ? (row as { partner_id?: { id?: unknown } }).partner_id?.id : null;
+      return id != null && id !== '' ? String(id) : null;
+    })
+    .filter((id): id is string => id != null);
 }
 
 function isFileVisibleForPartner(file: unknown): boolean {
-  if (!isPartnerScoped.value || !partnerScopeId.value) return true;
-  return fileUploaderPartnerId(file) === partnerScopeId.value;
+  const scopeIds = partnerScopeIds.value ?? [];
+  if (!isPartnerScoped.value || scopeIds.length === 0) return true;
+  const ownIds = fileOwnPartnerIds(file);
+  if (ownIds.length > 0) return ownIds.some((id) => scopeIds.includes(id));
+  return fileUploaderPartnerIds(file).some((id) => scopeIds.includes(id));
 }
 
 function splitRowsByPartner(rows: JunctionRow[]): { visible: JunctionRow[]; hidden: JunctionRow[] } {
@@ -512,9 +518,12 @@ async function loadFiles() {
       `${fk}.uploaded_by.first_name`,
       `${fk}.uploaded_by.last_name`,
       `${fk}.uploaded_by.email`,
-      `${fk}.uploaded_by.partner_selected.id`,
-      `${fk}.uploaded_by.partner_selected.visually`,
-      `${fk}.uploaded_by.partner_selected.label`,
+      `${fk}.uploaded_by.partner_selected.partner_id.id`,
+      `${fk}.uploaded_by.partner_selected.partner_id.visually`,
+      `${fk}.uploaded_by.partner_selected.partner_id.label`,
+      `${fk}.partner_selected.partner_id.id`,
+      `${fk}.partner_selected.partner_id.visually`,
+      `${fk}.partner_selected.partner_id.label`,
       `${fk}.keyword_ids.keywords_id.keyword`,
     ];
     const fields = ['id', collectionFkField.value, ...fileFields];
@@ -646,9 +655,12 @@ async function fetchFilesByIds(fileIds: string[]) {
         'uploaded_by.first_name',
         'uploaded_by.last_name',
         'uploaded_by.email',
-        'uploaded_by.partner_selected.id',
-        'uploaded_by.partner_selected.visually',
-        'uploaded_by.partner_selected.label',
+        'uploaded_by.partner_selected.partner_id.id',
+        'uploaded_by.partner_selected.partner_id.visually',
+        'uploaded_by.partner_selected.partner_id.label',
+        'partner_selected.partner_id.id',
+        'partner_selected.partner_id.visually',
+        'partner_selected.partner_id.label',
         'keyword_ids.keywords_id.keyword',
       ],
       limit: -1,
