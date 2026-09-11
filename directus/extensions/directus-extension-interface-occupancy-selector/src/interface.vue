@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useI18n } from 'vue-i18n';
 import { useApi, useStores } from "@directus/extensions-sdk";
+import Draggable from "vuedraggable";
 
 type ItemId = string | number;
 
@@ -29,6 +30,11 @@ interface SelectedGroupState {
   fromPriceTrue: boolean;
 }
 
+interface DraggableEntry {
+  key: string;
+  state: SelectedGroupState;
+}
+
 const { t } = useI18n();
 
 const props = withDefaults(
@@ -42,6 +48,8 @@ const props = withDefaults(
     fromPriceField?: string;
     translationsField?: string;
     translationLocaleCodePath?: string;
+    sortable?: boolean;
+    sortField?: string;
     leftPaneLabel?: string;
     rightPaneLabel?: string;
     searchPlaceholder?: string;
@@ -59,6 +67,8 @@ const props = withDefaults(
     fromPriceField: "from_price",
     translationsField: "",
     translationLocaleCodePath: "translations_id.code",
+    sortable: true,
+    sortField: "",
     leftPaneLabel: "Available",
     rightPaneLabel: "Selected",
     searchPlaceholder: "Search…",
@@ -126,6 +136,8 @@ const junctionCollection = ref<string>("");
 const parentKeyField = ref<string>("");
 const resolvedRelatedKey = ref<string>("");
 const resolvedRelatedCollection = ref<string>("");
+const resolvedSortField = ref<string>("");
+const lastKnownSort = ref<Map<ItemId, number>>(new Map());
 
 const parsedGroupFields = computed<string[]>(() =>
   props.groupFields
@@ -332,6 +344,8 @@ function resolveJunctionInfo() {
   junctionCollection.value = junctionRel.collection;
   parentKeyField.value = junctionRel.field;
   resolvedRelatedKey.value = junctionRel.meta.junction_field;
+  resolvedSortField.value =
+    props.sortField || junctionRel.meta.sort_field || "sort";
 
   const relatedRelations: any[] = relationsStore.getRelationsForField(
     junctionRel.collection,
@@ -447,15 +461,25 @@ async function fetchSavedSelection() {
   }
 
   try {
+    const sortField = resolvedSortField.value;
     const res = await api.get(`/items/${junctionCollection.value}`, {
       params: {
         filter: { [parentKeyField.value]: { _eq: props.primaryKey } },
-        fields: ["id", resolvedRelatedKey.value],
+        fields: sortField
+          ? ["id", resolvedRelatedKey.value, sortField]
+          : ["id", resolvedRelatedKey.value],
+        sort: sortField ? [sortField] : undefined,
         limit: -1,
       },
     });
     const rows: JunctionRow[] = res.data.data ?? [];
     savedJunctionRows.value = rows;
+
+    lastKnownSort.value = new Map(
+      rows
+        .filter((row) => sortField && row[sortField] !== undefined && row[sortField] !== null)
+        .map((row) => [row.id, row[sortField]]),
+    );
 
     const ids = rows.map((row) => row[resolvedRelatedKey.value]);
     initSelectedFromIds(ids);
@@ -488,12 +512,19 @@ function initSelectedFromIds(ids: ItemId[]) {
   selectedGroupMap.value = next;
 }
 
+function findSavedRowForRelatedId(rk: string, relatedId: ItemId): JunctionRow | undefined {
+  return savedJunctionRows.value.find((row) => {
+    const related = row[rk];
+    const id = typeof related === "object" && related !== null ? related.id : related;
+    return id === relatedId;
+  });
+}
+
 function emitDiffFromMap(map = selectedGroupMap.value) {
   const rk = resolvedRelatedKey.value;
-  const newIds = new Set<ItemId>();
-  for (const state of map.values()) {
-    newIds.add(state.selectedItem.id);
-  }
+  const sortField = resolvedSortField.value;
+  const orderedStates = Array.from(map.values());
+  const newIds = new Set<ItemId>(orderedStates.map((s) => s.selectedItem.id));
 
   const originalIds = new Set(
     savedJunctionRows.value.map((row) => {
@@ -504,9 +535,25 @@ function emitDiffFromMap(map = selectedGroupMap.value) {
     }),
   );
 
-  const create = [...newIds]
-    .filter((id) => !originalIds.has(id))
-    .map((id) => ({ [rk]: id }));
+  const create: Record<string, any>[] = [];
+  const update: Record<string, any>[] = [];
+
+  orderedStates.forEach((state, index) => {
+    const relatedId = state.selectedItem.id;
+    const payload: Record<string, any> = { [rk]: relatedId };
+    if (sortField) payload[sortField] = index;
+
+    if (originalIds.has(relatedId)) {
+      if (!sortField) return;
+      const savedRow = findSavedRowForRelatedId(rk, relatedId);
+      const previousSort = savedRow ? lastKnownSort.value.get(savedRow.id) : undefined;
+      if (savedRow && previousSort !== index) {
+        update.push({ id: savedRow.id, [sortField]: index });
+      }
+    } else {
+      create.push(payload);
+    }
+  });
 
   const del = savedJunctionRows.value
     .filter((row) => {
@@ -517,7 +564,7 @@ function emitDiffFromMap(map = selectedGroupMap.value) {
     })
     .map((row) => row.id);
 
-  emit("input", { create, update: [], delete: del });
+  emit("input", { create, update, delete: del });
 }
 
 function selectEntry(entry: GroupEntry) {
@@ -538,6 +585,28 @@ function deselectEntry(key: string) {
   if (!selectedGroupMap.value.has(key)) return;
   const next = new Map(selectedGroupMap.value);
   next.delete(key);
+  selectedGroupMap.value = next;
+  emitDiffFromMap(next);
+}
+
+const canReorder = computed(
+  () => props.sortable !== false && !!resolvedSortField.value,
+);
+
+const draggableEntries = computed<DraggableEntry[]>({
+  get: () =>
+    selectedGroupStates.value.map((state) => ({ key: state.entry.key, state })),
+  set: (entries) => {
+    reorderSelected(entries.map((e) => e.key));
+  },
+});
+
+function reorderSelected(newOrderKeys: string[]) {
+  const next = new Map<string, SelectedGroupState>();
+  for (const key of newOrderKeys) {
+    const state = selectedGroupMap.value.get(key);
+    if (state) next.set(key, state);
+  }
   selectedGroupMap.value = next;
   emitDiffFromMap(next);
 }
@@ -672,47 +741,63 @@ watch(
         </div>
 
         <div class="pane-list">
-          <div
-            v-for="state in selectedGroupStates"
-            :key="state.entry.key"
-            class="list-item list-item-selected"
+          <Draggable
+            v-model="draggableEntries"
+            item-key="key"
+            handle=".drag-handle"
+            :disabled="!canReorder"
+            tag="div"
           >
-            <span class="item-label">
-              <template
-                v-for="(part, i) in renderParts(state.selectedItem)"
-                :key="i"
-              >
-                <span v-if="'bool' in part" class="label-text"> </span>
-                <span v-else class="label-text">{{ part.text }}</span>
-              </template>
-            </span>
-            <div class="item-actions">
-              <v-icon
-                :name="
-                  state.fromPriceTrue ? 'check_box' : 'check_box_outline_blank'
-                "
-                small
-                class="item-icon toggle-icon"
-                :class="{
-                  'toggle-disabled':
-                    !state.entry.trueItem || !state.entry.falseItem,
-                }"
-                :title="
-                  state.fromPriceTrue
-                    ? resolvedFromPriceTrueLabel
-                    : resolvedFromPriceFalseLabel
-                "
-                @click.stop="toggleFromPrice(state.entry.key)"
-              />
-              <v-icon
-                name="remove_circle_outline"
-                small
-                class="item-icon icon-remove"
-                :title="resolvedRemoveLabel"
-                @click.stop="deselectEntry(state.entry.key)"
-              />
-            </div>
-          </div>
+            <template #item="{ element }">
+              <div class="list-item list-item-selected">
+                <v-icon
+                  v-if="canReorder"
+                  name="drag_indicator"
+                  small
+                  class="item-icon drag-handle"
+                  :title="resolvedClickToSelectLabel"
+                />
+                <span class="item-label">
+                  <template
+                    v-for="(part, i) in renderParts(element.state.selectedItem)"
+                    :key="i"
+                  >
+                    <span v-if="'bool' in part" class="label-text"> </span>
+                    <span v-else class="label-text">{{ part.text }}</span>
+                  </template>
+                </span>
+                <div class="item-actions">
+                  <v-icon
+                    :name="
+                      element.state.fromPriceTrue
+                        ? 'check_box'
+                        : 'check_box_outline_blank'
+                    "
+                    small
+                    class="item-icon toggle-icon"
+                    :class="{
+                      'toggle-disabled':
+                        !element.state.entry.trueItem ||
+                        !element.state.entry.falseItem,
+                    }"
+                    :title="
+                      element.state.fromPriceTrue
+                        ? resolvedFromPriceTrueLabel
+                        : resolvedFromPriceFalseLabel
+                    "
+                    @click.stop="toggleFromPrice(element.state.entry.key)"
+                  />
+                  <v-icon
+                    name="remove_circle_outline"
+                    small
+                    class="item-icon icon-remove"
+                    :title="resolvedRemoveLabel"
+                    @click.stop="deselectEntry(element.state.entry.key)"
+                  />
+                </div>
+              </div>
+            </template>
+          </Draggable>
 
           <div v-if="selectedGroupStates.length === 0" class="empty-state">
             {{ resolvedNoSelectionMessage }}
@@ -871,6 +956,20 @@ watch(
 
 .icon-remove {
   color: var(--theme--danger);
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--theme--foreground-subdued);
+  opacity: 0.6;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.sortable-ghost {
+  opacity: 0.4;
 }
 
 .empty-state {

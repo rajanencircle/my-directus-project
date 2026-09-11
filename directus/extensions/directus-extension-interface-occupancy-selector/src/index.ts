@@ -80,6 +80,31 @@ export default defineInterface({
       schema: { default_value: 'from_price' },
     },
 
+    // ─── Sorting ──────────────────────────────────────────────────────────────
+    {
+      field: 'sortable',
+      name: 'Allow Reordering',
+      type: 'boolean',
+      meta: {
+        width: 'half',
+        interface: 'boolean',
+        note: 'Let editors drag-and-drop reorder the Selected pane.',
+      },
+      schema: { default_value: true },
+    },
+    {
+      field: 'sortField',
+      name: 'Sort Field (Junction)',
+      type: 'string',
+      meta: {
+        width: 'half',
+        interface: 'input',
+        note: 'Field on the junction collection that stores the manual sort order for the Selected pane. Leave empty to auto-detect from the relation, falling back to "sort".',
+        options: { placeholder: 'sort' },
+      },
+      schema: { default_value: 'sort' },
+    },
+
     // ─── Search ───────────────────────────────────────────────────────────────
     {
       field: 'searchPlaceholder',
