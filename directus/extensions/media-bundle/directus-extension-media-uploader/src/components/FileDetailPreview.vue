@@ -5,15 +5,13 @@ import {
   mimeToKindLabel,
   resolveFileMediaKind,
 } from '../utils/fileType';
+import { getOriginalAssetUrl, getThumbnailAssetUrl } from '../utils/assetUrl';
 
 const props = withDefaults(
   defineProps<{
     fileId: string;
     mimeType?: string | null;
     filename?: string | null;
-    // File's modified_on, appended as a v= cache-buster (same param the native
-    // Directus app uses) so replaced file content isn't hidden by the browser's
-    // 30-day asset cache.
     modifiedOn?: string | null;
   }>(),
   { mimeType: null, filename: null, modifiedOn: null }
@@ -27,16 +25,8 @@ const isVideo = computed(() => mediaKind.value === 'video');
 const iconName = computed(() => mimeToIcon(props.mimeType, props.filename));
 const kindLabel = computed(() => mimeToKindLabel(props.mimeType, props.filename));
 
-const cacheBuster = computed(() =>
-  props.modifiedOn ? `&v=${encodeURIComponent(props.modifiedOn)}` : ''
-);
-
-const imageUrl = computed(() => `/assets/${props.fileId}?width=1200&fit=contain${cacheBuster.value}`);
-const assetUrl = computed(() =>
-  props.modifiedOn
-    ? `/assets/${props.fileId}?v=${encodeURIComponent(props.modifiedOn)}`
-    : `/assets/${props.fileId}`
-);
+const imageUrl = computed(() => getThumbnailAssetUrl(props.fileId, props.modifiedOn));
+const assetUrl = computed(() => getOriginalAssetUrl(props.fileId, props.modifiedOn));
 
 watch(
   () => [props.fileId, props.mimeType, props.filename] as const,

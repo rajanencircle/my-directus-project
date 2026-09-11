@@ -1,29 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useApi, useStores } from "@directus/extensions-sdk";
 import {
-  type AnyRecord,
-  type ColumnDef,
-  type ReverseSectionLike,
-  type TranslatableString,
+  type UnifiedRow,
+  type UsageSource,
+  buildSourceItemFilter,
+  buildUnifiedRow,
   normalizeFieldsParam,
-  parseFileReverseLinks,
+  parseUsageTableConfig,
+  resolveColumnHeaders,
   resolveTranslatable,
-  resolvedTableCells,
-  resolvedTableHeaders,
-} from "./utils/fileReverseLinks";
+} from "./utils/usageTable";
 
-type ReverseSectionState = ReverseSectionLike & {
-  title: string;
-  collection: string;
-  loading: boolean;
-  error: string | null;
-  rows: AnyRecord[];
-  fileField: string;
-  columns?: ColumnDef[];
-  tableHeaders?: Array<TranslatableString>;
-  tablePaths?: string[];
-};
+const SEARCH_DEBOUNCE_MS = 350;
 
 const props = withDefaults(
   defineProps<{
@@ -32,18 +21,21 @@ const props = withDefaults(
     field: string;
     primaryKey?: string | number;
     disabled?: boolean;
-    file_reverse_links?: unknown;
+    usage_table_title?: unknown;
+    usage_columns?: unknown;
+    usage_sources?: unknown;
   }>(),
   {
     value: null,
     disabled: false,
-    file_reverse_links: undefined,
+    usage_table_title: undefined,
+    usage_columns: undefined,
+    usage_sources: undefined,
   },
 );
 
 const api = useApi();
 
-// ── Current UI locale ────────────────────────────────────────────────────
 const { useUserStore } = useStores();
 const userStore = useUserStore();
 const currentLocale = computed<string>(
@@ -53,7 +45,6 @@ const currentLocale = computed<string>(
     "en-US",
 );
 
-// ── File ID ──────────────────────────────────────────────────────────────
 const fileId = computed(() =>
   props.primaryKey == null ||
   props.primaryKey === "+" ||
@@ -62,88 +53,243 @@ const fileId = computed(() =>
     : String(props.primaryKey),
 );
 
-// ── Reverse-link usage sections ──────────────────────────────────────────
-const reverseSections = ref<ReverseSectionState[]>([]);
-const hasReverseRules = computed(
-  () => parseFileReverseLinks(props.file_reverse_links).length > 0,
+const config = computed(() =>
+  parseUsageTableConfig({
+    usage_table_title: props.usage_table_title,
+    usage_columns: props.usage_columns,
+    usage_sources: props.usage_sources,
+  }),
 );
 
-async function loadReverseLinks(id: string) {
-  const rules = parseFileReverseLinks(props.file_reverse_links);
-  if (!rules.length) {
-    reverseSections.value = [];
+const hasConfig = computed(
+  () => config.value.columns.length > 0 && config.value.sources.length > 0,
+);
+
+const tableTitle = computed(() =>
+  resolveTranslatable(config.value.title, currentLocale.value, ""),
+);
+
+const headers = computed(() =>
+  resolveColumnHeaders(config.value.columns, currentLocale.value),
+);
+
+/** Grid tracks: link columns stay compact with a fixed min width */
+const gridTemplateColumns = computed(() =>
+  config.value.columns
+    .map((c) => (c.type === "link" ? "minmax(72px, 88px)" : "minmax(120px, 1fr)"))
+    .join(" "),
+);
+
+const loading = ref(false);
+const error = ref<string | null>(null);
+const rows = ref<UnifiedRow[]>([]);
+
+/** Search by name/id — API-backed (debounced) */
+const searchInput = ref("");
+const debouncedSearch = ref("");
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+watch(searchInput, (q) => {
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    debouncedSearch.value = q.trim();
+  }, SEARCH_DEBOUNCE_MS);
+});
+
+onUnmounted(() => {
+  if (searchTimer) clearTimeout(searchTimer);
+});
+
+/** Product filter — local (static labels) */
+const productFilter = ref("");
+
+const productFilterOptions = computed(() => {
+  const locale = currentLocale.value;
+  const labels = config.value.sources.map((s) =>
+    resolveTranslatable(s.product_label, locale, s.junction_collection),
+  );
+  const unique = [...new Set(labels.filter(Boolean))];
+  return [
+    { text: "All products", value: "" },
+    ...unique.map((label) => ({ text: label, value: label })),
+  ];
+});
+
+const filterWidthPx = computed(() => {
+  const labels = productFilterOptions.value.map((o) => String(o.text ?? ""));
+  const longest = labels.reduce((a, b) => (b.length > a.length ? b : a), "All products");
+  // ch-based fit + chevron/padding; clamp so it never eats the search field
+  return Math.min(Math.max(Math.ceil(longest.length * 7.2) + 52, 132), 220);
+});
+
+const resultCountLabel = computed(() => {
+  const n = displayedRows.value.length;
+  if (loading.value) return "";
+  return n === 1 ? "1 result" : `${n} results`;
+});
+
+const productsColIndex = computed(() => {
+  const cols = config.value.columns;
+  const byType = cols.findIndex((c) => c.type === "static");
+  if (byType >= 0) return byType;
+  return cols.findIndex((c) => c.key === "products");
+});
+
+/** Column index currently sorted; null = original order */
+const sortCol = ref<number | null>(null);
+const sortDir = ref<"asc" | "desc">("asc");
+
+function toggleSort(index: number) {
+  if (sortCol.value === index) {
+    sortDir.value = sortDir.value === "asc" ? "desc" : "asc";
+  } else {
+    sortCol.value = index;
+    sortDir.value = "asc";
+  }
+}
+
+function sortIcon(index: number): string {
+  if (sortCol.value !== index) return "unfold_more";
+  return sortDir.value === "asc" ? "arrow_upward" : "arrow_downward";
+}
+
+const displayedRows = computed(() => {
+  let list = rows.value;
+
+  // Local product filter (static label)
+  const pIdx = productsColIndex.value;
+  if (productFilter.value && pIdx >= 0) {
+    const want = productFilter.value;
+    list = list.filter((r) => (r.cells[pIdx]?.text ?? "") === want);
+  }
+
+  if (sortCol.value == null) return list;
+  const col = sortCol.value;
+  const dir = sortDir.value === "asc" ? 1 : -1;
+  return [...list].sort((a, b) => {
+    const av = a.cells[col]?.text ?? "";
+    const bv = b.cells[col]?.text ?? "";
+    const an = Number(av);
+    const bn = Number(bv);
+    if (
+      av !== "" &&
+      bv !== "" &&
+      !Number.isNaN(an) &&
+      !Number.isNaN(bn)
+    ) {
+      return (an - bn) * dir;
+    }
+    return (
+      String(av).localeCompare(String(bv), undefined, {
+        sensitivity: "base",
+        numeric: true,
+      }) * dir
+    );
+  });
+});
+
+async function fetchSourceRows(
+  source: UsageSource,
+  id: string,
+  search: string,
+) {
+  const fields = normalizeFieldsParam(source.fields);
+  const coll = encodeURIComponent(source.junction_collection.trim());
+  const res = await api.get(`/items/${coll}`, {
+    params: {
+      filter: buildSourceItemFilter(source, id, search),
+      limit: -1,
+      ...(fields ? { fields } : {}),
+    },
+  });
+  return (res.data?.data ?? []) as Record<string, any>[];
+}
+
+async function loadTable(id: string) {
+  const cfg = config.value;
+  if (!cfg.columns.length || !cfg.sources.length) {
+    rows.value = [];
+    error.value = null;
     return;
   }
 
+  loading.value = true;
+  error.value = null;
+
   const locale = currentLocale.value;
-
-  reverseSections.value = rules.map((r) => ({
-    title: resolveTranslatable(r.section_title, locale, r.junction_collection),
-    collection: r.junction_collection,
-    loading: true,
-    error: null,
-    rows: [],
-    fileField: r.file_field,
-    columns: r.columns,
-    tableHeaders: r.table_headers,
-    tablePaths: r.table_paths,
-  }));
-
-  const updates = await Promise.all(
-    rules.map(async (rule) => {
+  const search = debouncedSearch.value;
+  const results = await Promise.all(
+    cfg.sources.map(async (source, sourceIndex) => {
       try {
-        const limit = Math.min(Math.max(1, rule.limit ?? 50), 500);
-        const fields = normalizeFieldsParam(rule.fields);
-        const coll = encodeURIComponent(rule.junction_collection.trim());
-        const res = await api.get(`/items/${coll}`, {
-          params: {
-            filter: { [rule.file_field.trim()]: { _eq: id } },
-            limit,
-            ...(fields ? { fields } : {}),
-          },
-        });
+        const junctionRows = await fetchSourceRows(source, id, search);
         return {
+          sourceIndex,
+          source,
           error: null as string | null,
-          rows: (res.data?.data ?? []) as AnyRecord[],
+          junctionRows,
         };
       } catch (e: any) {
         return {
-          error: e?.response?.data?.errors?.[0]?.message ?? "Failed to load.",
-          rows: [] as AnyRecord[],
+          sourceIndex,
+          source,
+          error:
+            e?.response?.data?.errors?.[0]?.message ??
+            `Failed to load ${source.junction_collection}.`,
+          junctionRows: [] as Record<string, any>[],
         };
       }
     }),
   );
 
-  reverseSections.value = rules.map((rule, idx) => {
-    return {
-      title: resolveTranslatable(rule.section_title, locale, rule.junction_collection),
-      collection: rule.junction_collection,
-      loading: false,
-      error: updates[idx]?.error ?? null,
-      rows: updates[idx]?.rows ?? [],
-      fileField: rule.file_field,
-      columns: rule.columns,
-      tableHeaders: rule.table_headers,
-      tablePaths: rule.table_paths,
-    };
-  });
+  const errors = results.map((r) => r.error).filter(Boolean) as string[];
+  error.value = errors.length ? errors.join(" · ") : null;
+
+  const unified: UnifiedRow[] = [];
+  for (const result of results) {
+    result.junctionRows.forEach((jrow, rowIndex) => {
+      unified.push(
+        buildUnifiedRow(
+          cfg.columns,
+          result.source,
+          result.sourceIndex,
+          jrow,
+          rowIndex,
+          locale,
+        ),
+      );
+    });
+  }
+  rows.value = unified;
+  loading.value = false;
 }
 
 watch(fileId, async (id) => {
   if (!id) return;
-  await loadReverseLinks(id);
+  await loadTable(id);
+});
+
+watch(debouncedSearch, async () => {
+  if (fileId.value) await loadTable(fileId.value);
 });
 
 watch(
-  () => JSON.stringify(props.file_reverse_links),
+  () =>
+    JSON.stringify({
+      t: props.usage_table_title,
+      c: props.usage_columns,
+      s: props.usage_sources,
+    }),
   async () => {
-    if (fileId.value) await loadReverseLinks(fileId.value);
+    if (fileId.value) await loadTable(fileId.value);
   },
 );
 
+watch(currentLocale, async () => {
+  if (fileId.value) await loadTable(fileId.value);
+});
+
 onMounted(async () => {
-  if (fileId.value) await loadReverseLinks(fileId.value);
+  if (fileId.value) await loadTable(fileId.value);
 });
 </script>
 
@@ -153,62 +299,115 @@ onMounted(async () => {
   </div>
 
   <div v-else class="file-media-extras">
-    <!-- Usage / assignment tables -->
-    <template v-if="hasReverseRules">
-      <div
-        v-for="(sec, rIdx) in reverseSections"
-        :key="`${sec.collection}-${rIdx}`"
-        class="section"
-      >
-        <div class="section-title">{{ sec.title }}</div>
-        <div class="reverse-meta subdued">{{ sec.collection }}</div>
+    <template v-if="!hasConfig">
+      <p class="reverse-empty">
+        Configure table columns and product sources in the field Interface
+        options.
+      </p>
+    </template>
 
-        <div v-if="sec.loading" class="reverse-loading">
-          <v-progress-circular indeterminate x-small />
-          <span class="muted">Loading…</span>
-        </div>
+    <template v-else>
+      <div v-if="tableTitle" class="section-title">{{ tableTitle }}</div>
 
-        <div v-else-if="sec.error" class="notice notice-error">
-          <v-icon name="error" small />
-          {{ sec.error }}
-        </div>
-
-        <p v-else-if="!sec.rows.length" class="reverse-empty">
-          No assignments found.
-        </p>
-
-        <div v-else class="reverse-table-wrap">
-          <div
-            class="table reverse-table"
-            :style="{
-              '--reverse-cols': String(
-                resolvedTableHeaders(sec, currentLocale).length,
-              ),
-            }"
-          >
-            <div class="tr th">
-              <div
-                v-for="(h, hIdx) in resolvedTableHeaders(sec, currentLocale)"
-                :key="`${sec.collection}-h-${hIdx}`"
-                class="td"
-              >
-                {{ h }}
-              </div>
-            </div>
-            <div
-              v-for="(jrow, tIdx) in sec.rows"
-              :key="`${sec.collection}-${String(jrow.id ?? 'row')}-${tIdx}`"
-              class="tr"
+      <div class="usage-panel">
+        <div class="usage-toolbar">
+          <div class="toolbar-search">
+            <v-input
+              v-model="searchInput"
+              placeholder="Search by name or id…"
             >
+              <template #prepend>
+                <v-icon name="search" />
+              </template>
+              <template v-if="searchInput" #append>
+                <v-icon name="close" clickable @click="searchInput = ''" />
+              </template>
+            </v-input>
+          </div>
+
+          <div
+            class="toolbar-filter"
+            :style="{ width: `${filterWidthPx}px` }"
+          >
+            <v-select
+              v-model="productFilter"
+              :items="productFilterOptions"
+              placeholder="All products"
+            />
+          </div>
+
+          <span v-if="resultCountLabel" class="toolbar-count">{{ resultCountLabel }}</span>
+        </div>
+
+        <div class="usage-body">
+          <div v-if="loading" class="reverse-loading">
+            <v-progress-circular indeterminate x-small />
+            <span class="muted">Loading…</span>
+          </div>
+
+          <div v-else-if="error && !rows.length" class="notice notice-error">
+            <v-icon name="error" small />
+            {{ error }}
+          </div>
+
+          <template v-else>
+            <div v-if="error" class="notice notice-error">
+              <v-icon name="error" small />
+              {{ error }}
+            </div>
+
+            <p v-if="!displayedRows.length" class="reverse-empty">
+              No assignments found.
+            </p>
+
+            <div v-else class="reverse-table-wrap">
               <div
-                v-for="(cell, cIdx) in resolvedTableCells(sec, jrow)"
-                :key="`${sec.collection}-c-${tIdx}-${cIdx}`"
-                class="td"
+                class="table reverse-table"
+                :style="{ '--reverse-cols-template': gridTemplateColumns }"
               >
-                {{ cell ?? "—" }}
+                <div class="tr th">
+                  <button
+                    v-for="(h, hIdx) in headers"
+                    :key="`h-${hIdx}`"
+                    type="button"
+                    class="td th-btn"
+                    :class="{
+                      sorted: sortCol === hIdx,
+                      'is-link-col': config.columns[hIdx]?.type === 'link',
+                    }"
+                    @click="toggleSort(hIdx)"
+                  >
+                    <span class="th-label">{{ h }}</span>
+                    <v-icon :name="sortIcon(hIdx)" x-small class="th-sort-icon" />
+                  </button>
+                </div>
+                <div
+                  v-for="row in displayedRows"
+                  :key="row.key"
+                  class="tr"
+                >
+                  <div
+                    v-for="(cell, cIdx) in row.cells"
+                    :key="`${row.key}-c-${cIdx}`"
+                    class="td"
+                    :class="{ 'is-link-col': cell.isLink }"
+                  >
+                    <a
+                      v-if="cell.isLink && cell.href"
+                      class="cell-link"
+                      :href="cell.href"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open"
+                    >
+                      <v-icon name="open_in_new" small />
+                    </a>
+                    <template v-else>{{ cell.text ?? "—" }}</template>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
       </div>
     </template>
@@ -218,32 +417,127 @@ onMounted(async () => {
 <style scoped>
 .empty-state {
   color: var(--theme--foreground-subdued);
-  font-size: 13px;
-  padding: 10px 0;
-  font-family: var(--theme--fonts--sans--font-family);
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
+  font-family: var(--theme--form--field--input--font-family, var(--theme--fonts--sans--font-family));
+  font-weight: var(--theme--form--field--input--font-weight, 400);
+  padding: 0.5rem 0;
+  margin: 0;
 }
 
 .file-media-extras {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  font-family: var(--theme--fonts--sans--font-family);
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
   gap: 10px;
+  color: var(--theme--form--field--input--foreground, var(--theme--foreground));
+  font-family: var(--theme--form--field--input--font-family, var(--theme--fonts--sans--font-family));
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
+  font-weight: var(--theme--form--field--input--font-weight, 400);
 }
 
 .section-title {
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--theme--foreground-subdued);
+  margin: 0;
+  color: var(--theme--form--field--label--foreground, var(--theme--foreground-accent));
+  font-family: var(--theme--form--field--label--font-family, var(--theme--fonts--sans--font-family));
+  font-weight: var(--theme--form--field--label--font-weight, 600);
+  font-size: 0.875rem;
 }
 
+.usage-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--theme--border-color);
+  border-radius: var(--theme--border-radius, 6px);
+}
+
+.usage-toolbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border-bottom: 1px solid var(--theme--border-color);
+}
+
+.toolbar-search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.toolbar-search :deep(.v-input),
+.toolbar-search :deep(.input) {
+  width: 100%;
+  background: #fff !important;
+}
+
+.toolbar-filter {
+  flex: 0 0 auto;
+}
+
+.toolbar-filter :deep(.v-select),
+.toolbar-filter :deep(.v-input),
+.toolbar-filter :deep(.input) {
+  width: 100% !important;
+  background: #fff !important;
+}
+
+.toolbar-filter :deep(.v-text-overflow),
+.toolbar-filter :deep(.display),
+.toolbar-filter :deep(.preview) {
+  white-space: nowrap !important;
+}
+
+.toolbar-count {
+  flex: 0 0 auto;
+  margin-left: 2px;
+  color: var(--theme--foreground-subdued);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.usage-body {
+  background: #fff;
+  min-height: 48px;
+}
+
+.usage-body .reverse-empty,
+.usage-body .reverse-loading,
+.usage-body .notice {
+  margin: 12px;
+}
+
+.cell-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  color: var(--theme--primary);
+  text-decoration: none;
+  line-height: 1;
+}
+
+.cell-link:hover {
+  background: color-mix(in srgb, var(--theme--primary) 12%, transparent);
+}
+
+.td.is-link-col,
+.th-btn.is-link-col {
+  min-width: 64px;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.th-btn.is-link-col {
+  gap: 2px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
 
 .notice {
   display: flex;
@@ -251,7 +545,8 @@ onMounted(async () => {
   gap: 8px;
   padding: 10px 12px;
   border-radius: var(--theme--border-radius);
-  font-size: 13px;
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
+  font-family: inherit;
 }
 
 .notice-error {
@@ -266,33 +561,94 @@ onMounted(async () => {
 }
 
 .table {
-  border: 1px solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius);
-  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  background: #fff;
 }
 
 .tr {
   display: grid;
-  grid-template-columns: repeat(var(--reverse-cols, 2), minmax(120px, 1fr));
+  grid-template-columns: var(
+    --reverse-cols-template,
+    repeat(4, minmax(120px, 1fr))
+  );
+}
+
+.tr:hover .td {
+  background: color-mix(in srgb, var(--theme--background-subdued) 55%, #fff);
+}
+
+.tr.th:hover .td,
+.tr.th:hover .th-btn {
+  background: var(--theme--background-subdued);
 }
 
 .tr.th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   background: var(--theme--background-subdued);
-  font-weight: 800;
-  font-size: 12px;
+  color: var(--theme--form--field--label--foreground, var(--theme--foreground-accent));
+  font-family: var(--theme--form--field--label--font-family, var(--theme--fonts--sans--font-family));
+  font-weight: var(--theme--form--field--label--font-weight, 600);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 0 var(--theme--border-color);
+}
+
+.th-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+  border: none;
+  border-bottom: none;
+  border-right: none;
+  background: inherit;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 10px 12px;
+}
+
+.th-btn:hover {
+  color: var(--theme--primary);
+}
+
+.th-btn.sorted .th-sort-icon {
+  opacity: 1;
+  color: var(--theme--primary);
+}
+
+.th-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.th-sort-icon {
+  flex-shrink: 0;
+  opacity: 0.4;
 }
 
 .td {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--theme--border-color);
-  border-right: 1px solid var(--theme--border-color);
-  font-size: 13px;
-  color: var(--theme--foreground);
-  word-break: break-word;
-}
-
-.td:last-child {
+  border-bottom: 1px solid var(--theme--border-color-subdued, var(--theme--border-color));
   border-right: none;
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
+  font-family: inherit;
+  font-weight: inherit;
+  color: var(--theme--form--field--input--foreground, var(--theme--foreground));
+  word-break: break-word;
+  background: #fff;
 }
 
 .tr:last-child .td {
@@ -300,36 +656,19 @@ onMounted(async () => {
 }
 
 .reverse-table-wrap {
-  max-height: 260px;
+  max-height: 340px;
   overflow: auto;
-}
-
-.reverse-table .tr.th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.subdued {
-  color: var(--theme--foreground-subdued);
-}
-
-.reverse-meta {
-  font-size: 11px;
-  font-weight: 600;
-  font-family:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
-  margin: -4px 0 0;
+  background: #fff;
 }
 
 .reverse-loading {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 8px 0;
   color: var(--theme--foreground-subdued);
-  font-size: 13px;
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
+  font-family: inherit;
 }
 
 .muted {
@@ -338,8 +677,10 @@ onMounted(async () => {
 
 .reverse-empty {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
+  font-family: inherit;
+  font-weight: inherit;
   color: var(--theme--foreground-subdued);
-  padding: 8px 2px;
+  padding: 0;
 }
 </style>

@@ -2,8 +2,7 @@
 
 This document maps every field in the BOTG Product API's JSON responses back to the exact
 Directus collection/relation/field it is sourced from, per product type. It reflects the
-code as of this session, including the schema-drift fixes applied on 2026-08-05 (see notes
-inline where relevant).
+code as of the current implementation, including schema-drift fixes (see notes inline where relevant).
 
 **Format:** `api_response_path : <collection>.<field>.<path>`
 `->` in the left column shows JSON nesting in the response. `.` in the right column shows
@@ -16,7 +15,7 @@ multiple source fields) are called out explicitly rather than given a fake path.
 
 **Web vs backoffice:** fields marked "web-stripped" are omitted from the public/web detail
 body (`GET /products/{id}`, `GET /products/full`) — they remain present on the backoffice
-per-type endpoints (`GET /hotels/{id}`, etc). As of 2026-08-07 this is enforced by the same
+per-type endpoints (`GET /hotels/{id}`, etc). This is enforced by the same
 allowlist mechanism described below, not a separate step: each transformer's `fieldDefs`
 carries `visibleTo`/`restrictTo(...)` visibility metadata (`src/shared/response/
 visibility.js`), and `assembleResponse()` (`src/shared/response/assembleResponse.js`)
@@ -29,7 +28,7 @@ followed by a separate deny-list subtraction. Verified equivalent to the old two
 pipeline for all 6 collections × 3 languages before the old code was deleted (see
 `refactor-baseline/PHASE2_NOTES.md`).
 
-**Completeness guarantee (2026-08-07, extended 2026-08-07):** response assembly
+**Completeness guarantee:** response assembly
 (`src/shared/response/assembleResponse.js`) is allowlist-only for **both** audiences — a
 response contains exactly the fields declared in a transformer's `fieldDefs` and visible to
 the requested audience, nothing else. There is no automatic passthrough of unconsumed raw
@@ -168,7 +167,7 @@ rooms[]->periods[]->prices[]->buy : hotels.room_prices.buy_price (parsed to floa
 rooms[]->periods[]->prices[]->margin : hotels.hotel_prices.margin_percentage (hotel-level setting, same value on every row) — web-stripped
 ```
 Also web-stripped from each room: `booking_code`, `tour32_name`, `catering`, `calc_type`.
-> Fixed this session: `webDetail.js` previously checked the wrong path (`room.prices[]`
+> Fixed: `webDetail.js` previously checked the wrong path (`room.prices[]`
 > instead of `room.periods[].prices[]`), so `buy`/`margin` leaked into the web response.
 
 ### Surcharges
@@ -213,13 +212,15 @@ image_badge->status : hotels.image_badge_status
 ```
 media[]->id : hotels.media.directus_files_id.id
 media[]->url : derived — `${request protocol+host}/assets/<file id>`
-media[]->alt : hotels.media.directus_files_id.alt_text
+media[]->alt : hotels.media.directus_files_id.translations.alt_text (picked for request lang via de-DE/en-GB/nl-NL)
 media[]->sort : hotels.media.sort
 media[]->copyright : hotels.media.directus_files_id.copyright
-media[]->is_map : hotels.media.is_map (falls back to media.directus_files_id.is_map) — web-stripped
+media[]->is_map : hotels.media.directus_files_id.is_map (hotels_directus_files has no junction is_map) — web-stripped
 media[]->object_id_primarix : hotels.media.directus_files_id.primarix_picid — web-stripped
-media[]->filename_fotoweb : hotels.media.directus_files_id.fotoware_file_name — web-stripped
-media[]->use_tour32 : hotels.media.tour32_export (falls back to media.directus_files_id.tour32_export) — web-stripped
+media[]->filename_fotoweb : hotels.media.directus_files_id.original_filename (falls back to fotoware_file_name) — web-stripped
+media[]->use_tour32 : hotels.media.tour32_export (junction hotels_directus_files.tour32_export) — web-stripped
+
+Hotel backoffice returns all assigned files (including unpublished). Other products still return published-only via buildImageUrls.
 ```
 
 ### Booking — entire group web-stripped (backoffice-only)
@@ -278,7 +279,7 @@ internal->sell_prices_updated_at : hotels.sell_prices_updated_at
 
 Directus root collection: `tours`.
 
-> Fixed this session: `id_service_provider_tour32`/`id_main_service_provider_tour32` were
+> Fixed: `id_service_provider_tour32`/`id_main_service_provider_tour32` were
 > previously misnamed as `service_provider_id_tour32`/`main_service_provider_id_tour32`
 > (the real tours field names) — corrected. `mobility_advice` previously assumed a
 > nonexistent m2o relation copied from excursions; now correctly reads the flat text field
@@ -368,9 +369,9 @@ categories[]->from : tours.categories.category_from (coerced to boolean)
 categories[]->periods[]->period->start : tours.price_periods.price_period_start
 categories[]->periods[]->period->end : tours.price_periods.price_period_end
 categories[]->periods[]->period->from : tours.price_periods.price_period_from (coerced to boolean)
-categories[]->periods[]->prices[]->occupancy->id : tours.occupancies.occupancy.id (the transformer spreads ...o.occupancy, so id is the related occupancies record id — not the tours_occupancies junction row id)
-categories[]->periods[]->prices[]->occupancy->name : tours.occupancies.occupancy.translations.name (falls back to occupancies.occupancy.name)
-categories[]->periods[]->prices[]->sell : (hardcoded null — tours_prices has no sell-price column or translations table anywhere in Directus; schema limitation, not a code bug)
+categories[]->periods[]->prices[]->occupancy->id : tours.occupancies.tours_occupancies_id.occupancy.id (tours.occupancies is an m2m via the tours_occupancies_selected junction; the transformer spreads ...tours_occupancies_id.occupancy, so id is the related tour_occupancies_names record id — not the tours_occupancies junction row id, which is exposed as `value`)
+categories[]->periods[]->prices[]->occupancy->name : tours.occupancies.tours_occupancies_id.occupancy.translations.name (falls back to .occupancy.name)
+categories[]->periods[]->prices[]->sell : tours.prices.tours_prices_translations.sell_price (the earlier claim that no sell-price column/translations table exists was wrong; `tours_prices_translations` has `sell_price`, it just wasn't fetched/wired)
 categories[]->periods[]->prices[]->buy : tours.prices.buy_price (parsed to float) — web-stripped
 categories[]->periods[]->prices[]->margin : tours.price_calculation_translations.margin_percentage (same value on every row) — web-stripped
 ```
@@ -382,12 +383,12 @@ The o2m alias on `tours` is `surcharges` (→ `tours_surcharges`), not `tours_su
 ```
 surcharges[]->booking_name : tours.surcharges.surcharge_booking_name
 surcharges[]->description : tours.surcharges.translations.surcharge_description
-surcharges[]->sell : (hardcoded null — tours_surcharges/tours_surcharges_translations have no sell-price column at all; schema limitation)
+surcharges[]->sell : tours.surcharges.translations.sell_price (parsed to float — the earlier claim that no sell-price column/translations table exists here was wrong; `tours_surcharges_translations` has `sell_price`, it just wasn't fetched/wired)
 surcharges[]->type->id : tours.surcharges.surcharge_type.id — web-stripped
 surcharges[]->type->name : tours.surcharges.surcharge_type.designation — web-stripped
 surcharges[]->calculation_method->id : tours.surcharges.calculation_method.id — web-stripped
 surcharges[]->calculation_method->name : tours.surcharges.calculation_method.designation — web-stripped
-surcharges[]->buy : (hardcoded null — tours_surcharges has no buy_price column either; schema limitation)
+surcharges[]->buy : tours.surcharges.buy_price (parsed to float — the earlier claim that no buy_price column exists here was wrong; it's a plain column directly on `tours_surcharges`) — web-stripped
 surcharges[]->margin : tours.surcharges_calculation_translations.surcharge_margin_percentage — web-stripped
 ```
 
@@ -509,7 +510,7 @@ pricing_config->percentage_type : tours.price_calculation_translations.percentag
 pricing_config->provision_percentage : tours.price_calculation_translations.provision_percentage (cast to Number)
 pricing_config->margin_percentage : tours.price_calculation_translations.margin_percentage (cast to Number)
 pricing_config->exchange_rate : tours.price_calculation_translations.exchange_rate (via toExchangeRateObject(); this field's UI is a `rates`-collection picker — a `{key, collection:'rates'}` stub is resolved to a real `{id, currency, rate}` by enrichExchangeRates() in tours.service.js before the transformer runs, so `.id` can be non-null; a bare decimal here still yields `.id: null`)
-pricing_config->from_price : tours.price_calculation_translations.from_price
+pricing_config->from_price : tours.price_calculation_translations.from_price (plain M2O to a tours_price_periods row — no nested sell-price translations exist for tours)
 pricing_config->surcharge_percentage_type : tours.surcharges_calculation_translations.surcharge_percentage_type
 pricing_config->surcharge_provision_percentage : tours.surcharges_calculation_translations.surcharge_provision_percentage (cast to Number)
 pricing_config->surcharge_margin_percentage : tours.surcharges_calculation_translations.surcharge_margin_percentage (cast to Number)
@@ -522,14 +523,18 @@ pricing_config->surcharge_exchange_rate : tours.surcharges_calculation_translati
 
 Directus root collection: `excursions`.
 
-> Fixed this session: `service_provider_id_tour32`/`main_service_provider_id_tour32` were
+> Fixed: `service_provider_id_tour32`/`main_service_provider_id_tour32` were
 > previously misnamed as `id_service_provider_tour32`/`id_main_service_provider_tour32`
 > (the swap in the opposite direction from tours) — corrected.
 >
-> **Excursions is the one product type where `mobility_advice.id` is real** —
-> `excursions.mobility_advice_text` is a genuine m2o relation to the shared
-> `mobility_advice_text` collection, unlike hotels/tours/cruises/rental companies which only
-> have a flat text field with no id.
+> **Correction:** the earlier claim that "Excursions is the one product type
+> where `mobility_advice.id` is real" was wrong — `excursions.mobility_advice_text` as a m2o
+> relation to a shared `mobility_advice_text` collection does not exist in the live schema
+> (verified via `/fields/excursions` and a live query — the field path threw a Directus
+> "field does not exist" error). Excursions actually follows the same pattern as
+> hotels/tours/cruises/rental companies: mobility advice is a flat per-language text field,
+> `excursions.price_infos_translations.mobility_advice_text` — `id` is hardcoded null like
+> every other product type, not real anywhere.
 
 ### Top-level
 
@@ -579,8 +584,8 @@ price_info->additional_information : excursions.price_infos_translations.additio
 price_info->deviating_cancellation_terms : excursions.price_infos_translations.deviating_cancellation_terms
 price_info->children_policy : excursions.price_infos_translations.children_policy
 price_info->participants_text : excursions.price_infos_translations.participants_text
-price_info->mobility_advice->id : excursions.mobility_advice_text.id  (real relation id — see note above)
-price_info->mobility_advice->name : excursions.mobility_advice_text.hotel_translations.hotel_mobility_advice_text
+price_info->mobility_advice->id : (hardcoded null — no m2o relation for excursions; flat text field only — see note above)
+price_info->mobility_advice->name : excursions.price_infos_translations.mobility_advice_text
 price_info->supplementary : excursions.price_infos_translations.price_info_supplementary (via toSupplementaryBlocks())
 price_info->price_info_markdown : (hardcoded null)
 ```
@@ -623,9 +628,9 @@ categories[]->from : excursions.categories.category_from (coerced to boolean)
 categories[]->periods[]->period->start : excursions.price_periods.price_period_start
 categories[]->periods[]->period->end : excursions.price_periods.price_period_end
 categories[]->periods[]->period->from : excursions.price_periods.price_period_from (coerced to boolean)
-categories[]->periods[]->prices[]->price_category->id : excursions.price_categories.price_category.id (the transformer spreads ...pc.price_category, so id is the related price_categories record id — not the excursions_price_categories junction row id)
-categories[]->periods[]->prices[]->price_category->name : excursions.price_categories.price_category.translations.name (falls back to .name)
-categories[]->periods[]->prices[]->sell : (currently always null — KNOWN BUG, deferred: `excursions.prices.excursions_prices_translations.sell_price` does not resolve. The relation `excursions_prices_translations.excursions_prices_id` has `meta.one_field = "translations"` while the actual alias field on `excursions_prices` is named `excursions_prices_translations`, so Directus silently drops the nested expansion and the `sell_price` data (which exists in `excursions_prices_translations`) is never loaded)
+categories[]->periods[]->prices[]->price_category->id : excursions.price_categories.excursions_price_categories_id.price_category.id (`excursions.price_categories` is an o2m alias to the `excursions_price_categories_selected` junction, whose row carries only `excursions_price_categories_id`; the actual price-category settings row, and its `price_category` m2o, live one level deeper than previously mapped. The transformer spreads `...priceCategory.price_category`, so `id` is the related `excursion_price_categories_names` record id — not the junction row id, which is exposed as `value`)
+categories[]->periods[]->prices[]->price_category->name : excursions.price_categories.excursions_price_categories_id.price_category.translations.name (falls back to .name)
+categories[]->periods[]->prices[]->sell : excursions.prices.excursions_prices_translations.sell_price (parsed to float — the earlier "known bug" claim that this relation doesn't resolve was wrong; `excursions_prices_translations.excursions_prices_id`'s `meta.one_field` correctly matches the `excursions_prices_translations` alias field, and the code already correctly wires `translationsKey: "excursions_prices_translations"` — verified live, e.g. excursion id 35 resolves real sell prices)
 categories[]->periods[]->prices[]->buy : excursions.prices.buy_price (parsed to float) — web-stripped
 categories[]->periods[]->prices[]->margin : excursions.price_calculation_translations.margin_percentage (same value on every row) — web-stripped
 ```
@@ -752,12 +757,24 @@ pricing_config->surcharge_exchange_rate : excursions.surcharges_translations.sur
 
 Directus root collection: `cruises`.
 
-> Fixed this session (schema drift): (1) `cruises.special_valid_from`/`special_valid_to`
+> Fixed (schema drift): (1) `cruises.special_valid_from`/`special_valid_to`
 > top-level columns no longer exist — the validity window now comes from
 > `cruises_specials_translations.specials` (a JSON array of `{name, special_description,
 > special_valid_from, special_valid_to}` entries), read via `extractSpecialsValidity()`.
 > (2) `cruise_occupancies` no longer has a translations relation — occupancy naming is now
 > a flat `name` field read directly, not via `.translations`.
+> (3) `cruises.occupancies` (an o2m alias to the `cruises_occupancies_selected` junction)
+> previously mapped straight to `occupancies.occupancy.*`; the junction row actually only
+> carries `cruises_occupancies_id`, and both the flat `occupancy_from`/`value` fields and the
+> nested `occupancy` m2o (→ `cruise_occupancies`) live one level deeper than that, under
+> `occupancies.cruises_occupancies_id.*`. (4) `price_calculation` was mapped as if it were a
+> nested relation/array (`cruises.price_calculation[0].*`) — it isn't; `buy_price_type`,
+> `sell_price_type`, `percentage_type`, `provision_percentage`, `margin_percentage`,
+> `exchange_rate`, and `from_price` are all plain top-level fields directly on `cruises`.
+> (5) `cruises.exchange_rate` **is** a `rates`-collection picker like tours/excursions (a
+> `{key, collection:'rates'}` stub resolved by `enrichExchangeRates()`), not a bare decimal —
+> the earlier claim that its `.id` is always null was wrong; verified live (e.g. cruise id
+> 156 resolves to `{id, currency:"Euro", rate:1}`).
 
 ### Top-level
 
@@ -849,18 +866,18 @@ cabin_categories[]->sailings[]->date_departure : cruises.price_dates.date_depart
 cabin_categories[]->sailings[]->date_arrival : cruises.price_dates.date_arrival
 cabin_categories[]->sailings[]->frequency[]->id : cruises.price_dates.departure_frequencies.cruises_frequencies_id.id
 cabin_categories[]->sailings[]->frequency[]->name : cruises.price_dates.departure_frequencies.cruises_frequencies_id.name
-cabin_categories[]->sailings[]->prices[]->occupancy->id : cruises.occupancies.occupancy.id (the transformer spreads ...o.occupancy, so id is the related cruise_occupancies record id — not the cruises_occupancies junction row id; groupPrices2() resolves occ.id ?? occ.value and the spread's id wins)
-cabin_categories[]->sailings[]->prices[]->occupancy->name : cruises.occupancies.occupancy.name (flat field — no translations relation exists; fixed this session)
-cabin_categories[]->sailings[]->prices[]->sell : (hardcoded null — cruises_prices has no sell-price column or translations table; schema limitation)
+cabin_categories[]->sailings[]->prices[]->occupancy->id : cruises.occupancies.cruises_occupancies_id.occupancy.id (the transformer spreads ...o.cruises_occupancies_id.occupancy, so id is the related cruise_occupancies record id — not the cruises_occupancies_selected junction row id, and not the cruises_occupancies settings row id either; groupPrices2() resolves occ.id ?? occ.value and the spread's id wins)
+cabin_categories[]->sailings[]->prices[]->occupancy->name : cruises.occupancies.cruises_occupancies_id.occupancy.name (flat field — no translations relation exists)
+cabin_categories[]->sailings[]->prices[]->sell : cruises_prices.sell_price (a plain, non-localized column directly on the row, unlike other product types' per-language translation table — the earlier claim that no sell-price column exists here was wrong)
 cabin_categories[]->sailings[]->prices[]->buy : cruises_prices.buy_price (separate query on the `cruises_prices` collection filtered by `cruises_id`, joined into sailings; parsed to float) — web-stripped
-cabin_categories[]->sailings[]->prices[]->margin : cruises.price_calculation[0].margin_percentage (same value on every row) — web-stripped
+cabin_categories[]->sailings[]->prices[]->margin : cruises.margin_percentage (plain top-level field, same value on every row — see note above) — web-stripped
 ```
 
 ### Specials
 
 ```
 specials->special_description : cruises.specials_translations.specials (JSON array; extractSpecialsDescription())
-specials->valid_from : cruises.specials_translations.specials (JSON repeater column — per-entry key `special_valid_from`; extractSpecialsValidity() walks the array and returns the FIRST entry where either special_valid_from or special_valid_to is non-null; fixed this session — the old top-level cruises.special_valid_from/to columns no longer exist)
+specials->valid_from : cruises.specials_translations.specials (JSON repeater column — per-entry key `special_valid_from`; extractSpecialsValidity() walks the array and returns the FIRST entry where either special_valid_from or special_valid_to is non-null; the old top-level cruises.special_valid_from/to columns no longer exist)
 specials->valid_to : cruises.specials_translations.specials (JSON repeater column — per-entry key `special_valid_to`; same winning entry as valid_from)
 ```
 
@@ -884,13 +901,13 @@ Web-stripped from each item: `is_map`, `object_id_primarix`, `filename_fotoweb`,
 ### Pricing Config — entire group web-stripped (backoffice-only)
 
 ```
-pricing_config->buy_price_type : cruises.price_calculation[0].buy_price_type
-pricing_config->sell_price_type : cruises.price_calculation[0].sell_price_type
-pricing_config->percentage_type : cruises.price_calculation[0].percentage_type
-pricing_config->provision_percentage : cruises.price_calculation[0].provision_percentage (cast to Number)
-pricing_config->margin_percentage : cruises.price_calculation[0].margin_percentage (cast to Number)
-pricing_config->exchange_rate : cruises.price_calculation[0].exchange_rate (via toExchangeRateObject(); `.id` is null here — cruises stores a bare decimal, no `rates`-collection relation)
-pricing_config->from_price : cruises.price_calculation[0].from_price (fixed this session — no longer falls back to price_calculation[0].translations.sell_price)
+pricing_config->buy_price_type : cruises.buy_price_type (plain top-level field, not a nested relation — see note above)
+pricing_config->sell_price_type : cruises.sell_price_type
+pricing_config->percentage_type : cruises.percentage_type
+pricing_config->provision_percentage : cruises.provision_percentage (cast to Number)
+pricing_config->margin_percentage : cruises.margin_percentage (cast to Number)
+pricing_config->exchange_rate : cruises.exchange_rate (via toExchangeRateObject(); a `rates`-collection picker like tours/excursions — `.id` can be non-null, resolved by enrichExchangeRates())
+pricing_config->from_price : cruises.from_price
 ```
 
 ### Internal — entire group web-stripped (backoffice-only)
@@ -917,7 +934,7 @@ id : vehicles.id
 object_id : vehicles.object_id
 publishing_status : vehicles.status_primarix
 date_updated : vehicles.date_updated
-season->id : vehicles.rental_company.season.id (fixed this session — was hardcoded null)
+season->id : vehicles.rental_company.season.id (was hardcoded null)
 season->name : vehicles.rental_company.season.season
 name : vehicles.name_vehicle
 rental_type : vehicles.rental_type
@@ -1003,7 +1020,7 @@ rental_company->conditions->conditions_driver : vehicles.rental_company.conditio
 rental_company->conditions->conditions_licence : vehicles.rental_company.conditions_translations.conditions_licence
 rental_company->conditions->conditions_calculation : vehicles.rental_company.conditions_translations.conditions_calculation
 rental_company->conditions->conditions_oneway : vehicles.rental_company.conditions_translations.conditions_oneway
-rental_company->conditions->has_multi_rental_discount : vehicles.rental_company.has_multi_rental_discount (coerced to boolean)
+rental_company->conditions->has_multi_rental_discount : vehicles.rental_company.conditions_translations.has_multi_rental_discount (coerced to boolean; this field lives per-language on conditions_translations, not as a top-level field on rental_company)
 rental_company->conditions->conditions_multi_rental_discount : vehicles.rental_company.conditions_translations.conditions_multi_rental_discount
 rental_company->conditions->conditions_restricted_area : vehicles.rental_company.conditions_translations.conditions_restricted_area
 rental_company->conditions->conditions_border_crossing : vehicles.rental_company.conditions_translations.conditions_border_crossing
@@ -1053,19 +1070,36 @@ depots[]->email : vehicles.depots_selected.rental_depots_id.email
 depots[]->office_hours_deviating : rental_depots.office_hours_translations.office_hours_deviating — fetched via a separate knex query (no Directus relation graph path exists), attached per-depot before shaping
 depots[]->object_id : vehicles.depots_selected.rental_depots_id.object_id — web-stripped
 depots[]->status : vehicles.depots_selected.rental_depots_id.status_primarix — web-stripped
-depots[]->rental_company->id : vehicles.depots_selected.rental_depots_id.rental_company.id (fixed this session — was the vehicle's own rental_company, a cross-entity substitution; a depot's rental_company can differ from its parent vehicle's) — web-stripped
-depots[]->rental_company->name : vehicles.depots_selected.rental_depots_id.rental_company.name_company (fixed this session, see above) — web-stripped
+depots[]->rental_company->id : vehicles.depots_selected.rental_depots_id.rental_company.id (was the vehicle's own rental_company, a cross-entity substitution; a depot's rental_company can differ from its parent vehicle's) — web-stripped
+depots[]->rental_company->name : vehicles.depots_selected.rental_depots_id.rental_company.name_company (see above) — web-stripped
 ```
 
 ### Zones & Prices
 
-Built by `buildRentalZones()`, joining `zones`, `price_periods`, `rental_periods`, `prices`.
-None of these are o2m aliases on `vehicles` — the service fetches each via its own
-`ItemsService` query (on `vehicles_rental_zones`, `vehicles_price_periods`,
-`vehicles_rental_periods`, `vehicles_prices`, `vehicles_price_calculation`) and joins them.
+Built by `buildRentalZones()`, joining `zones`, `price_periods`, `rental_periods`, `prices`,
+and (for sell price only) `rental_companies_prices`. None of these are o2m aliases on
+`vehicles` — the service fetches each via its own `ItemsService` query (on
+`vehicles_rental_zones`, `vehicles_price_periods`, `vehicles_rental_periods`,
+`vehicles_prices`, `rental_companies_prices`) and joins them.
+
+> **Correction:** sell price for the price matrix was previously claimed to be a genuine
+> schema gap ("no sell_price column anywhere"). That was wrong about *where* to look, not
+> about `vehicles_prices` itself — `vehicles_prices` (buy price + zone granularity) genuinely
+> has no sell column, but there's a parallel, company-scoped collection,
+> `rental_companies_prices` (scoped to `vehicle_id`, no zone dimension), whose `buy_price`
+> values mirror `vehicles_prices` exactly for the same (price_period, rental_period) — it's
+> the same underlying price matrix, and its own `prices_translations` relation is where sell
+> price actually lives. Matched onto each `vehicles_prices` row by (price_period,
+> rental_period) — sell doesn't vary by zone in this data model. Verified live: e.g. vehicle
+> id 1055's price row (period 751, rental_period 730, buy 135.60) resolves sell 109.00/de-DE,
+> 111.00/nl-NL, 107.00/de-CH via `rental_companies_prices` id 83.
+>
+> Also corrected: `margin` now comes from the resolved, per-language `rental_companies_price_
+> calculation_translations` row (see Pricing Config below) — the collection it was
+> previously sourced from, `vehicles_price_calculation`, holds **zero rows** live.
 
 ```
-zones[]->zone->id : vehicles.depots_selected.rental_depots_id.rental_zone.id (fixed this session — was vehicles_rental_zones.id via a separate query keyed off vehicles_prices.rental_zone, which is frequently null even when the vehicle's depots each have a real, distinct rental_zone; the depot-sourced zone now wins and takes precedence in the zone lookup)
+zones[]->zone->id : vehicles.depots_selected.rental_depots_id.rental_zone.id (was vehicles_rental_zones.id via a separate query keyed off vehicles_prices.rental_zone, which is frequently null even when the vehicle's depots each have a real, distinct rental_zone; the depot-sourced zone now wins and takes precedence in the zone lookup)
 zones[]->zone->name : vehicles.depots_selected.rental_depots_id.rental_zone.name (see note above)
 > Array coverage: every zone found across the vehicle's depots_selected now gets its own
 > entry in `zones[]` (with `periods: []` if no price row carries that zone id), instead of
@@ -1079,9 +1113,9 @@ zones[]->periods[]->prices[]->duration_min : vehicles_rental_periods.rental_peri
 zones[]->periods[]->prices[]->duration_max : vehicles_rental_periods.rental_period_max (cast to Number)
 zones[]->periods[]->prices[]->duration_label : vehicles_rental_periods.rental_period_duration
 zones[]->periods[]->prices[]->duration_from : vehicles_rental_periods.rental_period_from (coerced to boolean)
-zones[]->periods[]->prices[]->sell : (hardcoded null — vehicles_prices has no sell_price column anywhere in Directus; schema limitation)
+zones[]->periods[]->prices[]->sell : rental_companies_prices.prices_translations.sell_price (parsed to float, matched by price_period+rental_period — see note above; null when the company hasn't priced that specific period/duration in `rental_companies_prices`, a real data gap for some older periods, not a code defect)
 zones[]->periods[]->prices[]->buy : vehicles_prices.buy_price (parsed to float) — web-stripped
-zones[]->periods[]->prices[]->margin : vehicles_price_calculation.margin_percentage (same value on every row) — web-stripped
+zones[]->periods[]->prices[]->margin : rental_companies_price_calculation_translations.margin_percentage (resolved per language — see note above) — web-stripped
 ```
 
 ### Surcharges
@@ -1092,13 +1126,13 @@ Fetched via a separate query on `vehicles_surcharges` (filtered by the vehicle's
 ```
 surcharges[]->booking_name : vehicles_surcharges.surcharge_booking_name (separate query)
 surcharges[]->description : vehicles_surcharges.surcharge_translations.surcharge_description
-surcharges[]->sell : (hardcoded null — no sell column on vehicles_surcharges/surcharge_translations)
-surcharges[]->type->id : (hardcoded null — surcharge_type is a plain string, not a relation)
-surcharges[]->type->name : vehicles_surcharges.surcharge_type
-surcharges[]->calc_type->id : (hardcoded null) — web-stripped
-surcharges[]->calc_type->name : vehicles_surcharges.surcharge_calc_type — web-stripped
-surcharges[]->buy : (hardcoded null — vehicles_surcharges has no buy_price column) — web-stripped
-surcharges[]->margin : vehicles_surcharges_calculation.surcharge_margin_percentage (separate query) — web-stripped
+surcharges[]->sell : vehicles_surcharges.surcharge_translations.sell_price (parsed to float — the earlier claim that no sell column exists here was wrong; `vehicles_surcharges_translations` has `sell_price`, it just wasn't fetched/wired)
+surcharges[]->type->id : vehicles_surcharges.surcharge_type.id (the earlier claim that `surcharge_type` is a plain string was wrong — it's a real m2o relation to `mandatory`) — web-stripped
+surcharges[]->type->name : vehicles_surcharges.surcharge_type.designation
+surcharges[]->calc_type->id : vehicles_surcharges.surcharge_calc_type.id (real m2o relation to `calculation_method`, not a plain string) — web-stripped
+surcharges[]->calc_type->name : vehicles_surcharges.surcharge_calc_type.designation — web-stripped
+surcharges[]->buy : vehicles_surcharges.buy_price (parsed to float — the earlier claim that no buy_price column exists here was wrong; it's a plain column directly on `vehicles_surcharges`) — web-stripped
+surcharges[]->margin : rental_companies_surcharges_calculation_translations.surcharge_margin_percentage (resolved per language — corrected, see Pricing Config below) — web-stripped
 ```
 
 ### Specials
@@ -1135,25 +1169,41 @@ rental_car->conditions_ferry : vehicles.rental_company.conditions_translations.c
 
 ### Pricing Config — entire group web-stripped (backoffice-only)
 
-Both settings rows are fetched via separate queries (on `vehicles_price_calculation` and
-`vehicles_surcharges_calculation`, filtered by `vehicle_id`) — not aliases on `vehicles`.
+> **Major correction:** this entire block was previously sourced from `vehicles_price_
+> calculation`/`vehicles_surcharges_calculation` (filtered by `vehicle_id`, one row assumed
+> per vehicle) — those two collections exist in the schema but hold **zero rows live**
+> (confirmed via `GET /items/vehicles_price_calculation` returning `count: 0`), so this whole
+> block was silently empty/null for every rental car and camper in production. The real
+> settings live under the *rental company* (not the individual vehicle), one row per
+> language, in `rental_companies_price_calculation_translations` /
+> `rental_companies_surcharges_calculation_translations` (filtered by `rental_company_id`).
+> The active-language row is resolved via `buildPriceSettingsMap()`/
+> `buildSurchargeSettingsMap()` (`transformers/helpers/pricing.js`) — the same mechanism
+> tours/cruises/excursions already use for their own `price_calculation_translations`.
+> `exchange_rate`/`surcharge_exchange_rate` here are **real `rates`-collection picker stubs**
+> (`{key, collection: 'rates'}`, resolved by `enrichExchangeRates()`), not bare decimals as
+> previously claimed — verified live, e.g. rental company id 245 resolves a real
+> `margin_percentage` of 23 (de-DE) and a real exchange-rate stub per language.
+> `from_price` is a real m2o to `rental_companies_prices` (the same hotel-standard pattern
+> tours/hotels use — see `buildPriceSettingsMap()`), so it resolves through that row's own
+> `prices_translations.sell_price`, not a flat decimal.
 
 ```
-pricing_config->buy_price_type : vehicles_price_calculation.buy_price_type (separate query)
-pricing_config->sell_price_type : vehicles_price_calculation.sell_price_type
-pricing_config->percentage_type : vehicles_price_calculation.percentage_type
-pricing_config->provision_percentage : vehicles_price_calculation.provision_percentage (cast to Number)
-pricing_config->margin_percentage : vehicles_price_calculation.margin_percentage (cast to Number)
-pricing_config->exchange_rate->id : (hardcoded null via toExchangeRateObject() — vehicles_price_calculation.exchange_rate is a bare decimal, no `rates`-collection relation)
-pricing_config->exchange_rate->currency : (resolved from the family's exchange_rate_presets default-locale text — rental_car_other_default_locale / camper_other_default_locale, format "<locale> : <FROM>=><TO>@<rate>" — matched by rate to the stored decimal, using the TO currency; else null)
-pricing_config->exchange_rate->rate : vehicles_price_calculation.exchange_rate (cast to Number)
-pricing_config->from_price : vehicles_price_calculation.from_price (cast to Number)
-pricing_config->surcharge_percentage_type : vehicles_surcharges_calculation.surcharge_percentage_type (separate query)
-pricing_config->surcharge_provision_percentage : vehicles_surcharges_calculation.surcharge_provision_percentage (cast to Number)
-pricing_config->surcharge_margin_percentage : vehicles_surcharges_calculation.surcharge_margin_percentage (cast to Number)
-pricing_config->surcharge_exchange_rate->id : (hardcoded null via toExchangeRateObject() — vehicles_surcharges_calculation.surcharge_exchange_rate is a bare decimal, no `rates`-collection relation)
-pricing_config->surcharge_exchange_rate->currency : (resolved from the family's exchange_rate_presets default-locale text — rental_car_other_default_locale / camper_other_default_locale, format "<locale> : <FROM>=><TO>@<rate>" — matched by rate to the stored decimal, using the TO currency; else null)
-pricing_config->surcharge_exchange_rate->rate : vehicles_surcharges_calculation.surcharge_exchange_rate (cast to Number)
+pricing_config->buy_price_type : rental_companies_price_calculation_translations.buy_price_type (resolved per language, filtered by rental_company_id)
+pricing_config->sell_price_type : rental_companies_price_calculation_translations.sell_price_type
+pricing_config->percentage_type : rental_companies_price_calculation_translations.percentage_type
+pricing_config->provision_percentage : rental_companies_price_calculation_translations.provision_percentage (cast to Number)
+pricing_config->margin_percentage : rental_companies_price_calculation_translations.margin_percentage (cast to Number)
+pricing_config->exchange_rate->id : rental_companies_price_calculation_translations.exchange_rate (a real `{key, collection:'rates'}` stub, resolved by enrichExchangeRates() — `.id` can be non-null)
+pricing_config->exchange_rate->currency : rental_companies_price_calculation_translations.exchange_rate (resolved currency from the `rates` row)
+pricing_config->exchange_rate->rate : rental_companies_price_calculation_translations.exchange_rate (resolved rate from the `rates` row)
+pricing_config->from_price : rental_companies_price_calculation_translations.from_price.prices_translations.sell_price (m2o to a `rental_companies_prices` row, hotel-standard pattern — cast to Number)
+pricing_config->surcharge_percentage_type : rental_companies_surcharges_calculation_translations.surcharge_percentage_type (resolved per language, filtered by rental_company_id)
+pricing_config->surcharge_provision_percentage : rental_companies_surcharges_calculation_translations.surcharge_provision_percentage (cast to Number)
+pricing_config->surcharge_margin_percentage : rental_companies_surcharges_calculation_translations.surcharge_margin_percentage (cast to Number)
+pricing_config->surcharge_exchange_rate->id : rental_companies_surcharges_calculation_translations.surcharge_exchange_rate (a real `{key, collection:'rates'}` stub, resolved by enrichExchangeRates())
+pricing_config->surcharge_exchange_rate->currency : rental_companies_surcharges_calculation_translations.surcharge_exchange_rate (resolved currency from the `rates` row)
+pricing_config->surcharge_exchange_rate->rate : rental_companies_surcharges_calculation_translations.surcharge_exchange_rate (resolved rate from the `rates` row)
 ```
 
 ---
@@ -1173,7 +1223,7 @@ id : vehicles.id
 object_id : vehicles.object_id
 publishing_status : vehicles.status_primarix
 date_updated : vehicles.date_updated
-season->id : vehicles.rental_company.season.id (fixed this session — was hardcoded null)
+season->id : vehicles.rental_company.season.id (was hardcoded null)
 season->name : vehicles.rental_company.season.season
 name : vehicles.name_vehicle
 rental_type : vehicles.rental_type — web-stripped
@@ -1215,7 +1265,7 @@ descriptions->descriptions_markdown : (hardcoded null)
 
 ```
 camper->bedsize : vehicles.descriptions_translations.bedsize (camper-only translation field)
-camper->camping_equipment : vehicles.descriptions_translations.camping_equipment (camper-only translation field)
+camper->camping_equipment : vehicles.camping_equipment (this is a plain top-level field on `vehicles`, not per-language on descriptions_translations)
 camper->conditions_towaway : vehicles.rental_company.conditions_translations.conditions_towaway (shared getCompanyConditionsRow(); same source row rental_cars uses for its `rental_car` group, surfaced standalone here instead)
 ```
 
@@ -1232,8 +1282,12 @@ One difference: camper's `rental_company->conditions` does not surface
 ### Depots, Zones & Prices, Surcharges, Specials, Image Badge, Media
 
 Identical mapping to the Rental Cars section (shared functions `shapeDepot()`,
-`buildRentalZones()`, `shapeRentalSurcharges()`) — same hardcoded-null sell/buy/type
-limitations apply (no sell-price column anywhere in the vehicles pricing schema).
+`buildRentalZones()`, `shapeRentalSurcharges()`) — including price-matrix and surcharge
+sell/buy/type/margin, all now sourced from `rental_companies_prices`/`rental_companies_
+surcharges_calculation_translations`/real relations (see the Rental Cars sections above).
+No genuine gap remains here — `vehicles_prices` itself still has no sell column, but its
+company-scoped counterpart `rental_companies_prices` does, and is matched onto it by
+(price_period, rental_period).
 
 ### Pricing Config — entire group web-stripped (backoffice-only)
 
@@ -1243,20 +1297,32 @@ Identical mapping to the Rental Cars section.
 
 ## Cross-cutting notes
 
-- **Sell price is only modeled end-to-end for Hotels today.** Excursions have the
-  `sell_price` column in `excursions_prices_translations`, but it never loads — the
-  relation metadata (`excursions_prices_translations.excursions_prices_id` →
-  `meta.one_field = "translations"`) doesn't match the actual alias field
-  (`excursions_prices_translations`), so the nested query is silently dropped and `sell`
-  stays `null` (known bug, deferred). Tours, Cruises, Rental Cars, and Campers have no
-  sell-price column or translations table at all — `sell` is hardcoded `null` for those
-  four product types until a schema change adds one. This is a data-model gap, not a code
-  defect.
-- **`mobility_advice.id` is only ever real for Excursions** (genuine m2o relation to the
-  shared `mobility_advice_text` collection). Hotels, Tours, Cruises, and Rental
-  Companies/Campers only have a flat per-language text field with no relation, so `id` is
-  correctly `null` for those — this is expected behavior per the current schema, not a bug
-  (hotels' flat-text field is populated by a Directus Flow).
+- **Sell price is now modeled end-to-end for every product type's prices and surcharges — no
+  remaining schema gaps found.** A prior version of this document claimed sell prices were
+  hardcoded null for Tours, Cruises, Excursions, Rental Cars, and Campers due to missing
+  columns/relations or a broken relation — every one of those claims was checked against the
+  live schema and found wrong: the columns and relations exist and resolve correctly, the
+  code just wasn't fetching/reading them. Fixed for: tours prices (`tours_prices_translations.
+  sell_price`) and surcharges (`tours_surcharges_translations.sell_price`, plus
+  `tours_surcharges.buy_price`); cruises prices (`cruises_prices.sell_price`, a plain
+  non-localized column); vehicles surcharges (`vehicles_surcharges_translations.sell_price`,
+  plus `vehicles_surcharges.buy_price`, plus `surcharge_type`/`surcharge_calc_type` — real
+  m2o relations to `mandatory`/`calculation_method`, not plain strings as previously claimed).
+  **Rental car/camper price-matrix `sell`** turned out not to be a schema gap either —
+  `vehicles_prices` itself indeed has no sell column, but the company-scoped
+  `rental_companies_prices` (matched by price_period + rental_period) does, via its own
+  `prices_translations` relation; see the Rental Cars "Zones & Prices" section above. The
+  entire `pricing_config` block for rental cars/campers was also silently empty in production
+  — it was sourced from `vehicles_price_calculation`/`vehicles_surcharges_calculation`, which
+  hold zero rows live; the real settings are scoped to the rental company, not the vehicle
+  (see the Pricing Config section above).
+- **`mobility_advice.id` is hardcoded `null` for every product type** — Hotels, Tours,
+  Cruises, Excursions, and Rental Companies/Campers all store mobility advice as a flat
+  per-language text field with no relation. (Note: an earlier version of
+  this document claimed Excursions had a genuine m2o relation to a shared
+  `mobility_advice_text` collection — that relation does not exist in the live schema;
+  Excursions actually follows the same flat-text pattern as every other product type, hotels'
+  flat-text field is populated by a Directus Flow.)
 - **`/products/full` field selection is now schema-validated** for every product type
   (routed through the same `buildDetailFields()` + `DETAIL_RELATIONS` mechanism each type's
   own `/{id}` endpoint already used) instead of raw static field lists — a renamed/removed

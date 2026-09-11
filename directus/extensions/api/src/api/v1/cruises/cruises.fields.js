@@ -1,3 +1,8 @@
+/**
+ * Defines the raw fields retrieved from Directus for the cruises collection queries.
+ * This determines only the database fetch scope — response shape/audience visibility
+ * is controlled independently by cruise.transformer.js's fieldDefs.
+ */
 export const LIST_FIELDS = [
   "id",
   "object_id",
@@ -26,6 +31,7 @@ export const LIST_FIELDS = [
   // Media fields for thumbnail
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.uploaded_by.partner_selected",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -35,7 +41,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
-  "media.directus_files_id.tour32_export",
+  "media.tour32_export",
   "media.directus_files_id.dimensions_px",
   "media.directus_files_id.keyword_ids",
   "media.directus_files_id.folder.id",
@@ -123,7 +129,6 @@ export const DETAIL_FIELDS = [
   "countries.countries_id.destination_id.translations.name",
   "countries.countries_id.destination_id.translations.translations_id.code",
   "partner_selected.partner_id.id",
-  "partner_selected.partner_id.primarix_id",
   "partner_selected.partner_id.label",
   "partner_selected.partner_id.partner_type",
   "partner_selected.partner_id.status",
@@ -145,30 +150,43 @@ export const DETAIL_FIELDS = [
   "price_dates.departure_frequencies.cruises_frequencies_id.id",
   "price_dates.departure_frequencies.cruises_frequencies_id.name",
   "price_dates.departure_frequencies.cruises_frequencies_id.status",
-  // Occupancies
+  /* Occupancies resolve through the `cruises_occupancies_selected` junction (`cruises.occupancies`
+   * is an o2m alias). The junction row carries only `cruises_occupancies_id`, and the label/status
+   * live one level deeper still under that row's own `occupancy` m2o to `cruise_occupancies`. */
   "occupancies.id",
-  "occupancies.occupancy.id",
-  "occupancies.occupancy.name",
-  "occupancies.occupancy.status",
-  "occupancies.occupancy_from",
-  /* 
-   * Price calculation settings per market, including margins and the 'from' price. 
-   * Note: This is a settings row only; the actual per-cabin/date/occupancy price matrix
-   * lives in `cruises_prices` and is fetched separately.
+  "occupancies.cruises_occupancies_id.id",
+  "occupancies.cruises_occupancies_id.value",
+  "occupancies.cruises_occupancies_id.occupancy_from",
+  "occupancies.cruises_occupancies_id.occupancy.id",
+  "occupancies.cruises_occupancies_id.occupancy.name",
+  "occupancies.cruises_occupancies_id.occupancy.status",
+  /*
+   * Price calculation settings per market, including margins — these are plain top-level
+   * fields on `cruises` itself, not a nested relation. `from_price` is the one exception:
+   * BUG-FIXED — it's actually an M2O to `cruises_prices` (confirmed via schema:
+   * foreign_key_table cruises_prices), same shape as hotels'/tours'/excursions'
+   * from_price wiring, not a plain value. `cruises_prices.sell_price` is a plain
+   * (non-localized) column directly on that row (no per-language translations table for
+   * cruises prices), so the nested field below is enough — no further translations join
+   * needed the way tours/excursions/hotels require. Previously only the bare row id was
+   * fetched here and cruise.transformer.js read it directly as if it were already the sell
+   * price.
    */
-  "price_calculation.buy_price_type",
-  "price_calculation.sell_price_type",
-  "price_calculation.percentage_type",
-  "price_calculation.provision_percentage",
-  "price_calculation.margin_percentage",
-  "price_calculation.exchange_rate",
-  "price_calculation.from_price",
+  "buy_price_type",
+  "sell_price_type",
+  "percentage_type",
+  "provision_percentage",
+  "margin_percentage",
+  "exchange_rate",
+  "from_price",
+  "from_price.sell_price",
   /* 
    * Media mappings. Note that `is_map` and `tour32_export` are junction-level fields
    * on `cruises_directus_files`, allowing overrides per product for the same file.
    */
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.uploaded_by.partner_selected",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -190,7 +208,8 @@ export const DETAIL_FIELDS = [
 /**
  * Defines fields for `cruises_prices`, the actual price matrix per cabin category, date, and occupancy.
  * Fetched as a separate query filtered by `cruises_id` as no o2m alias exists on `cruises`.
- * Note: No translation/sell_price junction exists, so sell prices remain null after grouping.
+ * `sell_price` is a plain (non-localized) column directly on this row — unlike other
+ * product types, there's no per-language translations table for it here.
  */
 export const CRUISES_PRICES_FIELDS = [
   "id",
@@ -198,4 +217,5 @@ export const CRUISES_PRICES_FIELDS = [
   "price_date",
   "occupancy",
   "buy_price",
+  "sell_price",
 ];

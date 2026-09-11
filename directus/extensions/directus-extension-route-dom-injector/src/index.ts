@@ -7,9 +7,9 @@
  * at module evaluation time, and runs across ALL routes in the admin panel.
  *
  * Execution flow:
- * 1. injectStyles()        → write <style> tag to <head> (once)
- * 2. initRouteDomInjector()→ patch History API + start MutationObserver
- * 3. Export module def     → register management UI in Directus nav
+ * 1. CSS is provided externally via Directus's custom CSS setting
+ * 2. initRouteDomInjector() → patch History API + start MutationObserver
+ * 3. Export module def      → register management UI in Directus nav
  */
 
 import ModuleComponent from './module.vue';

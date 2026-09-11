@@ -1,3 +1,6 @@
+/* Parses and clamps pagination parameters from a request query. The `page` starts at 1,
+ * `limit` is bounded to the configured maximum, and the resulting SQL offset is derived
+ * as (page - 1) * limit. */
 export function parsePagination(
   query,
   { defaultLimit = 50, maxLimit = 200 } = {},

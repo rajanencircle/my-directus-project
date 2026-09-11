@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { Ref, ComputedRef } from 'vue';
 import { useApi } from '@directus/extensions-sdk';
+import FormFieldLabel from './FormFieldLabel.vue';
 
 type UploaderLabels = Record<string, string>
 const uploaderLabels = inject<ComputedRef<UploaderLabels>>('uploaderLabels')
@@ -83,7 +84,16 @@ const loading = ref(false);
 const items = ref<DropdownItem[]>([]);
 const selectedItem = ref<DropdownItem | null>(null);
 const drawerOpen = ref(false);
+const rootRef = ref<HTMLElement | null>(null);
+const inputWrapRef = ref<HTMLElement | null>(null);
+const dropdownRef = ref<HTMLElement | null>(null);
+const dropdownStyle = ref<Record<string, string>>({});
+const openUpward = ref(false);
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+const DROPDOWN_MAX_HEIGHT = 220;
+const DROPDOWN_GAP = 4;
+const DROPDOWN_Z_INDEX = 500;
 // Suppresses filterBy-triggered clearing for 1 s after user explicitly
 // selects or clears this field.
 let suppressFilterClear = false;
@@ -283,27 +293,81 @@ function clearSelf() {
   }
 }
 
+function updateDropdownPosition() {
+  const el = inputWrapRef.value;
+  if (!el || !active.value) return;
+
+  const rect = el.getBoundingClientRect();
+  const viewportH = window.innerHeight;
+  const spaceBelow = viewportH - rect.bottom - DROPDOWN_GAP;
+  const spaceAbove = rect.top - DROPDOWN_GAP;
+  const preferredHeight = Math.min(DROPDOWN_MAX_HEIGHT, Math.max(spaceBelow, spaceAbove, 120));
+
+  openUpward.value = spaceBelow < preferredHeight && spaceAbove > spaceBelow;
+  const maxHeight = Math.min(
+    DROPDOWN_MAX_HEIGHT,
+    Math.max(120, openUpward.value ? spaceAbove : spaceBelow),
+  );
+
+  const base = {
+    position: 'fixed',
+    left: `${Math.max(8, rect.left)}px`,
+    width: `${Math.min(rect.width, window.innerWidth - 16)}px`,
+    maxHeight: `${maxHeight}px`,
+    zIndex: String(DROPDOWN_Z_INDEX),
+  };
+
+  dropdownStyle.value = openUpward.value
+    ? { ...base, bottom: `${viewportH - rect.top + DROPDOWN_GAP}px` }
+    : { ...base, top: `${rect.bottom + DROPDOWN_GAP}px` };
+}
+
+function bindDropdownPositionListeners() {
+  window.addEventListener('scroll', updateDropdownPosition, true);
+  window.addEventListener('resize', updateDropdownPosition);
+}
+
+function unbindDropdownPositionListeners() {
+  window.removeEventListener('scroll', updateDropdownPosition, true);
+  window.removeEventListener('resize', updateDropdownPosition);
+}
+
+async function showDropdown() {
+  active.value = true;
+  await nextTick();
+  updateDropdownPosition();
+  bindDropdownPositionListeners();
+}
+
+function hideDropdown() {
+  active.value = false;
+  unbindDropdownPositionListeners();
+}
+
 // ─── Event handlers ───────────────────────────────────────────────────────────
 
 function onInput(val: string) {
   searchText.value = val;
   selectedItem.value = null;
-  active.value = true;
+  if (!active.value) void showDropdown();
 
   if (searchTimer) clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => search(val), 250);
+  searchTimer = setTimeout(async () => {
+    await search(val);
+    await nextTick();
+    updateDropdownPosition();
+  }, 250);
 }
 
 async function onFocus() {
-  active.value = true;
-  // Clear the label text so the dropdown shows all options, not just the selected label
   if (selectedItem.value) searchText.value = '';
   await search(searchText.value);
+  await showDropdown();
 }
 
 function onBlur() {
-  setTimeout(() => {
-    active.value = false;
+  window.setTimeout(() => {
+    hideDropdown();
     if (props.modelValue?.id) initFromValue();
   }, 180);
 }
@@ -313,7 +377,7 @@ function onSelect(item: DropdownItem) {
   emit('update:modelValue', { id: item.id, collection: props.targetCollection });
   selectedItem.value = item;
   searchText.value = item.label;
-  active.value = false;
+  hideDropdown();
   items.value = [];
 }
 
@@ -360,8 +424,16 @@ async function onDrawerInput(val: AnyRecord) {
 }
 
 function handleOutsideClick(e: MouseEvent) {
-  if (!(e.target as HTMLElement).closest('.geo-individual-select')) active.value = false;
+  const target = e.target as Node | null;
+  if (!target) return;
+  if (rootRef.value?.contains(target)) return;
+  if (dropdownRef.value?.contains(target)) return;
+  hideDropdown();
 }
+
+watch([active, () => items.value.length, loading], () => {
+  if (active.value) nextTick(updateDropdownPosition);
+});
 
 // ─── Cascade watcher ─────────────────────────────────────────────────────────
 
@@ -472,6 +544,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleOutsideClick);
+  unbindDropdownPositionListeners();
   if (searchTimer) clearTimeout(searchTimer);
 });
 
@@ -479,20 +552,18 @@ const canClear = computed(() => Boolean(props.modelValue?.id) && !props.disabled
 </script>
 
 <template>
-  <div class="geo-individual-select" :class="{ invalid: invalid }">
-    <div class="label">
-      {{ label }}
-      <span v-if="required" class="required-mark" aria-hidden="true">*</span>
-    </div>
-    <div class="input-wrap">
-      <v-input
+  <div ref="rootRef" class="field geo-field" :class="{ 'is-invalid': invalid }">
+    <FormFieldLabel :label="label" :required="required" />
+    <div class="interface">
+      <div ref="inputWrapRef" class="input-wrap">
+        <v-input
         :model-value="searchText"
         :placeholder="lbl('geoSearchPlaceholder', `Search ${label}…`).replace('{label}', label)"
         :disabled="disabled"
         @update:model-value="(v: unknown) => onInput(String(v ?? ''))"
         @focus="onFocus"
         @blur="onBlur"
-        @keydown.escape="active = false"
+        @keydown.escape="hideDropdown"
       >
         <template v-if="icon" #prepend>
           <v-icon :name="icon" small />
@@ -512,68 +583,67 @@ const canClear = computed(() => Boolean(props.modelValue?.id) && !props.disabled
         @input="onDrawerInput"
       />
 
-      <div v-if="active" class="dropdown">
-        <div v-if="filterHint" class="dropdown-filter-hint">
-          <v-icon name="filter_alt" x-small />
-          {{ filterHint }}
-        </div>
-        <div v-if="loading" class="dropdown-item loading">
-          <v-progress-circular x-small indeterminate />
-          {{ lbl('geoLoading', 'Loading…') }}
-        </div>
-        <template v-else-if="items.length">
-          <div v-for="it in items" :key="it.id" class="dropdown-item" @mousedown.prevent="onSelect(it)">
-            <v-icon v-if="icon" :name="icon" x-small />
-            {{ it.label }}
+      <Teleport to="body">
+        <div
+          v-if="active"
+          ref="dropdownRef"
+          class="geo-dropdown-portal"
+          :class="{ 'is-upward': openUpward }"
+          :style="dropdownStyle"
+          @mousedown.prevent
+        >
+          <div v-if="filterHint" class="dropdown-filter-hint">
+            <v-icon name="filter_alt" x-small />
+            {{ filterHint }}
           </div>
-        </template>
-        <div v-else class="dropdown-item empty">{{ lbl('geoNoResults', 'No results found') }}</div>
-      </div>
+          <div v-if="loading" class="dropdown-item loading">
+            <v-progress-circular x-small indeterminate />
+            {{ lbl('geoLoading', 'Loading…') }}
+          </div>
+          <template v-else-if="items.length">
+            <div v-for="it in items" :key="it.id" class="dropdown-item" @mousedown.prevent="onSelect(it)">
+              <v-icon v-if="icon" :name="icon" x-small />
+              {{ it.label }}
+            </div>
+          </template>
+          <div v-else class="dropdown-item empty">{{ lbl('geoNoResults', 'No results found') }}</div>
+        </div>
+      </Teleport>
+    </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.geo-individual-select {
+.field.geo-field {
+  position: relative;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  position: relative;
+  margin: 0;
 }
 
-.label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--theme--foreground-subdued);
+.field.geo-field .interface {
+  margin: 0;
 }
 
-.required-mark {
-  color: var(--theme--danger, #dc3545);
-  margin-left: 2px;
-}
-
-.geo-individual-select.invalid :deep(.v-input) {
-  --v-input-border-color: var(--theme--danger, #dc3545);
-  --v-input-border-color-hover: var(--theme--danger, #dc3545);
-  --v-input-border-color-focus: var(--theme--danger, #dc3545);
+.field.geo-field.is-invalid :deep(.v-input) {
+  --v-input-border-color: var(--theme--danger);
+  --v-input-border-color-hover: var(--theme--danger);
+  --v-input-border-color-focus: var(--theme--danger);
 }
 
 .input-wrap {
   position: relative;
 }
 
-.dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  background: var(--theme--background, #fff);
-  border: 1px solid var(--theme--border-color, #d3dae4);
-  border-radius: var(--theme--border-radius, 6px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  z-index: 220;
-  max-height: 220px;
+.geo-dropdown-portal {
+  background: var(--theme--background);
+  border: var(--theme--border-width) solid var(--theme--border-color);
+  border-radius: var(--theme--border-radius);
+  box-shadow: var(--theme--elevation-medium, 0 4px 16px rgba(0, 0, 0, 0.12));
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .dropdown-filter-hint {
@@ -581,11 +651,8 @@ const canClear = computed(() => Boolean(props.modelValue?.id) && !props.disabled
   align-items: center;
   gap: 4px;
   padding: 5px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--theme--primary, #6644ff);
-  background: var(--theme--primary-background, #f0ecff);
-  border-bottom: 1px solid var(--theme--border-color, #d3dae4);
+  background: var(--theme--primary-background);
+  border-bottom: 1px solid var(--theme--border-color);
   position: sticky;
   top: 0;
   z-index: 1;
@@ -599,20 +666,17 @@ const canClear = computed(() => Boolean(props.modelValue?.id) && !props.disabled
   align-items: center;
   padding: 8px 12px;
   cursor: pointer;
-  font-size: 14px;
-  color: var(--theme--foreground, #1e2e3e);
   gap: 8px;
   transition: background 0.1s;
 }
 
 .dropdown-item:hover {
-  background: var(--theme--background-normal, #f0f4f9);
+  background: var(--theme--background-normal);
 }
 
 .dropdown-item.loading,
 .dropdown-item.empty {
   cursor: default;
-  color: var(--theme--foreground-subdued, #a2b5cd);
   font-style: italic;
 }
 </style>

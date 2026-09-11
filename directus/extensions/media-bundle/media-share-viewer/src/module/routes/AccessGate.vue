@@ -168,7 +168,7 @@ async function handleSubmit() {
 }
 
 .gate-input:focus {
-  border-color: #6644dd;
+  border-color: #6644FF;
 }
 
 .gate-input:disabled {
@@ -182,7 +182,7 @@ async function handleSubmit() {
   font-size: 15px;
   font-weight: 600;
   color: #fff;
-  background-color: #6644dd;
+  background-color: #6644FF;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -193,7 +193,7 @@ async function handleSubmit() {
 }
 
 .gate-button:hover:not(:disabled) {
-  background-color: #5533cc;
+  background-color: #5039CC;
 }
 
 .gate-button:disabled {
@@ -222,7 +222,7 @@ async function handleSubmit() {
   width: 32px;
   height: 32px;
   border-color: rgba(0, 0, 0, 0.15);
-  border-top-color: #6644dd;
+  border-top-color: #6644FF;
 }
 
 @keyframes spin {

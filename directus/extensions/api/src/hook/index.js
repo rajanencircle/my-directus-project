@@ -1,23 +1,26 @@
 import { setupRouter } from "../api/index.js";
-import { loadApiKey } from "../api/shared/authMiddleware.js";
 import { loadDocsAuthConfig } from "../api/shared/docsAuthMiddleware.js";
 
+/**
+ * @description The main entry point for the custom API extension hook.
+ *
+ * When Directus starts, it loads this extension and calls the handler. The handler
+ * loads the internal documentation authentication configuration and passes the
+ * router, context, and auth state to `setupRouter` to initialize all custom API
+ * endpoints.
+ *
+ * Partner token authentication is handled by the separate authHook
+ * (src/authHook/index.js), which validates tokens directly against the
+ * `api_users` table via a database query.
+ *
+ * Directus uses this hook to register the custom API routes and endpoints under
+ * the extension namespace.
+ */
 export default {
   id: "api",
   handler: (router, context) => {
     const { logger } = context;
-    const keyState = { apiKey: undefined };
     const docsAuthState = { config: undefined };
-
-    (async () => {
-      try {
-        keyState.apiKey = await loadApiKey(context);
-        logger.info('[api-extension] API key loaded successfully.');
-      } catch (err) {
-        keyState.apiKey = null;
-        logger.fatal(`[api-extension] FATAL: Failed to load API key — all requests will return 503. Reason: ${err.message}`);
-      }
-    })();
 
     try {
       docsAuthState.config = loadDocsAuthConfig();
@@ -27,6 +30,6 @@ export default {
       logger.error(`[api-extension] Internal docs auth NOT configured — internal-docs routes will return 503. Reason: ${err.message}`);
     }
 
-    setupRouter(router, context, keyState, docsAuthState);
+    setupRouter(router, context, docsAuthState);
   },
 };

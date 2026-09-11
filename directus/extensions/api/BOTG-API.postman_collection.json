@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "BOTG API Local",
-    "description": "Custom REST API layer for BOTG \u2014 hotels, products, cruises, tours, excursions, rental cars, campers and metadata.\n\nSet the `baseUrl` collection variable to your environment (e.g. `http://localhost:8055` for local).\nSet `apiKey` to your Bearer token.\n\n**v2.0.0** \u2014 aligned with BOTG API Contract v1.1.0 and the real implementation:\n- Fixed Rental Cars paths: `rental-cars` -> `rental_cars` (underscore).\n- Products: replaced stale `/products/details` and `/products/limited-list` with `/products` (slim), `/products/full`, `/products/{id}`.\n- `lang` is REQUIRED on every list/detail endpoint.\n- Renamed `status_primarix` -> `publishing_status` query param.\n- Added Metadata endpoints (field-map, labels, product-types) and Swagger UI links.\n- Response meta is `{page, limit, total, returned}` per the contract.",
+    "description": "Custom REST API layer for BOTG \u2014 hotels, products, cruises, tours, excursions, rental cars, campers and metadata.\n\nSet the `baseUrl` collection variable to your environment (e.g. `http://localhost:8055` for local).\nSet `partnerToken` to your partner token (the `token` field of an active `api_users` row) \u2014 sent as a standard `Authorization: Bearer` header. Partner tokens are validated directly against the `api_users` table via a database query in the authenticate hook — no intermediate admin token is needed.\n\n**v4.0.0** \u2014 authenticate-hook architecture:\n- Partner tokens are validated directly against `api_users` via a database query in the Directus `authenticate` filter hook, eliminating the HTTP round-trip to Directus's own REST API.\n- The authenticate hook sets `{ admin: true }` accountability for valid partner tokens on `/api/v1/*` routes, allowing the custom middleware chain to handle authorization.\n\n**v3.0.0** \u2014 partner access-control layer (`api_users`):\n- Auth switched from a single shared Bearer key to per-partner Bearer tokens looked up live against the `api_users` collection (partner_selected, status, access_scope, products). A dedicated hook exempts only `/api/v1/*` routes from Directus's own default Bearer-token validation so partner tokens (which aren't Directus tokens) can reach this check.\n- Every request is scoped to the token's assigned partner; requests for a product type or endpoint tier outside the token's `products`/`access_scope` are rejected with 403.\n- `/hotels`, `/tours`, `/excursions`, `/cruises`, `/rental_cars`, `/campers` require `access_scope = web_and_backoffice`; `/products*` is accessible to any active token.\n\n**v2.0.0** \u2014 aligned with BOTG API Contract v1.1.0 and the real implementation:\n- Fixed Rental Cars paths: `rental-cars` -> `rental_cars` (underscore).\n- Products: replaced stale `/products/details` and `/products/limited-list` with `/products` (slim), `/products/full`, `/products/{id}`.\n- `lang` is REQUIRED on every list/detail endpoint.\n- Renamed `status_primarix` -> `publishing_status` query param.\n- Added Metadata endpoints (field-map, labels, product-types) and Swagger UI links.\n- Response meta is `{page, limit, total, returned}` per the contract.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -12,10 +12,10 @@
       "description": "Base URL of the Directus instance. Override per environment."
     },
     {
-      "key": "apiKey",
+      "key": "partnerToken",
       "value": "",
       "type": "string",
-      "description": "Bearer token \u2014 value from global_configurations where entity = botg-api-user-key."
+      "description": "Partner API token \u2014 the `token` field of an active row in the `api_users` collection. Sent as a standard Authorization: Bearer header. Validated directly against `api_users` via a database query in the authenticate hook."
     },
     {
       "key": "lang",
@@ -71,7 +71,7 @@
     "bearer": [
       {
         "key": "token",
-        "value": "{{apiKey}}",
+        "value": "{{partnerToken}}",
         "type": "string"
       }
     ]

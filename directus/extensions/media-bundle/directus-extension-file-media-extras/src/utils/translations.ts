@@ -32,14 +32,31 @@ export function resolveTranslatable(
 }
 
 function coerceToMap(value: TranslatableString): Record<string, string> | null {
-  if (typeof value === 'object') return value;
+  // Directus translated-string arrays: [{ language: 'en-US', translation: '…' }, …]
+  if (Array.isArray(value)) {
+    const map: Record<string, string> = {};
+    for (const item of value as any[]) {
+      if (!item || typeof item !== 'object') continue;
+      const lang = String(item.language ?? item.lang ?? '').trim();
+      const text = item.translation ?? item.value ?? item.text;
+      if (lang && typeof text === 'string' && text.trim()) map[lang] = text.trim();
+    }
+    return Object.keys(map).length ? map : null;
+  }
+  if (typeof value === 'object' && value !== null) {
+    // Only keep string values (ignore nested junk that can produce "Productsen"-style glitches)
+    const map: Record<string, string> = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (typeof v === 'string' && v.trim()) map[k] = v.trim();
+    }
+    return Object.keys(map).length ? map : null;
+  }
   const trimmed = (value as string).trim();
-  if (!trimmed.startsWith('{')) return null;
+  if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return null;
   try {
     const parsed = JSON.parse(trimmed);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      return parsed as Record<string, string>;
-    }
-  } catch {}
-  return null;
+    return coerceToMap(parsed as TranslatableString);
+  } catch {
+    return null;
+  }
 }

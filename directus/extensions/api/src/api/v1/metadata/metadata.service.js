@@ -1,13 +1,14 @@
 import { ISO_TO_LOCALE } from "../../../maps/language-code.map.js";
 import { DEFAULT_PRIMARIX_STATUS, FIELD_MAP_STATUSES } from "../../shared/constants.js";
+import { filterValidFieldPaths } from "../../../shared/query/validateFieldPaths.js";
 
 const FIELD_DICTIONARY_COLLECTION = "field_dictionary";
 
-// The API-facing product-type collection names (used by /metadata/labels' `collection`
-// param and /metadata/product-types) don't all map 1:1 to Directus collection names —
-// rental_cars/campers both live in the single `vehicles` Directus collection. Exported so
-// metadata.validation.js can validate the `collection` query param against these same keys
-// instead of maintaining a separate duplicate list.
+/* The API-facing product-type collection names (used by /metadata/labels' `collection`
+ * param and /metadata/product-types) don't all map 1:1 to Directus collection names —
+ * rental_cars/campers both live in the single `vehicles` Directus collection. Exported so
+ * metadata.validation.js can validate the `collection` query param against these same keys
+ * instead of maintaining a separate duplicate list. */
 export const LABEL_COLLECTION_TO_DIRECTUS = {
   hotels: "hotels",
   cruises: "cruises",
@@ -35,10 +36,10 @@ const FIELD_MAP_FIELDS = [
   "primarix_sources",
 ];
 
-// `audience` is stored as a CSV/array on each row (e.g. ["public","backoffice"]) since a
-// field can be relevant to more than one audience. Rows tagged ONLY "internal" (or with no
-// audience at all) are never exposed, per the contract's field-map description. Rows with
-// a mix are exposed once, reporting the most-public audience they carry.
+/* `audience` is stored as a CSV/array on each row (e.g. ["public","backoffice"]) since a
+ * field can be relevant to more than one audience. Rows tagged ONLY "internal" (or with no
+ * audience at all) are never exposed, per the contract's field-map description. Rows with
+ * a mix are exposed once, reporting the most-public audience they carry. */
 function resolveExposedAudience(audience) {
   const list = Array.isArray(audience) ? audience : (audience ? [audience] : []);
   if (list.includes("public")) return "public";
@@ -46,13 +47,12 @@ function resolveExposedAudience(audience) {
   return null;
 }
 
-// `status` isn't populated in the underlying data today — derived instead from whether
-// the row has a mapped api_field_name and/or legacy primarix_sources, per the contract's
-// own description of what `new`/`outdated` rows look like. Falls back to "active" for a
-// normally-mapped row, since "renamed" isn't derivable from the data available. Any
-// stored value outside the contract enum is ignored so the response always conforms.
-// (FIELD_MAP_STATUSES itself now lives in shared/constants.js — imported above.)
-
+/* `status` isn't populated in the underlying data today — derived instead from whether the
+ * row has a mapped api_field_name and/or legacy primarix_sources, per the contract's own
+ * description of what `new`/`outdated` rows look like. Falls back to "active" for a
+ * normally-mapped row, since "renamed" isn't derivable from the data available. Any stored
+ * value outside the contract enum is ignored so the response always conforms.
+ * (FIELD_MAP_STATUSES itself now lives in shared/constants.js — imported above.) */
 function resolveStatus(row) {
   if (row.status && FIELD_MAP_STATUSES.includes(row.status)) return row.status;
   const hasSources = Array.isArray(row.primarix_sources) && row.primarix_sources.length > 0;
@@ -69,7 +69,7 @@ export async function getFieldMap({ collection, status, shape = "flat" }, { serv
   const filter = collection ? { target_collection: { _eq: collection } } : {};
 
   const rows = await dictionaryService.readByQuery({
-    fields: FIELD_MAP_FIELDS,
+    fields: filterValidFieldPaths(schema, FIELD_DICTIONARY_COLLECTION, FIELD_MAP_FIELDS),
     filter,
     limit: -1,
   });
@@ -107,8 +107,8 @@ export async function getFieldMap({ collection, status, shape = "flat" }, { serv
     return { data, total: data.length };
   }
 
-  // flat: one row per legacy source; fields with no primarix_sources (status=new) get a
-  // single row with null legacy_* columns.
+  /* flat: one row per legacy source; fields with no primarix_sources (status=new) get a
+   single row with null legacy_* columns. */
   const data = [];
   for (const { row, audience, resolvedStatus } of exposed) {
     const sources = Array.isArray(row.primarix_sources) && row.primarix_sources.length > 0

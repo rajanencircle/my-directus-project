@@ -1,6 +1,5 @@
 <template>
   <div class="media-share-interface">
-
     <!-- Loading -->
     <div v-if="loading" class="state-loading">
       <v-progress-circular indeterminate small />
@@ -67,19 +66,16 @@
 
     <!-- Create share dialog -->
     <v-dialog v-model="dialogOpen" @esc="closeDialog" :persistent="creating">
-      <v-card style="max-width: 460px; width: 100%">
-        <v-card-title>
-          <v-icon name="share" left />
-          Create Share Link
+      <v-card class="share-create-card" style="max-width: 460px; width: 100%">
+        <v-card-title class="dialog-title">
+          <v-icon name="share" />
+          <span>Create Share Link</span>
         </v-card-title>
 
         <v-card-text>
           <div class="fields">
             <div class="field">
-              <div class="type-label label">
-                Password
-                <span class="subdued"> — optional</span>
-              </div>
+              <div class="type-label field-label">Password</div>
               <v-input
                 v-model="newPassword"
                 type="password"
@@ -91,10 +87,7 @@
             </div>
 
             <div class="field">
-              <div class="type-label label">
-                Expires
-                <span class="subdued"> — optional</span>
-              </div>
+              <div class="type-label field-label">Expires</div>
               <v-input
                 v-model="newExpiry"
                 type="datetime-local"
@@ -103,16 +96,13 @@
             </div>
 
             <div class="field">
-              <div class="type-label label">
-                Notify via Email
-                <span class="subdued"> — optional</span>
-              </div>
+              <div class="type-label field-label">Notify via Email</div>
               <v-input
                 v-model="newEmailsRaw"
                 placeholder="user@example.com, other@example.com"
                 :disabled="creating"
               />
-              <span class="type-hint subdued">Comma-separated for multiple recipients</span>
+              <span class="type-note field-hint">Comma-separated for multiple recipients</span>
             </div>
           </div>
 
@@ -326,7 +316,11 @@ function isExpired(iso: unknown): boolean {
 .media-share-interface {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem;
+  color: var(--theme--form--field--input--foreground, var(--theme--foreground));
+  font-family: var(--theme--form--field--input--font-family, var(--theme--fonts--sans--font-family));
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
+  font-weight: var(--theme--form--field--input--font-weight, 400);
 }
 
 .state-loading {
@@ -335,7 +329,6 @@ function isExpired(iso: unknown): boolean {
   padding: 16px;
 }
 
-/* Share list */
 .share-list {
   display: flex;
   flex-direction: column;
@@ -343,6 +336,7 @@ function isExpired(iso: unknown): boolean {
   border: 1px solid var(--theme--border-color);
   border-radius: var(--theme--border-radius);
   overflow: hidden;
+  background: var(--theme--form--field--input--background, var(--theme--background));
 }
 
 .share-row {
@@ -373,9 +367,9 @@ function isExpired(iso: unknown): boolean {
 }
 
 .share-url {
-  font-family: var(--theme--fonts--mono--font-family, monospace);
-  font-size: 12px;
-  color: var(--theme--foreground);
+  font-family: var(--theme--fonts--monospace--font-family, monospace);
+  font-size: 0.75rem;
+  color: var(--theme--form--field--input--foreground, var(--theme--foreground));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -391,7 +385,8 @@ function isExpired(iso: unknown): boolean {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 11px;
+  font-size: 0.75rem;
+  font-family: inherit;
   color: var(--theme--foreground-subdued);
 }
 
@@ -415,9 +410,10 @@ function isExpired(iso: unknown): boolean {
   color: var(--theme--danger);
 }
 
-/* Empty / footer */
 .empty-state {
-  font-size: 13px;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
   color: var(--theme--foreground-subdued);
   margin: 0;
 }
@@ -426,11 +422,13 @@ function isExpired(iso: unknown): boolean {
   display: flex;
 }
 
-/* Dialog fields */
 .fields {
   display: flex;
   flex-direction: column;
-  gap: var(--theme--form--row-gap, 24px);
+  /* Half of native form row-gap (~24–36px → ~12–18px) */
+  gap: calc(var(--theme--form--row-gap, 24px) / 2);
+  font-family: var(--theme--form--field--input--font-family, var(--theme--fonts--sans--font-family));
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
 }
 
 .field {
@@ -439,16 +437,50 @@ function isExpired(iso: unknown): boolean {
   gap: 8px;
 }
 
-.label {
-  color: var(--theme--foreground);
+.field-label.type-label {
+  margin: 0;
+  color: var(--theme--form--field--label--foreground, var(--theme--foreground-accent));
+  font-family: var(--theme--form--field--label--font-family, var(--theme--fonts--sans--font-family));
+  font-weight: var(--theme--form--field--label--font-weight, 600);
+  font-size: 0.875rem;
+  line-height: 1.2143;
+  text-transform: uppercase;
+  letter-spacing: normal;
 }
 
-.subdued {
+/* Native v-card-title is 25px top / 7px bottom — balance it */
+.share-create-card :deep(.v-card-title.dialog-title),
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem !important;
+  margin: 0 !important;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--theme--foreground-accent, var(--theme--foreground));
+  font-family: var(--theme--fonts--sans--font-family);
+}
+
+.dialog-title :deep(.v-icon) {
+  flex-shrink: 0;
+}
+
+.share-create-card :deep(.v-card-text) {
+  padding-block: 0.75rem 0.5rem;
+}
+
+.field-hint {
   color: var(--theme--foreground-subdued);
+  font-size: 0.75rem;
+  font-family: inherit;
   font-weight: 400;
 }
 
 .notice {
-  margin-top: var(--theme--form--row-gap, 24px);
+  margin-top: calc(var(--theme--form--row-gap, 24px) / 2);
 }
 </style>

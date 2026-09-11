@@ -1,6 +1,6 @@
 {
   "name": "media-bundle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Directus bundle — media-library module, media-uploader interface, media-share-viewer module + interface, and media-share-validate endpoint.",
   "directus:extension": {
@@ -37,6 +37,16 @@
         "source": "./media-share-validate/src/index.ts"
       },
       {
+        "type": "endpoint",
+        "name": "media-download",
+        "source": "./media-download/src/index.ts"
+      },
+      {
+        "type": "hook",
+        "name": "media-mention-notifications",
+        "source": "./media-mention-notifications/src/index.ts"
+      },
+      {
         "type": "interface",
         "name": "file-albums",
         "source": "./directus-extension-interface-file-albums/src/index.ts"
@@ -49,13 +59,16 @@
     ]
   },
   "scripts": {
-    "build": "directus-extension build",
+    "build": "directus-extension build && npm run build:share-viewer",
+    "build:share-viewer": "vite build --config vite.share-viewer.config.ts",
     "dev": "directus-extension build --watch"
   },
   "devDependencies": {
     "@directus/extensions-sdk": "^17.0.0",
     "@joeattardi/emoji-button": "^4.6.4",
     "@types/dompurify": "^3.0.0",
+    "@types/lodash": "^4.17.25",
+    "@vitejs/plugin-vue": "^6.0.8",
     "dompurify": "^3.0.0",
     "marked": "^12.0.0",
     "pinia": "^2.1.0",
@@ -63,5 +76,8 @@
     "vite": "^6.0.0",
     "vue": "^3.4.0",
     "vue-router": "^4.6.3"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3"
   }
 }

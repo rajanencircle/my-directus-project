@@ -1,20 +1,30 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useApi, useStores } from '@directus/extensions-sdk'
+import { usePartnerScope } from '../composables/usePartnerScope'
 
 export interface DirectusFile {
   id: string
   title: string | null
   filename_disk: string
   filename_download: string
+  generated_filename?: string | null
+  description?: string | null
   filesize: number
   type: string
   width: number | null
   height: number | null
   uploaded_on: string
-  uploaded_by: string | { id: string; first_name: string; last_name: string; avatar: string | null } | null
+  created_on?: string | null
+  uploaded_by: string | {
+    id: string
+    first_name: string
+    last_name: string
+    avatar: string | null
+    partner_selected?: string | { id?: string; visually?: string | null } | null
+  } | null
   modified_on?: string | null
-  modified_by?: string | { id: string; first_name: string; last_name: string } | null
+  modified_by?: string | { id: string; first_name: string; last_name: string; avatar?: string | null } | null
   folder: string | null
   // Media Data fields
   copyright?: string | null
@@ -58,12 +68,39 @@ export interface FetchParams {
 
 export type FileFilter = 'all' | 'mine' | 'recent'
 
-const FILE_FIELDS = ['*', 'uploaded_by.id', 'uploaded_by.first_name', 'uploaded_by.last_name', 'uploaded_by.avatar']
+/** Nested user fields so list display has names (avoids per-row GET /users/:id → 403 “Unknown User”). */
+const FILE_FIELDS = [
+  '*',
+  'uploaded_by.id',
+  'uploaded_by.first_name',
+  'uploaded_by.last_name',
+  'uploaded_by.avatar',
+  'uploaded_by.partner_selected.id',
+  'uploaded_by.partner_selected.visually',
+  'uploaded_by.partner_selected.label',
+  'modified_by.id',
+  'modified_by.first_name',
+  'modified_by.last_name',
+  'modified_by.avatar',
+]
+
+function uniqueFields(fields: string[]): string[] {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const f of fields) {
+    const key = f.trim()
+    if (!key || key === 'thumbnail' || seen.has(key)) continue
+    seen.add(key)
+    out.push(key)
+  }
+  return out
+}
 
 export const useFilesStore = defineStore('media-library-files', () => {
   const api = useApi()
   const { useUserStore } = useStores()
   const userStore = useUserStore()
+  const { partnerScopeId, isPartnerScoped } = usePartnerScope()
 
   const files = ref<DirectusFile[]>([])
   const totalCount = ref(0)
@@ -77,12 +114,30 @@ export const useFilesStore = defineStore('media-library-files', () => {
   const activeFilter = ref<FileFilter>('all')
   const customFilter = ref<Record<string, unknown>>({})
   const albumFileIds = ref<string[] | null>(null) // null = no album filter active
+  /** Album currently scoped in the file list (null when not in album mode). */
+  const currentAlbumId = ref<string | null>(null)
+  /** Extra nested paths from table columns, e.g. uploaded_by.partner_selected.label */
+  const extraQueryFields = ref<string[]>([])
+
+  const queryFields = computed(() => uniqueFields([...FILE_FIELDS, ...extraQueryFields.value]))
 
   const totalPages = computed(() => Math.ceil(totalCount.value / limit.value))
+  const hasMore = computed(() => files.value.length < totalCount.value)
+  const isLoadingMore = ref(false)
 
   async function fetchFiles(params?: FetchParams): Promise<void> {
     isLoading.value = true
     try {
+      // Empty album has no file UUIDs — skip the /files request.
+      // Using a fake "__no_match__" id breaks Postgres UUID casting and left
+      // the previous album's rows on screen when the request failed.
+      if (albumFileIds.value !== null && albumFileIds.value.length === 0) {
+        files.value = []
+        totalCount.value = 0
+        currentPage.value = 1
+        return
+      }
+
       const page = params?.page ?? currentPage.value
       const lim = params?.limit ?? limit.value
       const sortConfig = params?.sort ?? sort.value
@@ -92,11 +147,13 @@ export const useFilesStore = defineStore('media-library-files', () => {
       const sortParam = `${sortConfig.direction === 'desc' ? '-' : ''}${String(sortConfig.field)}`
 
       const queryParams: Record<string, unknown> = {
-        fields: FILE_FIELDS,
+        fields: queryFields.value,
         limit: lim,
         page,
         sort: sortParam,
-        meta: 'total_count',
+        // filter_count = items matching current folder/search/filter (for pagination).
+        // total_count is collection-wide and wrongly shows ~76 pages inside a small folder.
+        meta: 'filter_count',
       }
 
       if (searchTerm) {
@@ -109,14 +166,55 @@ export const useFilesStore = defineStore('media-library-files', () => {
 
       const response = await api.get('/files', { params: queryParams })
       files.value = response.data?.data ?? []
-      totalCount.value = response.data?.meta?.total_count ?? 0
+      totalCount.value =
+        response.data?.meta?.filter_count ?? response.data?.meta?.total_count ?? 0
       currentPage.value = page
 
       repairMissingDimensions(files.value)
     } catch (err) {
       console.warn('[media-library] Failed to fetch files:', err)
+      // Clear stale rows from the previous folder/album on failure
+      files.value = []
+      totalCount.value = 0
     } finally {
       isLoading.value = false
+    }
+  }
+
+  /** Append the next page (grid infinite scroll). */
+  async function fetchMoreFiles(): Promise<void> {
+    if (isLoading.value || isLoadingMore.value || !hasMore.value) return
+    if (albumFileIds.value !== null && albumFileIds.value.length === 0) return
+
+    const nextPage = currentPage.value + 1
+    isLoadingMore.value = true
+    try {
+      const lim = limit.value
+      const sortParam = `${sort.value.direction === 'desc' ? '-' : ''}${String(sort.value.field)}`
+      const filterParam = buildFilter()
+
+      const queryParams: Record<string, unknown> = {
+        fields: queryFields.value,
+        limit: lim,
+        page: nextPage,
+        sort: sortParam,
+        meta: 'filter_count',
+      }
+
+      if (search.value) queryParams.search = search.value
+      if (Object.keys(filterParam).length > 0) queryParams.filter = filterParam
+
+      const response = await api.get('/files', { params: queryParams })
+      const batch: DirectusFile[] = response.data?.data ?? []
+      files.value = [...files.value, ...batch]
+      totalCount.value =
+        response.data?.meta?.filter_count ?? response.data?.meta?.total_count ?? totalCount.value
+      currentPage.value = nextPage
+      repairMissingDimensions(batch)
+    } catch (err) {
+      console.warn('[media-library] Failed to fetch more files:', err)
+    } finally {
+      isLoadingMore.value = false
     }
   }
 
@@ -151,8 +249,11 @@ export const useFilesStore = defineStore('media-library-files', () => {
 
     // Album mode: filter by file IDs belonging to the album; skip folder/filter logic
     if (albumFileIds.value !== null) {
-      const ids = albumFileIds.value.length ? albumFileIds.value : ['__no_match__']
-      builtIn['id'] = { _in: ids }
+      // Empty list is handled in fetchFiles (no API call). Guard here anyway.
+      if (albumFileIds.value.length === 0) {
+        return { id: { _null: true } }
+      }
+      builtIn['id'] = { _in: albumFileIds.value }
       const custom = customFilter.value
       const hasCustom = Object.keys(custom).length > 0
       if (hasCustom) return { _and: [builtIn, custom] }
@@ -166,6 +267,8 @@ export const useFilesStore = defineStore('media-library-files', () => {
       if (currentUserId) {
         builtIn['uploaded_by'] = { _eq: currentUserId }
       }
+    } else if (isPartnerScoped.value) {
+      builtIn['uploaded_by'] = { partner_selected: { _eq: partnerScopeId.value } }
     }
 
     if (activeFilter.value === 'all' && folderTarget !== undefined) {
@@ -187,9 +290,13 @@ export const useFilesStore = defineStore('media-library-files', () => {
 
   async function setAlbum(albumId: string | null): Promise<void> {
     albumFileIds.value = null
+    currentAlbumId.value = albumId
     currentFolder.value = undefined
     activeFilter.value = 'all'
     currentPage.value = 1
+    // Drop previous view immediately so empty/new albums never flash old rows
+    files.value = []
+    totalCount.value = 0
 
     if (albumId !== null) {
       try {
@@ -208,7 +315,7 @@ export const useFilesStore = defineStore('media-library-files', () => {
       }
     }
 
-    fetchFiles()
+    await fetchFiles()
   }
 
   function setCustomFilter(filter: Record<string, unknown>): void {
@@ -229,8 +336,13 @@ export const useFilesStore = defineStore('media-library-files', () => {
     fetchFiles()
   }
 
-  function setFolder(folderId: string | null): void {
+  /**
+   * @param folderId - folder UUID, or `null` for unfiled (folder is null),
+   *   or `undefined` to clear folder filter (All Files / My Files / Recent).
+   */
+  function setFolder(folderId: string | null | undefined): void {
     albumFileIds.value = null
+    currentAlbumId.value = null
     currentFolder.value = folderId
     activeFilter.value = 'all'
     currentPage.value = 1
@@ -239,6 +351,9 @@ export const useFilesStore = defineStore('media-library-files', () => {
 
   function setFilter(filter: FileFilter): void {
     albumFileIds.value = null
+    currentAlbumId.value = null
+    // Clear folder scope so pagination/count match All / My / Recent (not last folder)
+    currentFolder.value = undefined
     activeFilter.value = filter
     currentPage.value = 1
     if (filter === 'recent') {
@@ -259,6 +374,14 @@ export const useFilesStore = defineStore('media-library-files', () => {
     return [first_name, last_name].filter(Boolean).join(' ') || '—'
   }
 
+  /** Nested table columns (e.g. uploaded_by.partner_selected.label) must be requested explicitly. */
+  function setListFields(columnKeys: string[]): boolean {
+    const nested = uniqueFields(columnKeys.filter((k) => k.includes('.')))
+    if (nested.join('\0') === extraQueryFields.value.join('\0')) return false
+    extraQueryFields.value = nested
+    return true
+  }
+
   return {
     files,
     totalCount,
@@ -271,8 +394,13 @@ export const useFilesStore = defineStore('media-library-files', () => {
     activeFilter,
     customFilter,
     albumFileIds,
+    currentAlbumId,
     isLoading,
+    isLoadingMore,
+    hasMore,
     fetchFiles,
+    fetchMoreFiles,
+    setListFields,
     setSort,
     setSearch,
     setFolder,

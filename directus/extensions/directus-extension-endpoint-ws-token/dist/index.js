@@ -1,1 +1,0 @@
-var e={id:"ws-token",handler:e=>{e.get("/",(e,o)=>{const s=(e.headers.cookie??"").match(/(?:^|;\s*)directus_session_token=([^;]+)/),n=s?decodeURIComponent(s[1]):null;return n?o.json({token:n}):o.status(401).json({error:"No directus_session_token found in request"})})}};export{e as default};

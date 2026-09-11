@@ -155,6 +155,29 @@ function getNestedValue(obj: any, path: string): any {
   return path.split(".").reduce((acc, key) => acc?.[key], obj);
 }
 
+// Extracts every {{path}} placeholder from a template, e.g. "{{occupancy.name}}"
+// -> ["occupancy.name"]. Paths may be a plain field (flat scalar) or a dotted
+// path into a relational field's own fields (e.g. an m2o's display field).
+function parseTemplatePaths(template?: string): string[] {
+  if (!template) return [];
+  const regex = /\{\{([\w.]+)\}\}/g;
+  const paths: string[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(template)) !== null) paths.push(match[1]);
+  return paths;
+}
+
+// Resolves a field value for grouping. Relational fields deep-fetched via
+// buildItemFields() come back as nested objects rather than raw FK ids — using
+// the object itself as a group-key component would collapse every item into
+// one group (every object stringifies to "[object Object]"), so relation
+// values are reduced to their own `id` (or a JSON fallback) instead.
+function groupFieldValue(item: RelatedItem, path: string): any {
+  const val = getNestedValue(item, path);
+  if (val === null || typeof val !== "object") return val;
+  return "id" in val ? val.id : JSON.stringify(val);
+}
+
 function resolveLocalePath(): string {
   const raw = props.translationLocaleCodePath || "translations_id.code";
   const prefix = (props.translationsField || "") + ".";
@@ -188,8 +211,8 @@ function enrichWithTranslation(item: RelatedItem): RelatedItem {
 function renderLabel(item: RelatedItem): string {
   const enriched = enrichWithTranslation(item);
   if (!props.displayTemplate) return String(enriched.id);
-  return props.displayTemplate.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-    const val = enriched[key];
+  return props.displayTemplate.replace(/\{\{([\w.]+)\}\}/g, (_, path) => {
+    const val = getNestedValue(enriched, path);
     if (val === null || val === undefined) return "";
     return String(val);
   });
@@ -202,14 +225,14 @@ function renderParts(
   const result: Array<{ text: string } | { bool: boolean }> = [];
   const template = props.displayTemplate || String(enriched.id);
   let cursor = 0;
-  const regex = /\{\{(\w+)\}\}/g;
+  const regex = /\{\{([\w.]+)\}\}/g;
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(template)) !== null) {
     if (match.index > cursor) {
       result.push({ text: template.slice(cursor, match.index) });
     }
-    const val = enriched[match[1]];
+    const val = getNestedValue(enriched, match[1]);
     if (val === null || val === undefined) {
       // skip
     } else if (typeof val === "boolean") {
@@ -226,7 +249,9 @@ function renderParts(
 
 function getGroupKey(item: RelatedItem): string | null {
   if (!parsedGroupFields.value.length) return null;
-  return parsedGroupFields.value.map((f) => `${f}=${item[f]}`).join("&");
+  return parsedGroupFields.value
+    .map((f) => `${f}=${groupFieldValue(item, f)}`)
+    .join("&");
 }
 
 function normalizeGroupKey(item: RelatedItem): string {
@@ -236,7 +261,7 @@ function normalizeGroupKey(item: RelatedItem): string {
 
 function getFromPriceFlag(item: RelatedItem): boolean {
   const fieldName = props.fromPriceField ?? 'from_price';
-  const value = item[fieldName];
+  const value = getNestedValue(item, fieldName);
   if (typeof value === "boolean") return value;
   if (typeof value === "string") return value === "true";
   if (typeof value === "number") return value === 1;
@@ -326,13 +351,58 @@ function resolveJunctionInfo() {
   }
 }
 
+// True only if `field` is a genuine relational field (m2o/m2a) on `collection`
+// — verified against the relations store rather than assumed, so a plain
+// scalar field that happens to contain a "." in a misconfigured template
+// doesn't get deep-fetched (which Directus would reject as an invalid query).
+function isRelationalField(collection: string, field: string): boolean {
+  const { useRelationsStore } = useStores();
+  const relationsStore = useRelationsStore();
+  const relations: any[] = relationsStore.getRelationsForField(
+    collection,
+    field,
+  );
+  return relations.some((r) => r.field === field && r.related_collection);
+}
+
+// Collects the top-level segment of every dotted path referenced in
+// displayTemplate/groupFields (e.g. "occupancy" from "occupancy.name") that
+// resolves to a real relation on the related collection, so its fields can be
+// deep-fetched dynamically — works for any relational shape (tours'
+// occupancy -> tour_occupancies_names, hotels' flat name/value fields, or any
+// future product), not just a hardcoded field name.
+function collectRelationalSegments(): string[] {
+  if (!resolvedRelatedCollection.value) return [];
+  const paths = [
+    ...parseTemplatePaths(props.displayTemplate),
+    ...parsedGroupFields.value,
+  ];
+  const segments = new Set<string>();
+  for (const path of paths) {
+    const [first, ...rest] = path.split(".");
+    if (
+      rest.length > 0 &&
+      isRelationalField(resolvedRelatedCollection.value, first)
+    ) {
+      segments.add(first);
+    }
+  }
+  return Array.from(segments);
+}
+
 function buildItemFields(): string {
-  if (!props.translationsField) return "*";
+  const relationalSegments = collectRelationalSegments();
+  if (!props.translationsField && relationalSegments.length === 0) return "*";
+
+  const parts = ["*", ...relationalSegments.map((f) => `${f}.*`)];
+
+  if (!props.translationsField) return parts.join(",");
+
   const localePath = resolveLocalePath();
   const localeRelation = localePath.includes(".")
     ? localePath.split(".")[0]
     : null;
-  const parts = [`*`, `${props.translationsField}.*`];
+  parts.push(`${props.translationsField}.*`);
   if (localeRelation) {
     parts.push(`${props.translationsField}.${localeRelation}.*`);
   }

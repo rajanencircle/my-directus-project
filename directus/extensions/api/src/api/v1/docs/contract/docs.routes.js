@@ -1,5 +1,5 @@
 import { openapiSpec } from "./openapi.spec.js";
-import { setRedocCsp, setSwaggerCsp } from "../shared/docsCsp.js";
+import { setRedocCsp, setSwaggerCsp } from "../lib/docsCsp.js";
 
 const contractTitle = openapiSpec?.info?.title ?? "BOTG ContentHub API";
 const contractVersion = openapiSpec?.info?.version ?? "";
@@ -51,7 +51,6 @@ const REDOC_HTML = `<!DOCTYPE html>
     }
 
     #api-banner .api-json-link {
-      margin-left: auto;
       color: #a0b4cc;
       text-decoration: none;
       font-size: 13px;
@@ -61,15 +60,6 @@ const REDOC_HTML = `<!DOCTYPE html>
       color: #fff;
     }
 
-    #api-banner .api-internal-link {
-      color: #a0b4cc;
-      text-decoration: none;
-      font-size: 13px;
-    }
-
-    #api-banner .api-internal-link:hover {
-      color: #fff;
-    }
 
     #api-banner .api-swagger-link {
       color: #a0b4cc;
@@ -87,10 +77,9 @@ const REDOC_HTML = `<!DOCTYPE html>
   <div id="api-banner">
     <span class="api-title">${contractTitle}</span>
     <span class="api-version">${contractVersion}</span>
-    <span style="color:#a0b4cc; font-size:13px;">Contract (source of truth)</span>
-    <a class="api-internal-link" href="/api/v1/internal-docs" target="_blank">Internal implementation docs ↗</a>
+    <a class="api-json-link" href="/api/v1/openapi.json" target="_blank">OpenAPI JSON (Contract) ↗ </a>
+
     <a class="api-swagger-link" href="/api/v1/docs/swagger" target="_blank">Try it out (Swagger) ↗</a>
-    <a class="api-json-link" href="/api/v1/openapi.json" target="_blank">OpenAPI JSON ↗</a>
   </div>
 
   <redoc

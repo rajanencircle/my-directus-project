@@ -13,11 +13,13 @@ import {
   reverseTableCells,
   reverseTableHeaders,
 } from '../utils/fileReverseLinks';
+import DownloadModal from '../../../media-library/src/components/download/DownloadModal.vue';
+import { useMediaSettings } from '../../../media-library/src/composables/useMediaSettings';
+import { buildDownloadModalLabels } from '../../../media-library/src/utils/downloadModalLabels';
+import { useT } from '../composables/useT';
 import {
-  parseDownloadFormatPresets,
-  downloadFileViaApi,
-} from '../utils/downloadPresets';
-import { supportsMultiFormatDownload } from '../utils/fileType';
+  type DownloadModalFile,
+} from '../../../media-library/src/utils/downloadVariants';
 
 type ReverseSectionState = {
   title: string;
@@ -38,30 +40,49 @@ const props = withDefaults(
     fileType?: string | null;
     filenameDownload?: string | null;
     fileReverseLinks?: unknown;
-    downloadFormatPresets?: unknown;
     readonly?: boolean;
     showDownloads?: boolean;
     showUsage?: boolean;
+    mediaSizesCm?: string | null;
+    width?: number | null;
+    height?: number | null;
   }>(),
   {
     fileType: null,
     filenameDownload: null,
     fileReverseLinks: undefined,
-    downloadFormatPresets: undefined,
     readonly: false,
     showDownloads: true,
     showUsage: true,
-  }
+    mediaSizesCm: null,
+    width: null,
+    height: null,
+  },
 );
 
 const api = useApi();
-const reverseSections = ref<ReverseSectionState[]>([]);
+const { t } = useT();
+const { settings, fetchSettings } = useMediaSettings();
 
-const canMultiFormatDownload = computed(() =>
-  supportsMultiFormatDownload(props.fileType, props.filenameDownload)
+const downloadModalLabels = computed(() =>
+  buildDownloadModalLabels(t, settings.value as Record<string, string>),
 );
-const downloadPresets = computed(() => parseDownloadFormatPresets(props.downloadFormatPresets));
-const hasReverseRules = computed(() => parseFileReverseLinks(props.fileReverseLinks).length > 0);
+
+const reverseSections = ref<ReverseSectionState[]>([]);
+const hasReverseRules = computed(() => reverseSections.value.length > 0);
+
+const downloadModalOpen = ref(false);
+
+const downloadModalFiles = computed<DownloadModalFile[]>(() => [
+  {
+    id: props.fileId,
+    filename: props.filenameDownload,
+    type: props.fileType,
+    width: props.width,
+    height: props.height,
+    media_sizes_cm: props.mediaSizesCm,
+  },
+]);
 
 async function loadReverseLinks(fileId: string) {
   const rules = parseFileReverseLinks(props.fileReverseLinks);
@@ -70,23 +91,23 @@ async function loadReverseLinks(fileId: string) {
     return;
   }
 
-  reverseSections.value = rules.map((r) => ({
-    title: r.section_title?.trim() || r.junction_collection,
-    collection: r.junction_collection,
+  reverseSections.value = rules.map((rule) => ({
+    title: rule.section_title?.trim() || rule.junction_collection,
+    collection: rule.junction_collection,
     loading: true,
     error: null,
     rows: [],
-    relatedItemField: r.related_item_field,
-    nameField: r.name_field,
-    fileField: r.file_field,
-    tableHeaders: r.table_headers,
-    tablePaths: r.table_paths,
+    relatedItemField: rule.related_item_field,
+    nameField: rule.name_field,
+    fileField: rule.file_field,
+    tableHeaders: rule.table_headers,
+    tablePaths: rule.table_paths,
   }));
 
   const updates = await Promise.all(
     rules.map(async (rule) => {
       try {
-        const limit = Math.min(Math.max(1, rule.limit ?? 50), 500);
+        const limit = Math.min(Math.max(rule.limit ?? 25, 1), 100);
         const fields = normalizeFieldsParam(rule.fields);
         const coll = encodeURIComponent(rule.junction_collection.trim());
         const res = await api.get(`/items/${coll}`, {
@@ -119,18 +140,6 @@ async function loadReverseLinks(fileId: string) {
   }));
 }
 
-async function downloadPreset(idx: number) {
-  if (props.readonly) return;
-  const preset = downloadPresets.value[idx];
-  if (!preset) return;
-  await downloadFileViaApi(api, props.fileId, preset, props.fileType, props.filenameDownload);
-}
-
-async function downloadOriginal() {
-  if (props.readonly) return;
-  await downloadFileViaApi(api, props.fileId, {}, props.fileType, props.filenameDownload);
-}
-
 watch(
   () => [props.fileId, props.fileReverseLinks] as const,
   async () => {
@@ -140,6 +149,7 @@ watch(
 );
 
 onMounted(async () => {
+  await fetchSettings();
   if (props.showUsage) await loadReverseLinks(props.fileId);
 });
 </script>
@@ -149,22 +159,9 @@ onMounted(async () => {
     <div v-if="showDownloads" class="section">
       <div class="section-title">{{ lbl('extrasDownloads', 'Downloads') }}</div>
       <div class="download-actions">
-        <template v-if="canMultiFormatDownload">
-          <v-button
-            v-for="(preset, idx) in downloadPresets"
-            :key="`${preset.label}-${idx}`"
-            secondary
-            small
-            :disabled="readonly"
-            @click="downloadPreset(idx)"
-          >
-            <v-icon name="download" small />
-            {{ preset.label }}
-          </v-button>
-        </template>
-        <v-button v-else secondary small :disabled="readonly" @click="downloadOriginal">
+        <v-button secondary small :disabled="readonly" @click="downloadModalOpen = true">
           <v-icon name="download" small />
-          {{ lbl('extrasDownloadOriginal', 'Download original') }}
+          {{ lbl('extrasDownload', downloadModalLabels.download) }}
         </v-button>
       </div>
     </div>
@@ -221,6 +218,13 @@ onMounted(async () => {
         </div>
       </div>
     </template>
+
+    <DownloadModal
+      v-model="downloadModalOpen"
+      mode="single"
+      :files="downloadModalFiles"
+      :labels="downloadModalLabels"
+    />
   </div>
 </template>
 
@@ -238,11 +242,8 @@ onMounted(async () => {
 }
 
 .section-title {
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--theme--foreground-subdued);
+  font-weight: 600;
+  font-size: 13px;
 }
 
 .download-actions {
@@ -251,91 +252,71 @@ onMounted(async () => {
   gap: 8px;
 }
 
-.notice {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--theme--border-radius);
-  font-size: 13px;
-}
-
-.notice-error {
-  background: color-mix(in srgb, var(--theme--danger, #dc3545) 10%, transparent);
-  color: var(--theme--danger, #dc3545);
-  border: 1px solid color-mix(in srgb, var(--theme--danger, #dc3545) 30%, transparent);
-}
-
-.table {
-  border: 1px solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius);
-  overflow: hidden;
-}
-
-.tr {
-  display: grid;
-  grid-template-columns: repeat(var(--reverse-cols, 2), minmax(120px, 1fr));
-}
-
-.tr.th {
-  background: var(--theme--background-subdued);
-  font-weight: 800;
+.reverse-meta {
   font-size: 12px;
-}
-
-.td {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--theme--border-color);
-  border-right: 1px solid var(--theme--border-color);
-}
-
-.td:last-child {
-  border-right: none;
-}
-
-.tr:last-child .td {
-  border-bottom: none;
-}
-
-.reverse-table-wrap {
-  max-height: 260px;
-  overflow: auto;
-}
-
-.reverse-table .tr.th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
 }
 
 .subdued {
   color: var(--theme--foreground-subdued);
 }
 
-.reverse-meta {
-  font-size: 11px;
-  font-weight: 600;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  margin: -4px 0 0;
-}
-
 .reverse-loading {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  color: var(--theme--foreground-subdued);
-  font-size: 13px;
+  gap: 8px;
 }
 
 .muted {
   color: var(--theme--foreground-subdued);
+  font-size: 12px;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.notice-error {
+  background: var(--theme--danger-background);
+  color: var(--theme--danger);
 }
 
 .reverse-empty {
   margin: 0;
   font-size: 13px;
   color: var(--theme--foreground-subdued);
-  padding: 8px 2px;
+}
+
+.reverse-table-wrap {
+  overflow-x: auto;
+}
+
+.reverse-table {
+  display: grid;
+  gap: 0;
+  min-width: 100%;
+  font-size: 12px;
+}
+
+.reverse-table .tr {
+  display: grid;
+  grid-template-columns: repeat(var(--reverse-cols, 3), minmax(80px, 1fr));
+  border-bottom: 1px solid var(--theme--border-color-subdued);
+}
+
+.reverse-table .th {
+  font-weight: 600;
+  background: var(--theme--background-subdued);
+}
+
+.reverse-table .td {
+  padding: 6px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

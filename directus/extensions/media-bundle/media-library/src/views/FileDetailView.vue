@@ -1,6 +1,6 @@
 <template>
   <private-view
-    :title="isLoading ? lbl('file_loading', 'Loading…') : (file?.title ?? file?.filename_disk ?? lbl('file_fallback_title', 'File Detail'))"
+    :title="isLoading ? lbl('file_loading', 'Loading…') : displayTitle"
     show-back
     back-to="/media-library"
   >
@@ -15,12 +15,13 @@
             v-tooltip.bottom="t('delete')"
             class="action-delete"
             icon
+            small
             rounded
             secondary
             :disabled="!file"
             @click="on"
           >
-            <v-icon name="delete" />
+            <v-icon small name="delete" />
           </v-button>
         </template>
         <v-card>
@@ -33,11 +34,24 @@
         </v-card>
       </v-dialog>
 
+      <!-- Download -->
+      <v-button
+        v-if="file"
+        v-tooltip.bottom="downloadModalLabels.download"
+        icon
+        small
+        rounded
+        secondary
+        @click="downloadModalOpen = true"
+      >
+        <v-icon small name="download" />
+      </v-button>
+
       <!-- Move to folder -->
       <v-dialog v-if="file" v-model="moveToDialogActive" @esc="moveToDialogActive = false">
         <template #activator="{ on }">
-          <v-button v-tooltip.bottom="t('move_to_folder')" icon rounded secondary @click="on">
-            <v-icon name="folder_move" />
+          <v-button v-tooltip.bottom="t('move_to_folder')" icon small rounded secondary @click="on">
+            <v-icon small name="folder_move" />
           </v-button>
         </template>
         <v-card>
@@ -57,11 +71,12 @@
         v-if="file"
         v-tooltip.bottom="lbl('share', 'Share')"
         icon
+        small
         rounded
         secondary
         @click="shareDialogActive = true"
       >
-        <v-icon name="share" />
+        <v-icon small name="share" />
       </v-button>
 
       <!-- Copy URL -->
@@ -69,23 +84,25 @@
         v-if="file"
         v-tooltip.bottom="t('copy_url')"
         icon
+        small
         rounded
         secondary
         @click="copyAssetUrl"
       >
-        <v-icon name="content_copy" />
+        <v-icon small name="content_copy" />
       </v-button>
 
       <!-- Save -->
       <v-button
         v-tooltip.bottom="hasEdits ? t('save') : t('no_changes')"
         icon
+        small
         rounded
         :loading="isSaving"
         :disabled="!hasEdits"
         @click="save"
       >
-        <v-icon name="check" />
+        <v-icon small name="check" />
       </v-button>
 
     </template>
@@ -98,11 +115,11 @@
     <!-- ── Right info sidebar ──────────────────────────────────────── -->
     <template #sidebar>
       <div class="sidebar-scroll-wrap">
-      <SidebarDetail icon="info" :title="lbl('sidebar_file_info', 'File Details')" :start-open="true">
+      <SidebarDetail icon="info" :title="lbl('sidebar_file_info', 'File Info')" :start-open="true">
         <div class="sidebar-info">
           <template v-if="file">
             <div class="sidebar-row">
-              <span class="sidebar-label">Copy ID</span>
+              <span class="sidebar-label">{{ lbl('sidebar_copy_id', 'Copy ID') }}</span>
               <button class="copy-id-btn" v-tooltip.left="fileIdCopied ? t('copied') : t('copy')" @click="copyFileId">
                 <v-icon :name="fileIdCopied ? 'check' : 'content_copy'" x-small />
               </button>
@@ -118,25 +135,6 @@
         </div>
       </SidebarDetail>
 
-      <SidebarDetail v-if="file" icon="download" :title="lbl('sidebar_downloads', 'Downloads')" :start-open="true">
-        <div class="sidebar-downloads">
-          <template v-if="canMultiFormatDownload">
-            <v-button
-              v-for="preset in downloadPresets"
-              :key="String(preset.label)"
-              small
-              secondary
-              class="download-preset-btn"
-              @click="downloadPreset(preset)"
-            >
-              {{ preset.label }}
-            </v-button>
-          </template>
-          <v-button v-else small secondary class="download-preset-btn" @click="downloadPreset({ label: lbl('download_original', 'Download Original') })">
-            {{ lbl('download_original', 'Download Original') }}
-          </v-button>
-        </div>
-      </SidebarDetail>
       <RevisionsSidebar v-if="file" :file-id="props.id" />
       <CommentsSidebar v-if="file" :file-id="props.id" />
       </div>
@@ -163,7 +161,7 @@
           <img
             v-if="isImageType(file.type)"
             :src="previewUrl"
-            :alt="file.title ?? file.filename_disk"
+            :alt="displayTitle"
             class="preview-image"
           />
           <video
@@ -179,8 +177,9 @@
           </div>
         </div>
 
-        <!-- Editable form -->
+        <!-- Editable form — :key remounts when M2M (keywords) hydrate finishes -->
         <v-form
+          :key="formRenderKey"
           v-model="edits"
           :fields="editableFields"
           :initial-values="file"
@@ -195,101 +194,11 @@
     </div>
 
     <!-- Share dialog -->
-    <v-dialog v-model="shareDialogActive" @esc="shareDialogActive = false" :persistent="shareCreating">
-      <v-card>
-        <v-card-title>
-          <v-icon name="share" left />
-          {{ lbl('shareTitle', 'Share File') }}
-        </v-card-title>
-
-        <template v-if="!shareUrl">
-          <v-card-text>
-            <v-notice type="info" class="share-hint">
-              {{ lbl('shareHint', 'A link will be generated. Optionally protect it with a password or set an expiry date.') }}
-            </v-notice>
-
-            <div class="share-fields">
-              <div class="share-field">
-                <div class="label type-label">
-                  {{ lbl('sharePasswordLabel', 'Password') }}
-                  <span class="share-optional">— {{ t('optional') }}</span>
-                </div>
-                <v-input
-                  v-model="sharePassword"
-                  type="password"
-                  :placeholder="lbl('sharePasswordPlaceholder', 'Leave blank for no password')"
-                  :disabled="shareCreating"
-                  autocomplete="off"
-                />
-              </div>
-
-              <div class="share-field">
-                <div class="label type-label">
-                  {{ lbl('shareExpiryLabel', 'Expiry Date') }}
-                  <span class="share-optional">— {{ t('optional') }}</span>
-                </div>
-                <v-input
-                  v-model="shareExpiryDate"
-                  type="datetime-local"
-                  :disabled="shareCreating"
-                />
-              </div>
-
-              <div class="share-field">
-                <div class="label type-label">
-                  {{ lbl('shareEmailLabel', 'Share via Email') }}
-                  <span class="share-optional">— {{ t('optional') }}</span>
-                </div>
-                <v-input
-                  v-model="shareEmailsRaw"
-                  :placeholder="lbl('shareEmailPlaceholder', 'email@example.com, another@example.com')"
-                  :disabled="shareCreating"
-                />
-                <p class="share-note">{{ lbl('shareEmailHint', 'Separate multiple addresses with commas') }}</p>
-              </div>
-            </div>
-
-            <v-notice v-if="shareError" type="danger" class="share-error">{{ shareError }}</v-notice>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-button secondary :disabled="shareCreating" @click="closeShareDialog">{{ t('cancel') }}</v-button>
-            <v-button :loading="shareCreating" @click="createShareLink">
-              <v-icon name="link" left />
-              {{ lbl('shareCreateBtn', 'Create Link') }}
-            </v-button>
-          </v-card-actions>
-        </template>
-
-        <template v-else>
-          <v-card-text>
-            <v-notice type="success" class="share-hint">
-              {{ lbl('shareSuccess', 'Share link created successfully!') }}
-            </v-notice>
-
-            <div class="share-fields">
-              <div class="share-field">
-                <div class="label type-label">{{ lbl('shareUrlLabel', 'Share URL') }}</div>
-                <v-input :model-value="shareUrl" readonly>
-                  <template #append>
-                    <v-icon
-                      :name="shareCopied ? 'check' : 'content_copy'"
-                      clickable
-                      :title="lbl('shareCopyUrl', 'Copy URL')"
-                      @click="copyShareUrl"
-                    />
-                  </template>
-                </v-input>
-              </div>
-            </div>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-button @click="closeShareDialog">{{ t('done') }}</v-button>
-          </v-card-actions>
-        </template>
-      </v-card>
-    </v-dialog>
+    <ShareModal
+      v-if="shareDialogActive && file"
+      :file-id="file.id"
+      @close="shareDialogActive = false"
+    />
 
     <!-- Unsaved changes dialog -->
     <v-dialog v-model="confirmLeave" @esc="confirmLeave = false">
@@ -303,6 +212,13 @@
       </v-card>
     </v-dialog>
 
+    <DownloadModal
+      v-model="downloadModalOpen"
+      mode="single"
+      :files="downloadModalFiles"
+      :labels="downloadModalLabels"
+    />
+
   </private-view>
 </template>
 
@@ -313,6 +229,7 @@ import { useApi, useStores } from '@directus/extensions-sdk'
 import { useAssetUrl } from '../composables/useAssetUrl'
 import { useT } from '../composables/useT'
 import { useMediaSettings } from '../composables/useMediaSettings'
+import { useNotificationBadgeSync } from '../composables/useNotificationBadgeSync'
 import { resolveTranslatable } from '../utils/translations'
 import MediaSidebar from '../components/layout/MediaSidebar.vue'
 import SidebarDetail from '../components/layout/SidebarDetail.vue'
@@ -320,8 +237,13 @@ import RevisionsSidebar from '../components/layout/RevisionsSidebar.vue'
 import CommentsSidebar from '../components/layout/CommentsSidebar.vue'
 import FolderDropdown from '../components/upload/FolderDropdown.vue'
 import type { DirectusFile } from '../stores/files.store'
+import { filePrimaryTitle } from '../utils/fileCardMeta'
 import { validateItem, clearHiddenEdits } from '../utils/validate-item'
-import { DEFAULT_DOWNLOAD_FORMAT_PRESETS, type DownloadFormatPreset } from '../utils/downloadPresets'
+import { type DownloadModalFile } from '../utils/downloadVariants'
+import { buildDownloadModalLabels } from '../utils/downloadModalLabels'
+import DownloadModal from '../components/download/DownloadModal.vue'
+import ShareModal from '../../../directus-extension-media-uploader/src/components/ShareModal.vue'
+import { hydrateFileM2mFields } from '../utils/hydrateFileM2m'
 
 const props = defineProps<{ id: string }>()
 
@@ -332,14 +254,17 @@ const { settings, fetchSettings } = useMediaSettings()
 const { getPreviewUrl, getAssetUrl } = useAssetUrl()
 const lbl = (key: keyof typeof settings.value, fallback: string) =>
   resolveTranslatable(settings.value[key] as string, t, fallback)
-const { useFieldsStore } = useStores()
+const { useFieldsStore, useRelationsStore } = useStores()
 const fieldsStore = useFieldsStore()
+const relationsStore = useRelationsStore()
 
 // ── State ──────────────────────────────────────────────────────────
 const file = ref<DirectusFile | null>(null)
 const edits = ref<Record<string, any>>({})
 const validationErrors = ref<any[]>([])
 const isLoading = ref(true)
+/** Bump after load so list-m2m picks up hydrated keyword_ids */
+const formRenderKey = ref(0)
 const isSaving = ref(false)
 const isDeleting = ref(false)
 const isMoving = ref(false)
@@ -354,17 +279,15 @@ const fileIdCopied = ref(false)
 
 // ── Share state ────────────────────────────────────────────────────
 const shareDialogActive = ref(false)
-const sharePassword = ref('')
-const shareExpiryDate = ref('')
-const shareEmailsRaw = ref('')
-const shareCreating = ref(false)
-const shareError = ref('')
-const shareUrl = ref('')
-const shareCopied = ref(false)
 
 
 // ── Computed ───────────────────────────────────────────────────────
 const hasEdits = computed(() => Object.keys(edits.value).length > 0)
+
+const displayTitle = computed(() => {
+  if (!file.value) return lbl('file_fallback_title', 'File Detail')
+  return filePrimaryTitle(file.value)
+})
 
 const FIELDS_DENY_LIST = [
   'storage_divider', 'filename_disk', 'filename_download', 'metadata', 'type', 'filesize', 'focal_point_divider', 'focal_point_x', 'focal_point_y', 'location', 'charset', 'created_on', 'modified_on', 'uploaded_by', 'modified_by', 'width', 'height', 'duration',
@@ -433,7 +356,7 @@ const sidebarInfoRows = computed(() => {
     const folderName = typeof f.folder === 'object' ? (f.folder as any).name : null
     const folderId = typeof f.folder === 'object' ? (f.folder as any).id : f.folder
     const linkText = folderName ? `Open "${folderName}" folder` : 'Open folder'
-    rows.push({ label: 'Folder', value: linkText, to: `/media-library?folder=${folderId}` })
+    rows.push({ label: 'Folder', value: linkText, to: `/media-library/folders/${folderId}` })
   }
 
   add(getFieldLabel('storage', 'Storage'), f.storage)
@@ -449,50 +372,31 @@ const sidebarInfoRows = computed(() => {
   return rows
 })
 
-const canMultiFormatDownload = computed(() => isImageType(file.value?.type ?? ''))
-const downloadPresets = computed<DownloadFormatPreset[]>(() => DEFAULT_DOWNLOAD_FORMAT_PRESETS)
+const downloadModalOpen = ref(false)
 
-async function downloadPreset(preset: DownloadFormatPreset) {
-  if (!file.value) return
-  const fileId = file.value.id
-  const origFilename = file.value.filename_download ?? 'download'
-  const isImage = isImageType(file.value.type)
-  const params: Record<string, string> = {}
-  const format: string | undefined = isImage ? ((preset as any).format as string | undefined) : undefined
+const downloadModalFiles = computed<DownloadModalFile[]>(() => {
+  if (!file.value) return []
+  return [
+    {
+      id: file.value.id,
+      filename: file.value.filename_download,
+      type: file.value.type,
+      width: file.value.width,
+      height: file.value.height,
+      media_sizes_cm: file.value.media_sizes_cm,
+    },
+  ]
+})
 
-  if (isImage) {
-    if (format) params['format'] = format
-    if ((preset as any).width) params['width'] = String((preset as any).width)
-    if ((preset as any).height) params['height'] = String((preset as any).height)
-    if ((preset as any).fit) params['fit'] = (preset as any).fit
-    if ((preset as any).quality) params['quality'] = String((preset as any).quality)
-  }
-  params['download'] = ''
+const downloadModalLabels = computed(() =>
+  buildDownloadModalLabels(t, settings.value as Record<string, string>),
+)
 
-  // Rename extension to match chosen format so the saved file has the right type
-  let filename = origFilename
-  if (format) {
-    const dot = origFilename.lastIndexOf('.')
-    filename = (dot >= 0 ? origFilename.slice(0, dot) : origFilename) + '.' + format
-  }
-
-  try {
-    const res = await api.get(`/assets/${fileId}`, { params, responseType: 'blob' })
-    const blobUrl = URL.createObjectURL(res.data as Blob)
-    const link = document.createElement('a')
-    link.href = blobUrl
-    link.download = filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
-  } catch (err) {
-    console.error('[media-library] Download failed:', err)
-  }
-}
+const { start: startNotificationBadgeSync } = useNotificationBadgeSync()
 
 // ── Lifecycle ──────────────────────────────────────────────────────
 onMounted(async () => {
+  startNotificationBadgeSync()
   fetchSettings()
   await loadFile()
 })
@@ -542,6 +446,29 @@ async function loadFile() {
       `${rel}.translations.name`,
       `${rel}.translations.translations_id.code`,
     ]
+
+    // Alias M2M/O2M fields (e.g. keyword_ids) are NOT included in `*` — request them
+    // explicitly. Also always request keywords (fieldsStore may not be ready yet).
+    const relationalAliasFields: string[] = [
+      'keyword_ids',
+      'keyword_ids.id',
+      'keyword_ids.keywords_id',
+      'keyword_ids.keywords_id.id',
+      'keyword_ids.keywords_id.keyword',
+    ]
+    try {
+      for (const f of fieldsStore.getFieldsForCollection('directus_files') ?? []) {
+        const specials = f?.meta?.special
+        const list = Array.isArray(specials) ? specials : specials ? [specials] : []
+        if (!list.includes('m2m') && !list.includes('o2m') && !list.includes('files')) continue
+        const key = f.field as string
+        if (!key || key === 'translations') continue
+        relationalAliasFields.push(key, `${key}.*`, `${key}.*.*`)
+      }
+    } catch {
+      // keep keyword_ids defaults above
+    }
+
     const res = await api.get(`/files/${props.id}`, {
       params: {
         fields: [
@@ -554,11 +481,24 @@ async function loadFile() {
           ...geoTranslationFields('region'),
           ...geoTranslationFields('country'),
           ...geoTranslationFields('destination'),
+          ...relationalAliasFields,
         ],
       },
     })
-    file.value = res.data?.data ?? null
-    selectedFolder.value = file.value?.folder ?? null
+
+    let data = res.data?.data ?? null
+    // /files often omits custom M2M — hydrate keyword_ids from junction rows
+    data = await hydrateFileM2mFields(
+      api,
+      data,
+      fieldsStore.getFieldsForCollection('directus_files') ?? [],
+      (relationsStore.relations as any[]) ?? [],
+    )
+
+    file.value = data
+    selectedFolder.value = (file.value as any)?.folder ?? null
+    edits.value = {}
+    formRenderKey.value += 1
   } catch (err) {
     console.warn('[media-library] Failed to fetch file:', err)
     file.value = null
@@ -658,75 +598,6 @@ async function copyFileId() {
     fileIdCopied.value = true
     setTimeout(() => { fileIdCopied.value = false }, 2000)
   } catch { /* no-op */ }
-}
-
-// ── Share actions ──────────────────────────────────────────────────
-function closeShareDialog() {
-  shareDialogActive.value = false
-  sharePassword.value = ''
-  shareExpiryDate.value = ''
-  shareEmailsRaw.value = ''
-  shareError.value = ''
-  shareUrl.value = ''
-  shareCopied.value = false
-}
-
-function parseShareEmails(raw: string): string[] {
-  return raw
-    .split(/[\s,;]+/)
-    .map(e => e.trim())
-    .filter(e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
-}
-
-async function createShareLink() {
-  if (!file.value) return
-  shareCreating.value = true
-  shareError.value = ''
-
-  try {
-    const payload: Record<string, any> = {
-      status: 'published',
-      file: file.value.id,
-    }
-    if (sharePassword.value) payload.password = sharePassword.value
-    if (shareExpiryDate.value) payload.expired_date = shareExpiryDate.value
-
-    const { data } = await api.post('/items/media_share_link', payload)
-    const shareId = data.data.id
-    const url = `${window.location.origin}/media-share-validate/view/${shareId}/`
-
-    try {
-      await api.patch(`/items/media_share_link/${shareId}`, { link: url })
-    } catch (patchErr: any) {
-      console.error('[FileDetailView] PATCH share link failed', patchErr?.response?.data ?? patchErr)
-    }
-
-    shareUrl.value = url
-
-    const emails = parseShareEmails(shareEmailsRaw.value)
-    if (emails.length > 0) {
-      try {
-        await api.post('/media-share-validate/notify', { shareUrl: url, emails })
-      } catch (mailErr: any) {
-        console.error('[FileDetailView] notify failed', mailErr?.response?.data ?? mailErr)
-      }
-    }
-  } catch (err: any) {
-    console.error('[FileDetailView] create share link failed', err?.response?.data ?? err)
-    shareError.value = err?.response?.data?.errors?.[0]?.message ?? 'Failed to create share link.'
-  } finally {
-    shareCreating.value = false
-  }
-}
-
-async function copyShareUrl() {
-  try {
-    await navigator.clipboard.writeText(shareUrl.value)
-    shareCopied.value = true
-    setTimeout(() => { shareCopied.value = false }, 2000)
-  } catch {
-    /* no-op */
-  }
 }
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -839,7 +710,7 @@ function formatDate(isoString: string): string {
 }
 
 .sidebar-info {
-  padding: 4px 16px 12px;
+  padding: 0;
 }
 
 .sidebar-row {
@@ -856,21 +727,21 @@ function formatDate(isoString: string): string {
 }
 
 .sidebar-label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--theme--foreground);
   flex-shrink: 0;
 }
 
 .sidebar-value {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--theme--foreground-subdued);
   text-align: right;
   word-break: break-word;
 }
 
 .sidebar-link {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--theme--primary);
   text-decoration: none;
   text-align: right;
@@ -890,65 +761,6 @@ function formatDate(isoString: string): string {
   display: flex;
   align-items: center;
   line-height: 1;
-}
-
-/* ── Publishable field star indicator ────────────────────────────── */
-:deep([data-field="copyright"] .field-label-content::after),
-:deep([data-field="photographer"] .field-label-content::after),
-:deep([data-field="company_name"] .field-label-content::after),
-:deep([data-field="original_filename"] .field-label-content::after),
-:deep([data-field="alt_text"] .field-label-content::after),
-:deep([data-field="contact_email"] .field-label-content::after) {
-  content: '*';
-  color: var(--theme--warning);
-  margin-left: 2px;
-  font-size: 0.75rem;
-  vertical-align: super;
-  line-height: 0;
-}
-
-/* ── Downloads section content ────────────────────────────────────── */
-.sidebar-downloads {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 12px;
-}
-
-.download-preset-btn {
-  width: 100%;
-}
-
-/* ── Share dialog ─────────────────────────────────────────────────── */
-.share-hint {
-  margin-bottom: var(--theme--form--row-gap);
-}
-
-.share-error {
-  margin-top: var(--theme--form--row-gap);
-}
-
-.share-fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--theme--form--row-gap);
-}
-
-.share-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.share-optional {
-  font-weight: 400;
-  color: var(--theme--foreground-subdued);
-}
-
-.share-note {
-  font-size: 12px;
-  color: var(--theme--foreground-subdued);
-  margin: 0;
 }
 
 </style>

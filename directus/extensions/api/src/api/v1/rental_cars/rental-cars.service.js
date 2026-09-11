@@ -1,39 +1,25 @@
-import { LIST_FIELDS } from "./rental-cars.fields.js";
-import { CAMPER_SPECS_FIELDS } from "./rental-cars.fields.js";
 import {
+  DETAIL_FIELDS,
   SURCHARGE_FIELDS,
   ZONE_FIELDS,
   PRICE_PERIOD_FIELDS,
   RENTAL_PERIOD_FIELDS,
   PRICE_FIELDS,
+  RENTAL_COMPANY_PRICE_FIELDS,
   PRICE_CALCULATION_FIELDS,
   SURCHARGE_CALCULATION_FIELDS,
 } from "./rental-cars.fields.js";
-import { ROOT_COLLECTION, DETAIL_RELATIONS } from "./rental-cars.query-config.js";
-import {
-  buildListFilter,
-  buildSort,
-  buildIdFilter,
-  buildUpdatedAfterFilter,
-} from "./rental-cars.filters.js";
-import { createCollectionService } from "../../shared/createCollectionService.js";
+import { rentalCars as rentalCarsFilters } from "../../shared/collectionFilters.js";
+const { buildIdFilter } = rentalCarsFilters;
+import { createQueryConfig } from "../../shared/createQueryConfig.js";
 import { fetchVehicleDetail } from "../../shared/fetchVehicleDetail.js";
 
 const COLLECTION = "vehicles";
-const CAMPER_SPECS_COLLECTION = "camper_specs";
 
-const { listSlim, listFull, detailFields } = createCollectionService({
-  collection: COLLECTION,
-  resourceLabel: "rental car",
-  listFields: LIST_FIELDS,
-  buildListFilter,
-  buildSort,
-  buildUpdatedAfterFilter,
-  getDetails: (params, context) => getRentalCarDetails(params, context),
-});
-
-export const listSlimRentalCars = listSlim;
-export const listFullRentalCars = listFull;
+export const { ROOT_COLLECTION, DETAIL_RELATIONS } = createQueryConfig(
+  COLLECTION,
+  DETAIL_FIELDS,
+);
 
 /**
  * Retrieves and enriches the full details for a specific rental car.
@@ -45,13 +31,15 @@ export const listFullRentalCars = listFull;
  * @param {Object} context - The Directus context.
  * @returns {Promise<Object>} The enriched rental car details.
  */
-export async function getRentalCarDetails({ id, idFilterMode }, context) {
+export async function getRentalCarDetails({ id, idFilterMode, partnerId, partnerVisibility }, context) {
   return fetchVehicleDetail(
     {
       id,
       idFilterMode,
+      partnerId,
+      partnerVisibility,
       rentalType: "car",
-      resourceLabel: "RentalCar",
+      resourceLabel: "Rental Car",
       rootCollection: ROOT_COLLECTION,
       detailRelations: DETAIL_RELATIONS,
       fields: {
@@ -61,21 +49,9 @@ export async function getRentalCarDetails({ id, idFilterMode }, context) {
         PRICE_PERIOD_FIELDS,
         RENTAL_PERIOD_FIELDS,
         PRICE_FIELDS,
+        RENTAL_COMPANY_PRICE_FIELDS,
         PRICE_CALCULATION_FIELDS,
         SURCHARGE_CALCULATION_FIELDS,
-      },
-      /* 
-       * Retrieve `camper_specs` via an explicit query, as it lacks a reverse alias on `rental-cars`.
-       * This payload enhancement is specific to rental cars.
-       */
-      extraFetch: async ({ vehicle, itemsServiceFactory, detailFields }) => {
-        const camperSpecsService = itemsServiceFactory(CAMPER_SPECS_COLLECTION);
-        const camperSpecsRows = await camperSpecsService.readByQuery({
-          fields: detailFields(CAMPER_SPECS_COLLECTION, CAMPER_SPECS_FIELDS),
-          filter: { vehicle: { _eq: vehicle.id } },
-          limit: 1,
-        });
-        return { camper_specs: camperSpecsRows?.[0] ?? null };
       },
     },
     context,

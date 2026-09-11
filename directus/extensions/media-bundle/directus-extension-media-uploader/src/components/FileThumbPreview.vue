@@ -6,6 +6,7 @@ import {
   resolveFileMediaKind,
   type FileMediaKind,
 } from '../utils/fileType';
+import { getOriginalAssetUrl, getThumbnailAssetUrl } from '../utils/assetUrl';
 
 const props = withDefaults(
   defineProps<{
@@ -13,18 +14,13 @@ const props = withDefaults(
     mimeType?: string | null;
     filename?: string | null;
     alt?: string;
-    size?: number;
     showKindBadge?: boolean;
-    // File's modified_on, appended as a v= cache-buster (same param the native
-    // Directus app uses) — assets carry a 30-day browser cache, so without this
-    // a replaced file's old thumbnail keeps being shown.
     modifiedOn?: string | null;
   }>(),
   {
     mimeType: null,
     filename: null,
     alt: '',
-    size: 250,
     showKindBadge: true,
     modifiedOn: null,
   }
@@ -32,6 +28,7 @@ const props = withDefaults(
 
 const imageFailed = ref(false);
 const videoFailed = ref(false);
+const videoFrameReady = ref(false);
 
 const mediaKind = computed<FileMediaKind>(() =>
   resolveFileMediaKind(props.mimeType, props.filename)
@@ -41,19 +38,12 @@ const showVideo = computed(() => mediaKind.value === 'video' && !videoFailed.val
 const iconName = computed(() => mimeToIcon(props.mimeType, props.filename));
 const kindLabel = computed(() => mimeToKindLabel(props.mimeType, props.filename));
 
-const cacheBuster = computed(() =>
-  props.modifiedOn ? `&v=${encodeURIComponent(props.modifiedOn)}` : ''
+const thumbnailUrl = computed(() =>
+  getThumbnailAssetUrl(props.fileId, props.modifiedOn)
 );
 
-const thumbnailUrl = computed(() => {
-  const s = props.size;
-  return `/assets/${props.fileId}?width=${s}&height=${s}&fit=cover${cacheBuster.value}`;
-});
-
 const videoUrl = computed(() =>
-  props.modifiedOn
-    ? `/assets/${props.fileId}?v=${encodeURIComponent(props.modifiedOn)}`
-    : `/assets/${props.fileId}`
+  getOriginalAssetUrl(props.fileId, props.modifiedOn)
 );
 
 function onImageError() {
@@ -62,6 +52,23 @@ function onImageError() {
 
 function onVideoError() {
   videoFailed.value = true;
+  videoFrameReady.value = false;
+}
+
+/** Pause on first decoded frame — browser metadata only, no playback controls. */
+function onVideoFrameReady(event: Event) {
+  const video = event.target as HTMLVideoElement | null;
+  if (!video) return;
+
+  video.pause();
+  try {
+    if (video.currentTime === 0) {
+      video.currentTime = 0.001;
+    }
+  } catch {
+    // Some browsers reject seek before enough data is buffered.
+  }
+  videoFrameReady.value = true;
 }
 
 watch(
@@ -69,6 +76,7 @@ watch(
   () => {
     imageFailed.value = false;
     videoFailed.value = false;
+    videoFrameReady.value = false;
   }
 );
 </script>
@@ -83,15 +91,26 @@ watch(
       loading="lazy"
       @error="onImageError"
     />
-    <video
-      v-else-if="showVideo"
-      class="thumb-video"
-      :src="videoUrl"
-      controls
-      preload="metadata"
-      playsinline
-      @error="onVideoError"
-    />
+    <div v-else-if="showVideo" class="thumb-video-wrap">
+      <video
+        class="thumb-video"
+        :class="{ 'is-ready': videoFrameReady }"
+        :src="videoUrl"
+        preload="metadata"
+        muted
+        playsinline
+        disablepictureinpicture
+        disableremoteplayback
+        tabindex="-1"
+        aria-hidden="true"
+        @loadeddata="onVideoFrameReady"
+        @error="onVideoError"
+      />
+      <div class="thumb-video-overlay" aria-hidden="true">
+        <v-icon name="play_circle" class="thumb-play-icon" />
+        <span v-if="showKindBadge" class="video-type-badge">Video</span>
+      </div>
+    </div>
     <div v-else class="thumb-fallback">
       <v-icon :name="iconName" class="thumb-icon" />
       <span v-if="showKindBadge" class="kind-badge">{{ kindLabel }}</span>
@@ -116,10 +135,55 @@ watch(
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.25s ease;
+}
+
+.thumb-video-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #101010;
 }
 
 .thumb-video {
-  background: #000;
+  pointer-events: none;
+  opacity: 0;
+  background: #101010;
+}
+
+.thumb-video.is-ready {
+  opacity: 1;
+}
+
+.thumb-video-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+}
+
+.thumb-play-icon {
+  --v-icon-size: 36px;
+  --v-icon-color: rgba(255, 255, 255, 0.95);
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.45));
+}
+
+.video-type-badge {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.92);
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .thumb-fallback {

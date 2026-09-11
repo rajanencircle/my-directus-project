@@ -14,9 +14,6 @@
     "host": "^11.0.0"
   },
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "directus-extension build",
     "dev": "directus-extension build -w",

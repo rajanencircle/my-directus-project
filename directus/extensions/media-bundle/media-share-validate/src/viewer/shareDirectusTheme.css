@@ -1,0 +1,213 @@
+/* Directus light theme tokens for the public share download modal */
+.share-dl-theme {
+	--project-color: #6644FF;
+	--theme--primary: #6644FF;
+	--theme--primary-foreground: #ffffff;
+	--theme--primary-background: color-mix(in srgb, #ffffff, #6644FF 10%);
+	--theme--primary-accent: #5039cc;
+	--theme--foreground: #4f5464;
+	--theme--foreground-accent: #172940;
+	--theme--foreground-subdued: #a2b5cd;
+	--theme--background: #ffffff;
+	--theme--background-normal: #f0f4f9;
+	--theme--background-accent: #e4eaf1;
+	--theme--background-subdued: #f7fafc;
+	--theme--border-color: #e4eaf1;
+	--theme--border-color-accent: #d3dae4;
+	--theme--border-color-subdued: #f0f4f9;
+	--theme--border-radius: 6px;
+	--theme--danger: #e35169;
+	--theme--danger-background: color-mix(in srgb, #ffffff, #e35169 10%);
+	--theme--form--field--input--height: 2.9375rem;
+	--theme--form--field--input--background: #ffffff;
+	--theme--form--field--input--foreground: #4f5464;
+	--theme--form--field--input--border-color: #e4eaf1;
+	--theme--form--field--input--border-color-hover: #d3dae4;
+	--theme--form--field--input--border-color-focus: #6644FF;
+	--theme--form--field--input--padding: 0.6875rem;
+	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	color: var(--theme--foreground);
+}
+
+.share-dl-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	overflow-y: auto;
+	background: rgba(17, 28, 45, 0.72);
+	backdrop-filter: blur(2px);
+	-webkit-backdrop-filter: blur(2px);
+}
+
+body.share-dl-modal-open {
+	overflow: hidden;
+}
+
+.share-dl-dialog-shell {
+	position: relative;
+	z-index: 1;
+	flex-shrink: 0;
+	max-width: 100%;
+}
+
+.share-dl-theme .download-modal,
+.share-dl-theme .v-card {
+	background: var(--theme--background);
+	box-shadow:
+		0 16px 48px rgba(17, 28, 45, 0.28),
+		0 2px 8px rgba(17, 28, 45, 0.12);
+}
+
+.share-dl-theme .download-modal-header,
+.share-dl-theme .download-modal-footer {
+	background: var(--theme--background);
+}
+
+.share-dl-theme .options-panel {
+	background: var(--theme--background-subdued);
+	border: 1px solid var(--theme--border-color-subdued);
+}
+
+.share-dl-theme .segment-row {
+	background: var(--theme--background);
+	border: 1px solid var(--theme--border-color-subdued);
+}
+
+.share-dl-theme .v-icon {
+	font-family: 'Material Symbols Outlined';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	vertical-align: middle;
+	user-select: none;
+	font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.share-dl-theme .v-icon.small {
+	font-size: 18px;
+	font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
+.share-dl-theme .v-icon.left {
+	margin-right: 6px;
+}
+
+.share-dl-theme .v-icon.clickable {
+	cursor: pointer;
+}
+
+.share-dl-theme .v-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-width: 132px;
+	height: 44px;
+	padding: 0 20px;
+	border: 2px solid var(--theme--primary);
+	border-radius: var(--theme--border-radius);
+	background: var(--theme--primary);
+	color: var(--theme--primary-foreground);
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1;
+	cursor: pointer;
+	transition:
+		background-color 0.15s ease,
+		border-color 0.15s ease,
+		color 0.15s ease;
+}
+
+.share-dl-theme .v-button:hover:not(:disabled) {
+	background: var(--theme--primary-accent);
+	border-color: var(--theme--primary-accent);
+}
+
+.share-dl-theme .v-button.secondary {
+	background: var(--theme--background);
+	color: var(--theme--foreground);
+	border-color: var(--theme--border-color);
+}
+
+.share-dl-theme .v-button.secondary:hover:not(:disabled) {
+	background: var(--theme--background-accent);
+	border-color: var(--theme--border-color-accent);
+}
+
+.share-dl-theme .v-button:disabled,
+.share-dl-theme .v-button.loading {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.share-dl-theme .v-button .v-button-loading {
+	width: 16px;
+	height: 16px;
+	border: 2px solid rgba(255, 255, 255, 0.35);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: share-dl-spin 0.6s linear infinite;
+}
+
+.share-dl-theme .v-input,
+.share-dl-theme .v-select {
+	width: 100%;
+	height: var(--theme--form--field--input--height);
+	padding: var(--theme--form--field--input--padding);
+	border: var(--theme--border-width, 2px) solid var(--theme--form--field--input--border-color);
+	border-radius: var(--theme--border-radius);
+	background: var(--theme--form--field--input--background);
+	color: var(--theme--form--field--input--foreground);
+	font: inherit;
+	font-size: 14px;
+	line-height: 1.4;
+	box-sizing: border-box;
+}
+
+.share-dl-theme .v-input:focus,
+.share-dl-theme .v-select:focus {
+	outline: none;
+	border-color: var(--theme--form--field--input--border-color-focus);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme--primary) 18%, transparent);
+}
+
+.share-dl-theme .v-input:disabled,
+.share-dl-theme .v-select:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	background: var(--theme--background-subdued);
+}
+
+.share-dl-theme .v-notice {
+	padding: 12px 14px;
+	border-radius: var(--theme--border-radius);
+	font-size: 14px;
+	line-height: 1.45;
+}
+
+.share-dl-theme .v-notice.info {
+	background: color-mix(in srgb, #ffffff, #6644FF 8%);
+	color: var(--theme--foreground);
+	border: 1px solid color-mix(in srgb, #ffffff, #6644FF 18%);
+}
+
+.share-dl-theme .v-notice.danger {
+	background: var(--theme--danger-background);
+	color: var(--theme--danger);
+	border: 1px solid color-mix(in srgb, #ffffff, var(--theme--danger) 25%);
+}
+
+@keyframes share-dl-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}

@@ -1,9 +1,18 @@
+/**
+ * @description Standardizes raw exchange rate values into a consistent `{ id, currency, rate }` object shape.
+ *
+ * If the input is already an object (e.g. enriched from the `rates` collection), it ensures an
+ * `id` property exists, defaulting to null when missing. If it is a number or numeric string,
+ * it converts the value into a standard rate object with a null id and currency.
+ *
+ * Pricing transformers use this to guarantee exchange rates always follow the same structure,
+ * whether they were fully resolved from the database or patched in manually.
+ * 
+ * @param {Number|String|Object|null} value - The raw exchange rate value or object.
+ * @returns {Object|null} The standardized exchange rate object, or null if invalid.
+ */
 export function toExchangeRateObject(value) {
   if (value === undefined || value === null) return null;
-  // Objects reaching here are either already resolved by enrichExchangeRates()
-  // (a real { id, currency, rate } from the `rates` collection) or a { currency, rate }
-  // patch from ratesResolver's vehicle enrichment (no real id) — default id to null
-  // only when it isn't already set, never overwrite a resolved one.
   if (typeof value === "object") {
     return "id" in value ? value : { id: null, ...value };
   }

@@ -23,6 +23,7 @@ export const LIST_FIELDS = [
   // Media fields for thumbnail
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.uploaded_by.partner_selected",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -32,7 +33,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
-  "media.directus_files_id.tour32_export",
+  "media.tour32_export",
   "media.directus_files_id.dimensions_px",
   "media.directus_files_id.keyword_ids",
   "media.directus_files_id.folder.id",
@@ -96,7 +97,6 @@ export const DETAIL_FIELDS = [
   "rental_company.conditions_calculation_season",
   "rental_company.season.id",
   "rental_company.season.season",
-  "rental_company.has_multi_rental_discount",
   "rental_company.sell_prices_status",
   "rental_company.sell_prices_updated_at",
   "rental_company.location_tour32.id",
@@ -116,6 +116,7 @@ export const DETAIL_FIELDS = [
   "rental_company.descriptions_translations.text_negative",
   "rental_company.descriptions_translations.description_supplementary",
   "rental_company.conditions_translations.translations_id.code",
+  "rental_company.conditions_translations.has_multi_rental_discount",
   "rental_company.conditions_translations.conditions_driver",
   "rental_company.conditions_translations.conditions_licence",
   "rental_company.conditions_translations.conditions_calculation",
@@ -159,7 +160,8 @@ export const DETAIL_FIELDS = [
   "descriptions_translations.bond",
   "descriptions_translations.description_supplementary",
   "descriptions_translations.bedsize",
-  "descriptions_translations.camping_equipment",
+  /* camping_equipment lives directly on `vehicles`, not per-language on descriptions_translations. */
+  "camping_equipment",
   // Image badge translations
   "image_badge_translations.translations_id.code",
   "image_badge_translations.image_badge_teaser",
@@ -196,10 +198,10 @@ export const DETAIL_FIELDS = [
    * Consequently, translations are retrieved directly via Knex in the service layer 
    * and subsequently appended to each depot row.
    */
-  "partner_selected.partner_id.primarix_id",
   // Media
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.uploaded_by.partner_selected",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -209,7 +211,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
-  "media.directus_files_id.tour32_export",
+  "media.tour32_export",
   "media.directus_files_id.dimensions_px",
   "media.directus_files_id.keyword_ids",
   "media.directus_files_id.folder.id",
@@ -219,18 +221,27 @@ export const DETAIL_FIELDS = [
 ];
 
 /**
- * Shared entities (`vehicles_surcharges`, `vehicles_rental_zones`, `vehicles_price_periods`, `vehicles_rental_periods`) 
- * are scoped to the `rental_company` rather than the individual vehicle. 
- * These are fetched via dedicated queries filtered by `rental_company_id`.
+ * `vehicles_surcharges`, `vehicles_rental_zones`, `vehicles_price_periods`, and
+ * `vehicles_rental_periods` aren't relations on `vehicles` itself — they're fetched via
+ * dedicated queries in fetchVehicleDetail.js: surcharges filtered by rental_company_id,
+ * zones/price periods/rental periods filtered by the ids actually referenced in the
+ * vehicle's own `vehicles_prices` rows.
  */
 export const SURCHARGE_FIELDS = [
   "id",
   "surcharge_booking_name",
-  "surcharge_type",
-  "surcharge_calc_type",
+  "buy_price",
+  /* surcharge_type/surcharge_calc_type are m2o relations (-> mandatory / calculation_method),
+   * not plain strings — fetch id + designation so the transformer can output a real name
+   * instead of the raw relation id. */
+  "surcharge_type.id",
+  "surcharge_type.designation",
+  "surcharge_calc_type.id",
+  "surcharge_calc_type.designation",
   "px_source_id",
   "surcharge_translations.translations_id.code",
   "surcharge_translations.surcharge_description",
+  "surcharge_translations.sell_price",
 ];
 
 export const ZONE_FIELDS = ["id", "name"];
@@ -248,56 +259,50 @@ export const RENTAL_PERIOD_FIELDS = [
 ];
 
 /**
- * Vehicle-specific pricing and calculations (`vehicles_prices`, `vehicles_price_calculation`, `vehicles_surcharges_calculation`) 
- * are directly scoped to the `vehicle_id` and are retrieved via dedicated queries.
+ * Vehicle-specific pricing (`vehicles_prices`) is directly scoped to the `vehicle_id` and
+ * retrieved via a dedicated query. It carries buy price + zone granularity, but no sell
+ * price — see `RENTAL_COMPANY_PRICE_FIELDS` below for that.
  */
 export const PRICE_FIELDS = ["id", "rental_zone", "price_period", "rental_period", "buy_price"];
 
+/**
+ * The real sell-price counterpart to `vehicles_prices`. `rental_companies_prices` is scoped
+ * to `vehicle_id` (no zone dimension) and carries `buy_price` values that mirror
+ * `vehicles_prices` exactly for the same (price_period, rental_period) — its own
+ * `prices_translations` relation is where sell price actually lives.
+ */
+export const RENTAL_COMPANY_PRICE_FIELDS = [
+  "id",
+  "price_period_id",
+  "rental_period_id",
+  "prices_translations.translations_id.code",
+  "prices_translations.sell_price",
+];
+
+/*
+ * `vehicles_price_calculation`/`vehicles_surcharges_calculation` (keyed by vehicle_id) hold
+ * zero rows live — the real settings are scoped to the *company*, one row per language, under
+ * `rental_companies_price_calculation_translations`/`rental_companies_surcharges_calculation_
+ * translations` (see fetchVehicleDetail.js). `from_price` is a real m2o to
+ * `rental_companies_prices` (the hotel-standard pattern — see buildPriceSettingsMap()), so its
+ * nested sell-price translations are fetched here too.
+ */
 export const PRICE_CALCULATION_FIELDS = [
+  "translations_id.code",
   "buy_price_type",
   "sell_price_type",
   "percentage_type",
   "provision_percentage",
   "margin_percentage",
   "exchange_rate",
-  "from_price",
+  "from_price.prices_translations.translations_id.code",
+  "from_price.prices_translations.sell_price",
 ];
 
 export const SURCHARGE_CALCULATION_FIELDS = [
+  "translations_id.code",
   "surcharge_percentage_type",
   "surcharge_provision_percentage",
   "surcharge_margin_percentage",
   "surcharge_exchange_rate",
-];
-
-/**
- * `camper_specs` does not possess a reverse alias on `rental-cars` (O2O via `camper_specs.vehicle`).
- * Thus, it is retrieved via a separate query filtered by `rentalCar.id`. 
- * Note: Only populated when `rental_type` is 'Camper'.
- */
-export const CAMPER_SPECS_FIELDS = [
-  "id",
-  "berths_adults",
-  "berths_children",
-  "seats_cab",
-  "seats_living",
-  "length_m",
-  "width_m",
-  "height_m",
-  "interior_height_m",
-  "transmission",
-  "fuel_type",
-  "engine_power_kw",
-  "fuel_tank_l",
-  "beds",
-  "fridge_l",
-  "freshwater_tank_l",
-  "wastewater_tank_l",
-  "highlights",
-  "rating_botg",
-  "equipment_features.availability",
-  "equipment_features.feature.id",
-  "equipment_features.feature.name",
-  "equipment_features.feature.category",
-  "equipment_features.feature.icon",
 ];

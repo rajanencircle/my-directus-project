@@ -1,12 +1,15 @@
-import { asyncWrapper } from "../../shared/asyncWrapper.js";
-import { validate } from "../../shared/validate.js";
-import { listSlimCampersSchema, listFullCampersSchema, getCamperDetailSchema } from "./campers.validation.js";
-import { createCampersController } from "./campers.controller.js";
+import { createCollectionResource } from "../../shared/createCollectionResource.js";
+import { campers as filters } from "../../shared/collectionFilters.js";
+import { LIST_FIELDS } from "./campers.fields.js";
+import { shapeCamperListItem, shapeCamperDetail } from "../../../transformers/camper.transformer.js";
+import { getCamperDetails } from "./campers.service.js";
 
-export function setupCampersRoutes(router, prefix, context) {
-  const { index, fullList, detail } = createCampersController(context);
-
-  router.get(prefix, validate(listSlimCampersSchema), asyncWrapper(index));
-  router.get(`${prefix}/full`, validate(listFullCampersSchema), asyncWrapper(fullList));
-  router.get(`${prefix}/:id`, validate(getCamperDetailSchema), asyncWrapper(detail));
-}
+export const setupCampersRoutes = createCollectionResource({
+  collection: "vehicles",
+  resourceLabel: "camper",
+  listFields: LIST_FIELDS,
+  filters: filters,
+  getDetails: getCamperDetails,
+  shapeListItem: shapeCamperListItem,
+  shapeDetail: shapeCamperDetail,
+});

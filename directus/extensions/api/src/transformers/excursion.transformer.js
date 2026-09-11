@@ -13,21 +13,21 @@ import {
   getLocaleCode,
   buildTranslationsMap,
   pickFromMap,
-} from "./shared/i18n.js";
-import { getGeoName, shapeGeoRefs } from "./shared/geo.js";
-import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
-import { toNumOrNull } from "./shared/numeric.js";
+} from "./helpers/i18n.js";
+import { getGeoName, shapeGeoRefs } from "./helpers/geo.js";
+import { buildThumbnailUrl, buildImageBadge } from "./helpers/media.js";
+import { toNumOrNull } from "./helpers/numeric.js";
 import {
   buildPricingConfig,
   buildPriceSettingsMap,
   buildSurchargeSettingsMap,
-} from "./shared/pricing.js";
-import { shapeOperatorAddress } from "./shared/address.js";
+} from "./helpers/pricing.js";
+import { shapeOperatorAddress } from "./helpers/address.js";
 import {
   shapeFrequency as sharedShapeFrequency,
   parseTravelRoutes,
   shapeRoutePlace as sharedShapeRoutePlace,
-} from "./shared/departures.js";
+} from "./helpers/departures.js";
 
 const EXCURSION_GROUP_ORDER = ["main"];
 
@@ -66,7 +66,12 @@ function shapeExcursionDates(
 }
 
 /**
- * Shapes the raw excursion data into a summarized list item format.
+ * @description Shapes the raw excursion data into a summarized list item format.
+ *
+ * Extracts core list fields and relies on `assembleResponse` to guarantee a fixed property
+ * shape and apply visibility rules.
+ *
+ * The `/excursions` endpoint uses this to quickly render lists of excursions.
  *
  * @param {Object} excursion - The raw excursion data from the database.
  * @param {string} lang - The language code for translations.
@@ -108,8 +113,13 @@ export function shapeExcursionListItem(excursion, lang) {
 }
 
 /**
- * Shapes the raw excursion data into a comprehensive detail format.
- * Aggregates translations, pricing, schedules, categories, surcharges, and metadata.
+ * @description Shapes the raw excursion data into a comprehensive detail format.
+ *
+ * Aggregates translations, pricing, schedules, categories, surcharges, and metadata. Prices
+ * are grouped by periods and occupancies, and `assembleResponse` filters fields like margin
+ * that shouldn't be exposed to the web audience.
+ *
+ * The `/excursions/:id` endpoint uses this for the detailed view of an excursion.
  *
  * @param {Object} excursion - The raw excursion data from the database.
  * @param {string} lang - The language code for translations.
@@ -205,15 +215,16 @@ export function shapeExcursionDetail(excursion, lang, { audience } = {}) {
         excursion.prices ?? [],
         (excursion.price_categories ?? [])
           .map((pc) => {
-            if (!pc.price_category) return null;
-            const transList = pc.price_category.translations ?? [];
+            const priceCategory = pc.excursions_price_categories_id;
+            if (!priceCategory?.price_category) return null;
+            const transList = priceCategory.price_category.translations ?? [];
             const transMap = buildTranslationsMap(transList, (t) => ({
               name: t.name,
             }));
             const trans = pickFromMap(transMap, lang);
             return {
-              ...pc.price_category,
-              value: pc.id,
+              ...priceCategory.price_category,
+              value: priceCategory.id,
               name: trans?.name ?? null,
             };
           })
@@ -409,17 +420,8 @@ export function shapeExcursionDetail(excursion, lang, { audience } = {}) {
           price_info_translations?.deviating_cancellation_terms ?? null,
         children_policy: price_info_translations?.children_policy ?? null,
         participants_text: price_info_translations?.participants_text ?? null,
-        mobility_advice: excursion.mobility_advice_text?.id
-          ? {
-              id: null,
-              name: pickFromMap(
-                buildTranslationsMap(
-                  excursion.mobility_advice_text.hotel_translations,
-                  (t) => t.hotel_mobility_advice_text ?? null,
-                ),
-                lang,
-              ),
-            }
+        mobility_advice: price_info_translations?.mobility_advice_text
+          ? { id: null, name: price_info_translations.mobility_advice_text }
           : null,
         supplementary: toSupplementaryBlocks(
           price_info_translations?.price_info_supplementary,

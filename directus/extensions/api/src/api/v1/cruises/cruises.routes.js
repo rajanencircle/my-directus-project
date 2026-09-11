@@ -1,12 +1,15 @@
-import { asyncWrapper } from "../../shared/asyncWrapper.js";
-import { validate } from "../../shared/validate.js";
-import { listSlimCruisesSchema, listFullCruisesSchema, getCruiseDetailSchema } from "./cruises.validation.js";
-import { createCruisesController } from "./cruises.controller.js";
+import { createCollectionResource } from "../../shared/createCollectionResource.js";
+import { cruises as filters } from "../../shared/collectionFilters.js";
+import { LIST_FIELDS } from "./cruises.fields.js";
+import { shapeCruiseListItem, shapeCruiseDetail } from "../../../transformers/cruise.transformer.js";
+import { getCruiseDetails } from "./cruises.service.js";
 
-export function setupCruisesRoutes(router, prefix, context) {
-  const { index, fullList, detail } = createCruisesController(context);
-
-  router.get(prefix, validate(listSlimCruisesSchema), asyncWrapper(index));
-  router.get(`${prefix}/full`, validate(listFullCruisesSchema), asyncWrapper(fullList));
-  router.get(`${prefix}/:id`, validate(getCruiseDetailSchema), asyncWrapper(detail));
-}
+export const setupCruisesRoutes = createCollectionResource({
+  collection: "cruises",
+  resourceLabel: "cruise",
+  listFields: LIST_FIELDS,
+  filters: filters,
+  getDetails: getCruiseDetails,
+  shapeListItem: shapeCruiseListItem,
+  shapeDetail: shapeCruiseDetail,
+});

@@ -1,5 +1,5 @@
 import { openapiSpec } from "./openapi.spec.js";
-import { setRedocCsp, setSwaggerCsp } from "../shared/docsCsp.js";
+import { setRedocCsp, setSwaggerCsp } from "../lib/docsCsp.js";
 import {
   BASE_DOCS_BODY_STYLE,
   API_BANNER_BASE_STYLE,
@@ -8,10 +8,10 @@ import {
   REDOC_CDN_SCRIPT,
   SWAGGER_CDN_CSS,
   SWAGGER_CDN_SCRIPTS,
-} from "../shared/docsAssets.js";
+} from "../lib/docsAssets.js";
 
-// Derive the displayed version from the spec itself so the banner can't drift
-// from the contract's info.version again (it used to be hardcoded as v1.2.0).
+/* Derive the displayed version from the spec itself so the banner can't drift
+ * from the contract's info.version again (it used to be hardcoded as v1.2.0). */
 const SPEC_VERSION = openapiSpec?.info?.version ?? "1.1.0";
 
 const REDOC_HTML = `<!DOCTYPE html>
@@ -48,10 +48,9 @@ const REDOC_HTML = `<!DOCTYPE html>
   <div id="api-banner">
     <span class="api-title">BOTG API — Internal</span>
     <span class="api-version">v${SPEC_VERSION}</span>
-    <span style="color:#a0b4cc; font-size:13px;">Hotels · Products · Cruises · Tours · Excursions · Rental Cars · Campers · Metadata</span>
-    <a class="api-contract-link" href="/api/v1/docs" target="_blank">Client contract docs ↗</a>
+    <a class="api-json-link" href="/api/v1/internal-openapi.json" target="_blank">OpenAPI JSON (Contract) ↗ </a>
+    
     <a class="api-swagger-link" href="/api/v1/internal-docs/swagger" target="_blank">Try it out (Swagger) ↗</a>
-    <a class="api-json-link" href="/api/v1/internal-openapi.json" target="_blank">OpenAPI JSON ↗</a>
   </div>
 
   <redoc
@@ -124,9 +123,9 @@ const SWAGGER_HTML = `<!DOCTYPE html>
         layout: "StandaloneLayout",
       });
 
-      // Observer to rename "Servers" and format dropdown options to just "v1", "v2"
+      /* Observer to rename "Servers" and format dropdown options to just "v1", "v2" */
       const observer = new MutationObserver(() => {
-        // Broad search for any label
+        /* Broad search for any label */
         const labels = document.querySelectorAll('.swagger-ui label');
         labels.forEach(label => {
           Array.from(label.childNodes).forEach(child => {
@@ -138,10 +137,10 @@ const SWAGGER_HTML = `<!DOCTYPE html>
           });
         });
 
-        // Broad search for any option in a select
+        /* Broad search for any option in a select */
         const options = document.querySelectorAll('.swagger-ui select option');
         options.forEach(opt => {
-          // If it says "/api/v1 - v1", or "/api/v1", simplify it to "v1"
+          /* If it says "/api/v1 - v1", or "/api/v1", simplify it to "v1" */
           const match = opt.textContent.match(/\\/api\\/(v\\d+)/);
           if (match) {
             opt.textContent = match[1];
@@ -163,9 +162,9 @@ export function setupInternalDocsRoutes(router, requireDocsAuth) {
       ...openapiSpec,
       servers: [
         {
-          url: "/api/v1"
-        }
-      ]
+          url: "/api/v1",
+        },
+      ],
     };
     res.json(spec);
   });

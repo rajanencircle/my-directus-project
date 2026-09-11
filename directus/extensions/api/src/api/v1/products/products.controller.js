@@ -2,6 +2,7 @@ import { sendPaginated, sendSuccess } from '../../shared/apiResponse.js';
 import { parsePagination } from '../../shared/pagination.js';
 import { listProducts, listProductsSlim, getProductById } from './products.service.js';
 import { shapeProduct } from '../../../transformers/product.transformer.js';
+import { applyPartnerMediaFilter } from '../../../utils/images.js';
 
 export function createProductsController(context) {
   return {
@@ -12,9 +13,10 @@ export function createProductsController(context) {
     async list(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
       const { lang, updated_after } = req.query;
+      const { apiUser } = req.context;
 
       const result = await listProductsSlim(
-        { page, limit, offset, updated_after, lang: lang ?? null },
+        { page, limit, offset, updated_after, lang: lang ?? null, apiUser },
         context,
       );
 
@@ -28,13 +30,14 @@ export function createProductsController(context) {
     async full(req, res) {
       const { page, limit, offset } = parsePagination(req.query);
       const { lang, updated_after } = req.query;
+      const { apiUser } = req.context;
 
       const result = await listProducts(
-        { page, limit, offset, updated_after },
+        { page, limit, offset, updated_after, apiUser },
         context,
       );
 
-      const data = result.data.map(item => shapeProduct(item, lang ?? null, { allowTombstone: true }));
+      const data = result.data.map(item => shapeProduct(applyPartnerMediaFilter(item, apiUser), lang ?? null, { allowTombstone: true }));
 
       return sendPaginated(res, { ...result, data });
     },
@@ -46,9 +49,10 @@ export function createProductsController(context) {
     async detail(req, res) {
       const { id } = req.params;
       const { lang } = req.query;
+      const { apiUser } = req.context;
 
-      const item = await getProductById({ id }, context);
-      const data = shapeProduct(item, lang ?? null);
+      const item = await getProductById({ id, apiUser }, context);
+      const data = shapeProduct(applyPartnerMediaFilter(item, apiUser), lang ?? null);
 
       return sendSuccess(res, data);
     },

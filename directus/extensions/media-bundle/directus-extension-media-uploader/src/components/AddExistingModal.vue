@@ -3,6 +3,13 @@ import { computed, inject, onMounted, ref, watch } from "vue";
 import type { ComputedRef } from "vue";
 import { useApi } from "@directus/extensions-sdk";
 import { useT } from "../composables/useT";
+import { partnerAlbumOrFilter, usePartnerScope } from "../../../media-library/src/composables/usePartnerScope";
+import {
+  partnerAccentStyle,
+  partnerLabelFromUser,
+  partnerVisuallyFromUser,
+  userDisplayName,
+} from "../../../media-library/src/utils/partnerAccent";
 
 type UploaderLabels = Record<string, string>
 const labels = inject<ComputedRef<UploaderLabels>>('uploaderLabels')
@@ -10,6 +17,7 @@ const lbl = (key: string, fallback: string) => labels?.value?.[key] ?? fallback
 const { t } = useT()
 import FolderDropdown from "./FolderDropdown.vue";
 import ExpiryInfoDialog from "./ExpiryInfoDialog.vue";
+import PartnerInfoDialog from "./PartnerInfoDialog.vue";
 import { isExpired } from "../utils/expiry.js";
 import {
   extractJunctionFileId,
@@ -18,7 +26,6 @@ import {
 } from "../utils/fileReverseLinks.js";
 import LinkedCollectionsDialog from "./LinkedCollectionsDialog.vue";
 import FileThumbPreview from "./FileThumbPreview.vue";
-
 type ID = string | number;
 
 interface DirectusFile {
@@ -28,7 +35,13 @@ interface DirectusFile {
   type: string | null;
   expiry_date?: string | null;
   draft_status?: string | null;
+  created_on?: string | null;
+  uploaded_on?: string | null;
   modified_on?: string | null;
+  generated_filename?: string | null;
+  description?: string | null;
+  copyright?: string | null;
+  uploaded_by?: unknown;
 }
 
 const props = withDefaults(
@@ -59,6 +72,7 @@ const emit = defineEmits<{
 }>();
 
 const api = useApi();
+const { partnerScopeId, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
 
 const loading = ref(false);
 const linking = ref(false);
@@ -76,6 +90,8 @@ const selectedIds = ref<Set<string>>(new Set());
 
 const expiryDialogOpen = ref(false);
 const expiryDialogFile = ref<DirectusFile | null>(null);
+const partnerInfoOpen = ref(false);
+const partnerInfoFile = ref<DirectusFile | null>(null);
 
 const linkedDialogOpen = ref(false);
 const linkedDialogFile = ref<DirectusFile | null>(null);
@@ -95,6 +111,41 @@ function openExpiryInfo(file: DirectusFile) {
   expiryDialogOpen.value = true;
 }
 
+function openPartnerInfo(file: DirectusFile) {
+  partnerInfoFile.value = file;
+  partnerInfoOpen.value = true;
+}
+
+function partnerInfoImageName(file: DirectusFile | null): string {
+  if (!file) return "";
+  return (
+    file.generated_filename?.trim() ||
+    file.title?.trim() ||
+    file.filename_download?.trim() ||
+    ""
+  );
+}
+
+function partnerInfoUploadedBy(file: DirectusFile | null): string {
+  return userDisplayName(file?.uploaded_by) || "";
+}
+
+function partnerInfoPartnerName(file: DirectusFile | null): string {
+  return partnerLabelFromUser(file?.uploaded_by) || "";
+}
+
+function partnerInfoUploadedDate(file: DirectusFile | null): string {
+  const iso = file?.uploaded_on ?? file?.created_on ?? null;
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return String(iso);
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+}
+
 function openLinkedCollections(file: DirectusFile) {
   linkedDialogFile.value = file;
   linkedDialogOpen.value = true;
@@ -104,9 +155,12 @@ async function loadAlbums() {
   albumsLoading.value = true;
   albumsError.value = null;
   try {
-    const res = await api.get("/items/albums_directus", {
-      params: { limit: -1, sort: ["name"], fields: ["id", "name"] },
-    });
+    await initPartnerScope();
+    const params: Record<string, unknown> = { limit: -1, sort: ["name"], fields: ["id", "name"] };
+    if (isPartnerScoped.value && partnerScopeId.value) {
+      params.filter = partnerAlbumOrFilter(partnerScopeId.value);
+    }
+    const res = await api.get("/items/albums_directus", { params });
     albums.value = (res.data?.data ?? []) as Album[];
     if (!selectedAlbumId.value && albums.value.length)
       selectedAlbumId.value = String(albums.value[0].id);
@@ -208,7 +262,47 @@ function isLinkedAnywhere(fileId: string): boolean {
 }
 
 function displayName(file: DirectusFile): string {
-  return file.title || file.filename_download || "Unnamed file";
+  return file.generated_filename?.trim() || "";
+}
+
+function filePartnerAccent(file: DirectusFile) {
+  return partnerAccentStyle(partnerVisuallyFromUser(file.uploaded_by));
+}
+
+function fileDescription(file: DirectusFile): string {
+  return file.description?.trim() || "";
+}
+
+function fileCopyright(file: DirectusFile): string {
+  const c = file.copyright?.trim() || "";
+  if (!c) return "";
+  return c.replace(/^©+\s*/, "").trim();
+}
+
+function hasFileCopyright(file: DirectusFile): boolean {
+  return fileCopyright(file).length > 0;
+}
+
+function fileCreateIso(file: DirectusFile): string | null {
+  return file.created_on ?? file.uploaded_on ?? null;
+}
+
+function formatRelativeTime(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return "";
+  const seconds = Math.round((Date.now() - then) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return days === 1 ? "1 day ago" : `${days} days ago`;
+  const months = Math.round(days / 30);
+  if (months < 12) return months === 1 ? "1 month ago" : `${months} months ago`;
+  const years = Math.round(months / 12);
+  return years === 1 ? "1 year ago" : `${years} years ago`;
 }
 
 function toggleSelect(id: string) {
@@ -261,7 +355,12 @@ async function fetchPage() {
   loading.value = true;
   loadError.value = null;
   try {
+    await initPartnerScope();
     const filterClauses: Record<string, unknown>[] = [];
+
+    if (isPartnerScoped.value) {
+      filterClauses.push({ uploaded_by: { partner_selected: { _eq: partnerScopeId.value } } });
+    }
 
     const q = search.value.trim();
     if (q) {
@@ -269,6 +368,9 @@ async function fetchPage() {
         _or: [
           { title: { _icontains: q } },
           { filename_download: { _icontains: q } },
+          { generated_filename: { _icontains: q } },
+          { description: { _icontains: q } },
+          { copyright: { _icontains: q } },
         ],
       });
     }
@@ -282,7 +384,27 @@ async function fetchPage() {
     else if (filterClauses.length > 1) filter = { _and: filterClauses };
 
     const params: Record<string, unknown> = {
-      fields: ["id", "title", "filename_download", "type", "expiry_date", "draft_status", "modified_on"],
+      fields: [
+        "id",
+        "title",
+        "filename_download",
+        "generated_filename",
+        "description",
+        "copyright",
+        "type",
+        "expiry_date",
+        "draft_status",
+        "created_on",
+        "uploaded_on",
+        "modified_on",
+        "uploaded_by.id",
+        "uploaded_by.first_name",
+        "uploaded_by.last_name",
+        "uploaded_by.email",
+        "uploaded_by.partner_selected.id",
+        "uploaded_by.partner_selected.visually",
+        "uploaded_by.partner_selected.label",
+      ],
       sort: ["-uploaded_on"],
       limit: perPage.value,
       offset: offset.value,
@@ -292,7 +414,10 @@ async function fetchPage() {
     if (filter) params.filter = filter;
 
     const res = await api.get("/files", { params });
-    const batch: DirectusFile[] = res.data?.data ?? [];
+    const batch: DirectusFile[] = (res.data?.data ?? []).map((f: any) => ({
+      ...f,
+      id: String(f.id),
+    }));
 
     files.value = batch;
     // Reset + refetch linked status lazily for the current page results.
@@ -494,67 +619,133 @@ onMounted(() => {
               :title="displayName(file)"
               @click="toggleSelect(file.id)"
             >
-              <div class="thumb">
-                <FileThumbPreview
-                  :file-id="file.id"
-                  :mime-type="file.type"
-                  :filename="file.filename_download"
-                  :alt="displayName(file)"
-                  :size="thumbnailSize"
-                  :modified-on="file.modified_on"
-                />
-                <div class="badges-row">
-                  <div class="badges-left">
-                    <span
-                      v-if="
-                        alreadyLinkedFileIds.includes(file.id) &&
-                        !isLinkedAnywhere(file.id)
-                      "
-                      class="badge badge-linked"
-                    >
-                      {{ lbl('badgeLinked', 'Linked') }}
-                    </span>
-                    <span
-                      v-else-if="isLinkedAnywhere(file.id)"
-                      class="badge badge-linked badge-linked-clickable"
-                      role="button"
-                      tabindex="0"
-                      :title="linkedLoading ? t('loading') : t('view_linked_collections')"
-                      @click.stop="openLinkedCollections(file)"
-                      @keydown.enter.stop="openLinkedCollections(file)"
-                      @keydown.space.prevent.stop="openLinkedCollections(file)"
-                    >
-                      {{ lbl('badgeLinked', 'Linked') }}
-                    </span>
-                    <span
-                      v-if="isExpired(file.expiry_date)"
-                      class="badge badge-expired"
-                      role="button"
-                      tabindex="0"
-                      :title="lbl('whyExpired', 'Why is this expired?')"
-                      @click.stop="openExpiryInfo(file)"
-                      @keydown.enter.stop="openExpiryInfo(file)"
-                      @keydown.space.prevent.stop="openExpiryInfo(file)"
-                    >
-                      {{ lbl('badgeExpired', "Don't use") }}
-                    </span>
-                    <span
-                      v-if="file.draft_status === 'draft'"
-                      class="badge badge-draft"
-                    >
-                      {{ lbl('badgeDraft', 'Draft') }}
-                    </span>
-                  </div>
+              <div
+                class="media-shell"
+                :class="{ 'has-partner-accent': !!filePartnerAccent(file) }"
+                :style="filePartnerAccent(file)"
+              >
+                <div class="thumb">
+                  <FileThumbPreview
+                    class="thumb-preview"
+                    :file-id="file.id"
+                    :mime-type="file.type"
+                    :filename="file.filename_download"
+                    :alt="displayName(file)"
+                    :modified-on="file.modified_on"
+                    :show-kind-badge="false"
+                  />
+                  <div class="badges-row">
+                    <div class="badges-left">
+                      <button
+                        v-if="filePartnerAccent(file)"
+                        type="button"
+                        class="partner-info-btn"
+                        title="Media info"
+                        @click.stop="openPartnerInfo(file)"
+                      >
+                        <v-icon name="info" filled small />
+                      </button>
+                      <span
+                        v-if="
+                          alreadyLinkedFileIds.includes(file.id) &&
+                          !isLinkedAnywhere(file.id)
+                        "
+                        class="badge badge-linked"
+                      >
+                        {{ lbl('badgeLinked', 'Linked') }}
+                      </span>
+                      <span
+                        v-else-if="isLinkedAnywhere(file.id)"
+                        class="badge badge-linked badge-linked-clickable"
+                        role="button"
+                        tabindex="0"
+                        :title="linkedLoading ? t('loading') : t('view_linked_collections')"
+                        @click.stop="openLinkedCollections(file)"
+                        @keydown.enter.stop="openLinkedCollections(file)"
+                        @keydown.space.prevent.stop="openLinkedCollections(file)"
+                      >
+                        {{ lbl('badgeLinked', 'Linked') }}
+                      </span>
+                      <span
+                        v-if="file.draft_status === 'draft'"
+                        class="badge badge-draft"
+                      >
+                        {{ lbl('badgeDraft', 'Draft') }}
+                      </span>
+                    </div>
 
-                  <div v-if="selectedIds.has(file.id)" class="badges-right">
-                    <span class="badge badge-selected">
-                      <v-icon name="check" x-small />
-                    </span>
+                    <div class="badges-right">
+                      <span
+                        v-if="isExpired(file.expiry_date)"
+                        class="badge badge-expired"
+                        role="button"
+                        tabindex="0"
+                        :title="lbl('whyExpired', 'Why is this expired?')"
+                        @click.stop="openExpiryInfo(file)"
+                        @keydown.enter.stop="openExpiryInfo(file)"
+                        @keydown.space.prevent.stop="openExpiryInfo(file)"
+                      >
+                        {{ lbl('badgeExpired', "Don't use") }}
+                      </span>
+                      <span
+                        v-if="selectedIds.has(file.id)"
+                        class="badge badge-selected"
+                      >
+                        <v-icon name="check" x-small />
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="meta">
-                <p class="name">{{ displayName(file) }}</p>
+
+                <div class="card-footer">
+                  <div class="card-meta">
+                    <p
+                      class="meta-primary"
+                      :class="{ 'is-empty': !displayName(file) }"
+                      :title="displayName(file) || undefined"
+                    >
+                      <span class="meta-primary-text">{{
+                        displayName(file) || '\u00a0'
+                      }}</span>
+                    </p>
+                    <p
+                      v-if="fileDescription(file)"
+                      class="meta-line"
+                      :title="fileDescription(file)"
+                    >
+                      {{ fileDescription(file) }}
+                    </p>
+                    <div
+                      v-if="
+                        hasFileCopyright(file) ||
+                        formatRelativeTime(fileCreateIso(file))
+                      "
+                      class="meta-footer"
+                      :class="{
+                        'meta-footer--time-only': !hasFileCopyright(file),
+                      }"
+                    >
+                      <span
+                        v-if="hasFileCopyright(file)"
+                        class="meta-copyright"
+                        :title="`© ${fileCopyright(file)}`"
+                      >
+                        © {{ fileCopyright(file) }}
+                      </span>
+                      <span
+                        v-else-if="formatRelativeTime(fileCreateIso(file))"
+                        class="meta-copyright-spacer"
+                      />
+                      <span
+                        v-if="formatRelativeTime(fileCreateIso(file))"
+                        class="meta-time"
+                      >
+                        <v-icon name="schedule" x-small />
+                        {{ formatRelativeTime(fileCreateIso(file)) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </button>
           </div>
@@ -717,6 +908,14 @@ onMounted(() => {
     :filename="expiryDialogFile?.filename_download ?? null"
   />
 
+  <PartnerInfoDialog
+    v-model="partnerInfoOpen"
+    :image-name="partnerInfoImageName(partnerInfoFile)"
+    :uploaded-by="partnerInfoUploadedBy(partnerInfoFile)"
+    :uploaded-date="partnerInfoUploadedDate(partnerInfoFile)"
+    :partner-name="partnerInfoPartnerName(partnerInfoFile)"
+  />
+
   <LinkedCollectionsDialog
     v-if="linkedDialogOpen && linkedDialogFile"
     :file-id="linkedDialogFile.id"
@@ -731,7 +930,7 @@ onMounted(() => {
 
 <style scoped>
 .add-existing-card {
-  width: 860px;
+  width: 920px;
   max-width: 96vw;
   font-family: var(--theme--fonts--sans--font-family);
 }
@@ -791,120 +990,193 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 12px;
-  align-items: end;
+  align-items: center;
+}
+
+.toolbar .search,
+.toolbar .folder {
+  min-width: 0;
+}
+
+.toolbar .search :deep(.input),
+.toolbar .folder :deep(.trigger) {
+  min-height: 40px;
 }
 
 .grid-wrap {
   border: 1px solid var(--theme--border-color);
   border-radius: var(--theme--border-radius);
   background: var(--theme--background-normal);
-  max-height: 520px;
+  min-height: 320px;
+  max-height: 560px;
   overflow: auto;
-  padding: 12px;
+  padding: 16px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+  align-items: stretch;
 }
 
 .tile {
   appearance: none;
-  border: 1px solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius);
-  background: var(--theme--background-subdued);
+  border: none;
+  background: transparent;
   padding: 0;
   text-align: left;
   cursor: pointer;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--theme--fonts--sans--font-family);
+  outline: none;
+}
+
+.media-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  flex: 1;
+  min-height: 100%;
   overflow: hidden;
-  transition:
-    border-color 0.15s,
-    transform 0.08s;
+  border-radius: 12px;
+  border: 1px solid var(--theme--border-color-subdued, var(--theme--border-color));
+  background: var(--theme--background);
 }
 
-.tile:hover {
+.media-shell.has-partner-accent .meta-footer {
+  border-top-color: var(--partner-accent);
+}
+
+.media-shell.has-partner-accent .meta-footer--time-only {
+  padding-top: 6px;
+  border-top: 1px solid var(--partner-accent);
+}
+
+.partner-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--partner-accent) 35%, #fff);
+  color: var(--partner-accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  outline: none;
+  --v-icon-size: 20px;
+  --v-icon-color: var(--partner-accent);
+}
+
+.partner-info-btn :deep(.v-icon),
+.partner-info-btn :deep(i) {
+  font-variation-settings: 'FILL' 1;
+  font-weight: 600;
+}
+
+.partner-info-btn:hover,
+.partner-info-btn:focus-visible {
+  background: color-mix(in srgb, var(--partner-accent) 12%, #fff);
+}
+
+.tile.selected .media-shell {
   border-color: var(--theme--primary);
-  transform: translateY(-1px);
 }
 
-.tile.selected {
-  border-color: var(--theme--primary);
-  box-shadow: 0 0 0 2px
-    color-mix(in srgb, var(--theme--primary) 20%, transparent);
+.tile.linked .media-shell {
+  opacity: 0.92;
 }
 
-.tile.linked {
-  opacity: 0.85;
+.tile:focus-visible .media-shell {
+  outline: 2px solid color-mix(in srgb, var(--theme--primary) 35%, transparent);
+  outline-offset: 2px;
 }
 
 .thumb {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: var(--theme--background-normal);
-  border-bottom: 1px solid var(--theme--border-color);
+  overflow: hidden;
+  background: var(--theme--background-subdued);
+  flex-shrink: 0;
 }
 
-.thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.thumb-preview {
   display: block;
-}
-
-.thumb-fallback {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--theme--foreground-subdued);
+  transform-origin: center center;
+  transition: transform 0.55s ease;
+  will-change: transform;
+}
+
+.tile:hover .thumb-preview {
+  transform: scale(1.045);
 }
 
 .badges-row {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
+  top: 10px;
+  left: 10px;
+  right: 10px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
+  z-index: 2;
 }
 
 .badges-left {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
+  flex-wrap: wrap;
 }
 
 .badges-right {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  min-height: 28px;
   border-radius: 999px;
-  padding: 4px 8px;
+  padding: 0 10px;
   font-size: 11px;
   font-weight: 700;
+  line-height: 1;
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(6px);
   max-width: 100%;
+  white-space: nowrap;
 }
 
 .badge-selected {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
   padding: 0;
   background: color-mix(in srgb, var(--theme--primary) 75%, black);
   border-color: rgba(255, 255, 255, 0.25);
@@ -926,12 +1198,11 @@ onMounted(() => {
 
 .badge-expired {
   gap: 8px;
-  background: color-mix(
-    in srgb,
-    var(--theme--warning, #fd7e14) 30%,
-    rgba(0, 0, 0, 0.45)
-  );
-  border-color: rgba(255, 255, 255, 0.25);
+  min-height: 28px;
+  color: var(--theme--danger, #dc3545);
+  background: #fff;
+  border-color: color-mix(in srgb, var(--theme--danger, #dc3545) 25%, #fff);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
@@ -945,8 +1216,120 @@ onMounted(() => {
   user-select: none;
 }
 
-.meta {
-  padding: 8px 10px;
+.card-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 12px 14px 13px;
+  background: var(--theme--background);
+  border: none;
+  border-top: 1px solid var(--theme--border-color-subdued, var(--theme--border-color));
+}
+
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.meta-primary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  min-width: 0;
+  min-height: calc(13px * 1.35);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--theme--foreground);
+  line-height: 1.35;
+}
+
+.meta-primary.is-empty {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.meta-primary-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.meta-secondary {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--theme--foreground-subdued);
+  line-height: 1.3;
+}
+
+.meta-line {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--theme--foreground-subdued);
+  line-height: 1.35;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.meta-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--theme--border-color-subdued, var(--theme--border-color));
+}
+
+.meta-footer--time-only {
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 0;
+  border-top: none;
+}
+
+.meta-copyright {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 10px;
+  color: var(--theme--foreground-subdued);
+}
+
+.meta-copyright-spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.meta-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--theme--foreground-subdued);
+  white-space: nowrap;
 }
 
 .name {
@@ -962,10 +1345,13 @@ onMounted(() => {
 .empty,
 .end {
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 14px 10px 6px;
+  min-height: 300px;
+  padding: 14px 10px;
   color: var(--theme--foreground-subdued);
   font-size: 13px;
+  box-sizing: border-box;
 }
 
 .notice {
@@ -1033,17 +1419,35 @@ onMounted(() => {
 
 .album-actions {
   display: flex;
-  gap: 10px;
-  padding: 0 20px 20px;
   align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  min-height: 64px;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  border-top: 1px solid var(--theme--border-color-subdued, var(--theme--border-color));
+  background: var(--theme--background);
 }
 
 .card-actions {
   display: flex;
-  gap: 8px;
-  padding: 0 20px 20px;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 64px;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  border-top: 1px solid var(--theme--border-color-subdued, var(--theme--border-color));
+  background: var(--theme--background);
+}
+
+.card-actions :deep(.v-button) {
+  width: auto;
+  flex: 0 0 auto;
 }
 
 .pagination {

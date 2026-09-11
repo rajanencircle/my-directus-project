@@ -5,11 +5,18 @@ import FolderTreeItem from './FolderTreeItem.vue'
 import { useMediaSettings } from '../../composables/useMediaSettings'
 import { resolveTranslatable } from '../../utils/translations'
 import { useT } from '../../composables/useT'
+import {
+  fetchDirectFolderFileCounts,
+  formatFolderStats,
+  getFolderStats,
+} from '../../utils/folderStats'
+import { partnerVisuallyFromCreatedBy } from '../../composables/usePartnerScope'
 
 interface DirectusFolder {
   id: string
   name: string
   parent: string | null
+  createdByPartnerVisually?: string | null
 }
 
 type FolderNode = DirectusFolder & { children: FolderNode[] }
@@ -17,6 +24,10 @@ type FolderNode = DirectusFolder & { children: FolderNode[] }
 const props = defineProps<{
   modelValue: string | null
   excludeId?: string | null
+  /** Extra folder ids to hide (e.g. descendants when moving a folder). */
+  excludeIds?: string[]
+  /** Show file and subfolder counts beside each folder row. */
+  showStats?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -31,6 +42,8 @@ const lbl = (key: keyof typeof settings.value, fallback: string) =>
 
 const folders = ref<DirectusFolder[]>([])
 const loading = ref(false)
+const statsLoading = ref(false)
+const directFileCounts = ref<Map<string | null, number>>(new Map())
 const noAccess = ref(false)
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
@@ -49,12 +62,18 @@ function normalizeFolderRaw(item: Record<string, unknown>): DirectusFolder {
     id: String(item.id ?? ''),
     name: String(item.name ?? ''),
     parent: normalizeParentId(item.parent),
+    createdByPartnerVisually: partnerVisuallyFromCreatedBy(item.created_by),
   }
 }
 
-const visibleFolders = computed(() =>
-  props.excludeId ? folders.value.filter((f) => f.id !== props.excludeId) : folders.value
-)
+const visibleFolders = computed(() => {
+  const banned = new Set<string>([
+    ...(props.excludeId ? [props.excludeId] : []),
+    ...(props.excludeIds ?? []),
+  ])
+  if (!banned.size) return folders.value
+  return folders.value.filter((f) => !banned.has(f.id))
+})
 
 const folderMap = computed(() => new Map(visibleFolders.value.map((f) => [String(f.id), f])))
 
@@ -99,6 +118,24 @@ const folderTree = computed<FolderNode[]>(() => {
 const expanded = ref<Set<string>>(new Set())
 provide('folderDropdownExpanded', expanded)
 
+function folderStatsLabel(folderId: string | null): string | null {
+  if (!props.showStats || statsLoading.value) return null
+  const stats = getFolderStats(folderId, visibleFolders.value, directFileCounts.value)
+  return formatFolderStats(stats)
+}
+
+provide('folderDropdownStatsLabel', folderStatsLabel)
+
+async function fetchFolderStats() {
+  if (!props.showStats) return
+  statsLoading.value = true
+  try {
+    directFileCounts.value = await fetchDirectFolderFileCounts(api)
+  } finally {
+    statsLoading.value = false
+  }
+}
+
 function toggleExpand(id: string) {
   const next = new Set(expanded.value)
   if (next.has(id)) next.delete(id)
@@ -133,8 +170,27 @@ async function fetchFolders(opts?: { silent?: boolean }) {
   const silent = opts?.silent === true
   if (!silent) loading.value = true
   try {
-    const res = await api.get('/folders', { params: { limit: -1, fields: 'id,name,parent' } })
-    const rows = Array.isArray(res.data?.data) ? res.data.data : []
+    let rows: Record<string, unknown>[] = []
+    try {
+      const res = await api.get('/folders', {
+        params: {
+          limit: -1,
+          fields: [
+            'id',
+            'name',
+            'parent',
+            'created_by.partner_selected.id',
+            'created_by.partner_selected.visually',
+          ],
+        },
+      })
+      rows = Array.isArray(res.data?.data) ? res.data.data : []
+    } catch {
+      const res = await api.get('/folders', {
+        params: { limit: -1, fields: 'id,name,parent' },
+      })
+      rows = Array.isArray(res.data?.data) ? res.data.data : []
+    }
     folders.value = rows.map((r: Record<string, unknown>) => normalizeFolderRaw(r))
   } catch (e: any) {
     if (e?.response?.status === 403) noAccess.value = true
@@ -159,6 +215,14 @@ watch(
     if (!open) return
     if (props.modelValue) expandAncestors(String(props.modelValue))
     fetchFolders({ silent: folders.value.length > 0 })
+    if (props.showStats) fetchFolderStats()
+  },
+)
+
+watch(
+  () => props.showStats,
+  (enabled) => {
+    if (enabled && isOpen.value) fetchFolderStats()
   },
 )
 </script>
@@ -200,6 +264,9 @@ watch(
           <v-icon name="folder_special" small class="folder-tree-icon folder-tree-icon--root" />
           <span class="folder-tree-label folder-tree-label--root">
             <span class="folder-tree-label-title">{{ lbl('folder_root', 'File Library') }}</span>
+            <span v-if="showStats && folderStatsLabel(null)" class="folder-tree-meta">
+              {{ folderStatsLabel(null) }}
+            </span>
           </span>
           <span class="folder-tree-chevron-spacer" />
         </div>
@@ -207,11 +274,12 @@ watch(
 
       <div class="folder-tree">
         <FolderTreeItem
-          v-for="node in folderTree"
+          v-for="(node, index) in folderTree"
           :key="node.id"
           :node="node"
           :depth="0"
           :active-id="modelValue"
+          :is-last="index === folderTree.length - 1"
           @select="select"
           @toggle="toggleExpand"
         />
@@ -230,12 +298,15 @@ watch(
 .trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
-  padding: var(--theme--form--field--input--padding, 10px 12px);
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  box-sizing: border-box;
   background: var(--theme--background-normal);
   border: 1px solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius);
+  border-radius: var(--theme--border-radius, 6px);
   color: var(--theme--foreground);
   font-family: inherit;
   font-size: 14px;
@@ -272,8 +343,7 @@ watch(
 
 .trigger-library {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   min-width: 0;
 }
 
@@ -299,7 +369,9 @@ watch(
   left: 0;
   right: 0;
   max-height: 300px;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 8px 0 10px;
   background: var(--theme--background-normal);
   border: 1px solid var(--theme--border-color);
@@ -318,10 +390,12 @@ watch(
 .folder-tree {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .folder-tree-row {
   width: 100%;
+  min-width: 0;
   outline: none;
 }
 
@@ -329,6 +403,8 @@ watch(
   padding: 2px 8px;
   margin: 0 4px;
   border-radius: 8px;
+  min-width: 0;
+  overflow: hidden;
   transition: background 0.12s ease;
 }
 
@@ -349,6 +425,8 @@ watch(
   align-items: center;
   gap: 10px;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 44px;
   padding: 8px 4px;
   box-sizing: border-box;
@@ -380,9 +458,22 @@ watch(
 
 .folder-tree-label--root {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  white-space: normal;
+}
+
+.folder-tree-meta {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--theme--foreground-subdued);
+  line-height: 1.3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .folder-tree-label-title {

@@ -8,6 +8,9 @@ const DEFAULTS = {
   modelKey:   'model',
 } as const;
 
+/** Fail the upstream AI call instead of leaving the XHR pending forever. */
+const AI_FETCH_TIMEOUT_MS = 60_000;
+
 export default defineEndpoint({
   id: 'ai-translations',
   handler: (router, { database }: any) => {
@@ -17,16 +20,19 @@ export default defineEndpoint({
      * The client only supplies the collection+field identifiers so we know WHICH
      * field to read — the actual config values (collection name, entity type, key
      * names) are never taken from the request body.
+     *
+     * This project stores interface options in the flat `options` JSON column
+     * (not a `meta` blob). Querying `meta` throws and leaves the request hanging.
      */
     async function resolveConfig(sourceCollection: string, sourceField: string) {
       const row = await database('directus_fields')
         .where({ collection: sourceCollection, field: sourceField })
-        .select('meta')
+        .select('options')
         .first();
 
-      const rawMeta = row?.meta ?? {};
-      const meta = typeof rawMeta === 'string' ? JSON.parse(rawMeta) : rawMeta;
-      const options = meta?.options ?? {};
+      const rawOptions = row?.options ?? {};
+      const options =
+        typeof rawOptions === 'string' ? JSON.parse(rawOptions) : rawOptions;
 
       return {
         collection: options.configCollection || DEFAULTS.collection,
@@ -69,17 +75,34 @@ export default defineEndpoint({
     }
 
     async function callAI(apiUrl: string, apiKey: string, model: string, prompt: string): Promise<string> {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      });
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), AI_FETCH_TIMEOUT_MS);
+
+      let response: Response;
+      try {
+        response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: prompt }],
+          }),
+          signal: controller.signal,
+        });
+      } catch (err: any) {
+        if (err?.name === 'AbortError') {
+          throw Object.assign(
+            new Error(`Translation API timed out after ${AI_FETCH_TIMEOUT_MS / 1000}s`),
+            { status: 504 },
+          );
+        }
+        throw err;
+      } finally {
+        clearTimeout(timer);
+      }
 
       if (!response.ok) {
         const errorBody = await response.text();
@@ -105,13 +128,13 @@ export default defineEndpoint({
         return res.status(400).json({ error: 'Missing required fields: sourceCollection, sourceField' });
       }
 
-      const cfg = await resolveConfig(sourceCollection, sourceField);
-      const { apiUrl, apiKey, model } = await getConfig(cfg);
-      if (!apiUrl || !apiKey || !model) {
-        return res.status(500).json({ error: missingConfigError(cfg) });
-      }
-
       try {
+        const cfg = await resolveConfig(sourceCollection, sourceField);
+        const { apiUrl, apiKey, model } = await getConfig(cfg);
+        if (!apiUrl || !apiKey || !model) {
+          return res.status(500).json({ error: missingConfigError(cfg) });
+        }
+
         const prompt =
           `Translate the following text from ${sourceLanguage ?? 'the source language'} to ${targetLanguage}. ` +
           `Return only the translation, no extra text or markdown.\n\nText: ${text}`;
@@ -145,13 +168,13 @@ export default defineEndpoint({
         return res.status(400).json({ error: 'Missing required fields: sourceCollection, sourceField' });
       }
 
-      const cfg = await resolveConfig(sourceCollection, sourceField);
-      const { apiUrl, apiKey, model } = await getConfig(cfg);
-      if (!apiUrl || !apiKey || !model) {
-        return res.status(500).json({ error: missingConfigError(cfg) });
-      }
-
       try {
+        const cfg = await resolveConfig(sourceCollection, sourceField);
+        const { apiUrl, apiKey, model } = await getConfig(cfg);
+        if (!apiUrl || !apiKey || !model) {
+          return res.status(500).json({ error: missingConfigError(cfg) });
+        }
+
         const prompt =
           `Translate all string values in the following JSON object from ${sourceLanguage ?? 'the source language'} to ${targetLanguage}. ` +
           `Return ONLY a valid JSON object with the exact same keys and translated string values. ` +

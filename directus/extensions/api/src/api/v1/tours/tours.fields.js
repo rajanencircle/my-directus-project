@@ -49,6 +49,7 @@ export const LIST_FIELDS = [
   // Media fields for thumbnail
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.uploaded_by.partner_selected",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -58,7 +59,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
-  "media.directus_files_id.tour32_export",
+  "media.tour32_export",
   "media.directus_files_id.dimensions_px",
   "media.directus_files_id.keyword_ids",
   "media.directus_files_id.folder.id",
@@ -255,7 +256,6 @@ export const DETAIL_FIELDS = [
   "countries.countries_id.destination_id.translations.name",
   "countries.countries_id.destination_id.translations.translations_id.code",
   "partner_selected.partner_id.id",
-  "partner_selected.partner_id.primarix_id",
   "partner_selected.partner_id.label",
   "partner_selected.partner_id.partner_type",
   "partner_selected.partner_id.status",
@@ -272,19 +272,24 @@ export const DETAIL_FIELDS = [
   /* Localized names are stored natively in `category_original` via the standard `translations_id` pattern. */
   "categories.translations.category_original",
   "categories.translations.category_text",
-  // Occupancies
+  /* Occupancies resolve through the `tours_occupancies_selected` junction (`tours.occupancies` is an m2m,
+   * unlike cruises' direct o2m). The junction row carries only `tours_occupancies_id`, so the actual
+   * occupancy record (and its `occupancy_from` flag) lives one level deeper under that key. */
   "occupancies.id",
-  "occupancies.occupancy.id",
-  "occupancies.occupancy.name",
-  "occupancies.occupancy.translations.name",
-  "occupancies.occupancy.translations.translations_id.code",
-  "occupancies.occupancy_from",
-  /* Pricing metrics. Note: Contains `buy_price` only, as `sell_price` translation joins are not currently wired for tours. */
+  "occupancies.tours_occupancies_id.id",
+  "occupancies.tours_occupancies_id.occupancy.id",
+  "occupancies.tours_occupancies_id.occupancy.name",
+  "occupancies.tours_occupancies_id.occupancy.translations.name",
+  "occupancies.tours_occupancies_id.occupancy.translations.translations_id.code",
+  "occupancies.tours_occupancies_id.occupancy_from",
+  /* Pricing metrics, including per-language sell price via the tours_prices_translations junction. */
   "prices.id",
   "prices.tours_category_id",
   "prices.price_period_id",
   "prices.occupancy_id",
   "prices.buy_price",
+  "prices.tours_prices_translations.translations_id.code",
+  "prices.tours_prices_translations.sell_price",
   // Price periods
   "price_periods.id",
   "price_periods.price_period_start",
@@ -301,7 +306,14 @@ export const DETAIL_FIELDS = [
   "price_calculation_translations.provision_percentage",
   "price_calculation_translations.margin_percentage",
   "price_calculation_translations.exchange_rate",
+  /* `from_price` is an M2O to `tours_prices` (confirmed via schema: foreign_key_table
+   * tours_prices) — same shape as hotels' `room_prices` wiring, not a period. Nested
+   * sell-price translations are fetched here (fixed — previously only the bare id was
+   * fetched, so buildPriceSettingsMap's `row.from_price?.tours_prices_translations` lookup
+   * in pricing.js could never match and silently fell back to returning the raw id). */
   "price_calculation_translations.from_price",
+  "price_calculation_translations.from_price.tours_prices_translations.translations_id.code",
+  "price_calculation_translations.from_price.tours_prices_translations.sell_price",
   /* Surcharge calculation settings per market, establishing base margins for `surcharges[].margin`. */
   "surcharges_calculation_translations.translations_id.code",
   "surcharges_calculation_translations.surcharge_percentage_type",
@@ -311,6 +323,7 @@ export const DETAIL_FIELDS = [
   // Media
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.uploaded_by.partner_selected",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -320,7 +333,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
-  "media.directus_files_id.tour32_export",
+  "media.tour32_export",
   "media.directus_files_id.dimensions_px",
   "media.directus_files_id.keyword_ids",
   "media.directus_files_id.folder.id",
@@ -334,6 +347,7 @@ export const DETAIL_FIELDS = [
 export const SURCHARGE_FIELDS = [
   "id",
   "surcharge_booking_name",
+  "buy_price",
   "px_source_id",
   "surcharge_type.id",
   "surcharge_type.designation",
@@ -341,4 +355,5 @@ export const SURCHARGE_FIELDS = [
   "calculation_method.designation",
   "translations.translations_id.code",
   "translations.surcharge_description",
+  "translations.sell_price",
 ];

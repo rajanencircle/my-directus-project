@@ -33,29 +33,36 @@
         <v-icon name="delete" />
       </v-button>
 
-      <!-- Batch edit (multi selection only) -->
+      <!-- Add selected files to an album -->
       <v-button
-        v-if="selectedIds.length > 1"
-        v-tooltip.bottom="t('edit')"
+        v-if="selectedIds.length > 0"
+        v-tooltip.bottom="'Add to Album'"
         icon
         small
         rounded
         secondary
-        @click="batchEditActive = true"
+        @click="addToAlbumOpen = true"
       >
-        <v-icon name="edit" />
+        <v-icon name="playlist_add" />
       </v-button>
 
       <AddFolder :parent="foldersStore.selectedFolderId" />
 
-      <!-- View toggle -->
-      <v-button icon small rounded secondary :v-tooltip.bottom="viewMode === 'list' ? 'Switch to grid' : 'Switch to list'" @click="viewMode = viewMode === 'list' ? 'grid' : 'list'">
-        <v-icon :name="viewMode === 'list' ? 'grid_view' : 'view_list'" />
+      <!-- View toggle — same size as create-folder -->
+      <v-button
+        v-tooltip.bottom="viewMode === 'list' ? 'Switch to grid' : 'Switch to list'"
+        icon
+        small
+        rounded
+        secondary
+        @click="viewMode = viewMode === 'list' ? 'grid' : 'list'"
+      >
+        <v-icon small :name="viewMode === 'list' ? 'grid_view' : 'view_list'" />
       </v-button>
 
-      <!-- Upload -->
-      <v-button icon small rounded @click="showUploadModal = true">
-        <v-icon name="add" />
+      <!-- Upload — same size as create-folder -->
+      <v-button v-tooltip.bottom="t('create_item')" icon small rounded @click="showUploadModal = true">
+        <v-icon small name="add" />
       </v-button>
     </template>
 
@@ -76,11 +83,11 @@
       </v-card>
     </v-dialog>
 
-    <!-- ── Batch edit drawer ──────────────────────────────────────────── -->
-    <BatchEditDrawer
-      v-model:active="batchEditActive"
-      :primary-keys="selectedIds"
-      @refresh="onBatchEditRefresh"
+    <!-- ── Add to album modal ─────────────────────────────────────────── -->
+    <AddToAlbumModal
+      v-model="addToAlbumOpen"
+      :file-ids="selectedIds"
+      @added="onAddedToAlbum"
     />
 
     <!-- ── Upload modal ──────────────────────────────────────────────── -->
@@ -91,10 +98,9 @@
     />
 
     <!-- ── Center content ─────────────────────────────────────────── -->
-    <DropZone
+    <div
       class="content-area"
-      :folder-id="foldersStore.selectedFolderId"
-      @upload-complete="filesStore.fetchFiles()"
+      :class="{ 'is-grid': viewMode === 'grid', 'is-list': viewMode === 'list' }"
     >
 
       <!-- Loading -->
@@ -108,266 +114,276 @@
         <p class="empty-text">{{ noFilesLabel }}</p>
       </div>
 
-      <!-- LIST VIEW -->
-      <template v-else-if="viewMode === 'list'">
-        <v-table
-          v-model="selectedIds"
-          :headers="tableHeaders"
-          :items="filesStore.files"
-          :sort="tableSort"
-          :row-height="tableRowHeight"
-          item-key="id"
-          show-select="multiple"
-          show-resize
-          allow-header-reorder
-          must-sort
-          selection-use-keys
-          fixed-header
-          @click:row="handleRowClick"
-          @update:sort="onSort"
-          @update:headers="onHeadersUpdate"
-        >
-          <!-- Thumbnail: virtual column, rendered manually -->
-          <template #[`item.thumbnail`]="{ item }">
-            <div class="thumb-cell">
-              <img
-                v-if="isImageType(item.type) && !failedImages.has(item.id)"
-                :src="getThumbnailUrl(item.id, 48, item.modified_on)"
-                :alt="item.title ?? item.filename_disk"
-                class="thumb-img"
-                loading="lazy"
-                @error="onImageError(item.id)"
-              />
-              <div v-else-if="isImageType(item.type)" class="thumb-fallback">
-                <v-icon name="insert_drive_file" class="thumb-fallback-icon" />
-                <span class="thumb-fallback-ext">{{ getExtension(item.type) }}</span>
+      <!-- LIST VIEW — match native tabular: page scrollport owns horizontal scrollbar -->
+      <div v-else-if="viewMode === 'list'" class="layout-tabular-container">
+        <div class="layout-tabular">
+          <v-table
+            v-model="selectedIds"
+            :headers="tableHeaders"
+            :items="filesStore.files"
+            :sort="tableSort"
+            :row-height="tableRowHeight"
+            item-key="id"
+            show-select="multiple"
+            show-resize
+            allow-header-reorder
+            must-sort
+            selection-use-keys
+            fixed-header
+            @click:row="handleRowClick"
+            @update:sort="onSort"
+            @update:headers="onHeadersUpdate"
+          >
+            <!-- Thumbnail: virtual column, rendered manually -->
+            <template #[`item.thumbnail`]="{ item }">
+              <div class="thumb-cell">
+                <FileThumbPreview
+                  :file-id="item.id"
+                  :mime-type="item.type"
+                  :filename="item.filename_disk"
+                  :alt="filePrimaryTitle(item)"
+                  :modified-on="item.modified_on"
+                  :show-kind-badge="false"
+                />
               </div>
-              <v-icon v-else :name="getFileIcon(item.type)" class="file-type-icon" />
-            </div>
-          </template>
+            </template>
 
-          <!-- All real fields: delegate to native render-display -->
-          <template v-for="header in tableHeaders.filter(h => h.value !== 'thumbnail')" :key="header.value" #[`item.${header.value}`]="{ item }">
-            <render-display
-              :value="item[header.value]"
-              :display="header.field?.display"
-              :options="header.field?.displayOptions"
-              :interface="header.field?.interface"
-              :interface-options="header.field?.interfaceOptions"
-              :type="header.field?.type"
-              :collection="header.field?.collection"
-              :field="header.field?.field"
-            />
-          </template>
+            <!-- All real fields: delegate to native render-display -->
+            <template v-for="header in tableHeaders.filter(h => h.value !== 'thumbnail')" :key="header.value" #[`item.${header.value}`]="{ item }">
+              <render-display
+                :value="getByPath(item, header.value)"
+                :display="header.field?.display"
+                :options="header.field?.displayOptions"
+                :interface="header.field?.interface"
+                :interface-options="header.field?.interfaceOptions"
+                :type="header.field?.type"
+                :collection="header.field?.collection"
+                :field="header.field?.field"
+              />
+            </template>
 
-          <!-- Header right-click context menu -->
-          <template #header-context-menu="{ header }">
-            <v-list>
-              <v-list-item
-                :disabled="!header.sortable"
-                :active="tableSort?.by === header.value && tableSort?.desc === false"
-                clickable
-                @click="onSort({ by: header.value, desc: false })"
-              >
-                <v-list-item-icon><v-icon name="sort" class="flip" /></v-list-item-icon>
-                <v-list-item-content>Sort Ascending</v-list-item-content>
-              </v-list-item>
-              <v-list-item
-                :disabled="!header.sortable"
-                :active="tableSort?.by === header.value && tableSort?.desc === true"
-                clickable
-                @click="onSort({ by: header.value, desc: true })"
-              >
-                <v-list-item-icon><v-icon name="sort" /></v-list-item-icon>
-                <v-list-item-content>Sort Descending</v-list-item-content>
-              </v-list-item>
-
-              <v-divider />
-
-              <v-list-item :active="header.align === 'left'" clickable @click="onAlignChange(header.value, 'left')">
-                <v-list-item-icon><v-icon name="format_align_left" /></v-list-item-icon>
-                <v-list-item-content>Align Left</v-list-item-content>
-              </v-list-item>
-              <v-list-item :active="header.align === 'center'" clickable @click="onAlignChange(header.value, 'center')">
-                <v-list-item-icon><v-icon name="format_align_center" /></v-list-item-icon>
-                <v-list-item-content>Align Center</v-list-item-content>
-              </v-list-item>
-              <v-list-item :active="header.align === 'right'" clickable @click="onAlignChange(header.value, 'right')">
-                <v-list-item-icon><v-icon name="format_align_right" /></v-list-item-icon>
-                <v-list-item-content>Align Right</v-list-item-content>
-              </v-list-item>
-
-              <v-divider />
-
-              <v-list-item clickable @click="removeColumn(header.value)">
-                <v-list-item-icon><v-icon name="remove" /></v-list-item-icon>
-                <v-list-item-content>Hide Field</v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </template>
-
-          <!-- Add column — native v-field-list (globally registered) -->
-          <template #header-append>
-            <v-menu placement="bottom-end" show-arrow :close-on-content-click="false">
-              <template #activator="{ toggle, active }">
-                <v-icon
-                  v-tooltip="'Add Column'"
-                  name="add"
-                  class="add-field"
-                  :class="{ active }"
+            <!-- Header right-click context menu -->
+            <template #header-context-menu="{ header }">
+              <v-list>
+                <v-list-item
+                  :disabled="!header.sortable"
+                  :active="tableSort?.by === header.value && tableSort?.desc === false"
                   clickable
-                  @click.stop="toggle"
-                />
-              </template>
-              <v-field-list
-                collection="directus_files"
-                :disabled-fields="activeColumnKeys"
-                :allow-select-all="false"
-                @add="addField($event[0])"
-              />
-            </v-menu>
-          </template>
+                  @click="onSort({ by: header.value, desc: false })"
+                >
+                  <v-list-item-icon><v-icon name="sort" class="flip" /></v-list-item-icon>
+                  <v-list-item-content>Sort Ascending</v-list-item-content>
+                </v-list-item>
+                <v-list-item
+                  :disabled="!header.sortable"
+                  :active="tableSort?.by === header.value && tableSort?.desc === true"
+                  clickable
+                  @click="onSort({ by: header.value, desc: true })"
+                >
+                  <v-list-item-icon><v-icon name="sort" /></v-list-item-icon>
+                  <v-list-item-content>Sort Descending</v-list-item-content>
+                </v-list-item>
 
-          <!-- Pagination inside v-table footer slot (matches native Directus tabular layout) -->
-          <template #footer>
-            <div class="footer">
-              <div class="pagination">
-                <v-pagination
-                  v-if="filesStore.totalPages > 1"
-                  :length="filesStore.totalPages"
-                  :model-value="filesStore.currentPage"
-                  :total-visible="7"
-                  show-first-last
-                  @update:model-value="filesStore.goToPage($event)"
-                />
-              </div>
-              <div v-if="filesStore.totalCount > 10" class="per-page">
-                <span>Per page</span>
-                <v-select
-                  :model-value="`${filesStore.limit}`"
-                  :items="pageSizes"
-                  inline
-                  @update:model-value="onLimitChange"
-                />
-              </div>
-            </div>
-          </template>
-        </v-table>
-      </template>
+                <v-divider />
 
-      <!-- GRID VIEW -->
-      <div v-else class="grid-wrapper">
-        <div
-          v-for="file in filesStore.files"
-          :key="file.id"
-          class="grid-cell"
-          :class="{ selected: selectedIds.includes(file.id) }"
-          @click="handleGridClick(file)"
-        >
-          <div class="grid-thumb">
-            <div class="grid-checkbox" @click.stop="toggleGridSelection(file.id)">
-              <v-checkbox
-                :model-value="selectedIds.includes(file.id)"
-                :value="file.id"
-                icon-on="check_circle"
-                icon-off="radio_button_unchecked"
-                @update:model-value="toggleGridSelection(file.id)"
-              />
-            </div>
-            <img
-              v-if="isImageType(file.type) && !failedImages.has(file.id)"
-              :src="getThumbnailUrl(file.id, 200, file.modified_on)"
-              :alt="file.title ?? file.filename_disk"
-              class="grid-img"
-              loading="lazy"
-              @error="onImageError(file.id)"
-            />
-            <div v-else-if="isImageType(file.type)" class="grid-icon-bg grid-file-fallback">
-              <v-icon name="insert_drive_file" class="grid-fallback-icon" />
-              <span class="grid-fallback-ext">{{ getExtension(file.type) }}</span>
-            </div>
-            <div v-else class="grid-icon-bg">
-              <v-icon :name="getFileIcon(file.type)" class="grid-file-icon" />
-            </div>
-          </div>
-          <div class="grid-label">{{ file.title ?? file.filename_disk }}</div>
-          <div class="grid-meta">{{ formatFilesize(file.filesize) }}</div>
+                <v-list-item :active="header.align === 'left'" clickable @click="onAlignChange(header.value, 'left')">
+                  <v-list-item-icon><v-icon name="format_align_left" /></v-list-item-icon>
+                  <v-list-item-content>Align Left</v-list-item-content>
+                </v-list-item>
+                <v-list-item :active="header.align === 'center'" clickable @click="onAlignChange(header.value, 'center')">
+                  <v-list-item-icon><v-icon name="format_align_center" /></v-list-item-icon>
+                  <v-list-item-content>Align Center</v-list-item-content>
+                </v-list-item>
+                <v-list-item :active="header.align === 'right'" clickable @click="onAlignChange(header.value, 'right')">
+                  <v-list-item-icon><v-icon name="format_align_right" /></v-list-item-icon>
+                  <v-list-item-content>Align Right</v-list-item-content>
+                </v-list-item>
+
+                <v-divider />
+
+                <v-list-item clickable @click="removeColumn(header.value)">
+                  <v-list-item-icon><v-icon name="remove" /></v-list-item-icon>
+                  <v-list-item-content>Hide Field</v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </template>
+
+            <!-- Add column — native v-field-list (globally registered) -->
+            <template #header-append>
+              <v-menu placement="bottom-end" show-arrow :close-on-content-click="false">
+                <template #activator="{ toggle, active }">
+                  <v-icon
+                    v-tooltip="'Add Column'"
+                    name="add"
+                    class="add-field"
+                    :class="{ active }"
+                    clickable
+                    @click.stop="toggle"
+                  />
+                </template>
+                <v-field-list
+                  collection="directus_files"
+                  :disabled-fields="activeColumnKeys"
+                  :allow-select-all="false"
+                  @add="addField($event[0])"
+                />
+              </v-menu>
+            </template>
+
+            <!-- Pagination inside v-table footer slot (matches native Directus tabular layout) -->
+            <template #footer>
+              <div class="footer">
+                <div class="pagination">
+                  <v-pagination
+                    v-if="filesStore.totalPages > 1"
+                    :length="filesStore.totalPages"
+                    :model-value="filesStore.currentPage"
+                    :total-visible="7"
+                    show-first-last
+                    @update:model-value="filesStore.goToPage($event)"
+                  />
+                </div>
+                <div v-if="filesStore.totalCount > 10" class="per-page">
+                  <span>Per page</span>
+                  <v-select
+                    :model-value="`${filesStore.limit}`"
+                    :items="pageSizes"
+                    inline
+                    @update:model-value="onLimitChange"
+                  />
+                </div>
+              </div>
+            </template>
+          </v-table>
         </div>
       </div>
 
-      <!-- Grid view pagination -->
-      <div v-if="viewMode !== 'list'" class="footer">
-        <div class="pagination">
-          <v-pagination
-            v-if="filesStore.totalPages > 1"
-            :length="filesStore.totalPages"
-            :model-value="filesStore.currentPage"
-            :total-visible="7"
-            show-first-last
-            @update:model-value="filesStore.goToPage($event)"
+      <!-- GRID VIEW — wrapping cards + infinite scroll (100 / batch) -->
+      <div v-else class="grid-shell">
+        <div class="grid-wrapper">
+          <MediaLibraryGridCard
+            v-for="file in filesStore.files"
+            :key="file.id"
+            :file="file"
+            :selected="selectedIds.includes(file.id)"
+            @click="handleGridClick(file)"
+            @toggle-select="toggleGridSelection(file.id)"
           />
         </div>
-        <div v-if="filesStore.totalCount > 10" class="per-page">
-          <span>Per page</span>
-          <v-select
-            :model-value="`${filesStore.limit}`"
-            :items="pageSizes"
-            inline
-            @update:model-value="onLimitChange"
-          />
+
+        <div ref="gridSentinel" class="grid-sentinel" aria-hidden="true" />
+
+        <div v-if="filesStore.isLoadingMore" class="grid-loading-more">
+          <v-progress-circular indeterminate x-small />
+          <span>Loading more…</span>
         </div>
       </div>
-    </DropZone>
+    </div>
 
   </private-view>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useApi, useStores } from '@directus/extensions-sdk'
 import { useFoldersStore } from '../stores/folders.store'
 import { useFilesStore, type DirectusFile } from '../stores/files.store'
-import { useAssetUrl } from '../composables/useAssetUrl'
+import { filePrimaryTitle, getByPath } from '../utils/fileCardMeta'
+import { useAlbumsStore } from '../stores/albums.store'
 import MediaSidebar from '../components/layout/MediaSidebar.vue'
 import SearchInput from '../components/SearchInput.vue'
 import AddFolder from '../components/AddFolder.vue'
-import BatchEditDrawer from '../components/BatchEditDrawer.vue'
-import DropZone from '../components/upload/DropZone.vue'
+import AddToAlbumModal from '../components/AddToAlbumModal.vue'
 import UploadModal from '../components/upload/UploadModal.vue'
+import FileThumbPreview from '../../../directus-extension-media-uploader/src/components/FileThumbPreview.vue'
+import MediaLibraryGridCard from '../components/MediaLibraryGridCard.vue'
 import { useMediaSettings } from '../composables/useMediaSettings'
+import { usePartnerScope } from '../composables/usePartnerScope'
+import { useNotificationBadgeSync } from '../composables/useNotificationBadgeSync'
 import { resolveTranslatable } from '../utils/translations'
 import { useT } from '../composables/useT'
 
+const props = defineProps<{
+  folderId?: string
+  albumId?: string
+}>()
+
 const router = useRouter()
+const route = useRoute()
 const api = useApi()
 const { t } = useT()
-const { useFieldsStore } = useStores()
+const { useFieldsStore, useUserStore } = useStores()
 const fieldsStore = useFieldsStore()
+const userStore = useUserStore()
 const foldersStore = useFoldersStore()
 const filesStore = useFilesStore()
-const { getThumbnailUrl } = useAssetUrl()
-
-// ── Failed image tracking ──────────────────────────────────────────
-const failedImages = ref(new Set<string>())
-function onImageError(fileId: string) {
-  failedImages.value = new Set([...failedImages.value, fileId])
-}
+const albumsStore = useAlbumsStore()
 
 // ── View state ─────────────────────────────────────────────────────
+const GRID_BATCH = 100
 const viewMode = ref<'list' | 'grid'>(
   (localStorage.getItem('media-library-view-mode') as 'list' | 'grid') ?? 'list'
 )
-watch(viewMode, (v) => localStorage.setItem('media-library-view-mode', v))
+/** Limit used while in list (tabular) mode — restored when leaving grid. */
+const listLimit = ref(25)
+watch(viewMode, (v, prev) => {
+  localStorage.setItem('media-library-view-mode', v)
+  if (v === prev) return
+  if (v === 'grid') {
+    listLimit.value = filesStore.limit
+    filesStore.limit = GRID_BATCH
+    filesStore.goToPage(1)
+    nextTick(() => setupGridObserver())
+  } else {
+    filesStore.limit = listLimit.value || 25
+    filesStore.goToPage(1)
+    teardownGridObserver()
+  }
+})
+
 const selectedIds = ref<string[]>([])
 const tableRowHeight = 48
 const showUploadModal = ref(false)
 const pageSizes = ['10', '25', '50', '100']
 
+// ── Grid infinite scroll ───────────────────────────────────────────
+const gridSentinel = ref<HTMLElement | null>(null)
+let gridObserver: IntersectionObserver | null = null
+
+function setupGridObserver() {
+  teardownGridObserver()
+  if (viewMode.value !== 'grid' || !gridSentinel.value) return
+
+  const root =
+    (gridSentinel.value.closest('.content-area') as HTMLElement | null) ?? null
+
+  gridObserver = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return
+      if (viewMode.value !== 'grid') return
+      filesStore.fetchMoreFiles()
+    },
+    { root, rootMargin: '240px 0px', threshold: 0 },
+  )
+  gridObserver.observe(gridSentinel.value)
+}
+
+function teardownGridObserver() {
+  gridObserver?.disconnect()
+  gridObserver = null
+}
+
+watch(gridSentinel, (el) => {
+  if (el && viewMode.value === 'grid') setupGridObserver()
+})
+
+onBeforeUnmount(() => teardownGridObserver())
+
 // ── Batch actions ──────────────────────────────────────────────────
 const confirmDelete = ref(false)
 const isDeleting = ref(false)
-const batchEditActive = ref(false)
+const addToAlbumOpen = ref(false)
 
 // ── Search + Filter ────────────────────────────────────────────────
 const searchQuery = ref('')
@@ -439,13 +455,114 @@ const pageTitle = computed(() =>
 
 
 
+const { start: startNotificationBadgeSync } = useNotificationBadgeSync()
+
+/**
+ * Route is source of truth for folder/album scope (reload-safe),
+ * matching native `/admin/files/folders/:id` behavior.
+ */
+async function syncFromRoute() {
+  const folderId =
+    (props.folderId || (route.params.folderId as string | undefined) || '').trim() || null
+  const albumId =
+    (props.albumId || (route.params.albumId as string | undefined) || '').trim() || null
+
+  // Legacy `?folder=` links from older detail sidebar
+  const queryFolder =
+    typeof route.query.folder === 'string' && route.query.folder.trim()
+      ? route.query.folder.trim()
+      : null
+
+  if (albumId) {
+    foldersStore.selectFolder(null)
+    albumsStore.selectAlbum(albumId)
+    if (filesStore.currentAlbumId !== albumId || filesStore.albumFileIds === null) {
+      await filesStore.setAlbum(albumId)
+    } else if (filesStore.files.length === 0 && !filesStore.isLoading) {
+      await filesStore.fetchFiles()
+    }
+    return
+  }
+
+  const targetFolder = folderId || queryFolder
+  if (targetFolder) {
+    albumsStore.selectAlbum(null)
+    foldersStore.selectFolder(targetFolder)
+    // Avoid double-fetch if already scoped to this folder
+    if (filesStore.currentFolder !== targetFolder || filesStore.albumFileIds !== null) {
+      filesStore.setFolder(targetFolder)
+    } else if (filesStore.files.length === 0 && !filesStore.isLoading) {
+      await filesStore.fetchFiles()
+    }
+    // Normalize legacy query URL → /folders/:id
+    if (queryFolder && !folderId) {
+      router.replace(`/media-library/folders/${queryFolder}`)
+    }
+    return
+  }
+
+  // Root /media-library — All Files
+  albumsStore.selectAlbum(null)
+  foldersStore.selectFolder(null)
+  if (filesStore.currentFolder !== undefined || filesStore.albumFileIds !== null) {
+    filesStore.setFilter(filesStore.activeFilter === 'all' ? 'all' : filesStore.activeFilter)
+  } else if (filesStore.files.length === 0 && !filesStore.isLoading) {
+    await filesStore.fetchFiles()
+  }
+}
+
 // ── Lifecycle ──────────────────────────────────────────────────────
+let columnsReady = false
+watch(
+  activeColumnKeys,
+  (keys) => {
+    const changed = filesStore.setListFields(keys)
+    if (columnsReady && changed) filesStore.fetchFiles()
+  },
+)
+
+const { init: initPartnerScope } = usePartnerScope()
+
+async function refreshScopedLibraryData() {
+  await Promise.all([
+    foldersStore.fetchFolders({ force: true }),
+    albumsStore.fetchAlbums({ force: true }),
+  ])
+  await syncFromRoute()
+}
+
 onMounted(async () => {
+  startNotificationBadgeSync()
+  await initPartnerScope()
   await Promise.all([foldersStore.fetchFolders(), loadColumnPrefs(), fetchSettings()])
-  filesStore.fetchFiles()
+  filesStore.setListFields(activeColumnKeys.value)
+  // Grid mode: force 100-batch before first fetch from route sync
+  if (viewMode.value === 'grid') {
+    listLimit.value = filesStore.limit || 25
+    filesStore.limit = GRID_BATCH
+  }
+  await syncFromRoute()
+  columnsReady = true
+  if (viewMode.value === 'grid') nextTick(() => setupGridObserver())
 })
 
-watch(() => foldersStore.selectedFolderId, () => filesStore.fetchFiles())
+// After logout → login, Directus SPA keeps Pinia/module state. Refresh when user changes.
+watch(
+  () => userStore.currentUser?.id ?? null,
+  async (userId, prevUserId) => {
+    if (!userId || userId === prevUserId) return
+    _currentUserId = null
+    await initPartnerScope()
+    await refreshScopedLibraryData()
+  },
+)
+
+watch(
+  () => [route.path, route.params.folderId, route.params.albumId, route.query.folder] as const,
+  () => {
+    syncFromRoute()
+  },
+)
 
 // ── Column preferences (Directus presets API) ──────────────────────
 // layout_query:   { tabular: { fields: [...] } }
@@ -454,14 +571,18 @@ watch(() => foldersStore.selectedFolderId, () => filesStore.fetchFiles())
 
 const PRESET_BOOKMARK = 'media-library-columns'
 
-// Cache the current user ID — resolved once via /users/me so we don't depend
-// on the store being hydrated at mount time.
+// Resolve current user ID (prefer user store; clear on re-login via watch above).
 let _currentUserId: string | null = null
 async function getCurrentUserId(): Promise<string | null> {
+  const fromStore = userStore.currentUser?.id
+  if (fromStore) {
+    _currentUserId = String(fromStore)
+    return _currentUserId
+  }
   if (_currentUserId) return _currentUserId
   try {
     const res = await api.get('/users/me', { params: { fields: ['id'] } })
-    _currentUserId = res.data?.data?.id ?? null
+    _currentUserId = res.data?.data?.id ? String(res.data.data.id) : null
   } catch (err) {
     console.error('[media-library] Could not resolve current user:', err)
   }
@@ -586,8 +707,12 @@ function onAlignChange(field: string, align: 'left' | 'center' | 'right') {
 // ── Folder actions ─────────────────────────────────────────────────
 function navigateUp() {
   const parentId = foldersStore.folderMap.get(foldersStore.selectedFolderId ?? '')?.parent ?? null
-  foldersStore.selectFolder(parentId)
-  filesStore.setFolder(parentId)
+  if (parentId) {
+    router.push(`/media-library/folders/${parentId}`)
+  } else {
+    // Top-level folder → All Files root URL
+    router.push('/media-library')
+  }
 }
 
 // ── Search ─────────────────────────────────────────────────────────
@@ -645,7 +770,7 @@ function handleRowClick({ item }: { item: DirectusFile; event: PointerEvent }) {
 // ── Upload config — fetched from media_library_settings singleton ──
 const { settings: uploadConfig, fetchSettings } = useMediaSettings()
 
-const noFilesLabel = computed(() => resolveTranslatable(uploadConfig.value.no_files_label, t, 'No files here. Drop files to upload.'))
+const noFilesLabel = computed(() => resolveTranslatable(uploadConfig.value.no_files_label, t, 'No files here.'))
 
 // ── Batch delete ───────────────────────────────────────────────────
 async function batchDeleteFiles() {
@@ -668,42 +793,14 @@ async function onUploaded(_fileIds: string[]) {
   await filesStore.fetchFiles()
 }
 
-function onBatchEditRefresh() {
-  filesStore.fetchFiles()
+function onAddedToAlbum(albumId: string) {
   selectedIds.value = []
-}
-
-// ── Formatting (thumbnail cell + grid view only) ───────────────────
-function isImageType(t: string) { return t?.startsWith('image/') ?? false }
-
-function getFileIcon(mimeType: string): string {
-  if (!mimeType) return 'insert_drive_file'
-  if (mimeType.startsWith('video/')) return 'movie'
-  if (mimeType.startsWith('audio/')) return 'audiotrack'
-  if (mimeType.includes('pdf')) return 'picture_as_pdf'
-  if (mimeType.includes('zip') || mimeType.includes('archive')) return 'folder_zip'
-  if (mimeType.includes('word') || mimeType.includes('document')) return 'description'
-  if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return 'table_chart'
-  return 'insert_drive_file'
-}
-
-function getExtension(mimeType: string): string {
-  const map: Record<string, string> = {
-    'image/jpeg': 'JPG', 'image/jpg': 'JPG', 'image/png': 'PNG',
-    'image/gif': 'GIF', 'image/webp': 'WEBP', 'image/svg+xml': 'SVG',
-    'image/avif': 'AVIF', 'image/tiff': 'TIFF', 'image/bmp': 'BMP',
+  // If currently viewing that album, refresh membership list
+  if (filesStore.currentAlbumId === albumId) {
+    filesStore.setAlbum(albumId)
   }
-  return map[mimeType] ?? mimeType.split('/')[1]?.toUpperCase() ?? 'FILE'
 }
 
-function formatFilesize(bytes: number): string {
-  if (!bytes) return '—'
-  const kb = bytes / 1024
-  if (kb < 1024) return `${kb.toFixed(1)} KB`
-  const mb = kb / 1024
-  if (mb < 1024) return `${mb.toFixed(1)} MB`
-  return `${(mb / 1024).toFixed(1)} GB`
-}
 </script>
 
 <style scoped>
@@ -782,14 +879,51 @@ function formatFilesize(bytes: number): string {
   width: 260px;
 }
 
-/* ── Content area ─────────────────────────────────────────────────── */
+/* ── Content area (full-height scrollport — h-scroll at viewport bottom) ── */
 .content-area {
-  padding: var(--content-padding);
-  padding-top: var(--content-padding-top);
-  padding-bottom: var(--content-padding-bottom);
+  height: 100%;
+  min-height: 100%;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  overflow: auto;
+}
+
+/* Grid must not inherit the wide tabular scrollport */
+.content-area.is-grid {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Match native Directus tabular layout so wide tables scroll on this port,
+   not inside a content-sized v-table (which parks the bar under the last row). */
+.layout-tabular-container {
+  container-type: inline-size;
+  flex: 1 0 auto;
+  min-block-size: 100%;
+  align-self: flex-start;
+  inline-size: max-content;
+  min-inline-size: 100%;
+}
+
+.layout-tabular {
+  padding-block-start: var(--content-padding-top-table, var(--content-padding-top, 0));
+  inline-size: max-content;
+  min-inline-size: 100%;
+  min-block-size: 100%;
+}
+
+.content-area :deep(.layout-tabular > .v-table) {
+  display: contents;
+}
+
+.content-area :deep(.layout-tabular .v-table > table) {
+  min-inline-size: calc(100% - var(--content-padding)) !important;
+  margin-inline-start: var(--content-padding);
+}
+
+.content-area :deep(.layout-tabular .v-table > table tr) {
+  margin-inline-end: var(--content-padding);
 }
 
 
@@ -868,115 +1002,83 @@ function formatFilesize(bytes: number): string {
 .flip { transform: scaleY(-1); }
 
 /* ── Grid view ────────────────────────────────────────────────────── */
+.grid-shell {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  container-type: inline-size;
+  container-name: media-library-grid;
+}
+
 .grid-wrapper {
-  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
+  align-items: stretch;
   align-content: start;
-  padding: 22px !important;
+  padding: 22px;
 }
 
-.grid-cell {
-  cursor: pointer;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--theme--border-color);
-  background: var(--theme--background);
-  transition: border-color var(--fast) var(--transition), box-shadow var(--fast) var(--transition);
+/* 1 → 2 → 3 → 4 → 5 → 6 cards per row by content width */
+@container media-library-grid (min-width: 420px) {
+  .grid-wrapper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
-.grid-cell:hover {
-  border-color: var(--theme--primary);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-.grid-cell.selected { border-color: var(--theme--primary); }
 
-.grid-thumb {
-  position: relative;
+@container media-library-grid (min-width: 680px) {
+  .grid-wrapper {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container media-library-grid (min-width: 920px) {
+  .grid-wrapper {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@container media-library-grid (min-width: 1180px) {
+  .grid-wrapper {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@container media-library-grid (min-width: 1440px) {
+  .grid-wrapper {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+/* Fallback when container queries aren't available */
+@supports not (container-type: inline-size) {
+  .grid-wrapper {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+.grid-sentinel {
   width: 100%;
-  overflow: hidden;
-  background: var(--theme--background-subdued);
-  line-height: 0; /* prevent gap below inline img */
+  height: 1px;
+  flex-shrink: 0;
 }
 
-/* Hover overlay */
-.grid-thumb::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.12);
-  opacity: 0;
-  transition: opacity var(--fast) var(--transition);
-  pointer-events: none;
-  z-index: 1;
-}
-.grid-cell:hover .grid-thumb::after { opacity: 1; }
-
-.grid-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-.grid-cell:hover .grid-img { transform: scale(1.04); }
-
-.grid-icon-bg {
-  width: 100%;
-  aspect-ratio: 1 / 1;
+.grid-loading-more {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.grid-file-icon { --v-icon-size: 40px; --v-icon-color: var(--theme--foreground-subdued); }
-
-.grid-file-fallback {
-  background: var(--theme--primary-background);
-  flex-direction: column;
-  gap: 6px;
-}
-.grid-fallback-icon { --v-icon-size: 40px; --v-icon-color: var(--theme--primary); }
-.grid-fallback-ext {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--theme--primary);
-}
-.grid-label { padding: 8px 8px 2px; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--theme--foreground); }
-.grid-meta { padding: 0 8px 8px; font-size: 11px; color: var(--theme--foreground-subdued); }
-
-.grid-checkbox {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 3;
-  opacity: 0;
-  transition: opacity var(--fast) var(--transition);
-}
-.grid-cell:hover .grid-checkbox,
-.grid-cell.selected .grid-checkbox {
-  opacity: 1;
-}
-
-/* Unchecked: white circle with dark shadow so it shows on light images */
-.grid-checkbox :deep(.v-checkbox) {
-  --v-checkbox-unchecked-color: rgba(255, 255, 255, 0.95);
-}
-.grid-checkbox :deep(.v-checkbox .checkbox) {
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
-}
-
-/* Checked: primary-colored circle icon with white cutout checkmark.
-   White background behind the icon makes the checkmark cut-out appear white. */
-.grid-checkbox :deep(.v-checkbox.checked) {
-  --v-icon-color: var(--theme--primary);
-}
-.grid-checkbox :deep(.v-checkbox.checked .checkbox) {
-  background: white;
-  border-radius: 50%;
-  filter: none;
+  gap: 8px;
+  padding: 16px;
+  color: var(--theme--foreground-subdued);
+  font-size: 13px;
 }
 
 /* ── Pagination footer ────────────────────────────────────────────── */
@@ -984,9 +1086,12 @@ function formatFilesize(bytes: number): string {
   position: sticky;
   inset-inline-start: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  inline-size: 100%;
+  gap: 1rem;
+  /* Viewport-width within the container query, not full table width */
+  inline-size: 100cqi;
   padding: 1.8125rem var(--content-padding);
 }
 

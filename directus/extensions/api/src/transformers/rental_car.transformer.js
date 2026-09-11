@@ -3,16 +3,15 @@ import { buildImageUrls } from "../utils/images.js";
 import { assembleResponse } from "../shared/response/assembleResponse.js";
 import { restrictTo } from "../shared/response/visibility.js";
 import { toSupplementaryBlocks, extractSpecialsDescription } from "../utils/supplementary.js";
-import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
-import { toNumOrNull } from "./shared/numeric.js";
+import { buildThumbnailUrl, buildImageBadge } from "./helpers/media.js";
+import { toNumOrNull } from "./helpers/numeric.js";
 import {
   buildPricingConfig,
-  fromRawPriceCalc,
-  fromRawSurchargeCalc,
-} from "./shared/pricing.js";
-import { geoRef } from "./shared/geo.js";
+  buildPriceSettingsMap,
+  buildSurchargeSettingsMap,
+} from "./helpers/pricing.js";
+import { geoRef } from "./helpers/geo.js";
 import {
-  toExchangeRateObject,
   buildTranslationsMap,
   pickFromMap,
   getCompanyConditionsRow,
@@ -21,12 +20,17 @@ import {
   buildDepotZones,
   buildRentalZones,
   shapeRentalSurcharges,
-} from "./shared/vehicle.js";
+} from "./helpers/vehicle.js";
 
 const RENTALCAR_GROUP_ORDER = ["main"];
 
 /**
- * Shapes the raw rental car data into a summarized list item format.
+ * @description Shapes the raw rental car data into a summarized list item format.
+ *
+ * Extracts essential fields like ID, name, thumbnail, and base price, then uses
+ * `assembleResponse` to finalize the property structure and audience visibility.
+ *
+ * The `/rental_cars` collection endpoint uses this to format records for list views.
  *
  * @param {Object} rentalCar - The raw rental car data from the database.
  * @param {string} lang - The language code for translations.
@@ -48,8 +52,12 @@ export function shapeRentalCarListItem(rentalCar, lang) {
 }
 
 /**
- * Shapes the raw rental car data into a comprehensive detail format.
- * Aggregates translations, pricing, depots, rental zones, and metadata.
+ * @description Shapes the raw rental car data into a comprehensive detail format.
+ *
+ * Combines translations, pricing grouped by dates and occupancies, depot lists, rental zones,
+ * and associated metadata, enforcing audience rules through `assembleResponse`.
+ *
+ * The `/rental_cars/:id` endpoint uses this to deliver the full structure of a rental car.
  *
  * @param {Object} rentalCar - The raw rental car data from the database.
  * @param {string} lang - The language code for translations.
@@ -85,8 +93,11 @@ export function shapeRentalCarDetail(rentalCar, lang, { audience } = {}) {
 
   const translations = pickFromMap(descMap, lang);
   const activeSpecials = pickFromMap(specialsMap, lang);
-  const priceCalc = rentalCar.price_calculation;
-  const surchargeCalc = rentalCar.surcharge_calculation;
+  /* price_calculation/surcharge_calculation are arrays of per-language rows sourced from
+   * the rental company (see fetchVehicleDetail.js) — resolve the active language like every
+   * other product type's price_calculation_translations. */
+  const priceCalc = pickFromMap(buildPriceSettingsMap(rentalCar.price_calculation), lang);
+  const surchargeCalc = pickFromMap(buildSurchargeSettingsMap(rentalCar.surcharge_calculation), lang);
   const rentalCompany = rentalCar.rental_company;
   const companyConditions = getCompanyConditionsRow(rentalCompany, lang);
 
@@ -182,8 +193,10 @@ export function shapeRentalCarDetail(rentalCar, lang, { audience } = {}) {
         rentalCar.price_periods,
         rentalCar.rental_periods,
         rentalCar.prices,
-        priceCalc,
+        priceCalc?.marginPct,
         buildDepotZones(rentalCar.depots_selected),
+        rentalCar.rental_company_prices,
+        lang,
       ),
     },
     {
@@ -211,13 +224,11 @@ export function shapeRentalCarDetail(rentalCar, lang, { audience } = {}) {
       group: "main",
       visibleTo: ["backoffice"],
       value: buildPricingConfig({
-        settings: fromRawPriceCalc(priceCalc),
-        surchargeSettings: fromRawSurchargeCalc(surchargeCalc),
-        exchangeRate: toExchangeRateObject(priceCalc?.exchange_rate),
-        fromPrice: toNumOrNull(priceCalc?.from_price),
-        surchargeExchangeRate: toExchangeRateObject(
-          surchargeCalc?.surcharge_exchange_rate,
-        ),
+        settings: priceCalc,
+        surchargeSettings: surchargeCalc,
+        exchangeRate: priceCalc?.exchangeRate ?? null,
+        fromPrice: toNumOrNull(priceCalc?.fromPrice),
+        surchargeExchangeRate: surchargeCalc?.exchangeRate ?? null,
       }),
     },
     {

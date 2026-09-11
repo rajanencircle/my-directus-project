@@ -1,6 +1,9 @@
 import { HTTP_STATUS, HTTP_MESSAGE } from './constants.js';
 
 
+/* Response helpers that produce the API's uniform envelope: `{ success, message, data, meta }`.
+ * sendSuccess is for single resources, sendPaginated for list responses with pagination meta,
+ * and sendError for failures. */
 const DEFAULT_SINGLE_RECORD_META = { page: 1, limit: 1, total: 1, returned: 1 };
 
 export function sendSuccess(res, data, { status = HTTP_STATUS.OK, message, meta } = {}) {
@@ -28,13 +31,14 @@ export function sendPaginated(res, { data, total, page, limit }) {
 
 const DEFAULT_ERROR_META = { page: 1, limit: 0, total: 0, returned: 0 };
 
-export function sendError(res, { status = HTTP_STATUS.INTERNAL_SERVER_ERROR, message, errors } = {}) {
+export function sendError(res, { status = HTTP_STATUS.INTERNAL_SERVER_ERROR, message, code = null, errors, meta } = {}) {
   const resolvedMessage = message ?? HTTP_MESSAGE[status] ?? 'An error occurred';
   const body = {
     success: false,
     message: resolvedMessage,
+    code,
     errors: errors ?? [resolvedMessage],
-    meta: DEFAULT_ERROR_META,
+    meta: meta ?? DEFAULT_ERROR_META,
   };
   return res.status(status).json(body);
 }

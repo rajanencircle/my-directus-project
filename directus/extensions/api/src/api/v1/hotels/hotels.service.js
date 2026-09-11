@@ -1,7 +1,7 @@
 import { DETAIL_FIELDS, SURCHARGE_FIELDS, CHILD_RC_FIELDS } from "./hotels.fields.js";
 import { hotels as hotelFilters } from "../../shared/collectionFilters.js";
 const { buildIdFilter, buildPublicationDeepFilter } = hotelFilters;
-import { buildPublicationDateRangeFilter } from "../../shared/collectionFilters.js";
+import { buildPublicationDateRangeFilter, createScopedItemsService } from "../../shared/collectionFilters.js";
 import { enrichExchangeRates } from "../../../utils/ratesResolver.js";
 import { AppError } from "../../shared/AppError.js";
 import { HTTP_STATUS } from "../../shared/constants.js";
@@ -39,14 +39,14 @@ function detailFields(schema, rootCollection, fieldList) {
  * @throws {AppError} If the hotel is not found.
  */
 export async function getHotelDetails(
-  { id, idFilterMode },
+  { id, idFilterMode, partnerId, partnerVisibility },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
   const { ItemsService } = services;
-  const hotelsService = new ItemsService(COLLECTION, {
-    knex: database,
-    schema,
+  const hotelsService = createScopedItemsService(services, COLLECTION, { knex: database, schema }, {
+    partnerId,
+    partnerVisibility,
   });
   const surchargesService = new ItemsService(SURCHARGES_COLLECTION, {
     knex: database,

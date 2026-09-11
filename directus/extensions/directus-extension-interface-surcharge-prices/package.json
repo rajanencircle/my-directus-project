@@ -1,17 +1,14 @@
 {
   "name": "directus-extension-interface-surcharge-prices",
-  "description": "Please enter a description for your extension",
-  "icon": "extension",
-  "version": "1.1.0",
+  "description": "Surcharge buy/sell price table interface — calculates sell prices client-side using its own field-configured formula, with no dedicated backend endpoint",
+  "icon": "payments",
+  "version": "2.0.0",
   "keywords": [
     "directus",
     "directus-extension",
-    "directus-extension-interface"
+    "directus-custom-interface"
   ],
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "directus:extension": {
     "type": "interface",
     "path": "dist/index.js",
@@ -20,9 +17,7 @@
   },
   "scripts": {
     "build": "directus-extension build",
-    "dev": "directus-extension build -w --no-minify",
-    "link": "directus-extension link",
-    "validate": "directus-extension validate"
+    "dev": "directus-extension build -w"
   },
   "devDependencies": {
     "@directus/extensions-sdk": "17.1.3",

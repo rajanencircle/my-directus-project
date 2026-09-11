@@ -7,6 +7,7 @@ export default defineInterface({
   icon: 'share',
   description: 'Lists and manages password-protected, expiring share links for the current file.',
   component: InterfaceComponent,
+  hideLabel: true,
   types: ['alias'],
   localTypes: ['presentation'],
   group: 'presentation',

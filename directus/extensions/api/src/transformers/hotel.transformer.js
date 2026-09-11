@@ -13,20 +13,24 @@ import {
   getLocaleCode,
   buildTranslationsMap,
   pickFromMap,
-} from "./shared/i18n.js";
-import { getGeoName } from "./shared/geo.js";
-import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
-import { toNumOrNull } from "./shared/numeric.js";
+} from "./helpers/i18n.js";
+import { getGeoName } from "./helpers/geo.js";
+import { buildThumbnailUrl, buildImageBadge } from "./helpers/media.js";
+import { toNumOrNull } from "./helpers/numeric.js";
 import {
   buildPricingConfig,
   buildPriceSettingsMap,
   buildSurchargeSettingsMap,
-} from "./shared/pricing.js";
+} from "./helpers/pricing.js";
 
 /**
- * Determines if a given item is currently active for publication.
- * Validates the status and checks if the current timestamp falls within
- * the allowed `publish_start` and `publish_end` timeframe.
+ * @description Determines if a given item is currently active for publication.
+ *
+ * First checks that the status is not "unpublished". Then, when `publish_start` and
+ * `publish_end` are set, verifies that the current timestamp falls within that window.
+ *
+ * This is used internally to quickly drop items from list/detail responses if they are
+ * scheduled for future publication or have already expired.
  *
  * @param {Object} item - The item to evaluate, expecting `status`, `publish_start`, and `publish_end`.
  * @param {string|Date} now - The current timestamp for comparison.
@@ -41,7 +45,14 @@ function isPublicationActive(item, now) {
 }
 
 /**
- * Shapes the raw hotel data into a summarized list item format.
+ * @description Shapes the raw hotel data into a summarized list item format.
+ *
+ * Extracts only the essential fields needed for a listing (like ID, name, thumbnail, base
+ * price, and primary category) and delegates to `assembleResponse` so audience restrictions
+ * are respected.
+ *
+ * The `/hotels` collection endpoint uses this to build the payload for the list view, keeping
+ * the response size minimal compared to the full detail payload.
  *
  * @param {Object} hotel - The raw hotel data from the database.
  * @param {string} lang - The language code for translations.
@@ -76,15 +87,22 @@ export function shapeHotelListItem(hotel, lang) {
           }
         : null,
     },
-    thumbnail: buildThumbnailUrl(hotel.media, lang),
+    thumbnail: buildThumbnailUrl(hotel.media, lang, { publishedOnly: false }),
     publishing_status: hotel.status_primarix ?? null,
     date_updated: ensureUtcSuffix(hotel.source_updated_at),
   };
 }
 
 /**
- * Shapes the raw hotel data into a comprehensive detail format.
- * Aggregates translations, pricing, rooms, surcharges, and metadata based on the requested language and audience.
+ * @description Shapes the raw hotel data into a comprehensive detail format.
+ *
+ * Aggregates translations, pricing, rooms, surcharges, and metadata based on the requested
+ * language and audience. Pricing is grouped by room types and occupancies, formatting is
+ * applied dynamically, and `assembleResponse` produces the final output so restricted data
+ * stays hidden.
+ *
+ * The `/hotels/:id` endpoint uses this to return the fully expanded, highly detailed payload
+ * for a single hotel record.
  *
  * @param {Object} hotel - The raw hotel data from the database.
  * @param {string} lang - The language code for translations.
@@ -158,9 +176,9 @@ export function shapeHotelDetail(hotel, lang, { audience } = {}) {
   const roomCategories = (hotel.room_categories ?? []).filter((rc) =>
     isPublicationActive(rc, now),
   );
-  // A price period can be `status: "published"` with no publish window set and
-  // still have already ended (its own `end_date` is in the past) — isPublicationActive
-  // only checks the CMS publish window, not whether the booking period itself is over.
+  /* A price period can be `status: "published"` with no publish window set and
+   * still have already ended (its own `end_date` is in the past) — isPublicationActive
+   * only checks the CMS publish window, not whether the booking period itself is over. */
   const today = now.slice(0, 10);
   const priceDates = (hotel.price_dates ?? []).filter(
     (pd) => isPublicationActive(pd, now) && (!pd.end_date || pd.end_date >= today),
@@ -475,13 +493,17 @@ export function shapeHotelDetail(hotel, lang, { audience } = {}) {
     {
       key: "media",
       group: "main",
-      value: buildImageUrls(hotel.media, lang) ?? null,
+      value: buildImageUrls(hotel.media, lang, { publishedOnly: false }) ?? null,
     },
     {
       key: "booking",
       group: "main",
       visibleTo: ["backoffice"],
       value: {
+        /* Not a copy/paste swap: Directus `hotel.booking_partner` is a plain enum field
+         * naming the booking channel (output as `booking_channel`), while `hotel.booking` is
+         * the M2O relation to the actual supplier/agency record (output as `booking_partner`).
+         * The Directus field names and the API output keys are each other's counterpart. */
         booking_channel: hotel.booking_partner ?? null,
         booking_partner: hotel.booking
           ? {

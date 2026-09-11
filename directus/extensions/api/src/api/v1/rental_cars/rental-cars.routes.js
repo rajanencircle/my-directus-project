@@ -1,12 +1,15 @@
-import { asyncWrapper } from "../../shared/asyncWrapper.js";
-import { validate } from "../../shared/validate.js";
-import { listSlimRentalCarsSchema, listFullRentalCarsSchema, getRentalCarDetailSchema } from "./rental-cars.validation.js";
-import { createRentalCarsController } from "./rental-cars.controller.js";
+import { createCollectionResource } from "../../shared/createCollectionResource.js";
+import { rentalCars as filters } from "../../shared/collectionFilters.js";
+import { LIST_FIELDS } from "./rental-cars.fields.js";
+import { shapeRentalCarListItem, shapeRentalCarDetail } from "../../../transformers/rental_car.transformer.js";
+import { getRentalCarDetails } from "./rental-cars.service.js";
 
-export function setupRentalCarsRoutes(router, prefix, context) {
-  const { index, fullList, detail } = createRentalCarsController(context);
-
-  router.get(prefix, validate(listSlimRentalCarsSchema), asyncWrapper(index));
-  router.get(`${prefix}/full`, validate(listFullRentalCarsSchema), asyncWrapper(fullList));
-  router.get(`${prefix}/:id`, validate(getRentalCarDetailSchema), asyncWrapper(detail));
-}
+export const setupRentalCarsRoutes = createCollectionResource({
+  collection: "vehicles",
+  resourceLabel: "rental car",
+  listFields: LIST_FIELDS,
+  filters: filters,
+  getDetails: getRentalCarDetails,
+  shapeListItem: shapeRentalCarListItem,
+  shapeDetail: shapeRentalCarDetail,
+});

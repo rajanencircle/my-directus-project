@@ -8,9 +8,6 @@
     "directus-extension-interface",
     "item-preview"
   ],
-  "files": [
-    "dist"
-  ],
   "directus:extension": {
     "type": "interface",
     "path": "dist/index.js",

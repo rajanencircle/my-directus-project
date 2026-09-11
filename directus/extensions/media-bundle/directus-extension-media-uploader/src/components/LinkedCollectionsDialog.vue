@@ -58,7 +58,6 @@ const hasUsageConfig = () => parseFileReverseLinks(props.fileReverseLinks).lengt
           :file-type="fileType"
           :filename-download="filenameDownload"
           :file-reverse-links="fileReverseLinks"
-          :download-format-presets="downloadFormatPresets"
         />
 
         <div v-if="!hasUsageConfig()" class="empty">

@@ -6,17 +6,22 @@ import { buildImageUrls } from "../utils/images.js";
 import { extractSpecialsDescription, extractSpecialsValidity } from "../utils/supplementary.js";
 import { assembleResponse } from "../shared/response/assembleResponse.js";
 import { restrictTo } from "../shared/response/visibility.js";
-import { buildTranslationsMap, pickFromMap } from "./shared/i18n.js";
-import { shapeGeoRefs } from "./shared/geo.js";
-import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
-import { toNumOrNull } from "./shared/numeric.js";
+import { buildTranslationsMap, pickFromMap } from "./helpers/i18n.js";
+import { shapeGeoRefs } from "./helpers/geo.js";
+import { buildThumbnailUrl, buildImageBadge } from "./helpers/media.js";
+import { toNumOrNull } from "./helpers/numeric.js";
 
 const CRUISE_GROUP_ORDER = ["main"];
 
 
 
 /**
- * Shapes the raw cruise data into a summarized list item format.
+ * @description Shapes the raw cruise data into a summarized list item format.
+ *
+ * Extracts essential fields (like ID, name, base price) while ignoring heavy arrays such as
+ * schedules or cabin categories, and uses `assembleResponse` to filter properties.
+ *
+ * The `/cruises` endpoint uses this to generate lightweight payloads for list views.
  *
  * @param {Object} cruise - The raw cruise data from the database.
  * @param {string} lang - The language code for translations.
@@ -48,8 +53,13 @@ export function shapeCruiseListItem(cruise, lang) {
 }
 
 /**
- * Shapes the raw cruise data into a comprehensive detail format.
- * Aggregates translations, pricing, cabin categories, schedules, and metadata.
+ * @description Shapes the raw cruise data into a comprehensive detail format.
+ *
+ * Aggregates translations, pricing, cabin categories, schedules, and metadata. Sailings are
+ * formatted and nested pricing hierarchies are handled, with `assembleResponse` stripping
+ * internal or backoffice-only fields from public requests.
+ *
+ * The `/cruises/:id` endpoint uses this for displaying full cruise details.
  *
  * @param {Object} cruise - The raw cruise data from the database.
  * @param {string} lang - The language code for translations.
@@ -103,8 +113,13 @@ export function shapeCruiseDetail(cruise, lang, { audience } = {}) {
   const price_info_translations = pickFromMap(infoMap, lang);
   const specials_translations = pickFromMap(specialsMap, lang);
 
-  const priceCalc = cruise.price_calculation?.[0] ?? null;
-  const from_price = priceCalc?.from_price ?? null;
+  /* buy_price_type/margin_percentage/etc. are plain top-level fields on `cruises` itself.
+   * `from_price` is the exception — an M2O to `cruises_prices` (BUG FIX: previously the raw
+   * row id was read directly as if it were the sell price; cruises.fields.js now fetches
+   * `from_price.sell_price` — a plain non-localized column, unlike hotels/tours/excursions
+   * which need a further translations join). */
+  const priceCalc = cruise;
+  const from_price = priceCalc?.from_price?.sell_price ?? null;
 
   const cabins = groupPrices2(
     cruise.cabin_categories ?? [],
@@ -113,11 +128,12 @@ export function shapeCruiseDetail(cruise, lang, { audience } = {}) {
     /* Occupancy naming is structured as a single flat `name` field rather than per-language translations. */
     (cruise.occupancies ?? [])
       .map((o) => {
-        if (!o.occupancy) return null;
+        const occ = o.cruises_occupancies_id?.occupancy;
+        if (!occ) return null;
         return {
-          ...o.occupancy,
-          value: o.id,
-          name: o.occupancy.name ?? null,
+          ...occ,
+          value: o.cruises_occupancies_id.id,
+          name: occ.name ?? null,
         };
       })
       .filter(Boolean),
@@ -235,7 +251,7 @@ export function shapeCruiseDetail(cruise, lang, { audience } = {}) {
         special_description: specials_translations?.specials != null
           ? extractSpecialsDescription(specials_translations.specials)
           : null,
-        /* Extract validity windows directly from the `specials` translation entries, as top-level columns are no longer used. */
+        /* Validity windows are read from the `specials` translation entries, not top-level columns. */
         ...extractSpecialsValidity(specials_translations?.specials ?? null),
     } },
     { key: "image_badge", group: "main", value: buildImageBadge(cruise, badgeMap?.[lang]) },

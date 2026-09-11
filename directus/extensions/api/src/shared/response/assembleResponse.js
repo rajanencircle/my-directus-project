@@ -1,46 +1,24 @@
 import { HIDDEN_FOR, restrictTo } from "./visibility.js";
 
-// The one generic, domain-ignorant response layer. It knows nothing about hotels, tours,
-// pricing, translations, or any other business concept — it only orders, defaults, and
-// audience-filters a bag of already-computed values handed to it by a resource's
-// <resource>.transformer.js. All business logic (what a field means, how its value is
-// computed) stays in the resource; this file only ever decides *placement and visibility*,
-// never *meaning*.
-//
-// Allowlist-only: the response contains exactly the keys declared in fieldDefs — nothing
-// more. There is no passthrough of raw Directus fields. (Verified before this became the
-// only mode: the previous passthrough of unconsumed raw fields never actually surfaced
-// anything beyond Directus Studio UI-only "no-data" alias fields, confirmed against live
-// schema and real records across all 6 collections.)
-//
-// This is a different layer from each collection's `*.fields.js`: `*.fields.js` controls
-// what's fetched FROM Directus (the query); fieldDefs here controls what's shown IN the
-// response (the shape), for whom.
-//
-// fieldDefs: array of { key, group, value, default?, visibleTo?, order? }
-//   - key: output property name
-//   - group: string tag used only for ordering (see groupOrder)
-//   - value: the already-computed value for this field (not a lookup path). May itself
-//     contain `restrictTo(nestedValue, ...audiences)`-wrapped values at any depth (inside
-//     plain objects/arrays) — see visibility.js. Those resolve the same way visibleTo does
-//     below, just scoped to a piece of this field's value instead of the whole field.
-//   - default: optional fallback used when value is null/undefined
-//   - visibleTo: optional array of audience names; when set, this field is omitted
-//     entirely (not present in the output) for any assembleResponse() call whose
-//     `audience` isn't in this list. Omitted `visibleTo` (the common case) means "visible
-//     to every audience" — sugar for `restrictTo(value, ...everyAudienceThatMatters)`
-//     without having to enumerate them.
-//   - order: optional { [audience]: priority } map overriding this field's position
-//     within its group for a specific audience only (lower sorts first). Fields without
-//     an override for the requested audience keep their natural declaration-order
-//     position. No effect when assembleResponse is called without an `audience`.
-//
-// groupOrder: array of group-tag strings; fields are emitted grouped by this order, and
-//   (absent an `order` override) in fieldDefs declaration order within a group.
-//
-// audience: optional string (e.g. "web"). When omitted (every existing backoffice call
-//   site), every field and every restrictTo()-wrapped nested value resolves as visible —
-//   restriction only ever narrows what a specific named audience sees.
+/**
+ * @description The generic, domain-ignorant response assembly layer for the API.
+ *
+ * Takes a bag of already-computed values (`fieldDefs`) from a resource's transformer,
+ * then orders, defaults, and audience-filters these fields based on the provided
+ * configuration. Nested visibility restrictions are resolved recursively: if a field is
+ * restricted to an audience the current request doesn't match, it is entirely omitted
+ * from the output.
+ *
+ * This is the final step in all transformers (e.g. `hotel.transformer.js`), shaping the
+ * JSON response before it is sent to the client. It guarantees the output strictly adheres
+ * to an allowlist and that sensitive or audience-specific fields are correctly hidden.
+ * 
+ * @param {Object} options - The configuration options for assembling the response.
+ * @param {Array<Object>} options.fieldDefs - Array of field definitions { key, group, value, default, visibleTo, order }.
+ * @param {Array<String>} options.groupOrder - Array of group tag strings to determine the ordering of fields in the response.
+ * @param {String} [options.audience] - The target audience (e.g., "web"). If omitted, all fields are visible.
+ * @returns {Object} The assembled, ordered, and filtered response object.
+ */
 const OMIT = Symbol("omit");
 
 function resolveDeep(value, audience) {

@@ -3,14 +3,14 @@ import { buildImageUrls } from "../utils/images.js";
 import { toSupplementaryBlocks, extractSpecialsDescription } from "../utils/supplementary.js";
 import { assembleResponse } from "../shared/response/assembleResponse.js";
 import { restrictTo } from "../shared/response/visibility.js";
-import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
-import { toNumOrNull } from "./shared/numeric.js";
+import { buildThumbnailUrl, buildImageBadge } from "./helpers/media.js";
+import { toNumOrNull } from "./helpers/numeric.js";
 import {
   buildPricingConfig,
-  fromRawPriceCalc,
-  fromRawSurchargeCalc,
-} from "./shared/pricing.js";
-import { geoRef } from "./shared/geo.js";
+  buildPriceSettingsMap,
+  buildSurchargeSettingsMap,
+} from "./helpers/pricing.js";
+import { geoRef } from "./helpers/geo.js";
 import {
   buildTranslationsMap,
   pickFromMap,
@@ -20,13 +20,18 @@ import {
   buildDepotZones,
   shapeRentalSurcharges,
   getCompanyConditionsRow,
-  toExchangeRateObject,
-} from "./shared/vehicle.js";
+} from "./helpers/vehicle.js";
 
 const CAMPER_GROUP_ORDER = ["main"];
 
 /**
- * Shapes the raw camper data into a summarized list item format.
+ * @description Shapes the raw camper data into a summarized list item format.
+ *
+ * Extracts essential high-level fields (like ID, name, thumbnail, and base price) and
+ * delegates to `assembleResponse` so data structure and audience restrictions are strictly
+ * followed.
+ *
+ * The `/campers` collection endpoint uses this to build a lightweight payload for list views.
  *
  * @param {Object} camper - The raw camper data from the database.
  * @param {string} lang - The language code for translations.
@@ -48,8 +53,13 @@ export function shapeCamperListItem(camper, lang) {
 }
 
 /**
- * Shapes the raw camper data into a comprehensive detail format.
- * Aggregates translations, pricing, depots, rental zones, and metadata.
+ * @description Shapes the raw camper data into a comprehensive detail format.
+ *
+ * Aggregates translations, pricing, depots, rental zones, and metadata. Shared helpers format
+ * the nested arrays, and `assembleResponse` applies audience-based field hiding (e.g. hiding
+ * `margin` from the web audience).
+ *
+ * The `/campers/:id` endpoint uses this to return the fully expanded payload for a single camper.
  *
  * @param {Object} camper - The raw camper data from the database.
  * @param {string} lang - The language code for translations.
@@ -68,7 +78,6 @@ export function shapeCamperDetail(camper, lang, { audience } = {}) {
       bond: t.bond ?? null,
       description_supplementary: t.description_supplementary ?? null,
       bedsize: t.bedsize ?? null,
-      camping_equipment: t.camping_equipment ?? null,
     }),
   );
   const badgeMap = buildTranslationsMap(
@@ -88,8 +97,11 @@ export function shapeCamperDetail(camper, lang, { audience } = {}) {
 
   const translations = pickFromMap(descMap, lang);
   const activeSpecials = pickFromMap(specialsMap, lang);
-  const priceCalc = camper.price_calculation;
-  const surchargeCalc = camper.surcharge_calculation;
+  /* price_calculation/surcharge_calculation are arrays of per-language rows sourced from
+   * the rental company (see fetchVehicleDetail.js) — resolve the active language like every
+   * other product type's price_calculation_translations. */
+  const priceCalc = pickFromMap(buildPriceSettingsMap(camper.price_calculation), lang);
+  const surchargeCalc = pickFromMap(buildSurchargeSettingsMap(camper.surcharge_calculation), lang);
   const rentalCompany = camper.rental_company;
   const companyConditions = getCompanyConditionsRow(rentalCompany, lang);
 
@@ -184,8 +196,10 @@ export function shapeCamperDetail(camper, lang, { audience } = {}) {
         camper.price_periods,
         camper.rental_periods,
         camper.prices,
-        priceCalc,
+        priceCalc?.marginPct,
         buildDepotZones(camper.depots_selected),
+        camper.rental_company_prices,
+        lang,
       ),
     },
     {
@@ -209,13 +223,11 @@ export function shapeCamperDetail(camper, lang, { audience } = {}) {
       group: "main",
       visibleTo: ["backoffice"],
       value: buildPricingConfig({
-        settings: fromRawPriceCalc(priceCalc),
-        surchargeSettings: fromRawSurchargeCalc(surchargeCalc),
-        exchangeRate: toExchangeRateObject(priceCalc?.exchange_rate),
-        fromPrice: toNumOrNull(priceCalc?.from_price),
-        surchargeExchangeRate: toExchangeRateObject(
-          surchargeCalc?.surcharge_exchange_rate,
-        ),
+        settings: priceCalc,
+        surchargeSettings: surchargeCalc,
+        exchangeRate: priceCalc?.exchangeRate ?? null,
+        fromPrice: toNumOrNull(priceCalc?.fromPrice),
+        surchargeExchangeRate: surchargeCalc?.exchangeRate ?? null,
       }),
     },
     {
@@ -237,7 +249,8 @@ export function shapeCamperDetail(camper, lang, { audience } = {}) {
       group: "main",
       value: {
         bedsize: translations?.bedsize ?? null,
-        camping_equipment: translations?.camping_equipment ?? null,
+        /* camping_equipment lives directly on `vehicles`, not per-language. */
+        camping_equipment: camper.camping_equipment ?? null,
         conditions_towaway: companyConditions?.conditions_towaway ?? null,
       },
     },

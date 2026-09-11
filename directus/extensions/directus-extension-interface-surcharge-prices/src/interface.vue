@@ -3,19 +3,23 @@
     <div v-if="loading" class="loading">
       <v-progress-circular indeterminate />
       <p class="loading-text">
-        {{ loadingText || "Loading surcharge prices..." }}
+        {{ loadingText }}
       </p>
     </div>
 
     <div v-else>
+      <v-notice type="danger" v-if="errorMessage" class="error-notice">
+        {{ errorMessage }}
+      </v-notice>
+
       <!-- Save Bar Top -->
       <div class="save-bar button-top" v-if="placement === 'top'">
         <v-button
           @click="calculateAndSave"
           :loading="calculating"
-          :disabled="disabled || !hotelId || !hasBuyChanges"
+          :disabled="disabled || !parentId || !hasBuyChanges"
         >
-          {{ label || "Save & Calculate Sell Prices" }}
+          {{ label }}
         </v-button>
       </div>
 
@@ -30,44 +34,43 @@
           <thead>
             <tr>
               <th class="header-cell header-name sticky-col" colspan="2">
-                {{ headerSurchargeLabel || "Surcharge" }}
+                {{ headerSurchargeLabel }}
               </th>
               <th class="header-cell header-pricing">
-                {{ headerPricingLabel || "Pricing" }}
+                {{ headerPricingLabel }}
               </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="item in items" :key="item.id" class="data-row">
               <td class="name-cell sticky-col">
-                <span class="item-name">{{ item[surchargeNameField] }}</span>
+                <span class="item-name">{{ item[surchargeNameField || ''] }}</span>
               </td>
               <td class="label-cell">
                 <div class="price-labels">
                   <label class="input-label buy-label">
                     <v-icon name="shopping_cart" x-small />
-                    {{ buyLabel || "Buy" }} ({{ buyCurrencySymbol }})
+                    {{ buyLabel }} ({{ buyCurrencySymbol }})
                   </label>
                   <label class="input-label sell-label">
                     <v-icon name="sell" x-small />
-                    {{ sellLabel || "Sell" }} ({{ sellCurrencySymbol }})
+                    {{ sellLabel }} ({{ sellCurrencySymbol }})
                   </label>
                 </div>
               </td>
               <td class="price-cell" :class="{ 'has-changes': item._buyDirty }">
                 <div class="price-inputs">
                   <input
-                    :value="item[buyPriceField]"
+                    :value="getBuyDisplay(item)"
                     type="number"
                     step="0.01"
                     class="cell-input"
-                    placeholder="0.00"
                     :disabled="disabled"
-                    @input="handleBuyPriceInput(item, $event)"
+                    @input="(markBuyCellTyped(item), handleBuyPriceInput(item, $event))"
                     @focus="($event.target as HTMLInputElement).select()"
                   />
                   <span class="price-display">
-                    {{ formatValue(item[sellPriceField]) }}
+                    {{ formatValue(item[sellPriceField || '']) }}
                   </span>
                 </div>
               </td>
@@ -80,13 +83,10 @@
       <div v-else class="empty-state-card">
         <v-icon name="inbox" large class="empty-icon" />
         <p class="empty-title">
-          {{ emptyStateTitle || "No surcharges linked" }}
+          {{ emptyStateTitle }}
         </p>
         <p class="empty-hint">
-          {{
-            emptyStateHint ||
-            "Add surcharges to the hotel to manage pricing here."
-          }}
+          {{ emptyStateHint }}
         </p>
       </div>
 
@@ -95,9 +95,9 @@
         <v-button
           @click="calculateAndSave"
           :loading="calculating"
-          :disabled="disabled || !hotelId || !hasBuyChanges"
+          :disabled="disabled || !parentId || !hasBuyChanges"
         >
-          {{ label || "Save & Calculate Sell Prices" }}
+          {{ label }}
         </v-button>
       </div>
     </div>
@@ -105,49 +105,73 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from "vue";
+import { defineComponent, ref, reactive, onMounted, onUnmounted, watch } from "vue";
 import { useApi } from "@directus/extensions-sdk";
+import { useSurchargeData } from "./composables/useSurchargeData";
+import type { DirectusItem } from "./types";
 
+/**
+ * Vue component for the Surcharge Prices Table interface.
+ *
+ * Displays every surcharge linked to the current parent record as a row with an
+ * editable buy price and a read-only sell price. The "Save & Calculate" button
+ * persists any buy-price edits and then runs an admin-authored formula for every
+ * language configuration (each with its own margin and exchange rate) to
+ * recompute the sell prices.
+ *
+ * The data/API work lives in the `useSurchargeData` composable; this component
+ * owns the state, the input handling, and the lifecycle wiring. Registered as
+ * the "Surcharge Prices Table" interface's component (see `index.js`).
+ */
 export default defineComponent({
+  /*
+   * No field-name, collection-name, or cosmetic prop below carries a
+   * default value. An unconfigured prop is simply absent/empty, so a
+   * misconfiguration surfaces as a visibly missing value instead of a
+   * silent, wrong guess (e.g. assuming a "name" field or a "€" symbol) —
+   * identical to the rationale at the top of the price-table interface's
+   * `interface.vue`.
+   */
   props: {
     value: { type: Array, default: () => [] },
     primaryKey: { type: [String, Number], default: null },
     collection: { type: String, required: true },
     field: { type: String, required: true },
-    disabled: { type: Boolean, default: false },
+    disabled: { type: Boolean },
     values: { type: Object, default: () => ({}) },
-    sortField: { type: String, default: "sort" },
-    calculateFlowId: { type: String, default: "" },
-    surchargesCollection: { type: String, default: "surcharges" },
-    translationsCollection: {
-      type: String,
-      default: "surcharges_translations",
-    },
-    ratesCollection: { type: String, default: "rates" },
-    hotelField: { type: String, default: "hotel_id" },
-    buyPriceField: { type: String, default: "buy_price" },
-    sellPriceField: { type: String, default: "sell_price" },
-    exchangeRateField: { type: String, default: "surcharge_exchange_rate" },
-    junctionHotelField: { type: String, default: "hotels_id" },
-    junctionLanguageField: { type: String, default: "translations_id" },
-    surchargeNameField: { type: String, default: "name" },
-    translationsSurchargeField: { type: String, default: "surcharges_id" },
-    translationsLanguageField: { type: String, default: "translations_id" },
-    fromCurrencyField: { type: String, default: "from_currency" },
-    toCurrencyField: { type: String, default: "to_currency" },
-    currencySymbolField: { type: String, default: "symbol" },
+    sortField: { type: String },
+    percentageTypeField: { type: String },
+    marginField: { type: String },
+    provisionField: { type: String },
+    roundHalfLogic: { type: String },
+    calculateSellPriceLogic: { type: String },
+    surchargesCollection: { type: String },
+    translationsCollection: { type: String },
+    ratesCollection: { type: String },
+    parentField: { type: String },
+    buyPriceField: { type: String },
+    sellPriceField: { type: String },
+    exchangeRateField: { type: String },
+    junctionParentField: { type: String },
+    junctionLanguageField: { type: String },
+    surchargeNameField: { type: String },
+    translationsSurchargeField: { type: String },
+    translationsLanguageField: { type: String },
+    fromCurrencyField: { type: String },
+    toCurrencyField: { type: String },
+    currencySymbolField: { type: String },
     type: { type: String, default: null },
     relation: { type: Object, default: null },
     fieldData: { type: Object, default: null },
-    placement: { type: String, default: "bottom" },
-    label: { type: String, default: "" },
-    loadingText: { type: String, default: "" },
-    headerSurchargeLabel: { type: String, default: "" },
-    headerPricingLabel: { type: String, default: "" },
-    buyLabel: { type: String, default: "" },
-    sellLabel: { type: String, default: "" },
-    emptyStateTitle: { type: String, default: "" },
-    emptyStateHint: { type: String, default: "" },
+    placement: { type: String },
+    label: { type: String },
+    loadingText: { type: String },
+    headerSurchargeLabel: { type: String },
+    headerPricingLabel: { type: String },
+    buyLabel: { type: String },
+    sellLabel: { type: String },
+    emptyStateTitle: { type: String },
+    emptyStateHint: { type: String },
   },
 
   emits: ["input"],
@@ -157,212 +181,190 @@ export default defineComponent({
 
     const loading = ref(false);
     const calculating = ref(false);
-    const items = ref<any[]>([]);
-    const originalItems = ref<any[]>([]);
+    const errorMessage = ref("");
+    const items = ref<DirectusItem[]>([]);
+    const originalItems = ref<DirectusItem[]>([]);
     const hasBuyChanges = ref(false);
-    const hotelId = ref<string | null>(null);
+    const parentId = ref<string | null>(null);
     const languageId = ref<string | null>(null);
-    const buyCurrencySymbol = ref("€");
-    const sellCurrencySymbol = ref("$");
+    const buyCurrencySymbol = ref("");
+    const sellCurrencySymbol = ref("");
+    /*
+     * The parent id `loadData` last successfully loaded surcharges for —
+     * used solely to tell "this record's surcharges changed since last
+     * load" apart from "we just switched to a different record entirely".
+     * Diffing against a previous load only makes sense in the former case;
+     * in the latter, every one of the previous record's surcharges would
+     * otherwise look "removed" and their translations would be wrongly
+     * cascade-deleted.
+     */
+    const lastLoadedParentId = ref<string | null>(null);
+    const {
+      resolveContext,
+      fetchCurrencySymbols,
+      loadData,
+      saveChanges,
+      calculateAndSave: calculateAndSaveInternal,
+    } = useSurchargeData({
+      props,
+      api,
+      parentId,
+      languageId,
+      items,
+      originalItems,
+      hasBuyChanges,
+      buyCurrencySymbol,
+      sellCurrencySymbol,
+      lastLoadedParentId,
+      loading,
+      calculating,
+      errorMessage,
+    });
 
-    const resolveContext = async () => {
-      const hf = props.junctionHotelField;
-      const lf = props.junctionLanguageField;
+    // An explicit 0 (not null/empty) is treated as unset in the UI — show
+    // nothing rather than a literal 0.00, independently for buy and sell.
+    const isZero = (value: unknown) =>
+      value !== null && value !== undefined && value !== "" && Number(value) === 0;
 
-      hotelId.value = props.values?.[hf]?.id ?? props.values?.[hf] ?? null;
-      languageId.value = props.values?.[lf]?.id ?? props.values?.[lf] ?? null;
-
-      if (props.primaryKey && props.primaryKey !== "+") {
-        try {
-          const { data } = await api.get(
-            `/items/${props.collection}/${props.primaryKey}`,
-            { params: { fields: [hf, lf, props.exchangeRateField] } },
-          );
-          if (data?.data) {
-            hotelId.value = data.data[hf]?.id ?? data.data[hf] ?? hotelId.value;
-            languageId.value =
-              data.data[lf]?.id ?? data.data[lf] ?? languageId.value;
-            const rateKey = data.data[props.exchangeRateField]?.key;
-            if (rateKey) await fetchCurrencySymbols(rateKey);
-          }
-        } catch (err) {
-          console.error("[SurchargePrices] resolveContext error:", err);
-        }
-      }
-
-      // Fallback: when the interface is placed directly on the hotel collection,
-      // primaryKey IS the hotel ID and junctionHotelField won't resolve from values.
-      if (!hotelId.value && props.primaryKey && props.primaryKey !== "+") {
-        hotelId.value = String(props.primaryKey);
-      }
-
-      // Final fallback: for new junction records (pk="+"), extract the hotel UUID
-      // from the current page URL — works when rendered inside a hotel edit form.
-      if (!hotelId.value) {
-        const uuidMatch = window.location.pathname.match(
-          /\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i,
-        );
-        if (uuidMatch) hotelId.value = uuidMatch[1];
-      }
+    // Rows the user has actually typed a buy price into since the last
+    // save, tracked explicitly (not inferred by comparing values) so
+    // there's no ambiguity from type mismatches or reactivity timing — this
+    // is the single source of truth for "is this 0 a live edit or a saved
+    // value". Rows are mutated in place, so tracking by object reference is
+    // stable; the set is cleared wholesale once a save actually completes
+    // (see `calculateAndSave` below).
+    const editedBuyItems = reactive(new Set<DirectusItem>());
+    const markBuyCellTyped = (item: DirectusItem) => {
+      editedBuyItems.add(item);
     };
 
-    const fetchCurrencySymbols = async (rateKey: string) => {
-      try {
-        const fc = props.fromCurrencyField || "from_currency";
-        const tc = props.toCurrencyField || "to_currency";
-        const sf = props.currencySymbolField || "symbol";
-        const { data } = await api.get(
-          `/items/${props.ratesCollection}/${rateKey}`,
-          { params: { fields: [`${fc}.${sf}`, `${tc}.${sf}`] } },
-        );
-        buyCurrencySymbol.value = data.data[fc]?.[sf] || "€";
-        sellCurrencySymbol.value = data.data[tc]?.[sf] || "$";
-      } catch (err) {
-        console.error("[SurchargePrices] fetchCurrencySymbols error:", err);
-      }
+    // A 0 is only ever blanked once it's the value actually saved in the
+    // database — a 0 the user just typed and hasn't saved yet is shown
+    // plainly, exactly as typed, until Save and Stay commits it, at which
+    // point it blanks out like any other saved 0.
+    const getBuyDisplay = (item: DirectusItem) => {
+      const buy = item[props.buyPriceField as string];
+      if (!isZero(buy)) return buy;
+      return editedBuyItems.has(item) ? buy : "";
     };
 
-    const loadData = async () => {
-      if (!hotelId.value) return;
-
-      loading.value = true;
-      try {
-        const nameField = props.surchargeNameField || "name";
-        const tSurchargeField = props.translationsSurchargeField || "surcharges_id";
-        const tLanguageField = props.translationsLanguageField || "translations_id";
-
-        const { data: sRes } = await api.get(
-          `/items/${props.surchargesCollection}`,
-          {
-            params: {
-              filter: { [props.hotelField]: { _eq: hotelId.value } },
-              fields: [
-                "id",
-                nameField,
-                props.buyPriceField,
-                ...(props.sortField ? [props.sortField] : []),
-              ],
-              sort: props.sortField ? [props.sortField] : undefined,
-              limit: -1,
-            },
-          },
-        );
-
-        const sIds = sRes.data.map((s: any) => s.id);
-        const translations: Record<string, any> = {};
-
-        if (sIds.length > 0 && languageId.value) {
-          const { data: tRes } = await api.get(
-            `/items/${props.translationsCollection}`,
-            {
-              params: {
-                filter: {
-                  _and: [
-                    { [tSurchargeField]: { _in: sIds } },
-                    { [tLanguageField]: { _eq: languageId.value } },
-                  ],
-                },
-                limit: -1,
-              },
-            },
-          );
-          tRes.data.forEach((t: any) => {
-            translations[t[tSurchargeField]] = t;
-          });
-        }
-
-        items.value = sRes.data.map((s: any) => ({
-          ...s,
-          [props.sellPriceField]:
-            translations[s.id]?.[props.sellPriceField] ?? null,
-          _trans_id: translations[s.id]?.id || null,
-          _dirty: false,
-          _buyDirty: false,
-        }));
-
-        originalItems.value = JSON.parse(JSON.stringify(items.value));
-        hasBuyChanges.value = false;
-      } catch (err: any) {
-        console.error("[SurchargePrices] loadData error:", err);
-      } finally {
-        loading.value = false;
-      }
+    // Wraps the composable's own calculate-and-save so a successful save
+    // also clears every row's "user just typed this" flag — from that
+    // point on, a 0 in any of those rows reflects what's actually in the
+    // database again, so the normal blank-if-zero display takes back over.
+    const calculateAndSave = async () => {
+      await calculateAndSaveInternal();
+      editedBuyItems.clear();
     };
 
-    const handleBuyPriceInput = (item: any, event: Event) => {
+    // Renders the (read-only) sell price, always to two decimals; blank when
+    // the value is zero or missing.
+    const formatValue = (v: unknown) => {
+      if (isZero(v)) return "";
+      if (v === null || v === undefined || v === "") return "";
+      return Number(v).toFixed(2);
+    };
+
+    // Writes a buy-price keystroke straight into the row object (in place, so
+    // the table re-renders reactively), updates the per-row dirty flags
+    // against the last-saved `originalItems`, and refreshes the save-button
+    // state. Empty input is stored as `null`.
+    const handleBuyPriceInput = (item: DirectusItem, event: Event) => {
       const value = (event.target as HTMLInputElement).value;
-      item[props.buyPriceField] = value === "" ? null : Number(value);
-      const orig = originalItems.value.find((o: any) => o.id === item.id);
+      item[props.buyPriceField as string] = value === "" ? null : Number(value);
+      const orig = originalItems.value.find((o: DirectusItem) => o.id === item.id);
       if (orig) {
         item._buyDirty =
-          item[props.buyPriceField] !== orig[props.buyPriceField];
+          item[props.buyPriceField as string] !== orig[props.buyPriceField as string];
         item._dirty =
           item._buyDirty ||
-          item[props.sellPriceField] !== orig[props.sellPriceField];
+          item[props.sellPriceField as string] !== orig[props.sellPriceField as string];
       }
       hasBuyChanges.value = items.value.some((i) => i._buyDirty);
     };
 
-    const saveChanges = async () => {
-      const tSurchargeField = props.translationsSurchargeField || "surcharges_id";
-      const tLanguageField = props.translationsLanguageField || "translations_id";
-      const tasks: Promise<any>[] = [];
-      for (const item of items.value) {
-        if (!item._dirty) continue;
-        tasks.push(
-          api.patch(`/items/${props.surchargesCollection}/${item.id}`, {
-            [props.buyPriceField]: item[props.buyPriceField],
+    // Completion signal from an external caller (e.g. a Save & Stay flow
+    // that re-ran the surcharge calculator) for THIS parent — reload the
+    // surcharges so the table reflects the freshly computed prices.
+    const handleExternalCalculation = (event: Event) => {
+      const detail = (event as CustomEvent).detail;
+      if (detail?.parentId && String(detail.parentId) === String(parentId.value)) {
+        loadData();
+      }
+    };
+
+    /*
+     * Buy-price edits here are written straight into `items.value` and
+     * persisted via this component's own direct API calls (`saveChanges`),
+     * never through Directus's `emit("input", ...)` field path — same
+     * reasoning as the price-table interface. Broadcasting `hasBuyChanges`
+     * and responding to `flush-request` is what lets a standalone Save &
+     * Stay button (whose own dirty-tracking only sees the record's
+     * `values`) both enable itself for a surcharge-only edit and persist
+     * this table before it saves + calculates.
+     */
+    watch(hasBuyChanges, (dirty) => {
+      window.dispatchEvent(
+        new CustomEvent("surcharge-table:dirty-changed", { detail: { dirty } }),
+      );
+    });
+
+    const handleFlushRequest = async () => {
+      // `freshRows` carries the buy price this call just confirmed
+      // persisting for each dirty row — passed along so the Save & Stay
+      // button's sell-price calculator can use it directly instead of
+      // re-fetching (and possibly racing) this same write. Empty when
+      // there was nothing to persist.
+      let freshRows: unknown[] = [];
+      try {
+        if (hasBuyChanges.value) {
+          freshRows = await saveChanges();
+          // `saveChanges` only PATCHes — it doesn't reset the per-row dirty
+          // flags or `hasBuyChanges` itself, so reload to resync local state
+          // with what was just persisted (same as a normal record switch).
+          await loadData();
+        }
+      } finally {
+        window.dispatchEvent(
+          new CustomEvent("save-and-stay:flush-complete", {
+            detail: { source: "surcharge-table", freshRows },
           }),
         );
-        if (item._trans_id) {
-          tasks.push(
-            api.patch(
-              `/items/${props.translationsCollection}/${item._trans_id}`,
-              { [props.sellPriceField]: item[props.sellPriceField] },
-            ),
-          );
-        } else if (languageId.value) {
-          tasks.push(
-            api.post(`/items/${props.translationsCollection}`, {
-              [tSurchargeField]: item.id,
-              [tLanguageField]: languageId.value,
-              [props.sellPriceField]: item[props.sellPriceField],
-            }),
-          );
-        }
-      }
-      await Promise.all(tasks);
-    };
-
-    const calculateAndSave = async () => {
-      calculating.value = true;
-      try {
-        if (items.value.some((i: any) => i._dirty)) await saveChanges();
-        if (props.calculateFlowId) {
-          await api.post(`/flows/trigger/${props.calculateFlowId}`, {
-            collection: props.collection,
-            keys: [hotelId.value],
-          });
-          await new Promise((resolve) => setTimeout(resolve, 2500));
-        }
-        await loadData();
-      } catch {
-        // intentionally silent
-      } finally {
-        calculating.value = false;
       }
     };
 
-    const formatValue = (v: any) => {
-      if (v === null || v === undefined || v === "") return "—";
-      return Number(v).toFixed(2);
-    };
-
+    // Initial load: resolve the context, load the surcharges, then listen for
+    // external surcharge-calculation completions.
     onMounted(async () => {
       await resolveContext();
       await loadData();
+      window.addEventListener(
+        "surcharge-calculator:calculated",
+        handleExternalCalculation,
+      );
+      window.addEventListener("save-and-stay:flush-request", handleFlushRequest);
     });
 
+    onUnmounted(() => {
+      // Remove the completion-signal listener so nothing outlives the
+      // component instance.
+      window.removeEventListener(
+        "surcharge-calculator:calculated",
+        handleExternalCalculation,
+      );
+      window.removeEventListener("save-and-stay:flush-request", handleFlushRequest);
+      // The Save & Stay button may still be mounted after this table is
+      // torn down — don't leave it believing this table still has edits.
+      window.dispatchEvent(
+        new CustomEvent("surcharge-table:dirty-changed", { detail: { dirty: false } }),
+      );
+    });
+
+    // Reload when the context changes: either the primary key just arrived
+    // (a new junction record was created) or the resolved parent/language
+    // changed under us (e.g. the parent FK in `values` was set elsewhere).
+    // `loadData`'s own `lastLoadedParentId` guard then decides whether the
+    // orphan-translation cleanup should run (same record) or not (switch).
     watch(
       () =>
         [props.values, props.primaryKey] as [object, string | number | null],
@@ -370,13 +372,13 @@ export default defineComponent({
         [, newPK]: [object, string | number | null],
         [, oldPK]: [object, string | number | null],
       ) => {
-        const oldHotel = hotelId.value;
+        const oldParentId = parentId.value;
         const oldLang = languageId.value;
         await resolveContext();
         const pkJustArrived =
           newPK && newPK !== "+" && (!oldPK || oldPK === "+");
         const contextChanged =
-          hotelId.value !== oldHotel || languageId.value !== oldLang;
+          parentId.value !== oldParentId || languageId.value !== oldLang;
         if (pkJustArrived || contextChanged) await loadData();
       },
       { deep: true },
@@ -385,17 +387,20 @@ export default defineComponent({
     return {
       loading,
       calculating,
+      errorMessage,
       items,
       hasBuyChanges,
-      hotelId,
+      parentId,
       buyCurrencySymbol,
       sellCurrencySymbol,
       buyPriceField: props.buyPriceField,
       sellPriceField: props.sellPriceField,
-      surchargeNameField: props.surchargeNameField || "name",
+      surchargeNameField: props.surchargeNameField,
       handleBuyPriceInput,
       calculateAndSave,
       formatValue,
+      getBuyDisplay,
+      markBuyCellTyped,
     };
   },
 });
@@ -415,6 +420,9 @@ export default defineComponent({
   padding: 4rem 2rem;
   color: var(--theme--foreground-subdued);
   gap: 1rem;
+}
+.error-notice {
+  margin-bottom: 1rem;
 }
 .save-bar {
   display: flex;
@@ -478,7 +486,6 @@ col.col-price {
 .sticky-col {
   position: sticky;
   left: 0;
-  z-index: 10;
 }
 /* Name cell */
 .name-cell {
@@ -554,6 +561,8 @@ col.col-price {
   opacity: 0.7;
 }
 .price-display {
+  display: block;
+  min-height: 1.125rem;
   text-align: center;
   font-size: 0.75rem;
   font-weight: 500;
@@ -585,10 +594,5 @@ col.col-price {
 .empty-hint {
   margin: 0;
   font-size: 0.875rem;
-}
-@media (max-width: 768px) {
-  .sticky-col {
-    position: static;
-  }
 }
 </style>

@@ -131,31 +131,46 @@ export default defineComponent({
   emits: ["close"],
   setup(props) {
     const api = useApi();
-    const { locale: systemLocale } = useI18n();
+    const { locale: systemLocale, t } = useI18n();
 
-    const { languages } = useLanguages(
+    const { languages, loading: languagesLoading } = useLanguages(
       props.config?.translation_collection ?? "languages",
     );
-    const { fieldLabels, fieldChoices, groupLabels } = useFieldLabels(
-      props.collection,
-      toRef(props, "config"),
-    );
+    const { fieldLabels, fieldChoices, groupLabels, loading: labelsLoading } =
+      useFieldLabels(props.collection, toRef(props, "config"));
     const { getRelationMap } = useRelationMap();
 
     const rawItem = ref<Record<string, unknown>>({});
-    const loading = ref(false);
+    const itemLoading = ref(false);
+    // Item data, field/dropdown labels, and languages are fetched independently.
+    // Rendering only once ALL three are ready avoids a flash of raw field keys
+    // and unresolved dropdown values before labels finish resolving.
+    const loading = computed(
+      () => itemLoading.value || labelsLoading.value || languagesLoading.value,
+    );
     const error = ref<string | null>(null);
     // Configured field paths the API rejected (403/unknown field) — dropped from the
     // request and shown as "No access" instead of blanking the whole preview.
     const noAccessPaths = ref<Set<string>>(new Set());
 
-    function extractErrorMatch(e: unknown): { field: string; collection: string } | null {
+    function extractErrorMatch(
+      e: unknown,
+    ): { field: string | null; collection: string } | null {
       const apiErrors =
         (e as { response?: { data?: { errors?: Array<{ message?: string }> } } })?.response?.data
           ?.errors ?? (e as { errors?: Array<{ message?: string }> })?.errors;
       const msg = apiErrors?.[0]?.message ?? (e instanceof Error ? e.message : "");
-      const match = /access field "([^"]+)" in collection "([^"]+)"/.exec(msg);
-      return match ? { field: match[1], collection: match[2] } : null;
+
+      const fieldMatch = /access field "([^"]+)" in collection "([^"]+)"/.exec(msg);
+      if (fieldMatch) return { field: fieldMatch[1], collection: fieldMatch[2] };
+
+      // Collection-level FORBIDDEN (e.g. no read permission at all on a
+      // relation target like "catering_services") has no field name — drop
+      // every requested path that lands in that collection instead of bailing.
+      const collectionMatch = /access collection "([^"]+)"/.exec(msg);
+      if (collectionMatch) return { field: null, collection: collectionMatch[1] };
+
+      return null;
     }
 
     const currentLang = ref(props.config?.defaultLang ?? "de-DE");
@@ -178,7 +193,7 @@ export default defineComponent({
 
     async function fetchData() {
       if (!hasConfig.value) return;
-      loading.value = true;
+      itemLoading.value = true;
       error.value = null;
       noAccessPaths.value = new Set();
 
@@ -208,20 +223,24 @@ export default defineComponent({
           const before = fields.length;
           fields = fields.filter((p) => {
             const leaf = resolveLeafCollection(props.collection, p, relMap);
-            const isBad = leaf?.leafCollection === match.collection && leaf?.leafField === match.field;
+            const isBad =
+              leaf?.leafCollection === match.collection &&
+              (match.field === null || leaf?.leafField === match.field);
             if (isBad) noAccessPaths.value.add(p);
             return !isBad;
           });
 
           // Couldn't map the error back to a configured path — bail rather than loop forever.
           if (fields.length === before) {
-            error.value = `access field "${match.field}" in collection "${match.collection}"`;
+            error.value = match.field
+              ? `access field "${match.field}" in collection "${match.collection}"`
+              : `access collection "${match.collection}"`;
             break;
           }
         }
       }
 
-      loading.value = false;
+      itemLoading.value = false;
     }
 
     onMounted(fetchData);
@@ -255,6 +274,7 @@ export default defineComponent({
               fieldLabels.value,
               fieldChoices.value,
               noAccessPaths.value,
+              (key: string) => t(key) as string,
             ),
           };
         })

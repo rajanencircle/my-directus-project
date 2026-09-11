@@ -3,10 +3,11 @@ import {
   applyActions,
   applyBodyRouteClass,
   cleanupActions,
+  teardownStickyTabBar,
 } from "./domActions";
 import type { RouteConfig } from "./config";
-
-export const LOG = "[route-dom-injector]";
+import { LOG } from "./constants";
+export { LOG }; // re-export so existing callers of `import { LOG } from './observer'` still work
 
 interface InjectorState {
   config: RouteConfig[];
@@ -52,13 +53,18 @@ function runForCurrentRoute(): void {
   } catch (err) {
     console.error(`${LOG} applyActions error:`, err);
   } finally {
+    // Release on the next macrotask rather than after an arbitrary 80ms.
+    // MutationObserver callbacks fire as microtasks, so any mutation
+    // applyActions() itself just caused is delivered and correctly
+    // ignored (isRunning is still true) before this runs — but real
+    // mutations from Vue's own re-renders aren't held back for 80ms.
     setTimeout(() => {
       state.isRunning = false;
-    }, 80);
+    }, 0);
   }
 }
 
-function onRouteChange(newPath: string): void {
+function onRouteChange(): void {
   state.isRunning = false;
 
   if (state.debounceTimer) clearTimeout(state.debounceTimer);
@@ -78,7 +84,7 @@ function patchHistoryApi(): void {
     url?: string | URL | null,
   ) {
     _push(data, unused, url);
-    onRouteChange(window.location.pathname);
+    onRouteChange();
   };
 
   history.replaceState = function (
@@ -87,11 +93,11 @@ function patchHistoryApi(): void {
     url?: string | URL | null,
   ) {
     _replace(data, unused, url);
-    onRouteChange(window.location.pathname);
+    onRouteChange();
   };
 
   window.addEventListener("popstate", () => {
-    onRouteChange(window.location.pathname);
+    onRouteChange();
   });
 }
 
@@ -141,16 +147,18 @@ export function destroyRouteDomInjector(): void {
     state.debounceTimer = null;
   }
   cleanupActions();
+  teardownStickyTabBar();
   applyBodyRouteClass("");
   state.lastAppliedPath = null;
   state.isRunning = false;
 }
 
 export function getInjectorStatus() {
+  const matches = matchRoute(window.location.pathname, state.config);
   return {
     active: state.observer !== null,
     currentPath: window.location.pathname,
-    matchedConfig: matchRoute(window.location.pathname, state.config),
+    matchedConfig: matches.length > 0 ? matches[matches.length - 1] : null,
     configCount: state.config.length,
   };
 }

@@ -1,10 +1,16 @@
-// Normalizes a source "supplementary" value into the contract's SupplementaryBlock[]
-// shape ({ headline, text } strings). Source values arrive in various forms:
-// - an array of objects ({ headline, text } or { content } or { title, description } etc.)
-// - an array of strings
-// - a single object
-// - a plain string
-// Returns an array of SupplementaryBlock objects.
+/**
+ * @description Normalizes a source "supplementary" value into an array of `SupplementaryBlock` objects.
+ *
+ * Source data can arrive in unpredictable shapes (arrays of objects, arrays of strings,
+ * single objects, or plain strings). This function inspects the input type, extracts any
+ * `headline` and `text` it can find, and filters out empty blocks.
+ *
+ * It ensures unstructured supplementary JSON is cleaned up and strictly conforms to the
+ * API contract's `{ headline, text }[]` shape.
+ * 
+ * @param {Array|Object|String|null} value - The raw supplementary value.
+ * @returns {Array<Object>} Array of standardized SupplementaryBlock objects.
+ */
 export function toSupplementaryBlocks(value) {
   const extractBlock = (item) => {
     if (typeof item === "object" && item !== null) {
@@ -55,9 +61,19 @@ export function toSupplementaryBlocks(value) {
   return [];
 }
 
-// Extracts the description text from a specials JSON value directly, without the
-// extra name/headline/title field. Accepts an array of items, a single object, or a
-// plain string. Reads the `special_description` field.
+/**
+ * @description Extracts the description text from a specials JSON value.
+ *
+ * Accepts an array of items, a single object, or a plain string. It looks for
+ * `special_description` and trims the value. When given an array, all descriptions are
+ * extracted and joined together with double newlines.
+ *
+ * Product transformers use this to pull promotional or special description text buried
+ * inside complex JSON blobs.
+ * 
+ * @param {Array|Object|String|null} value - The raw specials JSON value.
+ * @returns {String|null} The combined specials description, or null if empty.
+ */
 export function extractSpecialsDescription(value) {
   const pick = (item) => {
     if (typeof item === "string") return item.trim() || null;
@@ -74,11 +90,19 @@ export function extractSpecialsDescription(value) {
   return pick(value);
 }
 
-// Extracts a single validity window from a specials JSON value (array of
-// { valid_from, valid_to } entries, or a single such object). The contract's
-// specials.valid_from/valid_to is one flat pair per product, but the source
-// data can carry several specials each with their own window — the first entry that
-// actually has one of the two dates set wins.
+/**
+ * @description Extracts a single validity window from a specials JSON value.
+ *
+ * Iterates through the input, which can be an array or a single object. The first entry
+ * that contains either `special_valid_from` or `special_valid_to` is returned immediately;
+ * any subsequent items are ignored.
+ *
+ * This is used when mapping multiple special offers into the contract's flat
+ * `valid_from` / `valid_to` structure, taking only the first relevant date range.
+ * 
+ * @param {Array|Object|null} value - The raw specials JSON value.
+ * @returns {Object} An object containing `valid_from` and `valid_to` properties.
+ */
 export function extractSpecialsValidity(value) {
   const items = Array.isArray(value) ? value : [value];
   for (const item of items) {

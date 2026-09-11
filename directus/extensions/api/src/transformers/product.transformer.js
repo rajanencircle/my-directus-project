@@ -21,10 +21,19 @@ const SHAPERS = {
 };
 
 /**
- * Dispatches a raw product item to the correct per-type transformer.
- * The `type` field on each item determines which transformer is called.
+ * @description Routes a generic product item to its specific shape function based on `_productType`.
  *
- * @param {object} item - raw product item with a `_productType` discriminator set by the service
+ * Products can be of multiple types (hotel, tour, camper, etc.), so this function looks up the
+ * correct shaping function from the local `SHAPERS` map above (keyed the same way as
+ * products.service.js's separate `PRODUCT_TYPE_REGISTRY`, which tags each item's
+ * `_productType` in the first place) and acts as a dispatcher to format the product
+ * correctly. When `allowTombstone` is true and the item is not published, a minimal
+ * tombstone object is returned instead of leaking data.
+ *
+ * This is used by the unified `/products` endpoint, which returns a heterogeneous list of
+ * different product types.
+ *
+ * @param {Object} item - The raw product item from Directus.
  * @param {string|null} lang - ISO 639-1 language code or null
  * @param {object} [opts]
  * @param {boolean} [opts.allowTombstone=false] - if true, a non-published item is collapsed
@@ -35,7 +44,7 @@ const SHAPERS = {
  *   practice — PRODUCT_TYPE_REGISTRY only ever sets one of the keys above — but this is a
  *   defined, safe fallback instead of leaking the raw Directus row).
  */
-export function shapeProduct(item, lang, { allowTombstone = false } = {}) {
+export function shapeProduct(item, lang, { allowTombstone = false, audience = "web" } = {}) {
   const shaper = SHAPERS[item._productType];
   if (!shaper) return null;
 
@@ -77,6 +86,6 @@ export function shapeProduct(item, lang, { allowTombstone = false } = {}) {
     title: shapedDetail.name ?? shapedDetail.title ?? null,
     publishing_status: publishingStatus,
     date_updated: shapedDetail.date_updated ?? null,
-    details: shaper(item, lang, { audience: "web" }),
+    details: shaper(item, lang, { audience }),
   };
 }

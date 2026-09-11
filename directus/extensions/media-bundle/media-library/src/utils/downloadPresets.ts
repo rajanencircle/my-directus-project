@@ -1,4 +1,42 @@
 import { type TranslatableString, resolveTranslatable } from './translations';
+export {
+  buildWebAssetParams,
+  buildCustomAssetParams,
+  choiceToAssetPreset,
+  cmToPrintPx,
+  isRasterImageMime,
+  isSvgMime,
+  isVideoMime,
+  isOriginalOnlyMime,
+  parseMediaSizesCm,
+  supportsPrintDownload,
+  supportsWebFormats,
+  supportsWebTransformDownload,
+  supportsCustomDownload,
+  webFormatsForMime,
+  customFormatsForMime,
+  defaultQualityForCustomFormat,
+	RASTER_WEB_FORMATS,
+	WEB_FORMATS_FOR_RASTER,
+  WEB_LONG_EDGE_PX,
+  WEB_QUALITY,
+  CUSTOM_FIT_OPTIONS,
+  CUSTOM_FORMAT_OPTIONS,
+  type DownloadChoice,
+  type DownloadModalFile,
+  type DownloadModalLabels,
+  type DownloadUseCase,
+  type WebFormat,
+  type WebResolution,
+  type CustomFit,
+  type CustomFormat,
+  DEFAULT_DOWNLOAD_MODAL_LABELS,
+} from './downloadVariants';
+
+export {
+  buildDownloadModalLabels,
+  resolveDownloadModalLabel,
+} from './downloadModalLabels';
 
 function supportsMultiFormatDownload(mimeType?: string | null, _filename?: string | null): boolean {
   return mimeType?.startsWith('image/') ?? false;
@@ -12,6 +50,8 @@ export type DownloadFormatPreset = {
   height?: number;
   fit?: string;
   quality?: number;
+  /** Sharp / Directus: do not enlarge past original dimensions */
+  withoutEnlargement?: boolean;
 };
 
 export const DEFAULT_DOWNLOAD_FORMAT_PRESETS: DownloadFormatPreset[] = [

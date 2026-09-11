@@ -1,9 +1,8 @@
 import { query, param } from "express-validator";
 import { PRIMARIX_STATUS_QUERY_VALUES, VALID_LANG_CODES } from "./constants.js";
 
-// Every list-resource's validation.js (hotels/cruises/tours/excursions/
-// rental_cars/campers) declared this exact trio of express-validator
-// schemas, differing only in name. This factory is that shared shape.
+/* Shared express-validator schema trio for every list-resource
+ * (hotels/cruises/tours/excursions/rental_cars/campers). */
 export function createStandardValidation() {
   const listSlimSchema = [
     query("page")

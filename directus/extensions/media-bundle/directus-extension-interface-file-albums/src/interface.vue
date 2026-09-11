@@ -62,9 +62,6 @@ const labelEmpty = computed(() =>
 const labelPlaceholder = computed(() =>
   t(props.searchPlaceholder, "Search or create album…"),
 );
-const labelUnknown = computed(() =>
-  t(props.unknownAlbumLabel, "(Unknown album)"),
-);
 const labelUnsaved = computed(() =>
   t(props.unsavedPlaceholder, "Save the file first…"),
 );
@@ -96,18 +93,22 @@ const comboboxRef = ref<HTMLElement | null>(null);
 let _skipNextDropdownOpen = false;
 
 // ── Derived ───────────────────────────────────────────────────────────────────
+/** Junction rows that still point at a real album (skip deleted / null album). */
+const validLinks = computed(() => {
+  const af = props.junctionAlbumField!;
+  return links.value.filter((j) => {
+    const a = j[af];
+    return a != null && typeof a === "object" && a.id != null;
+  });
+});
+
 const currentAlbums = computed(() => {
   const af = props.junctionAlbumField!;
   const nf = props.albumNameField!;
-  return links.value
-    .map((j) => {
-      const a = j[af];
-      if (!a) return null;
-      return typeof a === "object"
-        ? ({ id: a.id, [nf]: a[nf] } as Album)
-        : null;
-    })
-    .filter(Boolean) as Album[];
+  return validLinks.value.map((j) => {
+    const a = j[af] as Album;
+    return { id: a.id, [nf]: a[nf] } as Album;
+  });
 });
 
 const currentAlbumIds = computed(
@@ -150,7 +151,24 @@ async function loadLinks() {
         limit: -1,
       },
     });
-    links.value = (res.data?.data ?? []) as Junction[];
+    const rows = (res.data?.data ?? []) as Junction[];
+
+    // Orphan junctions (album deleted → related expand is null) look like
+    // "(Unknown album)". Hide them and delete the stale junction rows.
+    const orphans = rows.filter((j) => {
+      const a = j[af!];
+      return a == null || typeof a !== "object" || a.id == null;
+    });
+    if (orphans.length) {
+      await Promise.allSettled(
+        orphans.map((j) => api.delete(`/items/${jc}/${j.id}`)),
+      );
+    }
+
+    links.value = rows.filter((j) => {
+      const a = j[af!];
+      return a != null && typeof a === "object" && a.id != null;
+    });
   } catch (e: any) {
     error.value =
       e?.response?.data?.errors?.[0]?.message ?? "Failed to load albums.";
@@ -307,8 +325,7 @@ onUnmounted(() => {
 
 <template>
   <div class="panel">
-    <!-- Title -->
-    <div class="section-title">{{ labelTitle }}</div>
+    <!-- Title removed — Directus group/field label already shows "Album Group" / field name -->
 
     <!-- Error -->
     <div v-if="error" class="notice notice-error">
@@ -384,26 +401,19 @@ onUnmounted(() => {
       <v-progress-circular indeterminate x-small />
     </div>
     <template v-else>
-      <div v-if="currentAlbums.length > 0" class="chips">
+      <div v-if="validLinks.length > 0" class="chips">
         <v-chip
-          v-for="j in links"
+          v-for="j in validLinks"
           :key="String(j.id)"
           small
           label
           class="album-chip"
         >
-          {{
-            j[props.junctionAlbumField!] &&
-            typeof j[props.junctionAlbumField!] === "object"
-              ? j[props.junctionAlbumField!][props.albumNameField!]
-              : j[props.junctionAlbumField!] == null
-                ? labelUnknown
-                : String(j[props.junctionAlbumField!])
-          }}
+          {{ j[props.junctionAlbumField!][props.albumNameField!] }}
           <button
             class="chip-action"
             title="Open album"
-            @click.stop="navigateToAlbum(j[props.junctionAlbumField!]?.id ?? j[props.junctionAlbumField!])"
+            @click.stop="navigateToAlbum(j[props.junctionAlbumField!].id)"
           >
             <v-icon name="open_in_new" x-small />
           </button>
@@ -425,28 +435,23 @@ onUnmounted(() => {
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-family: var(--theme--fonts--sans--font-family);
-  font-size: var(--theme--form--field--input--font-size, 14px);
+  gap: 0.75rem;
+  color: var(--theme--form--field--input--foreground, var(--theme--foreground));
+  font-family: var(--theme--form--field--input--font-family, var(--theme--fonts--sans--font-family));
+  font-size: var(--theme--form--field--input--font-size, 0.875rem);
+  font-weight: var(--theme--form--field--input--font-weight, 400);
 }
 
-/* ── Section title ── */
-.section-title {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--theme--foreground-subdued);
-}
+/* Match native Directus field labels — kept for chips / inputs only */
 
-/* ── Error notice ── */
 .notice {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
   border-radius: var(--theme--border-radius);
-  font-size: 13px;
+  font-size: inherit;
+  font-family: inherit;
 }
 
 .notice-error {
@@ -469,22 +474,23 @@ onUnmounted(() => {
 }
 .notice-dismiss:hover { opacity: 1; }
 
-/* ── Loading ── */
 .loading {
   display: flex;
   align-items: center;
   gap: 8px;
   color: var(--theme--foreground-subdued);
-  font-size: 13px;
+  font-size: inherit;
+  font-family: inherit;
 }
 
-/* ── Empty ── */
 .empty {
   color: var(--theme--foreground-subdued);
-  font-size: 13px;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  margin: 0;
 }
 
-/* ── Chips ── */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -493,10 +499,13 @@ onUnmounted(() => {
 
 .album-chip {
   --v-chip-color: var(--white);
-  --v-chip-background-color: color-mix(in srgb, var(--theme--primary) 100%, transparent);
-  --v-chip-border-color: color-mix(in srgb, var(--theme--primary) 100, transparent);
+  --v-chip-background-color: var(--theme--primary);
+  --v-chip-border-color: var(--theme--primary);
   gap: 8px;
   cursor: default;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .chip-action {
@@ -515,7 +524,6 @@ onUnmounted(() => {
 .chip-action:hover { opacity: 1; }
 .chip-remove:disabled { cursor: not-allowed; opacity: 0.25; }
 
-/* ── Combobox ── */
 .combobox { position: relative; }
 
 .caret {
@@ -524,20 +532,21 @@ onUnmounted(() => {
 }
 .caret.open { transform: rotate(180deg); }
 
-/* ── Dropdown ── */
 .dropdown {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   right: 0;
   z-index: 500;
-  background: var(--theme--background-normal);
-  border: 1px solid var(--theme--form--field--input--border-color, var(--theme--border-color));
+  background: var(--theme--form--field--input--background, var(--theme--background));
+  border: var(--theme--border-width, 1px) solid var(--theme--form--field--input--border-color, var(--theme--border-color));
   border-radius: var(--theme--border-radius);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   max-height: 240px;
   overflow-y: auto;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .dropdown-item {
@@ -549,9 +558,10 @@ onUnmounted(() => {
   background: none;
   border: none;
   text-align: left;
-  font-family: var(--theme--fonts--sans--font-family);
-  font-size: 13px;
-  color: var(--theme--foreground);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: var(--theme--form--field--input--foreground, var(--theme--foreground));
   cursor: pointer;
   transition: background var(--fast) var(--transition);
 }
@@ -564,9 +574,8 @@ onUnmounted(() => {
   color: var(--theme--primary);
   border-top: 1px solid var(--theme--border-color);
 }
-.dropdown-create strong { font-weight: 700; }
+.dropdown-create strong { font-weight: var(--theme--form--field--label--font-weight, 600); }
 
-/* ── Dropdown transition ── */
 .dropdown-fade-enter-active,
 .dropdown-fade-leave-active {
   transition:

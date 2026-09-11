@@ -1,11 +1,19 @@
-// The single mechanism for audience-scoped visibility, usable at ANY depth inside a
-// fieldDef's value — not just at the top level. Wrap a value (a whole nested object, an
-// array item's property, whatever) with `restrictTo(value, ...audiences)` to make it
-// disappear entirely (the containing key is omitted, not set to null) when
-// `assembleResponse` is called for an audience not in that list. Omitting the audience
-// argument to assembleResponse entirely (today's every backoffice call site) always
-// resolves every restricted value as visible — restriction only ever narrows what's shown
-// for an explicitly-requested audience, so nothing changes for existing callers.
+/**
+ * @description Provides a mechanism to restrict the visibility of response fields to specific audiences.
+ *
+ * Wraps a value in an object that carries a special `Symbol("hiddenFor")` key holding a Set
+ * of permitted audiences. During response assembly (`assembleResponse.js`), if the requested
+ * audience is not in that Set, the value is entirely omitted (the key is dropped, not just
+ * set to null). If no audience is requested, the value defaults to visible.
+ *
+ * Transformer definitions use this to securely hide sensitive or internal data (such as
+ * margins, B2B pricing, or internal notes) from public or unauthorized audiences. It can be
+ * used at any depth within the response object.
+ * 
+ * @param {*} value - The value to be conditionally hidden.
+ * @param {...String} audiences - The list of audience names permitted to see this value.
+ * @returns {Object} An object wrapping the value and its visibility restrictions.
+ */
 export const HIDDEN_FOR = Symbol("hiddenFor");
 
 export function restrictTo(value, ...audiences) {

@@ -2,6 +2,7 @@
 import { ref, computed, inject, onMounted, onBeforeUnmount, watch, provide } from 'vue';
 import type { ComputedRef } from 'vue';
 import { useApi } from '@directus/extensions-sdk';
+import { collectPartnerFolderIds, partnerIdFromCreatedBy, partnerVisuallyFromCreatedBy, usePartnerScope } from '../../../media-library/src/composables/usePartnerScope';
 import FolderTreeItem from './FolderTreeItem.vue';
 
 type UploaderLabels = Record<string, string>
@@ -12,6 +13,8 @@ interface DirectusFolder {
   id: string;
   name: string;
   parent: string | null;
+  createdByPartnerId?: string | null;
+  createdByPartnerVisually?: string | null;
 }
 
 type FolderNode = DirectusFolder & { children: FolderNode[] };
@@ -26,6 +29,7 @@ const emit = defineEmits<{
 }>();
 
 const api = useApi();
+const { partnerScopeId, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
 
 const folders = ref<DirectusFolder[]>([]);
 const loading = ref(false);
@@ -48,6 +52,8 @@ function normalizeFolderRaw(item: Record<string, unknown>): DirectusFolder {
     id: String(item.id ?? ''),
     name: String(item.name ?? ''),
     parent: normalizeParentId(item.parent),
+    createdByPartnerId: partnerIdFromCreatedBy(item.created_by),
+    createdByPartnerVisually: partnerVisuallyFromCreatedBy(item.created_by),
   };
 }
 
@@ -137,14 +143,32 @@ async function fetchFolders(opts?: { silent?: boolean }) {
   const silent = opts?.silent === true;
   if (!silent) loading.value = true;
   try {
-    const res = await api.get('/folders', {
-      params: {
-        limit: -1,
-        fields: 'id,name,parent',
-      },
-    });
-    const rows = Array.isArray(res.data?.data) ? res.data.data : [];
-    folders.value = rows.map((r: Record<string, unknown>) => normalizeFolderRaw(r));
+    await initPartnerScope();
+    let rows: Record<string, unknown>[] = [];
+    try {
+      const res = await api.get('/folders', {
+        params: {
+          limit: -1,
+          fields: ['id', 'name', 'parent', 'created_by.partner_selected.id', 'created_by.partner_selected.visually'],
+        },
+      });
+      rows = Array.isArray(res.data?.data) ? res.data.data : [];
+    } catch {
+      const res = await api.get('/folders', {
+        params: {
+          limit: -1,
+          fields: 'id,name,parent',
+        },
+      });
+      rows = Array.isArray(res.data?.data) ? res.data.data : [];
+    }
+    const all = rows.map((r: Record<string, unknown>) => normalizeFolderRaw(r));
+    if (isPartnerScoped.value && partnerScopeId.value) {
+      const allowed = await collectPartnerFolderIds(api, partnerScopeId.value, all);
+      folders.value = all.filter((f) => allowed.has(f.id));
+    } else {
+      folders.value = all;
+    }
   } catch (e: any) {
     if (e?.response?.status === 403) {
       noAccess.value = true;
@@ -220,11 +244,12 @@ watch(
 
       <div class="folder-tree">
         <FolderTreeItem
-          v-for="node in folderTree"
+          v-for="(node, index) in folderTree"
           :key="node.id"
           :node="node"
           :depth="0"
           :active-id="modelValue"
+          :is-last="index === folderTree.length - 1"
           @select="select"
           @toggle="toggleExpand"
         />
@@ -237,28 +262,36 @@ watch(
 .folder-dropdown {
   position: relative;
   width: 100%;
-  font-family: var(--theme--fonts--sans--font-family);
+  min-width: 0;
 }
 
 .trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
-  padding: var(--theme--form--field--input--padding);
-  background: var(--theme--background-normal);
-  border: 1px solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius);
-  color: var(--theme--foreground);
-  font-family: inherit;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  background: var(--theme--form--field--input--background, var(--theme--background-normal));
+  border: var(--theme--border-width, 1px) solid var(--theme--form--field--input--border-color, var(--theme--border-color));
+  border-radius: var(--theme--border-radius, 6px);
+  color: var(--theme--form--field--input--foreground, var(--theme--foreground));
+  font: inherit;
   font-size: 14px;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s;
+  transition: border-color var(--fast, 0.15s) var(--transition, ease);
 }
 
 .trigger:hover:not(:disabled) {
-  border-color: var(--theme--primary);
+  border-color: var(--theme--form--field--input--border-color-hover, var(--theme--primary));
+}
+
+.trigger:focus-visible:not(:disabled) {
+  border-color: var(--theme--form--field--input--border-color-focus, var(--theme--primary));
+  outline: none;
 }
 
 .trigger:disabled {
@@ -285,22 +318,12 @@ watch(
 
 .trigger-library {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
+  align-items: center;
   min-width: 0;
 }
 
 .trigger-library-title {
-  font-size: 14px;
-  font-weight: 600;
   color: var(--theme--foreground);
-}
-
-.trigger-library-sub {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--theme--foreground-subdued);
 }
 
 .chevron {
@@ -319,37 +342,41 @@ watch(
   left: 0;
   right: 0;
   max-height: 300px;
+  overflow-x: hidden;
   overflow-y: auto;
-  padding: 8px 0 10px;
+  padding: 4px 0 6px;
   background: var(--theme--background-normal);
-  border: 1px solid var(--theme--border-color);
+  border: var(--theme--border-width) solid var(--theme--border-color);
   border-radius: var(--theme--border-radius);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--theme--elevation-medium);
   z-index: 100;
+  min-width: 0;
 }
 
 .dropdown-item {
-  font-size: 14px;
   cursor: pointer;
   color: var(--theme--foreground);
-  transition: background 0.1s;
+  transition: background var(--fast) var(--transition);
 }
 
 .folder-tree {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .folder-tree-row {
   width: 100%;
+  min-width: 0;
   outline: none;
 }
 
 .folder-tree-root {
-  padding: 2px 8px;
-  margin: 0 4px;
-  border-radius: 8px;
-  transition: background 0.12s ease;
+  padding: 2px 6px;
+  margin: 0 2px;
+  border-radius: var(--theme--border-radius);
+  transition: background var(--fast) var(--transition);
 }
 
 .folder-tree-root:hover {
@@ -367,10 +394,11 @@ watch(
 .folder-tree-row-inner {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  min-height: 44px;
-  padding: 8px 4px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 4px;
   box-sizing: border-box;
 }
 
@@ -393,8 +421,6 @@ watch(
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 650;
-  font-size: 14px;
   color: var(--theme--foreground);
 }
 
@@ -410,16 +436,14 @@ watch(
 }
 
 .folder-tree-label-sub {
-  font-size: 13px;
-  font-weight: 500;
   color: var(--theme--foreground-subdued);
 }
 
 .folder-tree-chevron-spacer {
   flex-shrink: 0;
-  margin-left: auto;
-  width: 28px;
-  height: 28px;
+  margin-inline-start: auto;
+  width: 24px;
+  height: 24px;
 }
 
 .folder-tree-root + .folder-tree {
@@ -429,7 +453,6 @@ watch(
 }
 
 .seg-root {
-  font-weight: 600;
   flex-shrink: 0;
 }
 

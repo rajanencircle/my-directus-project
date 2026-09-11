@@ -1,18 +1,28 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useApi } from '@directus/extensions-sdk'
+import {
+  collectPartnerFolderIds,
+  partnerIdFromCreatedBy,
+  partnerVisuallyFromCreatedBy,
+  usePartnerScope,
+} from '../composables/usePartnerScope'
 
 export interface FolderNode {
   id: string
   name: string
   parent: string | null
   children: FolderNode[]
+  createdByPartnerId?: string | null
+  createdByPartnerVisually?: string | null
 }
 
 interface RawFolder {
   id: string
   name: string
   parent: string | null
+  createdByPartnerId?: string | null
+  createdByPartnerVisually?: string | null
 }
 
 function buildTree(flat: RawFolder[], parentId: string | null = null): FolderNode[] {
@@ -22,17 +32,43 @@ function buildTree(flat: RawFolder[], parentId: string | null = null): FolderNod
       id: f.id,
       name: f.name,
       parent: f.parent,
+      createdByPartnerId: f.createdByPartnerId,
+      createdByPartnerVisually: f.createdByPartnerVisually,
       children: buildTree(flat, f.id),
     }))
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 
+function normalizeParent(parent: unknown): string | null {
+  if (parent == null || parent === '') return null
+  if (typeof parent === 'object' && parent !== null && 'id' in parent) {
+    const idVal = (parent as { id?: unknown }).id
+    return idVal != null && idVal !== '' ? String(idVal) : null
+  }
+  return String(parent)
+}
+
+function mapFolderRows(rows: unknown[]): RawFolder[] {
+  return (Array.isArray(rows) ? rows : []).map((row) => {
+    const f = row as Record<string, unknown>
+    return {
+      id: String(f.id),
+      name: String(f.name ?? ''),
+      parent: normalizeParent(f.parent),
+      createdByPartnerId: partnerIdFromCreatedBy(f.created_by),
+      createdByPartnerVisually: partnerVisuallyFromCreatedBy(f.created_by),
+    }
+  })
+}
+
 export const useFoldersStore = defineStore('media-library-folders', () => {
   const api = useApi()
+  const { partnerScopeId, currentUserId, isPartnerScoped, init: initPartnerScope } = usePartnerScope()
 
   const rawFolders = ref<RawFolder[]>([])
   const selectedFolderId = ref<string | null>(null)
   const isLoading = ref(false)
+  const loadedForUserId = ref<string | null>(null)
 
   const folderTree = computed<FolderNode[]>(() => buildTree(rawFolders.value, null))
 
@@ -46,7 +82,14 @@ export const useFoldersStore = defineStore('media-library-folders', () => {
   function getSubfolders(parentId: string | null): FolderNode[] {
     return (rawFolders.value as RawFolder[])
       .filter((f) => f.parent === parentId)
-      .map((f) => ({ id: f.id, name: f.name, parent: f.parent, children: getSubfolders(f.id) }))
+      .map((f) => ({
+        id: f.id,
+        name: f.name,
+        parent: f.parent,
+        createdByPartnerId: f.createdByPartnerId,
+        createdByPartnerVisually: f.createdByPartnerVisually,
+        children: getSubfolders(f.id),
+      }))
       .sort((a, b) => a.name.localeCompare(b.name))
   }
 
@@ -67,13 +110,42 @@ export const useFoldersStore = defineStore('media-library-folders', () => {
     return folderMap.value.get(id)?.name ?? 'Unknown Folder'
   }
 
-  async function fetchFolders(): Promise<void> {
+  async function applyPartnerPrune(all: RawFolder[]): Promise<void> {
+    if (isPartnerScoped.value && partnerScopeId.value) {
+      const allowed = await collectPartnerFolderIds(api, partnerScopeId.value, all)
+      rawFolders.value = all.filter((f) => allowed.has(f.id))
+    } else {
+      rawFolders.value = all
+    }
+  }
+
+  async function fetchFolders(opts?: { force?: boolean }): Promise<void> {
+    await initPartnerScope()
+    const uid = currentUserId.value ?? '__none__'
+    if (!opts?.force && loadedForUserId.value === uid) return
+
     isLoading.value = true
     try {
-      const response = await api.get('/folders', {
-        params: { fields: ['id', 'name', 'parent'], limit: -1 },
-      })
-      rawFolders.value = response.data?.data ?? []
+      if (loadedForUserId.value && loadedForUserId.value !== uid) {
+        rawFolders.value = []
+      }
+      try {
+        const response = await api.get('/folders', {
+          params: {
+            fields: ['id', 'name', 'parent', 'created_by.partner_selected.id', 'created_by.partner_selected.visually'],
+            limit: -1,
+          },
+        })
+        await applyPartnerPrune(mapFolderRows(response.data?.data ?? []))
+      } catch (err) {
+        // Fallback if created_by is not on directus_folders yet
+        console.warn('[media-library] folders fetch with created_by failed, retrying without:', err)
+        const response = await api.get('/folders', {
+          params: { fields: ['id', 'name', 'parent'], limit: -1 },
+        })
+        await applyPartnerPrune(mapFolderRows(response.data?.data ?? []))
+      }
+      loadedForUserId.value = uid
     } catch (err) {
       console.warn('[media-library] Failed to fetch folders:', err)
     } finally {
@@ -85,9 +157,25 @@ export const useFoldersStore = defineStore('media-library-folders', () => {
     selectedFolderId.value = id
   }
 
+  async function renameFolder(id: string, name: string): Promise<void> {
+    await api.patch(`/folders/${id}`, { name: name.trim() })
+    await fetchFolders({ force: true })
+  }
+
+  async function moveFolder(id: string, parent: string | null): Promise<void> {
+    await api.patch(`/folders/${id}`, { parent })
+    await fetchFolders({ force: true })
+  }
+
+  /** Flat list for delete/download helpers (id + parent). */
+  const flatFolders = computed(() =>
+    rawFolders.value.map((f) => ({ id: f.id, parent: f.parent, name: f.name })),
+  )
+
   return {
     folderTree,
     folderMap,
+    flatFolders,
     selectedFolderId,
     isLoading,
     getFolderName,
@@ -95,5 +183,7 @@ export const useFoldersStore = defineStore('media-library-folders', () => {
     getBreadcrumbs,
     fetchFolders,
     selectFolder,
+    renameFolder,
+    moveFolder,
   }
 })

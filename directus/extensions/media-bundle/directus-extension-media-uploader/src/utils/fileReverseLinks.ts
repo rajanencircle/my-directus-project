@@ -144,6 +144,31 @@ export function reverseTableCells(sec: ReverseSectionLike, jrow: AnyRecord): (st
       const v = getByPath(jrow, p);
       if (v === undefined || v === '') return null;
       if (v === null) return null;
+      // Prefer human labels from translation arrays / nested name fields
+      if (Array.isArray(v)) {
+        for (const item of v) {
+          if (!item || typeof item !== 'object') continue;
+          const name =
+            item.name ??
+            item.name_tour ??
+            item.name_excursion ??
+            item.name_vehicle ??
+            item.name_company ??
+            item.headline ??
+            item.title;
+          if (typeof name === 'string' && name.trim()) return name.trim();
+        }
+      } else if (v && typeof v === 'object') {
+        const name =
+          (v as AnyRecord).name ??
+          (v as AnyRecord).name_tour ??
+          (v as AnyRecord).name_excursion ??
+          (v as AnyRecord).name_vehicle ??
+          (v as AnyRecord).name_company ??
+          (v as AnyRecord).headline ??
+          (v as AnyRecord).title;
+        if (typeof name === 'string' && name.trim()) return name.trim();
+      }
       return typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean' ? String(v) : rowPrettyJson(v as any);
     });
   }

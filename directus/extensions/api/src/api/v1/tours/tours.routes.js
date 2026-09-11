@@ -1,12 +1,15 @@
-import { asyncWrapper } from "../../shared/asyncWrapper.js";
-import { validate } from "../../shared/validate.js";
-import { listSlimToursSchema, listFullToursSchema, getTourDetailSchema } from "./tours.validation.js";
-import { createToursController } from "./tours.controller.js";
+import { createCollectionResource } from "../../shared/createCollectionResource.js";
+import { tours as filters } from "../../shared/collectionFilters.js";
+import { LIST_FIELDS } from "./tours.fields.js";
+import { shapeTourListItem, shapeTourDetail } from "../../../transformers/tour.transformer.js";
+import { getTourDetails } from "./tours.service.js";
 
-export function setupToursRoutes(router, prefix, context) {
-  const { index, fullList, detail } = createToursController(context);
-
-  router.get(prefix, validate(listSlimToursSchema), asyncWrapper(index));
-  router.get(`${prefix}/full`, validate(listFullToursSchema), asyncWrapper(fullList));
-  router.get(`${prefix}/:id`, validate(getTourDetailSchema), asyncWrapper(detail));
-}
+export const setupToursRoutes = createCollectionResource({
+  collection: "tours",
+  resourceLabel: "tour",
+  listFields: LIST_FIELDS,
+  filters: filters,
+  getDetails: getTourDetails,
+  shapeListItem: shapeTourListItem,
+  shapeDetail: shapeTourDetail,
+});

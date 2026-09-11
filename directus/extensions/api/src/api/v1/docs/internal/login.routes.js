@@ -1,8 +1,10 @@
 import bcrypt from "bcryptjs";
 import { rateLimiter } from "../../../shared/rateLimiter.js";
 import { signDocsToken } from "../../../shared/jwt.js";
-import { DOCS_COOKIE_NAME } from "../../../shared/docsAuthMiddleware.js";
-import { setRedocCsp } from "../shared/docsCsp.js";
+import { DOCS_COOKIE_NAME, getValidDocsPayload } from "../../../shared/docsAuthMiddleware.js";
+import { setRedocCsp } from "../lib/docsCsp.js";
+import { sendError } from "../../../shared/apiResponse.js";
+import { HTTP_STATUS } from "../../../shared/constants.js";
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -54,7 +56,14 @@ function renderLoginPage({ error } = {}) {
 }
 
 export function setupDocsLoginRoutes(router, docsAuthState) {
-  router.get("/v1/internal-docs/login", (_req, res) => {
+  router.get("/v1/internal-docs/login", (req, res) => {
+    /* Already holding a valid session cookie (e.g. a second tab, or a refresh after
+     * logging in elsewhere) — skip the form and go straight to the docs instead of
+     * asking the user to log in again. */
+    if (getValidDocsPayload(req, docsAuthState)) {
+      return res.redirect(302, "/api/v1/internal-docs");
+    }
+
     setRedocCsp(res);
     res.setHeader("Content-Type", "text/html");
     res.send(renderLoginPage());
@@ -63,7 +72,10 @@ export function setupDocsLoginRoutes(router, docsAuthState) {
   router.post("/v1/internal-docs/login", rateLimiter, async (req, res, next) => {
     try {
       if (!docsAuthState.config) {
-        return res.status(503).send("Docs authentication is not configured.");
+        return sendError(res, {
+          status: HTTP_STATUS.SERVICE_UNAVAILABLE,
+          errors: ["Docs authentication is not configured."],
+        });
       }
 
       const { username, password } = await readUrlEncodedBody(req);

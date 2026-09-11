@@ -1,13 +1,20 @@
 import { buildDetailFields } from "../../shared/query/buildQueryFields.js";
+import { filterValidFieldPaths } from "../../shared/query/validateFieldPaths.js";
 import { computeUpdatedAtMax } from "../../utils/delta.js";
+import { createScopedItemsService } from "./collectionFilters.js";
 
 /**
  * Provides a standardized shape for every collection's `listSlim` and `listFull` methods.
  * Abstracts the boilerplate for schema/ItemsService setup, parallelized list/count retrieval,
  * delta-filter composition, and the per-ID detail-refetch loop in `listFull`.
  * 
- * Note: Detail retrieval (`getDetails`) remains explicitly hand-written per collection to accommodate 
+ * Note: Detail retrieval (`getDetails`) remains explicitly hand-written per collection to accommodate
  * domain-specific joins, deep filtering (e.g., hotels), and complex data fan-outs (e.g., vehicles).
+ *
+ * `listFields` is run through `filterValidFieldPaths` before every query (same mechanism
+ * `buildDetailFields` uses for detail endpoints): a renamed/removed field degrades to
+ * "silently omitted" instead of Directus throwing a raw ForbiddenException that fails the
+ * whole list/full request with a bare, unhelpful 403 (see the /products slim-list bug).
  */
 export function createCollectionService({
   collection,
@@ -19,21 +26,24 @@ export function createCollectionService({
   getDetails,
 }) {
   async function listSlim(
-    { page, limit, offset, publishing_status },
+    { page, limit, offset, publishing_status, apiUser },
     { services, database, getSchema },
   ) {
     const schema = await getSchema();
-    const { ItemsService } = services;
-    const itemsService = new ItemsService(collection, {
-      knex: database,
-      schema,
+    const itemsService = createScopedItemsService(services, collection, { knex: database, schema }, {
+      partnerId: apiUser?.partnerId,
+      partnerVisibility: apiUser?.partnerVisibility,
     });
 
-    const filter = buildListFilter({ publishing_status });
+    const filter = buildListFilter({
+      publishing_status,
+      partnerId: apiUser?.partnerId,
+      partnerVisibility: apiUser?.partnerVisibility,
+    });
 
     const [rawItems, countResult] = await Promise.all([
       itemsService.readByQuery({
-        fields: listFields,
+        fields: filterValidFieldPaths(schema, collection, listFields),
         sort: buildSort(),
         limit,
         offset,
@@ -53,24 +63,27 @@ export function createCollectionService({
   }
 
   async function listFull(
-    { page, limit, offset, publishing_status, updated_after },
+    { page, limit, offset, publishing_status, updated_after, apiUser },
     context,
   ) {
     const { services, database, getSchema } = context;
     const schema = await getSchema();
-    const { ItemsService } = services;
-    const itemsService = new ItemsService(collection, {
-      knex: database,
-      schema,
+    const itemsService = createScopedItemsService(services, collection, { knex: database, schema }, {
+      partnerId: apiUser?.partnerId,
+      partnerVisibility: apiUser?.partnerVisibility,
     });
 
-    const listFilter = buildListFilter({ publishing_status });
+    const listFilter = buildListFilter({
+      publishing_status,
+      partnerId: apiUser?.partnerId,
+      partnerVisibility: apiUser?.partnerVisibility,
+    });
     const deltaFilter = buildUpdatedAfterFilter(updated_after);
     const filter = deltaFilter ? { _and: [listFilter, deltaFilter] } : listFilter;
 
     const [rawItems, countResult] = await Promise.all([
       itemsService.readByQuery({
-        fields: listFields,
+        fields: filterValidFieldPaths(schema, collection, listFields),
         sort: buildSort(),
         limit,
         offset,
@@ -99,7 +112,16 @@ export function createCollectionService({
      * Monitor the structured warning logs, rather than the payload length, to identify dropped records.
      */
     const results = await Promise.allSettled(
-      rawItems.map((item) => getDetails({ id: item.id.toString() }, context)),
+      rawItems.map((item) =>
+        getDetails(
+          {
+            id: item.id.toString(),
+            partnerId: apiUser?.partnerId,
+            partnerVisibility: apiUser?.partnerVisibility,
+          },
+          context,
+        ),
+      ),
     );
     const data = [];
     for (let i = 0; i < results.length; i++) {

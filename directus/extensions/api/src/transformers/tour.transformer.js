@@ -13,26 +13,31 @@ import {
   getLocaleCode,
   buildTranslationsMap,
   pickFromMap,
-} from "./shared/i18n.js";
-import { getGeoName, shapeGeoRefs } from "./shared/geo.js";
-import { buildThumbnailUrl, buildImageBadge } from "./shared/media.js";
-import { toNumOrNull } from "./shared/numeric.js";
+} from "./helpers/i18n.js";
+import { getGeoName, shapeGeoRefs } from "./helpers/geo.js";
+import { buildThumbnailUrl, buildImageBadge } from "./helpers/media.js";
+import { toNumOrNull } from "./helpers/numeric.js";
 import {
   buildPricingConfig,
   buildPriceSettingsMap,
   buildSurchargeSettingsMap,
-} from "./shared/pricing.js";
-import { shapeOperatorAddress } from "./shared/address.js";
+} from "./helpers/pricing.js";
+import { shapeOperatorAddress } from "./helpers/address.js";
 import {
   shapeFrequency as sharedShapeFrequency,
   parseTravelRoutes,
   shapeRoutePlace as sharedShapeRoutePlace,
-} from "./shared/departures.js";
+} from "./helpers/departures.js";
 
 const TOUR_GROUP_ORDER = ["main"];
 
 /**
- * Shapes the raw tour data into a summarized list item format.
+ * @description Shapes the raw tour data into a summarized list item format.
+ *
+ * Extracts essential list properties (ID, name, thumbnail, and starting price) and uses
+ * `assembleResponse` to guarantee a payload shape that conforms to the API contract.
+ *
+ * The `/tours` collection endpoint uses this to produce a lightweight array of tour items.
  *
  * @param {Object} tour - The raw tour data from the database.
  * @param {string} lang - The language code for translations.
@@ -61,8 +66,14 @@ export function shapeTourListItem(tour, lang) {
 }
 
 /**
- * Shapes the raw tour data into a comprehensive detail format.
- * Aggregates translations, pricing, schedules, flight info, categories, surcharges, and metadata.
+ * @description Shapes the raw tour data into a comprehensive detail format.
+ *
+ * Aggregates all aspects of a tour: translations, pricing (via `groupPrices2`), schedules,
+ * flight info, categories, and surcharges. `assembleResponse` enforces visibility rules,
+ * hiding fields like margins from unauthorized audiences.
+ *
+ * The `/tours/:id` endpoint uses this to deliver the complete structured payload for a
+ * specific tour.
  *
  * @param {Object} tour - The raw tour data from the database.
  * @param {string} lang - The language code for translations.
@@ -184,15 +195,18 @@ export function shapeTourDetail(tour, lang, { audience } = {}) {
         tour.prices ?? [],
         (tour.occupancies ?? [])
           .map((o) => {
-            if (!o.occupancy) return null;
+            /* `o` is a `tours_occupancies_selected` junction row; the real occupancy
+             * record (and its `id`, used as `value` below) lives under `tours_occupancies_id`. */
+            const occRow = o.tours_occupancies_id;
+            if (!occRow?.occupancy) return null;
             const occTransMap = buildTranslationsMap(
-              o.occupancy.translations,
+              occRow.occupancy.translations,
               (t) => ({ name: t.name }),
             );
             const occTrans = pickFromMap(occTransMap, lang);
             return {
-              ...o.occupancy,
-              value: o.id,
+              ...occRow.occupancy,
+              value: occRow.id,
               name: occTrans?.name ?? null,
             };
           })
@@ -205,6 +219,7 @@ export function shapeTourDetail(tour, lang, { audience } = {}) {
           dateStartKey: "price_period_start",
           dateEndKey: "price_period_end",
           dateFromKey: "price_period_from",
+          translationsKey: "tours_prices_translations",
         },
         (cat) => {
           const catMap = buildTranslationsMap(cat.translations, (t) => ({
@@ -246,12 +261,13 @@ export function shapeTourDetail(tour, lang, { audience } = {}) {
     ? tour.surcharges.map((s) => {
         const translationsMap = buildTranslationsMap(s.translations, (t) => ({
           description: t.surcharge_description ?? null,
+          sell_price: t.sell_price ?? null,
         }));
         const active = pickFromMap(translationsMap, lang) ?? {};
         return {
           booking_name: s.surcharge_booking_name ?? null,
           description: active.description ?? null,
-          sell: null,
+          sell: active.sell_price !== null && active.sell_price !== undefined ? parseFloat(active.sell_price) : null,
           /* Restrict internal pricing, margins, and calculation details to backoffice visibility.
            * The public web payload is limited to `booking_name`, `description`, and `sell` price. */
           type: restrictTo(
@@ -272,7 +288,10 @@ export function shapeTourDetail(tour, lang, { audience } = {}) {
               : null,
             "backoffice",
           ),
-          buy: restrictTo(null, "backoffice"),
+          buy: restrictTo(
+            s.buy_price !== null && s.buy_price !== undefined ? parseFloat(s.buy_price) : null,
+            "backoffice",
+          ),
           margin: restrictTo(
             activeSurchargeSettings.marginPct !== undefined &&
               activeSurchargeSettings.marginPct !== null

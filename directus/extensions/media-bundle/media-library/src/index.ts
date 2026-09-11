@@ -8,10 +8,24 @@ export default defineModule({
   icon: 'photo_library',
   routes: [
     {
+      // All files (no folder filter)
       path: '',
       component: MediaLibraryView,
     },
     {
+      // Folder view — like native /admin/files/folders/:folderId
+      path: 'folders/:folderId',
+      component: MediaLibraryView,
+      props: true,
+    },
+    {
+      // Album view
+      path: 'albums/:albumId',
+      component: MediaLibraryView,
+      props: true,
+    },
+    {
+      // File detail — keep /media-library/:id for existing links/notifications
       path: ':id',
       component: FileDetailView,
       props: true,

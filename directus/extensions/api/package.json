@@ -9,13 +9,24 @@
     "directus-extension-endpoint"
   ],
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "directus:extension": {
-    "type": "endpoint",
-    "path": "dist/index.js",
-    "source": "src/hook/index.js",
+    "type": "bundle",
+    "path": {
+      "app": "dist/app.js",
+      "api": "dist/api.js"
+    },
+    "entries": [
+      {
+        "type": "endpoint",
+        "name": "api-endpoint",
+        "source": "src/hook/index.js"
+      },
+      {
+        "type": "hook",
+        "name": "api-auth",
+        "source": "src/authHook/index.js"
+      }
+    ],
     "host": "^10.10.0"
   },
   "scripts": {

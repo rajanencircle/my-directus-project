@@ -26,9 +26,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useApi } from '@directus/extensions-sdk'
+import { useApi, useStores } from '@directus/extensions-sdk'
 import { useT } from '../composables/useT'
 import { useFoldersStore } from '../stores/folders.store'
+import { usePartnerScope } from '../composables/usePartnerScope'
 
 const props = defineProps<{
   parent?: string | null
@@ -37,6 +38,9 @@ const props = defineProps<{
 const api = useApi()
 const { t } = useT()
 const foldersStore = useFoldersStore()
+const { useUserStore } = useStores()
+const userStore = useUserStore()
+const { init: initPartnerScope, currentUserId } = usePartnerScope()
 
 const dialogActive = ref(false)
 const saving = ref(false)
@@ -46,11 +50,15 @@ async function addFolder() {
   if (!newFolderName.value.trim() || saving.value) return
   saving.value = true
   try {
-    await api.post('/folders', {
+    await initPartnerScope()
+    const payload: Record<string, unknown> = {
       name: newFolderName.value.trim(),
       parent: props.parent ?? null,
-    })
-    await foldersStore.fetchFolders()
+    }
+    const creatorId = currentUserId.value ?? userStore.currentUser?.id ?? null
+    if (creatorId) payload.created_by = creatorId
+    await api.post('/folders', payload)
+    await foldersStore.fetchFolders({ force: true })
     cancel()
   } catch (err) {
     console.error('[media-library] Create folder failed:', err)

@@ -37,6 +37,9 @@
         </span>
       </div>
     </template>
+    <template v-else-if="isHtmlString(value)">
+      <div class="html-value" v-html="sanitizeHtml(value as string)"></div>
+    </template>
     <template v-else>
       <span class="scalar-value">{{ formatScalar(value) }}</span>
     </template>
@@ -46,12 +49,30 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 
+// Legacy imported content (e.g. cruise "Introduction"/teaser text) is stored
+// as raw HTML even though the field's own Directus interface is plain text —
+// rendering it as an escaped string would show literal "<p>" tags to editors.
+const HTML_TAG_PATTERN = /<\/?[a-z][\s\S]*>/i;
+
 export default defineComponent({
   name: "FieldValue",
   props: {
     value: { type: null as unknown as PropType<unknown>, default: null },
   },
   methods: {
+    isHtmlString(v: unknown): boolean {
+      return typeof v === "string" && HTML_TAG_PATTERN.test(v);
+    },
+    // Minimal allowlist-free strip of script/style/event-handler/js-uri vectors.
+    // Content originates from Directus editors (internal, not public-submitted),
+    // so this is defense-in-depth rather than a full sanitizer.
+    sanitizeHtml(html: string): string {
+      return html
+        .replace(/<(script|style|iframe|object|embed)[\s\S]*?<\/\1>/gi, "")
+        .replace(/<(script|style|iframe|object|embed)[^>]*>/gi, "")
+        .replace(/\son\w+\s*=\s*(".*?"|'.*?'|[^\s>]+)/gi, "")
+        .replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1="#"');
+    },
     formatScalar(v: unknown): string {
       if (v === null || v === undefined) return "—";
       if (typeof v === "string") {
@@ -64,6 +85,19 @@ export default defineComponent({
           }
         }
         return v;
+      }
+      if (typeof v === "boolean") return v ? "Yes" : "No";
+      // Nested arrays/objects (e.g. a raw JSON sub-field inside a repeater row)
+      // would otherwise stringify to "[object Object]" — summarize them as
+      // readable key/value pairs instead.
+      if (Array.isArray(v)) {
+        return v.length ? v.map((item) => this.formatScalar(item)).join(", ") : "—";
+      }
+      if (typeof v === "object") {
+        const entries = Object.entries(v as Record<string, unknown>);
+        return entries.length
+          ? entries.map(([k, val]) => `${k}: ${this.formatScalar(val)}`).join(", ")
+          : "—";
       }
       return String(v);
     },
@@ -123,5 +157,24 @@ export default defineComponent({
 .scalar-value {
   word-break: break-word;
   text-wrap: auto;
+  white-space: pre-wrap;
+}
+
+.html-value {
+  word-break: break-word;
+}
+.html-value :deep(p) {
+  margin: 0 0 0.75em;
+}
+.html-value :deep(p:last-child) {
+  margin-bottom: 0;
+}
+.html-value :deep(ul),
+.html-value :deep(ol) {
+  margin: 0 0 0.75em;
+  padding-left: 1.25em;
+}
+.html-value :deep(a) {
+  color: var(--theme--primary, #6644ff);
 }
 </style>

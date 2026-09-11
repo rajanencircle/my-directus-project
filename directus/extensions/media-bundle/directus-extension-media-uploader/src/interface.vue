@@ -3,13 +3,23 @@ import { ref, computed, onMounted, watch, provide } from 'vue';
 import { useApi, useStores } from '@directus/extensions-sdk';
 import { useT } from './composables/useT';
 import { resolveTranslatable } from './utils/translations';
+import { resolveFieldTranslatedName } from './utils/field-label';
 import MediaGrid from './components/MediaGrid.vue';
 import UploadModal from './components/UploadModal.vue';
 import AddExistingModal from './components/AddExistingModal.vue';
+import DownloadModal from '../../media-library/src/components/download/DownloadModal.vue';
 import {
-  parseDownloadFormatPresets,
-  downloadFileViaApi,
-} from './utils/downloadPresets';
+  type DownloadChoice,
+  type DownloadModalFile,
+} from '../../media-library/src/utils/downloadVariants';
+import { buildDownloadModalLabels } from '../../media-library/src/utils/downloadModalLabels';
+import {
+  downloadManyAsZipForChoice,
+  downloadSingleForChoice,
+} from '../../media-library/src/utils/downloadExecute';
+import type { SaveTarget } from '../../media-library/src/utils/zipDownloadShared';
+import { useMediaSettings } from '../../media-library/src/composables/useMediaSettings';
+import { usePartnerScope } from '../../media-library/src/composables/usePartnerScope';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -36,6 +46,7 @@ const props = withDefaults(
     upload_area_folder?: string | null;
     file_reverse_links?: any;
     download_format_presets?: any;
+    junction_flags?: any;
     geo_enabled?: boolean;
     geo_levels?: any;
     geo_cascades?: any;
@@ -44,6 +55,7 @@ const props = withDefaults(
     geo_label_field?: string;
     upload_status_field?: string | null;
     upload_status_value?: string | null;
+    upload_file_fields?: any;
     // Translatable UI labels — translation key selected from directus_translations
     section_label?: string | null;
     empty_label?: string | null;
@@ -133,9 +145,23 @@ const emit = defineEmits<{
 // ─── State ───────────────────────────────────────────────────────────────────
 
 const api = useApi();
-const { useRelationsStore } = useStores();
+const { useRelationsStore, useFieldsStore, useUserStore } = useStores();
 const relationsStore = useRelationsStore();
+const fieldsStore = useFieldsStore();
+const userStore = useUserStore();
+
+/** Current Directus UI language — drives junction flag labels. */
+const appLocale = computed(() => {
+	const lang = (userStore.currentUser as any)?.language;
+	return (typeof lang === 'string' && lang) || document.documentElement.lang || 'en-US';
+});
 const { t } = useT();
+const { settings, fetchSettings } = useMediaSettings();
+const { partnerScopeId, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
+
+const downloadModalLabels = computed(() =>
+  buildDownloadModalLabels(t, settings.value as Record<string, string>),
+);
 
 // ─── Translated labels ────────────────────────────────────────────────────────
 
@@ -171,6 +197,10 @@ provide('uploaderLabels', computed(() => ({
   uploadReadyCount: r(props.upload_ready_count, 'ready to upload'),
   uploadClearAll: r(props.upload_clear_all, 'Clear all'),
   uploadGeoRequiredError: r(props.upload_geo_required_error, 'Please fill in required geography fields'),
+  uploadRequiredFieldsError: r(
+    props.upload_required_fields_error ?? props.upload_file_fields_required_error,
+    'Please fill in required fields',
+  ),
   // Folder
   folderRoot: r(props.folder_root, 'File Library'),
   folderLoading: r(props.folder_loading, 'Loading folders…'),
@@ -243,6 +273,8 @@ const selectedFileId = ref<string | null>(null);
 // Draft rows for form state (staged until parent record Save).
 // This is what drives the UI, and what we emit back to Directus.
 const rowsDraft = ref<JunctionRow[]>([]);
+/** Junction rows for other partners — hidden in UI but kept on Save. */
+const rowsHiddenOtherPartner = ref<JunctionRow[]>([]);
 const lastEmittedValueSig = ref<string>('');
 
 // ─── Relation-derived Junction Info ──────────────────────────────────────────
@@ -267,6 +299,84 @@ const filesFkRelation = computed(() => {
 
 const filesRelatedCollection = computed(() => filesFkRelation.value?.related_collection ?? null);
 
+/** Junction has a `sort` column (e.g. hotels_directus_files.sort). */
+const hasSortField = computed(() => {
+	try {
+		return !!fieldsStore.getField(junctionTable.value, 'sort');
+	} catch {
+		return false;
+	}
+});
+
+interface JunctionFlagDef {
+	field: string;
+	/** Optional static fallback; UI prefers Field Name Translations from the junction field. */
+	label?: string;
+}
+
+const DEFAULT_JUNCTION_FLAGS: JunctionFlagDef[] = [
+	{ field: 'is_map' },
+	{ field: 'tour32_export' },
+];
+
+function parseJunctionFlags(raw: unknown): JunctionFlagDef[] {
+	let parsed: unknown = raw;
+	if (typeof raw === 'string') {
+		try {
+			parsed = JSON.parse(raw);
+		} catch {
+			return DEFAULT_JUNCTION_FLAGS;
+		}
+	}
+	if (!Array.isArray(parsed)) return DEFAULT_JUNCTION_FLAGS;
+	return parsed
+		.map((item) => {
+			if (!item || typeof item !== 'object') return null;
+			const field = String((item as any).field ?? '').trim();
+			if (!field) return null;
+			const rawLabel = (item as any).label;
+			const label =
+				rawLabel == null || rawLabel === ''
+					? undefined
+					: String(rawLabel).trim() || undefined;
+			return { field, label };
+		})
+		.filter(Boolean) as JunctionFlagDef[];
+}
+
+/** Configured flags that exist on this junction — labels from field translations. */
+const activeJunctionFlags = computed(() => {
+	const locale = appLocale.value;
+	const junction = junctionTable.value;
+	const defs = parseJunctionFlags(props.junction_flags);
+	return defs
+		.map((def) => {
+			let fieldMeta: any = null;
+			try {
+				fieldMeta = fieldsStore.getField(junction, def.field);
+			} catch {
+				return null;
+			}
+			if (!fieldMeta) return null;
+			const label = resolveFieldTranslatedName(
+				fieldMeta,
+				locale,
+				def.label || def.field,
+			);
+			return { field: def.field, label };
+		})
+		.filter(Boolean) as Array<{ field: string; label: string }>;
+});
+
+const activeJunctionFlagFields = computed(() =>
+	activeJunctionFlags.value.map((f) => f.field),
+);
+
+/** Pass-through for Upload modal — keep reactive to interface options. */
+const uploadFileFieldsOption = computed(
+	() => props.upload_file_fields ?? (props as any).uploadFileFields ?? null,
+);
+
 // ─── Computed ────────────────────────────────────────────────────────────────
 
 const isNewRecord = computed(
@@ -276,8 +386,40 @@ const isNewRecord = computed(
 const effectiveReadonly = computed(() => props.readonly || props.disabled);
 
 const linkedFileIds = computed(() =>
-  rowsDraft.value.map((r) => String(r[filesFkField.value]?.id ?? '')).filter(Boolean)
+  [...rowsDraft.value, ...rowsHiddenOtherPartner.value]
+    .map((r) => String(r[filesFkField.value]?.id ?? ''))
+    .filter(Boolean)
 );
+
+function compareJunctionSort(a: JunctionRow, b: JunctionRow): number {
+	const as = a?.sort == null || a.sort === '' ? Number.POSITIVE_INFINITY : Number(a.sort);
+	const bs = b?.sort == null || b.sort === '' ? Number.POSITIVE_INFINITY : Number(b.sort);
+	const aNum = Number.isFinite(as) ? as : Number.POSITIVE_INFINITY;
+	const bNum = Number.isFinite(bs) ? bs : Number.POSITIVE_INFINITY;
+	if (aNum !== bNum) return aNum - bNum;
+	return String(a?.id ?? '').localeCompare(String(b?.id ?? ''));
+}
+
+function sortRowsBySort(rows: JunctionRow[]): JunctionRow[] {
+	if (!hasSortField.value) return rows;
+	return [...rows].sort(compareJunctionSort);
+}
+
+/** Rewrite sort to 1..n matching current visual order (for DnD / add / delete). */
+function reindexSort() {
+	if (!hasSortField.value) return;
+	rowsDraft.value = rowsDraft.value.map((r, i) => ({ ...r, sort: i + 1 }));
+}
+
+function nextSortStart(): number {
+	if (!hasSortField.value || !rowsDraft.value.length) return 1;
+	let max = 0;
+	for (const r of rowsDraft.value) {
+		const n = Number(r?.sort);
+		if (Number.isFinite(n) && n > max) max = n;
+	}
+	return max + 1;
+}
 
 // ─── Junction Init ────────────────────────────────────────────────────────────
 
@@ -310,20 +452,89 @@ function initJunction(): boolean {
 
 // ─── Data Loading ─────────────────────────────────────────────────────────────
 
+function fileUploaderPartnerId(file: unknown): string | null {
+  if (file == null || typeof file !== 'object') return null;
+  const ub = (file as Record<string, unknown>).uploaded_by;
+  if (ub == null || ub === '') return null;
+  if (typeof ub === 'object' && ub !== null) {
+    const ps = (ub as { partner_selected?: unknown }).partner_selected;
+    if (ps == null || ps === '') return null;
+    if (typeof ps === 'object' && ps !== null && 'id' in ps) {
+      const idVal = (ps as { id?: unknown }).id;
+      return idVal != null && idVal !== '' ? String(idVal) : null;
+    }
+    return String(ps);
+  }
+  return null;
+}
+
+function isFileVisibleForPartner(file: unknown): boolean {
+  if (!isPartnerScoped.value || !partnerScopeId.value) return true;
+  return fileUploaderPartnerId(file) === partnerScopeId.value;
+}
+
+function splitRowsByPartner(rows: JunctionRow[]): { visible: JunctionRow[]; hidden: JunctionRow[] } {
+  const fk = filesFkField.value;
+  const visible: JunctionRow[] = [];
+  const hidden: JunctionRow[] = [];
+  for (const row of rows) {
+    if (isFileVisibleForPartner(row?.[fk])) visible.push(row);
+    else hidden.push(row);
+  }
+  return { visible, hidden };
+}
+
 async function loadFiles() {
   if (isNewRecord.value) return;
   loading.value = true;
   loadError.value = null;
   try {
-    const res = await api.get(`/items/${junctionTable.value}`, {
-      params: {
-        filter: { [collectionFkField.value]: { _eq: props.primaryKey } },
-        fields: ['id', collectionFkField.value, `${filesFkField.value}.*`],
-        limit: -1,
-      },
-    });
-    const fresh = res.data.data ?? [];
-    rowsDraft.value = fresh;
+    await initPartnerScope();
+    const fk = filesFkField.value;
+    const fileFields = [
+      `${fk}.id`,
+      `${fk}.type`,
+      `${fk}.title`,
+      `${fk}.filename_download`,
+      `${fk}.generated_filename`,
+      `${fk}.description`,
+      `${fk}.copyright`,
+      `${fk}.filesize`,
+      `${fk}.uploaded_on`,
+      `${fk}.created_on`,
+      `${fk}.expiry_date`,
+      `${fk}.draft_status`,
+      `${fk}.modified_on`,
+      `${fk}.width`,
+      `${fk}.height`,
+      `${fk}.media_sizes_cm`,
+      `${fk}.uploaded_by.id`,
+      `${fk}.uploaded_by.first_name`,
+      `${fk}.uploaded_by.last_name`,
+      `${fk}.uploaded_by.email`,
+      `${fk}.uploaded_by.partner_selected.id`,
+      `${fk}.uploaded_by.partner_selected.visually`,
+      `${fk}.uploaded_by.partner_selected.label`,
+      `${fk}.keyword_ids.keywords_id.keyword`,
+    ];
+    const fields = ['id', collectionFkField.value, ...fileFields];
+    if (hasSortField.value) fields.push('sort');
+    for (const flag of activeJunctionFlagFields.value) {
+      if (!fields.includes(flag)) fields.push(flag);
+    }
+
+    const params: Record<string, any> = {
+      filter: { [collectionFkField.value]: { _eq: props.primaryKey } },
+      fields,
+      limit: -1,
+    };
+    if (hasSortField.value) params.sort = ['sort'];
+
+    const res = await api.get(`/items/${junctionTable.value}`, { params });
+    const fresh = (res.data.data ?? []).map((row: any) => normalizeJunctionFileRow(row));
+    const { visible, hidden } = splitRowsByPartner(fresh);
+    rowsHiddenOtherPartner.value = hidden;
+    rowsDraft.value = sortRowsBySort(visible);
   } catch (e: any) {
     loadError.value = e?.response?.data?.errors?.[0]?.message ?? 'Failed to load files.';
   } finally {
@@ -348,9 +559,11 @@ async function hydrateDraftFromValue() {
   const raw = props.value ?? [];
   if (!Array.isArray(raw) || !raw.length) {
     rowsDraft.value = [];
+    rowsHiddenOtherPartner.value = [];
     return;
   }
 
+  await initPartnerScope();
   const fk = filesFkField.value;
   const hasNestedFiles = raw.some((item) => {
     const file = item?.[fk];
@@ -358,16 +571,21 @@ async function hydrateDraftFromValue() {
   });
 
   if (hasNestedFiles) {
-    rowsDraft.value = raw.map((item) => {
-      const file = item[fk];
-      const fileId = typeof file === 'object' ? file.id : file;
-      const rowId = item?.id && !String(item.id).startsWith('tmp:') ? item.id : `tmp:${fileId}`;
-      return {
-        ...item,
-        id: rowId,
-        [fk]: typeof file === 'object' ? file : { id: file },
-      };
-    });
+    const mapped = sortRowsBySort(
+      raw.map((item) => {
+        const file = item[fk];
+        const fileId = typeof file === 'object' ? file.id : file;
+        const rowId = item?.id && !String(item.id).startsWith('tmp:') ? item.id : `tmp:${fileId}`;
+        return {
+          ...item,
+          id: rowId,
+          [fk]: typeof file === 'object' ? file : { id: file },
+        };
+      }),
+    );
+    const { visible, hidden } = splitRowsByPartner(mapped);
+    rowsHiddenOtherPartner.value = hidden;
+    rowsDraft.value = visible;
     return;
   }
 
@@ -381,15 +599,23 @@ async function hydrateDraftFromValue() {
 
   if (!fileIds.length) {
     rowsDraft.value = [];
+    rowsHiddenOtherPartner.value = [];
     return;
   }
 
   try {
     const files = await fetchFilesByIds(fileIds);
-    rowsDraft.value = files.map((f: any) => ({
-      id: `tmp:${f.id}`,
-      [fk]: f,
-    }));
+    const byId = new Map(files.map((f: any) => [String(f.id), f]));
+    const mapped = raw.map((item) => {
+      const file = item?.[fk];
+      const fileId = String(typeof file === 'object' ? file?.id : file);
+      const resolved = byId.get(fileId) ?? (typeof file === 'object' ? file : { id: fileId });
+      const rowId = item?.id && !String(item.id).startsWith('tmp:') ? item.id : `tmp:${fileId}`;
+      return { ...item, id: rowId, [fk]: resolved };
+    });
+    const { visible, hidden } = splitRowsByPartner(mapped);
+    rowsHiddenOtherPartner.value = hidden;
+    rowsDraft.value = visible;
   } catch (e) {
     console.error('[media-uploader] Failed to hydrate draft from form value:', e);
   }
@@ -402,7 +628,29 @@ async function fetchFilesByIds(fileIds: string[]) {
   const res = await api.get('/files', {
     params: {
       filter: { id: { _in: ids } },
-      fields: ['id', 'type', 'title', 'filename_download', 'expiry_date', 'draft_status', 'modified_on'],
+      fields: [
+        'id',
+        'type',
+        'title',
+        'filename_download',
+        'generated_filename',
+        'description',
+        'copyright',
+        'filesize',
+        'uploaded_on',
+        'created_on',
+        'expiry_date',
+        'draft_status',
+        'modified_on',
+        'uploaded_by.id',
+        'uploaded_by.first_name',
+        'uploaded_by.last_name',
+        'uploaded_by.email',
+        'uploaded_by.partner_selected.id',
+        'uploaded_by.partner_selected.visually',
+        'uploaded_by.partner_selected.label',
+        'keyword_ids.keywords_id.keyword',
+      ],
       limit: -1,
     },
   });
@@ -412,10 +660,43 @@ async function fetchFilesByIds(fileIds: string[]) {
     type: f.type ?? null,
     title: f.title ?? null,
     filename_download: f.filename_download ?? '',
+    generated_filename: f.generated_filename ?? null,
+    description: f.description ?? null,
+    copyright: f.copyright ?? null,
+    filesize: f.filesize ?? null,
+    uploaded_on: f.uploaded_on ?? null,
+    created_on: f.created_on ?? null,
     expiry_date: f.expiry_date ?? null,
     draft_status: f.draft_status ?? null,
     modified_on: f.modified_on ?? null,
+    uploaded_by: f.uploaded_by ?? null,
+    keywords: extractKeywordLabels(f.keyword_ids),
   }));
+}
+
+function extractKeywordLabels(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((row: any) => {
+      const k = row?.keywords_id;
+      if (k == null) return '';
+      if (typeof k === 'string' || typeof k === 'number') return String(k);
+      return String(k.keyword ?? k.name ?? '').trim();
+    })
+    .filter(Boolean);
+}
+
+function normalizeJunctionFileRow(row: any) {
+  const fk = filesFkField.value;
+  const f = row?.[fk];
+  if (!f || typeof f !== 'object') return row;
+  return {
+    ...row,
+    [fk]: {
+      ...f,
+      keywords: extractKeywordLabels(f.keyword_ids),
+    },
+  };
 }
 
 async function stageAddFileIds(fileIds: string[]) {
@@ -423,17 +704,27 @@ async function stageAddFileIds(fileIds: string[]) {
   if (!incoming.length) return;
 
   const existing = new Set(
-    rowsDraft.value.map((r) => String(r?.[filesFkField.value]?.id ?? '')).filter(Boolean)
+    [...rowsDraft.value, ...rowsHiddenOtherPartner.value]
+      .map((r) => String(r?.[filesFkField.value]?.id ?? ''))
+      .filter(Boolean)
   );
   const toAdd = incoming.filter((id) => !existing.has(id));
   if (!toAdd.length) return;
 
   try {
     const files = await fetchFilesByIds(toAdd);
-    const appended = files.map((f: any) => ({
-      id: `tmp:${f.id}`,
-      [filesFkField.value]: f,
-    }));
+    let sortCursor = nextSortStart();
+    const appended = files.map((f: any) => {
+      const row: JunctionRow = {
+        id: `tmp:${f.id}`,
+        [filesFkField.value]: f,
+      };
+      if (hasSortField.value) {
+        row.sort = sortCursor;
+        sortCursor += 1;
+      }
+      return row;
+    });
     rowsDraft.value = [...rowsDraft.value, ...appended];
     emitCurrentValue();
   } catch (e) {
@@ -477,6 +768,7 @@ async function confirmDelete() {
   try {
     // Stage removal locally; persistence happens when parent record is saved.
     rowsDraft.value = rowsDraft.value.filter((r) => r.id !== row.id);
+    reindexSort();
     emitCurrentValue();
 
     // Optional: allow hard-delete of the underlying file only when explicitly enabled.
@@ -508,36 +800,128 @@ function closeDetails() {
   selectedFileId.value = null;
 }
 
+function onFileDrawerActive(active: boolean) {
+  if (!active) closeDetails();
+}
+
+/** drawer-item only emits edits — it does not PATCH. Persist file metadata here. */
+async function onFileDrawerSave(edits: Record<string, any>) {
+  const id = selectedFileId.value;
+  if (!id) return;
+
+  const payload: Record<string, any> = { ...(edits ?? {}) };
+  delete payload.id;
+
+  if (!Object.keys(payload).length) {
+    closeDetails();
+    return;
+  }
+
+  try {
+    await api.patch(`/files/${id}`, payload);
+
+    const [updated] = await fetchFilesByIds([id]);
+    if (updated) {
+      const fk = filesFkField.value;
+      rowsDraft.value = rowsDraft.value.map((row) => {
+        if (String(row?.[fk]?.id) !== String(id)) return row;
+        const prev = typeof row[fk] === 'object' && row[fk] ? row[fk] : {};
+        return { ...row, [fk]: { ...prev, ...updated } };
+      });
+    }
+  } catch (e) {
+    console.error('[media-uploader] Failed to save file details:', e);
+  } finally {
+    closeDetails();
+  }
+}
+
 // ─── Download All ─────────────────────────────────────────────────────────────
 
-const downloadFormats = computed(() => parseDownloadFormatPresets(props.download_format_presets));
+const downloadModalOpen = ref(false);
+const isBulkDownloading = ref(false);
 
-function downloadAll(presetIndex: number) {
-  const preset = downloadFormats.value[presetIndex];
-  if (!preset) return;
-  rowsDraft.value.forEach((row, i) => {
-    const file = row[filesFkField.value];
-    if (!file?.id) return;
-    setTimeout(() => {
-      downloadFileViaApi(api, String(file.id), preset, file.type, file.filename_download);
-    }, i * 300);
-  });
+const downloadModalFiles = computed<DownloadModalFile[]>(() =>
+  rowsDraft.value
+    .map((row) => {
+      const file = row[filesFkField.value];
+      if (!file?.id) return null;
+      return {
+        id: String(file.id),
+        filename: file.filename_download,
+        type: file.type,
+        width: file.width,
+        height: file.height,
+        media_sizes_cm: file.media_sizes_cm ?? null,
+      } satisfies DownloadModalFile;
+    })
+    .filter((f): f is DownloadModalFile => Boolean(f)),
+);
+
+async function handleBulkDownload(choice: DownloadChoice, saveTarget: SaveTarget) {
+  if (isBulkDownloading.value) return;
+  isBulkDownloading.value = true;
+  try {
+    const files = downloadModalFiles.value.map((file) => ({
+      id: file.id,
+      type: file.type,
+      filename_download: file.filename ?? null,
+      title: file.filename ?? null,
+      width: file.width ?? null,
+      height: file.height ?? null,
+      media_sizes_cm: file.media_sizes_cm ?? null,
+    }));
+    if (!files.length) return;
+    if (files.length === 1) {
+      await downloadSingleForChoice(api, files[0], choice, saveTarget);
+      return;
+    }
+    const result = await downloadManyAsZipForChoice(api, files, 'media', choice, saveTarget);
+    if (!result.ok) throw new Error('Bulk download failed');
+  } finally {
+    isBulkDownloading.value = false;
+  }
 }
 
 // ─── Emit ────────────────────────────────────────────────────────────────────
+
+function onReorder(nextRows: JunctionRow[]) {
+  rowsDraft.value = nextRows;
+  reindexSort();
+  emitCurrentValue();
+}
+
+function onJunctionFlagChange(payload: { row: JunctionRow; field: string; value: boolean }) {
+  const { row, field, value } = payload;
+  rowsDraft.value = rowsDraft.value.map((r) =>
+    r.id === row.id ? { ...r, [field]: value } : r,
+  );
+  emitCurrentValue();
+}
 
 function emitCurrentValue() {
   // Emit a value that Directus can persist on parent Save:
   // - keep existing junction items by id
   // - create new junction items using the junction file FK field
-  const out = rowsDraft.value.map((r) => {
+  // - include sort when the junction has a sort column
+  // - include per-assignment junction flags (is_map, tour32_export, …)
+  // - preserve other-partner rows that are hidden in the UI
+  const combined = [...rowsHiddenOtherPartner.value, ...rowsDraft.value];
+  const out = combined.map((r, index) => {
     const file = r?.[filesFkField.value];
     const fileId = file?.id ?? file;
     const base: Record<string, any> = {};
 
     if (r?.id && !String(r.id).startsWith('tmp:')) base.id = r.id;
     if (fileId) base[filesFkField.value] = fileId;
-    if ('sort' in r) base.sort = r.sort;
+    if (hasSortField.value) {
+      base.sort = r?.sort != null && r.sort !== '' ? Number(r.sort) : index + 1;
+    } else if ('sort' in r) {
+      base.sort = r.sort;
+    }
+    for (const flag of activeJunctionFlagFields.value) {
+      base[flag] = !!r?.[flag];
+    }
     return base;
   });
 
@@ -549,7 +933,7 @@ function emitCurrentValue() {
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
 
 onMounted(async () => {
-  await loadSettings();
+  await Promise.all([loadSettings(), fetchSettings(), initPartnerScope()]);
   const ready = initJunction();
   junctionReady.value = ready;
   if (!ready) return;
@@ -605,23 +989,17 @@ watch(
       <div class="header">
         <span class="header-title">{{ labelSection }} ({{ rowsDraft.length }})</span>
         <div class="header-actions">
-          <v-menu v-if="!effectiveReadonly && rowsDraft.length > 0" placement="bottom-end" show-arrow>
-            <template #activator="{ toggle }">
-              <v-button secondary icon :disabled="loading" :title="t('download')" @click="toggle">
-                <v-icon name="download" />
-              </v-button>
-            </template>
-            <v-list>
-              <v-list-item
-                v-for="(fmt, idx) in downloadFormats"
-                :key="`${fmt.label}-${idx}`"
-                clickable
-                @click="downloadAll(idx)"
-              >
-                <v-list-item-content>{{ fmt.label }}</v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+          <v-button
+            v-if="!effectiveReadonly && rowsDraft.length > 0"
+            secondary
+            icon
+            :disabled="loading || isBulkDownloading"
+            :loading="isBulkDownloading"
+            :title="t('download')"
+            @click="downloadModalOpen = true"
+          >
+            <v-icon name="download" />
+          </v-button>
           <v-button
             v-if="!effectiveReadonly"
             :disabled="loading || !junctionReady"
@@ -659,11 +1037,14 @@ watch(
         :rows="rowsDraft"
         :thumbnail-size="thumbnail_size"
         :readonly="effectiveReadonly"
+        :sortable="hasSortField && !effectiveReadonly"
+        :junction-flags="activeJunctionFlags"
         :files-fk-field="filesFkField"
-        :download-format-presets="download_format_presets"
         :empty-label="labelEmpty"
         @delete="requestDelete"
         @open="openDetails"
+        @reorder="onReorder"
+        @flag-change="onJunctionFlagChange"
       />
     </template>
 
@@ -686,6 +1067,7 @@ watch(
       :geo-label-field="geo_label_field"
       :upload-status-field="upload_status_field ?? 'directus_status'"
       :upload-status-value="upload_status_value ?? 'draft'"
+      :upload-file-fields="uploadFileFieldsOption"
       @close="showUploadModal = false"
       @uploaded="(fileIds: string[]) => { showUploadModal = false; stageAddFileIds(fileIds); }"
     />
@@ -712,7 +1094,8 @@ watch(
       collection="directus_files"
       :primary-key="selectedFileId"
       :edits="{}"
-      @update:active="closeDetails"
+      @input="onFileDrawerSave"
+      @update:active="onFileDrawerActive"
     />
 
     <!-- Delete confirmation dialog -->
@@ -743,6 +1126,16 @@ watch(
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <DownloadModal
+      v-model="downloadModalOpen"
+      :mode="downloadModalFiles.length > 1 ? 'zip' : 'single'"
+      :files="downloadModalFiles"
+      zip-base-name="media"
+      :labels="downloadModalLabels"
+      :on-zip-download="handleBulkDownload"
+      :on-single-download="handleBulkDownload"
+    />
   </div>
 </template>
 
@@ -750,8 +1143,8 @@ watch(
 .media-uploader {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px;
+  gap: 8px;
+  padding: 8px 12px 12px;
   border: 1px solid var(--theme--border-color);
   border-radius: var(--theme--border-radius);
   background: var(--theme--background-normal);

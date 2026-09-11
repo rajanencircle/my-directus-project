@@ -1,13 +1,18 @@
 import { restrictTo } from "../shared/response/visibility.js";
 
 /**
- * How much real data a row actually carries — used to rank candidates when
- * more than one `prices` row claims the same (category, date, occupancy).
- * `hasBuy` is weighted above `sellCount` on purpose: a row with a real buy
- * price but no sell translations yet still outranks one with neither. This
- * never decides "should this row be shown at all" — a row with nothing set
- * on it (buy null/0, every sell_price null) still gets the lowest rank, not
- * dropped, so it's still returned when it's the only candidate that exists.
+ * @description Evaluates how much real data a price row carries.
+ *
+ * Calculates a completeness score for a price row by checking whether it has a non-zero
+ * `buy_price` and counting how many valid `sell_price` translations it has. `hasBuy`
+ * is intentionally weighted over `sellCount`.
+ *
+ * This is used internally by `pickBestPriceRow` to rank conflicting duplicate price rows,
+ * ensuring the most complete row wins.
+ * 
+ * @param {Object} p - The price row object.
+ * @param {String} translationsKey - The key holding sell translations.
+ * @returns {Object} An object `{ hasBuy, sellCount }`.
  */
 function priceCompleteness(p, translationsKey) {
   const buy = p.buy_price;
@@ -20,17 +25,18 @@ function priceCompleteness(p, translationsKey) {
 }
 
 /**
- * Multiple `prices` rows can legitimately exist for the same (category, date,
- * occupancy) today — duplicate rows from non-idempotent writes upstream, not
- * a modeling choice. Picking one silently and picking one *consistently* are
- * different problems: this ranks by real data present (buy first, then sell
- * completeness), tie-broken by most recently updated, so the API never emits
- * more than one price per occupancy per period. A row is never excluded for
- * being blank — if every candidate for a slot is blank, the best-ranked blank
- * one is still returned, so the occupancy still shows up (buy: 0, sell: null)
- * rather than vanishing. Any time there's more than one candidate at all,
- * it's logged — this is a data conflict that needs a human decision, not
- * something to resolve invisibly.
+ * @description Selects the best price row when multiple rows claim the same category, date, and occupancy.
+ *
+ * Sorts duplicate rows by data completeness (using `priceCompleteness`), breaking ties with
+ * `date_updated` and `id`. It logs a warning when conflicts occur, since these represent
+ * underlying data issues upstream that need manual review.
+ *
+ * `groupPrices2` uses this to guarantee the API never emits more than one price per occupancy
+ * per period, resolving duplicates consistently.
+ * 
+ * @param {Array<Object>} candidates - Array of conflicting price row objects.
+ * @param {String} translationsKey - The key holding sell translations.
+ * @returns {Object} The single best price row.
  */
 function pickBestPriceRow(candidates, translationsKey) {
   if (candidates.length === 1) return candidates[0];
@@ -54,12 +60,17 @@ function pickBestPriceRow(candidates, translationsKey) {
 }
 
 /**
- * Generalized price-grouping helper, parameterized by field-name keys so each
- * of hotels/tours/excursions/cruises can call it with their own
- * category/date/occupancy/price FK names instead of hardcoded field names.
- * Originally introduced alongside hotels' now-retired groupPrices() (formerly
- * in utils/prices.js); hotels was migrated to this shared implementation once
- * parity was confirmed (see refactor-baseline/PHASE1_NOTES.md).
+ * @description A generalized helper for grouping flat price rows into structured category/date/occupancy arrays.
+ *
+ * Iterates through categories, filtering the prices that belong to them. Prices are bucketed
+ * by date and occupancy, with duplicate rows resolved via `pickBestPriceRow`. Every configured
+ * occupancy is listed for every date bucket (showing nulls where data is missing), and the
+ * correct `buy`, `sell`, and `margin` values are mapped, with sensitive data restricted to
+ * the `backoffice` audience.
+ *
+ * Resource transformers (e.g. hotels, tours, cruises) use this heavily to reshape flat
+ * relational pricing data from Directus into the nested, period-based structure required
+ * by the API contract.
  *
  * Transforms flat price rows into a categories array:
  *   categories[] → { category, ..., prices[] → { start_date, end_date, occupancies{} → { buy, sell, margin, unit } } }
@@ -117,10 +128,12 @@ export function groupPrices2(
     const pricesForCat = (prices ?? []).filter((p) => p[categoryIdKey] === cat.id);
 
     const dateMap = {};
-    // Bucketed by dateKey → occId so multiple `prices` rows claiming the same
-    // (category, date, occupancy) — duplicates from non-idempotent writes
-    // upstream, not a valid modeling case — get resolved to a single entry
-    // instead of each independently pushing into the output array.
+    /*
+     * Bucketed by dateKey -> occId so multiple `prices` rows claiming the same
+     * (category, date, occupancy) — duplicates from non-idempotent writes upstream,
+     * not a valid modeling case — get resolved to a single entry instead of each
+     * independently pushing into the output array.
+     */
     const candidatesByDateAndOcc = {};
 
     for (const p of pricesForCat) {
@@ -143,14 +156,15 @@ export function groupPrices2(
         candidatesByDateAndOcc[dateKey] = {};
       }
 
-      // `occupancyIdKey` on `prices` rows can go stale (e.g. a regenerated M2M
-      // junction row) or reference a since-nulled FK — in either case the id no
-      // longer exists in the current authoritative `occupancies` map. Such a row
-      // is omitted entirely: this API only ever reports prices for occupancies it
-      // can properly identify, never a fabricated name. On hotels where most
-      // `room_prices` rows are in this stale state, this means most of that
-      // hotel's prices won't appear until the underlying links are repaired —
-      // a known, accepted trade-off, not a bug.
+      /*
+       * `occupancyIdKey` on `prices` rows can go stale (e.g. a regenerated M2M junction
+       * row) or reference a since-nulled FK — in either case the id no longer exists in
+       * the current authoritative `occupancies` map. Such a row is omitted entirely: this
+       * API only ever reports prices for occupancies it can properly identify, never a
+       * fabricated name. On hotels where most `room_prices` rows are in this stale state,
+       * most of that hotel's prices won't appear until the underlying links are repaired —
+       * a known, accepted trade-off, not a bug.
+       */
       const occ = occupancyByValue[p[occupancyIdKey]];
       if (!occ) continue;
 
@@ -160,24 +174,40 @@ export function groupPrices2(
     }
 
     for (const dateKey of Object.keys(candidatesByDateAndOcc)) {
-      for (const { occ, rows } of Object.values(candidatesByDateAndOcc[dateKey])) {
-        const p = pickBestPriceRow(rows, translationsKey);
+      const occBucket = candidatesByDateAndOcc[dateKey];
+      /*
+      * Every occupancy configured for this product is listed for every date that has any
+      * price data at all — not just the occupancies that happen to have their own price row
+      * for this date. An occupancy with no row here gets buy/sell: null (margin is a
+      * product-level config, not tied to a specific row, so it's still shown). This makes
+      * gaps in upstream pricing visible as "no price yet" instead of the occupancy silently
+      * not appearing.
+      */
+      for (const occ of occupancies ?? []) {
+        const bucketEntry = occBucket[occ.id];
+        const rows = bucketEntry?.rows ?? [];
+        const p = rows.length ? pickBestPriceRow(rows, translationsKey) : null;
 
         let sell = null;
-        if (translationsKey) {
+        if (p && translationsKey) {
           const sellByLang = {};
           for (const t of p[translationsKey] ?? []) {
             const code = t.translations_id?.code ?? t.translations_id;
             const iso = localeToIso[code] ?? code;
             const val = t[sellPriceKey] ?? null;
-            // A single row's translations can list the same locale more than once
-            // (junk duplicates from repeated edits) — never let a later null
-            // silently clobber a real value already found for that language.
+            /* A single row's translations can list the same locale more than once
+            (junk duplicates from repeated edits) — never let a later null
+            silently clobber a real value already found for that language. */
             if (val !== null || !(iso in sellByLang)) {
               sellByLang[iso] = val;
             }
           }
           sell = sellByLang[lang] ?? null;
+        } else if (p && sellPriceKey) {
+          /* No per-language translations table for this product type — `sellPriceKey` is a
+           * plain (non-localized) column directly on the price row itself (e.g. cruises'
+           * `cruises_prices.sell_price`). */
+          sell = p[sellPriceKey] ?? null;
         }
 
         dateMap[dateKey].prices.push({
@@ -186,10 +216,9 @@ export function groupPrices2(
             name: occ.name ?? null,
           },
           sell: sell !== null && sell !== undefined ? parseFloat(sell) : null,
-          // buy/margin are backoffice-only per the contract's *Web price-cell variants —
-          // matches PRICE_CELL_ALLOWED_KEYS in shared/response/webDetail.js today.
+          /* buy/margin are backoffice-only per the contract's *Web price-cell variants. */
           buy: restrictTo(
-            p.buy_price !== null && p.buy_price !== undefined ? parseFloat(p.buy_price) : null,
+            p?.buy_price !== null && p?.buy_price !== undefined ? parseFloat(p.buy_price) : null,
             "backoffice",
           ),
           margin: restrictTo(

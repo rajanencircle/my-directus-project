@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "BOTG ContentHub API",
-    "version": "1.0.0-beta",
+    "version": "1.0.1 Beta",
     "description": "Contract (source of truth) for the BOTG Product API served by the ContentHub (PMS based on Directus). Describes the API endpoints for all BOTG Products.\n\n**Two families:**\na) `products`: for websites — aggregated, without buy prices.\nb) per-product backoffice endpoints such as `hotels` — full data incl. buy prices and margins.\n\n**Three access patterns for each:**\na) list (slim directory)\nb) `/full` (all records; delta/DIV sync via `updated_after`)\nc) `/{id}` (single record).\n\nOne language per response (`lang` mandatory). `date_updated` is present in every response as the consumer's delta cursor.\n\n**Field labels** (the caption of each field, per language) are served separately via `GET /metadata/labels` — fetched once and cached — so the data feed stays slim. Value labels (e.g. catering, classification) travel inline as `Ref.name`.\n\nMapping from the native PMS structure (Directus) to these fields, as well as from the former PMS (Primarix), lives in the `field_dictionary`, not in this document.\n\n**Open points flagged:**\n- Full Markdown-blob scope: which source fields feed the consolidated `*_markdown` blocks.\n- `updated_after` boundary: whether the cursor is inclusive (`>=`, may re-deliver the boundary record) or exclusive (`>`, risks skipping same-timestamp records).\n- De-publish semantics: how a record leaving `published` is surfaced to consumers so removals can be detected (e.g. as a tombstone in the `/full` feed via `publishing_status`), rather than silently disappearing from the delta."
   },
   "servers": [
@@ -2709,6 +2709,20 @@
           "message": {
             "type": "string",
             "example": "Validation failed"
+          },
+          "code": {
+            "type": "string",
+            "description": "Machine-readable error code, so clients can branch on the failure class without parsing the message.\n- `AUTH_HEADER_MISSING` (401): Authorization header missing or not `Bearer <token>`.\n- `TOKEN_UNKNOWN` (401): token not found / not registered.\n- `TOKEN_REVOKED` (401): token exists but its status is revoked.\n- `TOKEN_EXPIRED` (401): token has expired (reserved for future use).\n- `FORBIDDEN` (403): valid token, but not permitted for the requested product or endpoint.\n- `VALIDATION_ERROR` (422): request well-formed but a parameter value violates a rule (e.g. missing lang).",
+            "enum": [
+              "AUTH_HEADER_MISSING",
+              "TOKEN_UNKNOWN",
+              "TOKEN_REVOKED",
+              "TOKEN_EXPIRED",
+              "FORBIDDEN",
+              "VALIDATION_ERROR"
+            ],
+            "nullable": true,
+            "example": "VALIDATION_ERROR"
           },
           "errors": {
             "type": "array",
@@ -7335,11 +7349,11 @@
     },
     "headers": {
       "XApiVersion": {
-        "description": "Full semantic version of the API that served this response (e.g. 1.0.0-beta). Present on every response.",
+        "description": "Full semantic version of the API that served this response (e.g. 1.0.1 Beta). Present on every response.",
         "required": true,
         "schema": {
           "type": "string",
-          "example": "1.0.0-beta"
+          "example": "1.0.1 Beta"
         }
       }
     }

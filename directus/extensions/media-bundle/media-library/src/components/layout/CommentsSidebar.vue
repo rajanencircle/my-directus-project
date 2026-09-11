@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, watch } from 'vue'
-import { useApi } from '@directus/extensions-sdk'
+import { useApi, useStores } from '@directus/extensions-sdk'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import SidebarDetail from './SidebarDetail.vue'
@@ -9,11 +9,15 @@ import EmojiPickerButton from './EmojiPickerButton.vue'
 const props = defineProps<{ fileId: string }>()
 
 const api = useApi()
+const { useNotificationsStore } = useStores()
+const notificationsStore = useNotificationsStore()
 const baseUrl = (api.defaults.baseURL ?? '').replace(/\/$/, '')
 
 // Matches @UUID anywhere in a string (no leading-space requirement for extraction)
-const UUID_PATTERN = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+const UUID_PATTERN = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 const MENTION_EXTRACT_RE = new RegExp(`@(${UUID_PATTERN})`, 'gi')
+/** Capture group for v-template-input — keeps @uuid in model, shows name chip via items */
+const MENTION_CAPTURE_GROUP = `@${UUID_PATTERN}`
 
 interface CommentUser {
   id?: string
@@ -54,15 +58,14 @@ const userPreviews = ref<Record<string, string>>({})
 const newComment = ref('')
 const focused = ref(false)
 const posting = ref(false)
-const newCommentRef = ref<HTMLTextAreaElement | null>(null)
-// Last known caret positions so emoji/@ insertion lands at the right spot
+const newCommentRef = ref<{ $el?: HTMLElement } | null>(null)
 const lastCaretPos = ref<Record<MentionCtx, number>>({ new: 0, edit: 0 })
 
 // ─── Inline edit ─────────────────────────────────────────────────────────────
 const editingId = ref<string | null>(null)
 const editingText = ref('')
 const saving = ref(false)
-const editCommentRef = ref<HTMLTextAreaElement | null>(null)
+const editCommentRef = ref<{ $el?: HTMLElement } | null>(null)
 
 // ─── Delete ──────────────────────────────────────────────────────────────────
 const confirmDeleteId = ref<string | null>(null)
@@ -72,7 +75,7 @@ const deleting = ref(false)
 type MentionCtx = 'new' | 'edit'
 const mentionCtx = ref<MentionCtx>('new')
 const showMentions = ref(false)
-const mentionStart = ref(-1)  // index of the @ character in the text
+const triggerCaretPosition = ref(0)
 const mentionQuery = ref('')
 const mentionUsers = ref<MentionUser[]>([])
 const mentionLoading = ref(false)
@@ -119,7 +122,7 @@ function formatGroupDate(d: Date): string {
     : { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-function getUserName(user?: CommentUser | null): string {
+function getUserName(user?: CommentUser | MentionUser | null): string {
   if (!user) return 'Unknown'
   return [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Unknown'
 }
@@ -129,29 +132,25 @@ function getAvatarUrl(user?: CommentUser | MentionUser | null): string | null {
   return `${baseUrl}/assets/${user.avatar.id}?key=system-small-cover`
 }
 
-function getInitials(user?: CommentUser | null): string {
-  if (!user) return '?'
-  return ((user.first_name?.[0] ?? '') + (user.last_name?.[0] ?? '')).toUpperCase() || '?'
-}
-
 function formatTime(iso: string): string {
   if (!iso) return ''
   return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
 
+function getInputEl(ctx: MentionCtx): HTMLElement | null {
+  const comp = (ctx === 'new' ? newCommentRef : editCommentRef).value
+  return (comp?.$el as HTMLElement) ?? null
+}
+
 // ─── Mention rendering ────────────────────────────────────────────────────────
 function renderMarkdown(text: string): string {
   if (!text) return ''
-  // 1. Strip any raw HTML the user may have typed (preserves plain text + markdown syntax)
   const plain = DOMPurify.sanitize(text, { ALLOWED_TAGS: [] })
-  // 2. Replace @UUID with <mark>Name</mark> (same pattern as native Directus)
   const withMentions = plain.replace(
     new RegExp(`@(${UUID_PATTERN})`, 'gi'),
     (_, uuid: string) => `<mark>${userPreviews.value[uuid] ?? uuid}</mark>`,
   )
-  // 3. Render Markdown (marked passes through HTML tags)
   const html = marked.parse(withMentions, { async: false }) as string
-  // 4. Sanitize — DOMPurify allows <mark> by default
   return DOMPurify.sanitize(html)
 }
 
@@ -177,33 +176,24 @@ async function loadUserPreviews(commentsList: Comment[]) {
   } catch { /* non-critical */ }
 }
 
-// ─── Mention autocomplete ─────────────────────────────────────────────────────
-function detectMention(text: string, pos: number, ctx: MentionCtx) {
-  // Walk back from cursor: stop at space/newline or find @
-  let atPos = -1
-  for (let i = pos - 1; i >= 0; i--) {
-    if (text[i] === '@') {
-      if (i === 0 || text[i - 1] === ' ' || text[i - 1] === '\n') {
-        atPos = i; break
-      }
-      break
-    }
-    if (text[i] === ' ' || text[i] === '\n') break
-  }
-
-  if (atPos >= 0) {
-    const query = text.slice(atPos + 1, pos)
-    // Don't re-trigger inside an already-completed UUID
-    if (/^[0-9a-f-]{36}$/i.test(query)) { showMentions.value = false; return }
-    mentionCtx.value = ctx
-    mentionStart.value = atPos
-    mentionQuery.value = query
-    mentionIdx.value = 0
-    showMentions.value = true
-    scheduleMentionSearch(query)
-  } else {
+// ─── Mention autocomplete (v-template-input triggers) ─────────────────────────
+function onMentionTrigger(ctx: MentionCtx, payload: { searchQuery: string; caretPosition: number }) {
+  const query = payload.searchQuery ?? ''
+  // Don't re-trigger inside an already-completed UUID
+  if (/^[0-9a-f-]{36}$/i.test(query)) {
     showMentions.value = false
+    return
   }
+  mentionCtx.value = ctx
+  triggerCaretPosition.value = payload.caretPosition
+  mentionQuery.value = query
+  mentionIdx.value = 0
+  showMentions.value = true
+  scheduleMentionSearch(query)
+}
+
+function onMentionDeactivate() {
+  showMentions.value = false
 }
 
 function scheduleMentionSearch(query: string) {
@@ -227,7 +217,12 @@ async function fetchMentionUsers(query: string) {
       }
     }
     const res = await api.get('/users', { params })
-    mentionUsers.value = res.data?.data ?? []
+    const users: MentionUser[] = res.data?.data ?? []
+    mentionUsers.value = users
+    // Prefill previews so chips resolve as soon as a user is selected
+    for (const u of users) {
+      userPreviews.value[u.id] = getUserName(u)
+    }
   } catch {
     mentionUsers.value = []
   } finally {
@@ -235,111 +230,107 @@ async function fetchMentionUsers(query: string) {
   }
 }
 
+/** Insert @uuid into model (notifications require UUID); v-template-input shows the name chip. */
 function selectMention(user: MentionUser) {
   const isEdit = mentionCtx.value === 'edit'
   const textModel = isEdit ? editingText : newComment
-  const text = textModel.value
-  const before = text.slice(0, mentionStart.value)
-  const after = text.slice(mentionStart.value + 1 + mentionQuery.value.length)
-  textModel.value = `${before}@${user.id} ${after}`
+  const text = (textModel.value ?? '').replaceAll(String.fromCharCode(160), ' ')
+  const caret = triggerCaretPosition.value
+
+  let countBefore = caret - 1
+  let countAfter = caret
+
+  if (text.charAt(countBefore) !== ' ' && text.charAt(countBefore) !== '\n') {
+    while (countBefore >= 0 && text.charAt(countBefore) !== ' ' && text.charAt(countBefore) !== '\n') {
+      countBefore--
+    }
+  }
+
+  while (countAfter < text.length && text.charAt(countAfter) !== ' ' && text.charAt(countAfter) !== '\n') {
+    countAfter++
+  }
+
+  const before = text.substring(0, countBefore + (text.charAt(countBefore) === '\n' ? 1 : 0))
+  const after = text.substring(countAfter)
+
+  userPreviews.value[user.id] = getUserName(user)
+  textModel.value = `${before} @${user.id}${after.startsWith(' ') || after.startsWith('\n') || after === '' ? after : ` ${after}`}`
   showMentions.value = false
 
   nextTick(() => {
-    const el = (isEdit ? editCommentRef : newCommentRef).value
-    if (el) {
-      const pos = before.length + 1 + user.id.length + 1
-      el.setSelectionRange(pos, pos)
-      el.focus()
-    }
+    getInputEl(isEdit ? 'edit' : 'new')?.focus()
   })
 }
 
-function closeMentionsOnBlur(ctx: MentionCtx) {
-  // Save caret before focus moves away (for emoji / @ insertion)
-  const el = (ctx === 'new' ? newCommentRef : editCommentRef).value
-  if (el) lastCaretPos.value[ctx] = el.selectionStart ?? 0
-  // Give mousedown on mention items time to fire before closing
-  setTimeout(() => { showMentions.value = false }, 150)
+function saveCaretFromSelection(ctx: MentionCtx) {
+  const el = getInputEl(ctx)
+  if (!el || !document.getSelection) return
+  const selection = document.getSelection()
+  if (!selection || selection.rangeCount === 0) return
+  try {
+    const range = selection.getRangeAt(0).cloneRange()
+    range.selectNodeContents(el)
+    range.setEnd(selection.anchorNode ?? el, selection.anchorOffset)
+    lastCaretPos.value[ctx] = range.toString().length
+  } catch {
+    // ignore selection errors
+  }
 }
 
-function trackCaret(e: Event, ctx: MentionCtx) {
-  lastCaretPos.value[ctx] = (e.target as HTMLTextAreaElement).selectionStart ?? 0
+function closeMentionsOnBlur(_ctx: MentionCtx) {
+  setTimeout(() => { showMentions.value = false }, 150)
 }
 
 // ─── @ and emoji insertion ────────────────────────────────────────────────────
 function insertAtMention(ctx: MentionCtx) {
-  const el = (ctx === 'new' ? newCommentRef : editCommentRef).value
+  saveCaretFromSelection(ctx)
   const textModel = ctx === 'new' ? newComment : editingText
-  const pos = el ? el.selectionStart ?? lastCaretPos.value[ctx] : lastCaretPos.value[ctx]
-  const before = textModel.value.slice(0, pos)
-  const after = textModel.value.slice(pos)
-  // Add a space before @ when cursor isn't already at a word boundary
+  const pos = lastCaretPos.value[ctx]
+  const before = (textModel.value ?? '').slice(0, pos)
+  const after = (textModel.value ?? '').slice(pos)
   const needsSpace = before.length > 0 && !/[ \n]$/.test(before)
   const insert = needsSpace ? ' @' : '@'
   textModel.value = before + insert + after
-  const newPos = pos + insert.length
+  lastCaretPos.value[ctx] = pos + insert.length
   nextTick(() => {
-    if (el) {
-      el.focus()
-      el.setSelectionRange(newPos, newPos)
-      detectMention(textModel.value, newPos, ctx)
-    }
+    const el = getInputEl(ctx)
+    el?.focus()
+    // Manually open mention search after inserting @
+    onMentionTrigger(ctx, { searchQuery: '', caretPosition: lastCaretPos.value[ctx] })
   })
 }
 
 function insertText(text: string, ctx: MentionCtx) {
-  const el = (ctx === 'new' ? newCommentRef : editCommentRef).value
+  saveCaretFromSelection(ctx)
   const textModel = ctx === 'new' ? newComment : editingText
   const pos = lastCaretPos.value[ctx]
-  const before = textModel.value.slice(0, pos)
-  const after = textModel.value.slice(pos)
+  const before = (textModel.value ?? '').slice(0, pos)
+  const after = (textModel.value ?? '').slice(pos)
   textModel.value = before + text + after
-  const newPos = pos + text.length
-  lastCaretPos.value[ctx] = newPos
-  nextTick(() => {
-    if (el) {
-      el.focus()
-      el.setSelectionRange(newPos, newPos)
-    }
-  })
+  lastCaretPos.value[ctx] = pos + text.length
+  nextTick(() => getInputEl(ctx)?.focus())
 }
 
 // ─── Keyboard handlers ────────────────────────────────────────────────────────
-function handleMentionKeys(e: KeyboardEvent): boolean {
-  if (!showMentions.value) return false
-  if (e.key === 'ArrowDown') {
-    e.preventDefault()
-    mentionIdx.value = Math.min(mentionIdx.value + 1, mentionUsers.value.length - 1)
-    return true
-  }
-  if (e.key === 'ArrowUp') {
-    e.preventDefault()
-    mentionIdx.value = Math.max(mentionIdx.value - 1, 0)
-    return true
-  }
-  if (e.key === 'Enter') {
-    e.preventDefault()
-    const u = mentionUsers.value[mentionIdx.value]
-    if (u) selectMention(u)
-    return true
-  }
-  if (e.key === 'Escape') {
-    showMentions.value = false
-    return true
-  }
-  return false
+function pressedUp() {
+  if (!showMentions.value) return
+  mentionIdx.value = Math.max(mentionIdx.value - 1, 0)
 }
 
-function onNewKeydown(e: KeyboardEvent) {
-  if (handleMentionKeys(e)) return
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); postComment(); return }
-  if (e.key === 'Escape') cancelNew()
+function pressedDown() {
+  if (!showMentions.value) return
+  mentionIdx.value = Math.min(mentionIdx.value + 1, Math.max(mentionUsers.value.length - 1, 0))
 }
 
-function onEditKeydown(e: KeyboardEvent, id: string) {
-  if (handleMentionKeys(e)) return
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); saveEdit(id); return }
-  if (e.key === 'Escape') cancelEdit()
+function pressedEnter(_ctx: MentionCtx) {
+  // v-template-input only emits enter while @-mention is active
+  const u = mentionUsers.value[mentionIdx.value]
+  if (u) selectMention(u)
+  showMentions.value = false
+}
+
+function onTemplateFocus(ctx: MentionCtx) {
+  if (ctx === 'new') focused.value = true
 }
 
 // ─── API ──────────────────────────────────────────────────────────────────────
@@ -410,6 +401,18 @@ async function reload() {
   await loadCount()
 }
 
+async function refreshUnreadBadge() {
+  try {
+    if (typeof notificationsStore.refreshUnreadCount === 'function') {
+      await notificationsStore.refreshUnreadCount()
+    } else if (typeof notificationsStore.hydrate === 'function') {
+      await notificationsStore.hydrate()
+    }
+  } catch {
+    // non-critical
+  }
+}
+
 async function postComment() {
   const text = newComment.value.trim()
   if (!text || posting.value) return
@@ -422,7 +425,7 @@ async function postComment() {
     })
     newComment.value = ''
     focused.value = false
-    await Promise.all([loadComments(), loadCount()])
+    await Promise.all([loadComments(), loadCount(), refreshUnreadBadge()])
   } catch (err) {
     console.error('[CommentsSidebar] post error:', err)
   } finally {
@@ -433,6 +436,7 @@ async function postComment() {
 function cancelNew() {
   newComment.value = ''
   focused.value = false
+  showMentions.value = false
 }
 
 function startEdit(c: Comment) {
@@ -443,6 +447,7 @@ function startEdit(c: Comment) {
 function cancelEdit() {
   editingId.value = null
   editingText.value = ''
+  showMentions.value = false
 }
 
 async function saveEdit(id: string) {
@@ -486,19 +491,23 @@ watch(() => props.fileId, reload)
     <!-- ── New comment input ── -->
     <div class="comment-input-wrap">
       <div class="mention-anchor">
-        <textarea
+        <v-template-input
           ref="newCommentRef"
           v-model="newComment"
           class="comment-input"
+          :class="{ expanded: focused || !!newComment.trim() }"
+          multiline
           placeholder="Leave a comment…"
-          :rows="focused || newComment.trim() ? 3 : 1"
-          @focus="focused = true"
+          trigger-character="@"
+          :capture-group="MENTION_CAPTURE_GROUP"
+          :items="userPreviews"
+          @focus="onTemplateFocus('new')"
           @blur="closeMentionsOnBlur('new')"
-          @click="(e) => trackCaret(e, 'new')"
-          @keyup="(e) => trackCaret(e, 'new')"
-          @select="(e) => trackCaret(e, 'new')"
-          @input="(e) => { trackCaret(e, 'new'); detectMention((e.target as HTMLTextAreaElement).value, (e.target as HTMLTextAreaElement).selectionStart ?? 0, 'new') }"
-          @keydown="onNewKeydown"
+          @trigger="(p: any) => onMentionTrigger('new', p)"
+          @deactivate="onMentionDeactivate"
+          @up="pressedUp"
+          @down="pressedDown"
+          @enter="pressedEnter('new')"
         />
 
         <!-- Mention dropdown for new comment -->
@@ -591,19 +600,21 @@ watch(() => props.fileId, reload)
           <!-- Inline edit with mention support -->
           <div v-if="editingId === c.id" class="edit-wrap">
             <div class="mention-anchor">
-              <textarea
+              <v-template-input
                 ref="editCommentRef"
                 v-model="editingText"
-                class="comment-input"
-                rows="3"
+                class="comment-input expanded"
+                multiline
+                trigger-character="@"
+                :capture-group="MENTION_CAPTURE_GROUP"
+                :items="userPreviews"
                 @blur="closeMentionsOnBlur('edit')"
-                @click="(e) => trackCaret(e, 'edit')"
-                @keyup="(e) => trackCaret(e, 'edit')"
-                @select="(e) => trackCaret(e, 'edit')"
-                @input="(e) => { trackCaret(e, 'edit'); detectMention((e.target as HTMLTextAreaElement).value, (e.target as HTMLTextAreaElement).selectionStart ?? 0, 'edit') }"
-                @keydown="(e) => onEditKeydown(e, c.id)"
+                @trigger="(p: any) => onMentionTrigger('edit', p)"
+                @deactivate="onMentionDeactivate"
+                @up="pressedUp"
+                @down="pressedDown"
+                @enter="pressedEnter('edit')"
               />
-              <!-- Mention dropdown for edit -->
               <div v-if="showMentions && mentionCtx === 'edit'" class="mention-dropdown" role="listbox">
                 <div v-if="mentionLoading" class="mention-loading">
                   <v-progress-circular x-small indeterminate />
@@ -668,7 +679,7 @@ watch(() => props.fileId, reload)
 <style scoped>
 /* ── Input ──────────────────────────────────────────────────────────────────── */
 .comment-input-wrap {
-  padding: 0.5rem 1rem 0.625rem;
+  padding: 0 0 0.625rem;
   border-block-end: 1px solid var(--theme--border-color-subdued);
 }
 
@@ -679,8 +690,8 @@ watch(() => props.fileId, reload)
 .comment-input {
   display: block;
   inline-size: 100%;
+  min-block-size: var(--input-height);
   padding: 0.5rem 0.625rem;
-  resize: none;
   font-size: 0.8125rem;
   font-family: inherit;
   line-height: 1.5;
@@ -689,14 +700,19 @@ watch(() => props.fileId, reload)
   border-radius: var(--theme--border-radius);
   color: var(--theme--foreground);
   outline: none;
-  transition: border-color var(--fast) var(--transition);
+  transition: border-color var(--fast) var(--transition), min-block-size var(--fast) var(--transition);
   box-sizing: border-box;
   overflow: hidden;
+  white-space: pre-wrap;
 }
 
-.comment-input:focus {
-  border-color: var(--theme--primary);
+.comment-input.expanded {
+  min-block-size: 4.5rem;
   overflow: auto;
+}
+
+.comment-input:focus-within {
+  border-color: var(--theme--primary);
 }
 
 .input-actions {

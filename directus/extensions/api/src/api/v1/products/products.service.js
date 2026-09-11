@@ -1,15 +1,10 @@
 import { LIST_FIELDS as HOTELS_LIST_FIELDS } from "../hotels/hotels.fields.js";
-import { hotels as hotelFilters } from "../../shared/collectionFilters.js";
+import { hotels as hotelFilters, tours as toursFilters, excursions as excursionsFilters, cruises as cruisesFilters, campers as campersFilters, rentalCars as rentalCarsFilters } from "../../shared/collectionFilters.js";
 import { LIST_FIELDS as TOURS_LIST_FIELDS } from "../tours/tours.fields.js";
-import { buildUpdatedAfterFilter as buildToursUpdatedAfterFilter } from "../tours/tours.filters.js";
 import { LIST_FIELDS as EXCURSIONS_LIST_FIELDS } from "../excursions/excursions.fields.js";
-import { buildUpdatedAfterFilter as buildExcursionsUpdatedAfterFilter } from "../excursions/excursions.filters.js";
 import { LIST_FIELDS as CRUISES_LIST_FIELDS } from "../cruises/cruises.fields.js";
-import { buildUpdatedAfterFilter as buildCruisesUpdatedAfterFilter } from "../cruises/cruises.filters.js";
 import { LIST_FIELDS as CAMPERS_LIST_FIELDS } from "../campers/campers.fields.js";
-import { buildUpdatedAfterFilter as buildCampersUpdatedAfterFilter } from "../campers/campers.filters.js";
 import { LIST_FIELDS as RENTAL_CARS_LIST_FIELDS } from "../rental_cars/rental-cars.fields.js";
-import { buildUpdatedAfterFilter as buildRentalCarsUpdatedAfterFilter } from "../rental_cars/rental-cars.filters.js";
 import {
   ROOT_COLLECTION as HOTELS_ROOT,
   DETAIL_RELATIONS as HOTELS_RELATIONS,
@@ -17,24 +12,30 @@ import {
 import {
   ROOT_COLLECTION as TOURS_ROOT,
   DETAIL_RELATIONS as TOURS_RELATIONS,
-} from "../tours/tours.query-config.js";
+} from "../tours/tours.service.js";
 import {
   ROOT_COLLECTION as EXCURSIONS_ROOT,
   DETAIL_RELATIONS as EXCURSIONS_RELATIONS,
-} from "../excursions/excursions.query-config.js";
+} from "../excursions/excursions.service.js";
 import {
   ROOT_COLLECTION as CRUISES_ROOT,
   DETAIL_RELATIONS as CRUISES_RELATIONS,
-} from "../cruises/cruises.query-config.js";
+} from "../cruises/cruises.service.js";
 import {
   ROOT_COLLECTION as CAMPERS_ROOT,
   DETAIL_RELATIONS as CAMPERS_RELATIONS,
-} from "../campers/campers.query-config.js";
+} from "../campers/campers.service.js";
 import {
   ROOT_COLLECTION as RENTAL_CARS_ROOT,
   DETAIL_RELATIONS as RENTAL_CARS_RELATIONS,
-} from "../rental_cars/rental-cars.query-config.js";
+} from "../rental_cars/rental-cars.service.js";
+const { buildUpdatedAfterFilter: buildToursUpdatedAfterFilter, buildPublicationDeepFilter: buildToursPublicationDeepFilter } = toursFilters;
+const { buildUpdatedAfterFilter: buildExcursionsUpdatedAfterFilter, buildPublicationDeepFilter: buildExcursionsPublicationDeepFilter } = excursionsFilters;
+const { buildUpdatedAfterFilter: buildCruisesUpdatedAfterFilter, buildPublicationDeepFilter: buildCruisesPublicationDeepFilter } = cruisesFilters;
+const { buildUpdatedAfterFilter: buildCampersUpdatedAfterFilter } = campersFilters;
+const { buildUpdatedAfterFilter: buildRentalCarsUpdatedAfterFilter } = rentalCarsFilters;
 import { buildDetailFields } from "../../../shared/query/buildQueryFields.js";
+import { filterValidFieldPaths } from "../../../shared/query/validateFieldPaths.js";
 import { getHotelDetails } from "../hotels/hotels.service.js";
 import { getTourDetails } from "../tours/tours.service.js";
 import { getExcursionDetails } from "../excursions/excursions.service.js";
@@ -50,6 +51,8 @@ import { shapeCamperListItem } from "../../../transformers/camper.transformer.js
 import { AppError } from "../../shared/AppError.js";
 import { HTTP_STATUS } from "../../shared/constants.js";
 import { DEFAULT_PRIMARIX_STATUS } from "../../shared/constants.js";
+import { createScopedItemsService } from "../../shared/collectionFilters.js";
+import { applyPartnerMediaFilter } from "../../../utils/images.js";
 
 const { buildUpdatedAfterFilter, buildPublicationDeepFilter } = hotelFilters;
 
@@ -74,8 +77,10 @@ const VEHICLES_COLLECTION = "vehicles";
  *
  * @property {string} key - Property-name prefix used to build Service/Filter entries (e.g., 'hotels').
  * @property {string} productType - The singular tag assigned to `_productType` / `ProductListItem.product_type`.
- * @property {Function|null} deepFilter - Nested publication filtering. Currently, only 'hotels' utilizes this for 
- *   `room_categories`/`price_dates`; all other types are null.
+ * @property {Function|null} deepFilter - Nested publication filtering, matching each type's own
+ *   dedicated endpoint (hotels/tours/cruises/excursions): hotels' `room_categories`/`price_dates`,
+ *   tours' `categories`, cruises' `cabin_categories`, excursions' `categories`/`price_periods`.
+ *   campers/rentalCars have none (vehicles has no equivalent nested relation to filter).
  * @property {Object} detailRoot/detailRelations - Schema-validated field-path configurations for full detail fetches.
  * @property {Array|Function} listFields/listShaper - Static field list and list-item transformation logic for slim fetches.
  *
@@ -89,6 +94,7 @@ const PRODUCT_TYPE_REGISTRY = [
   {
     key: "hotels",
     productType: "hotel",
+    productLabel: "hotels",
     collection: HOTELS_COLLECTION,
     buildUpdatedAfterFilter,
     extraFilter: null,
@@ -101,10 +107,11 @@ const PRODUCT_TYPE_REGISTRY = [
   {
     key: "tours",
     productType: "tour",
+    productLabel: "tours",
     collection: TOURS_COLLECTION,
     buildUpdatedAfterFilter: buildToursUpdatedAfterFilter,
     extraFilter: null,
-    deepFilter: null,
+    deepFilter: buildToursPublicationDeepFilter,
     detailRoot: TOURS_ROOT,
     detailRelations: TOURS_RELATIONS,
     listFields: TOURS_LIST_FIELDS,
@@ -113,10 +120,11 @@ const PRODUCT_TYPE_REGISTRY = [
   {
     key: "excursions",
     productType: "excursion",
+    productLabel: "excursions",
     collection: EXCURSIONS_COLLECTION,
     buildUpdatedAfterFilter: buildExcursionsUpdatedAfterFilter,
     extraFilter: null,
-    deepFilter: null,
+    deepFilter: buildExcursionsPublicationDeepFilter,
     detailRoot: EXCURSIONS_ROOT,
     detailRelations: EXCURSIONS_RELATIONS,
     listFields: EXCURSIONS_LIST_FIELDS,
@@ -125,10 +133,11 @@ const PRODUCT_TYPE_REGISTRY = [
   {
     key: "cruises",
     productType: "cruise",
+    productLabel: "cruises",
     collection: CRUISES_COLLECTION,
     buildUpdatedAfterFilter: buildCruisesUpdatedAfterFilter,
     extraFilter: null,
-    deepFilter: null,
+    deepFilter: buildCruisesPublicationDeepFilter,
     detailRoot: CRUISES_ROOT,
     detailRelations: CRUISES_RELATIONS,
     listFields: CRUISES_LIST_FIELDS,
@@ -137,6 +146,7 @@ const PRODUCT_TYPE_REGISTRY = [
   {
     key: "campers",
     productType: "camper",
+    productLabel: "campers",
     collection: VEHICLES_COLLECTION,
     buildUpdatedAfterFilter: buildCampersUpdatedAfterFilter,
     extraFilter: { rental_type: { _eq: "camper" } },
@@ -149,6 +159,7 @@ const PRODUCT_TYPE_REGISTRY = [
   {
     key: "rentalCars",
     productType: "rental_car",
+    productLabel: "rental_cars",
     collection: VEHICLES_COLLECTION,
     buildUpdatedAfterFilter: buildRentalCarsUpdatedAfterFilter,
     extraFilter: { rental_type: { _eq: "car" } },
@@ -160,12 +171,20 @@ const PRODUCT_TYPE_REGISTRY = [
   },
 ];
 
+/* Only the sub-products a token's `products` list authorizes are ever fanned out to —
+ * an unauthorized type is silently omitted from the aggregate rather than causing a 403
+ * for the whole /v1/products request (see the router-mounting comment in api/index.js). */
+function getAllowedRegistry(apiUser) {
+  const allowed = apiUser?.products ?? [];
+  return PRODUCT_TYPE_REGISTRY.filter((entry) => allowed.includes(entry.productLabel));
+}
+
 async function fetchAllProductTypes(
-  { updated_after, includeTombstones = false },
+  { updated_after, includeTombstones = false, apiUser, registry },
   { services, database, getSchema },
 ) {
   const schema = await getSchema();
-  const { ItemsService } = services;
+  const partnerId = apiUser?.partnerId;
 
   /*
    * Full snapshots strictly mandate published records. 
@@ -184,39 +203,40 @@ async function fetchAllProductTypes(
   };
 
   const result = { schema };
-  for (const entry of PRODUCT_TYPE_REGISTRY) {
-    result[`${entry.key}Service`] = new ItemsService(entry.collection, {
-      knex: database,
-      schema,
+  for (const entry of registry) {
+    result[`${entry.key}Service`] = createScopedItemsService(services, entry.collection, { knex: database, schema }, {
+      partnerId,
+      partnerVisibility: apiUser?.partnerVisibility,
     });
-    const filter = publishedFilter(
-      entry.buildUpdatedAfterFilter(updated_after),
-    );
-    result[`${entry.key}Filter`] = entry.extraFilter
-      ? { _and: [filter, entry.extraFilter] }
-      : filter;
+    /* No manual partner-filter merge here — result[`${entry.key}Service`] above is already
+     * createScopedItemsService-wrapped, which ANDs the partner clause into every readByQuery
+     * call on it. Adding it here too would just AND the same clause in twice. */
+    let filter = publishedFilter(entry.buildUpdatedAfterFilter(updated_after));
+    if (entry.extraFilter) filter = { _and: [filter, entry.extraFilter] };
+    result[`${entry.key}Filter`] = filter;
   }
   return result;
 }
 
 export async function listProducts(
-  { page, limit, offset, updated_after },
+  { page, limit, offset, updated_after, apiUser },
   context,
 ) {
+  const registry = getAllowedRegistry(apiUser);
   const result = await fetchAllProductTypes(
-    { updated_after, includeTombstones: true },
+    { updated_after, includeTombstones: true, apiUser, registry },
     context,
   );
   const { schema } = result;
 
   /*
    * Field selection operates via schema-validation per type rather than relying on raw static `DETAIL_FIELDS` arrays.
-   * This architectural choice ensures that if a Directus field is renamed or removed, the query gracefully degrades 
-   * the specific field to a 'missing' state, preventing systemic 403 authorization failures across the entire 
+   * This architectural choice ensures that if a Directus field is renamed or removed, the query gracefully degrades
+   * the specific field to a 'missing' state, preventing systemic 403 authorization failures across the entire
    * aggregated endpoint for all product types.
    */
   const perTypeResults = await Promise.all(
-    PRODUCT_TYPE_REGISTRY.map((entry) =>
+    registry.map((entry) =>
       result[`${entry.key}Service`].readByQuery({
         fields: buildDetailFields({
           schema,
@@ -230,7 +250,7 @@ export async function listProducts(
     ),
   );
 
-  const tagged = PRODUCT_TYPE_REGISTRY.flatMap((entry, i) =>
+  const tagged = registry.flatMap((entry, i) =>
     perTypeResults[i].map((item) => ({
       ...item,
       _productType: entry.productType,
@@ -269,15 +289,27 @@ export async function listProducts(
  * back to the first array entry for tours/cruises.
  */
 export async function listProductsSlim(
-  { page, limit, offset, updated_after, lang },
+  { page, limit, offset, updated_after, lang, apiUser },
   context,
 ) {
-  const result = await fetchAllProductTypes({ updated_after }, context);
+  const registry = getAllowedRegistry(apiUser);
+  const result = await fetchAllProductTypes({ updated_after, apiUser, registry }, context);
+  const { schema } = result;
 
+  /*
+   * Field validation: same guard as listProducts (full). Passing a raw static field list to
+   * Directus ItemsService.readByQuery without schema validation causes a ForbiddenException (403)
+   * when any path references a renamed or removed field/relation — because Directus rejects the
+   * query before executing it. filterValidFieldPaths strips any invalid paths before the query
+   * runs, so schema drift degrades gracefully to missing fields rather than a 403 for the entire
+   * /products endpoint. This was the root cause of GET /products returning 403 for web-scope
+   * tokens while GET /products/full (which already used buildDetailFields + schema validation)
+   * returned 200 for the same token.
+   */
   const perTypeResults = await Promise.all(
-    PRODUCT_TYPE_REGISTRY.map((entry) =>
+    registry.map((entry) =>
       result[`${entry.key}Service`].readByQuery({
-        fields: entry.listFields,
+        fields: filterValidFieldPaths(schema, entry.collection, entry.listFields),
         ...(entry.deepFilter ? { deep: entry.deepFilter() } : {}),
         filter: result[`${entry.key}Filter`],
         limit: -1,
@@ -309,9 +341,9 @@ export async function listProductsSlim(
     date_updated: listItem.date_updated,
   });
 
-  const tagged = PRODUCT_TYPE_REGISTRY.flatMap((entry, i) =>
+  const tagged = registry.flatMap((entry, i) =>
     perTypeResults[i].map((item) =>
-      toProductListItem(entry.productType, entry.listShaper(item, lang)),
+      toProductListItem(entry.productType, entry.listShaper(applyPartnerMediaFilter(item, apiUser), lang)),
     ),
   );
 
@@ -354,26 +386,55 @@ export async function listProductsSlim(
  * the common case; it remains ambiguous only if two types share both fields with the same
  * value, which the contract doesn't otherwise disambiguate.
  */
-export async function getProductById({ id }, context) {
+export async function getProductById({ id, apiUser }, context) {
+  const allowedLabels = apiUser?.products ?? [];
+  const partnerId = apiUser?.partnerId;
+
   const lookups = [
-    { type: "hotel", get: getHotelDetails },
-    { type: "tour", get: getTourDetails },
-    { type: "excursion", get: getExcursionDetails },
-    { type: "cruise", get: getCruiseDetails },
-    { type: "rental_car", get: getRentalCarDetails },
-    { type: "camper", get: getCamperDetails },
-  ];
+    { type: "hotel", label: "hotels", get: getHotelDetails },
+    { type: "tour", label: "tours", get: getTourDetails },
+    { type: "excursion", label: "excursions", get: getExcursionDetails },
+    { type: "cruise", label: "cruises", get: getCruiseDetails },
+    { type: "rental_car", label: "rental_cars", get: getRentalCarDetails },
+    { type: "camper", label: "campers", get: getCamperDetails },
+  ].filter((lookup) => allowedLabels.includes(lookup.label));
 
   const idFilterModes = /^\d+$/.test(id) ? ["object_id", "id"] : [undefined];
 
+  /* Each idFilterMode pass fans its per-type lookups out in parallel (they're independent
+   * DB round-trips) instead of awaiting them one at a time — the previous sequential loop
+   * paid up to N (or 2N, for a numeric id) round-trips even though only the first match is
+   * ever used. Registry order still decides the winner when a pass yields more than one
+   * match: results are walked in `lookups` order (Promise.allSettled preserves index order),
+   * matching the old loop's "first hit in registry order wins" semantics exactly — only the
+   * waiting is parallelized, not the precedence. A non-404 failure also keeps its old
+   * precedence: it only aborts the whole lookup if no earlier-in-order type matched first,
+   * since the sequential version would have already returned on an earlier match before
+   * ever reaching the erroring type. */
   for (const idFilterMode of idFilterModes) {
-    for (const { type, get } of lookups) {
-      try {
-        const item = await get({ id, idFilterMode }, context);
-        return { ...item, _productType: type };
-      } catch (e) {
-        if (e instanceof AppError && e.statusCode === HTTP_STATUS.NOT_FOUND)
-          continue;
+    const results = await Promise.allSettled(
+      lookups.map(({ get }) =>
+        get(
+          {
+            id,
+            idFilterMode,
+            partnerId,
+            partnerVisibility: apiUser?.partnerVisibility,
+          },
+          context,
+        ),
+      ),
+    );
+
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      if (result.status === "fulfilled") {
+        return { ...result.value, _productType: lookups[i].type };
+      }
+    }
+    for (const result of results) {
+      const e = result.reason;
+      if (!(e instanceof AppError && e.statusCode === HTTP_STATUS.NOT_FOUND)) {
         throw e;
       }
     }

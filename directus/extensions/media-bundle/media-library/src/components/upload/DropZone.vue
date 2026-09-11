@@ -32,12 +32,13 @@
           :key="upload.name"
           class="upload-item"
         >
-          <span class="upload-name">{{ upload.name }}</span>
-          <span class="upload-percent">{{ upload.progress }}%</span>
+          <span class="upload-name" :title="upload.errorMessage || upload.name">{{ upload.name }}</span>
+          <span v-if="upload.error && upload.errorMessage" class="upload-error">{{ upload.errorMessage }}</span>
+          <span v-else class="upload-percent">{{ upload.progress }}%</span>
           <div class="progress-bar-track">
             <div
               class="progress-bar-fill"
-              :class="{ done: upload.progress === 100, error: upload.error }"
+              :class="{ done: upload.progress === 100 && !upload.error, error: upload.error }"
               :style="{ width: `${upload.progress}%` }"
             />
           </div>
@@ -51,6 +52,10 @@
 import { ref } from 'vue'
 import { useApi } from '@directus/extensions-sdk'
 import { useFilesStore } from '../../stores/files.store'
+import {
+  loadUploadValidationSettings,
+} from '../../../../directus-extension-media-uploader/src/utils/uploadValidationSettings'
+import { validateUploadFile } from '../../../../directus-extension-media-uploader/src/utils/validateUploadFile'
 
 export interface UploadAdapter {
   upload(file: File, folder: string | null, onProgress: (pct: number) => void): Promise<void>
@@ -97,9 +102,10 @@ const emit = defineEmits<{
   'upload-complete': []
 }>()
 
+const api = useApi()
 const filesStore = useFilesStore()
 
-const _defaultAdapter: UploadAdapter = new DirectusUploadAdapter(useApi())
+const _defaultAdapter: UploadAdapter = new DirectusUploadAdapter(api)
 
 function getAdapter(): UploadAdapter {
   return props.adapter ?? _defaultAdapter
@@ -109,6 +115,7 @@ interface UploadItem {
   name: string
   progress: number
   error: boolean
+  errorMessage?: string | null
 }
 
 const isDragging = ref(false)
@@ -136,17 +143,30 @@ async function onDrop(evt: DragEvent) {
   if (files.length === 0) return
 
   const adapter = getAdapter()
+  // Use cached settings when available (modal already loaded them); otherwise one fetch
+  const settings = await loadUploadValidationSettings(api)
 
   const items: UploadItem[] = files.map((f) => ({
     name: f.name,
     progress: 0,
     error: false,
+    errorMessage: null,
   }))
   uploads.value.push(...items)
 
   await Promise.all(
     files.map(async (file, idx) => {
       const item = items[idx]
+      if (!item) return
+
+      const validationError = await validateUploadFile(file, settings)
+      if (validationError) {
+        item.error = true
+        item.errorMessage = validationError
+        item.progress = 100
+        return
+      }
+
       try {
         await adapter.upload(file, props.folderId ?? null, (pct) => {
           item.progress = pct
@@ -155,6 +175,7 @@ async function onDrop(evt: DragEvent) {
         item.progress = 100
       } catch (err) {
         item.error = true
+        item.errorMessage = 'Upload failed'
         console.warn('[media-library] Upload failed:', file.name, err)
       }
     })
@@ -173,9 +194,18 @@ function clearCompleted() {
 .drop-zone-wrapper {
   position: relative;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 0 !important;
+  /* Own the scrollport so horizontal scrollbar stays at the viewport bottom
+     (native File Library behavior) instead of under a short table. */
+  overflow: auto;
+}
+
+.drop-zone-wrapper.is-grid {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .drop-overlay {
@@ -246,6 +276,16 @@ function clearCompleted() {
   font-size: 11px;
   color: var(--theme--foreground-subdued);
   text-align: right;
+}
+
+.upload-error {
+  font-size: 11px;
+  color: var(--theme--danger, #e35169);
+  text-align: right;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .progress-bar-track {

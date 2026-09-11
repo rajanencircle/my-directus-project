@@ -8,9 +8,9 @@ import {
 } from '../../shared/constants.js';
 import { LABEL_COLLECTION_TO_DIRECTUS } from './metadata.service.js';
 
-// Derived from the same source metadata.service.js's /metadata/labels handler actually
-// uses to resolve a `collection` param, instead of maintaining a separate duplicate list
-// that could silently drift from it.
+/* Derived from the same source metadata.service.js's /metadata/labels handler actually
+ * uses to resolve a `collection` param, instead of maintaining a separate duplicate list
+ * that could silently drift from it. */
 const VALID_LABEL_COLLECTIONS = Object.keys(LABEL_COLLECTION_TO_DIRECTUS);
 
 export const getFieldMapSchema = [

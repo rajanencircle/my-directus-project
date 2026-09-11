@@ -2,19 +2,19 @@ const DEPOT_TRANSLATIONS_TABLE = "rental_depots_translations";
 const LANGUAGES_TABLE = "translations";
 
 /**
- * Code-only workaround for `rental_depots_translations.translations_id`:
- * the Directus m2o relation to the `translations` language table is NOT configured
- * for this table (unlike every other *_translations table), so Directus silently
- * drops `office_hours_translations.translations_id.code` joins and the API would
- * receive raw UUIDs it cannot map to a language.
+ * @description Manually fetches and attaches office hours translations for rental depots.
  *
- * We fetch the rows directly via knex (joining on the existing FK that is already
- * present in the database) and attach them to each depot in the exact shape the
- * depot transformer expects: `{ translations_id: { code }, office_hours_deviating }`.
+ * This is a workaround for a missing Directus relation. It uses Knex directly to query the
+ * `rental_depots_translations` table and joins it with the `translations` (languages) table to
+ * obtain language codes. The rows are then mapped back into the main `depots` array, formatted
+ * exactly as the transformer expects.
  *
- * @param {Array} depots     depot rows (e.g. `depots_selected[].rental_depots_id`)
- * @param {object} database  Directus knex instance from the extension context
- * @returns {Array} the same array, mutated in place with `office_hours_translations`
+ * The camper and rental car transformers use this to load office hours translations, bypassing
+ * the standard API fetch, which silently drops this join due to missing configuration.
+ * 
+ * @param {Array<Object>} depots - Array of depot rows.
+ * @param {Object} database - Directus knex database instance.
+ * @returns {Promise<Array<Object>>} The `depots` array mutated in place with `office_hours_translations`.
  */
 export async function enrichDepotOfficeHours(depots, database) {
   if (!depots || depots.length === 0) return depots;

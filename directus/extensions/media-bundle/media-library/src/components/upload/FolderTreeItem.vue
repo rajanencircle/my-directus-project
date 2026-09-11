@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
-import { inject } from 'vue'
+import { computed, inject } from 'vue'
+import { partnerAccentStyle } from '../../utils/partnerAccent'
 
 export interface FolderTreeNode {
   id: string
   name: string
   parent: string | null
   children: FolderTreeNode[]
+  createdByPartnerVisually?: string | null
 }
 
 const props = defineProps<{
   node: FolderTreeNode
   depth: number
   activeId: string | number | null
+  isLast?: boolean
 }>()
 
 defineEmits<{
@@ -21,6 +24,13 @@ defineEmits<{
 }>()
 
 const expandedInjected = inject<Ref<Set<string>>>('folderDropdownExpanded')
+const statsLabelFn = inject<(folderId: string | null) => string | null>('folderDropdownStatsLabel')
+
+const accentStyle = computed(() => partnerAccentStyle(props.node.createdByPartnerVisually))
+
+function statsLabel(id: string): string | null {
+  return statsLabelFn?.(id) ?? null
+}
 
 function isRowExpanded(id: string): boolean {
   return expandedInjected?.value?.has(id) ?? false
@@ -32,46 +42,53 @@ function selected(id: string): boolean {
 </script>
 
 <template>
-  <div class="folder-tree-node">
-    <div class="folder-tree-row-wrap" :class="{ 'is-active': selected(node.id) }">
-      <div
-        class="folder-tree-row dropdown-item"
-        role="button"
-        tabindex="0"
-        @click="$emit('select', node.id)"
-        @keydown.enter.prevent="$emit('select', node.id)"
-        @keydown.space.prevent="$emit('select', node.id)"
+  <div
+    class="folder-tree-node"
+    :class="{ 'has-partner-accent': !!accentStyle }"
+    :style="{
+      ...accentStyle,
+      '--folder-depth': String(Math.max(0, depth)),
+    }"
+  >
+    <div
+      class="folder-tree-row"
+      :class="{ 'is-active': selected(node.id) }"
+      role="button"
+      tabindex="0"
+      @click="$emit('select', node.id)"
+      @keydown.enter.prevent="$emit('select', node.id)"
+      @keydown.space.prevent="$emit('select', node.id)"
+    >
+      <span v-if="accentStyle" class="folder-accent-bar" aria-hidden="true" />
+      <v-icon name="folder" small class="folder-tree-icon" />
+      <span class="folder-tree-label">
+        <span class="folder-tree-name">{{ node.name }}</span>
+        <span v-if="statsLabel(node.id)" class="folder-tree-meta">{{ statsLabel(node.id) }}</span>
+      </span>
+      <button
+        v-if="node.children.length"
+        type="button"
+        class="folder-tree-chevron"
+        :class="{ 'is-open': isRowExpanded(node.id) }"
+        :title="isRowExpanded(node.id) ? 'Collapse' : 'Expand'"
+        @click.stop="$emit('toggle', node.id)"
       >
-        <div class="folder-tree-row-inner" :style="{ '--depth': String(Math.max(0, depth)) }">
-          <v-icon name="folder" small class="folder-tree-icon" />
-          <span class="folder-tree-label" :class="{ 'folder-tree-label--nested': depth > 0 }">
-            {{ node.name }}
-          </span>
-          <button
-            v-if="node.children.length"
-            type="button"
-            class="folder-tree-chevron-btn"
-            :class="{ 'is-open': isRowExpanded(node.id) }"
-            :title="isRowExpanded(node.id) ? 'Collapse' : 'Expand'"
-            @click.stop="$emit('toggle', node.id)"
-          >
-            <v-icon name="chevron_right" small />
-          </button>
-          <span v-else class="folder-tree-chevron-spacer" aria-hidden="true" />
-        </div>
-      </div>
+        <v-icon name="expand_more" small />
+      </button>
+      <span v-else class="folder-tree-chevron-spacer" aria-hidden="true" />
     </div>
+
     <div
       v-if="node.children.length && isRowExpanded(node.id)"
       class="folder-tree-children"
-      :style="{ '--tree-depth': String(depth) }"
     >
       <FolderTreeItem
-        v-for="child in node.children"
+        v-for="(child, index) in node.children"
         :key="child.id"
         :node="child"
         :depth="depth + 1"
         :active-id="activeId"
+        :is-last="index === node.children.length - 1"
         @select="$emit('select', $event)"
         @toggle="$emit('toggle', $event)"
       />
@@ -83,39 +100,45 @@ function selected(id: string): boolean {
 .folder-tree-node {
   display: flex;
   flex-direction: column;
-}
-
-.folder-tree-row-wrap {
-  padding: 2px 8px;
-  border-radius: 8px;
-  transition: background 0.12s ease;
-}
-
-.folder-tree-row-wrap:hover {
-  background: color-mix(in srgb, var(--theme--primary) 7%, transparent);
-}
-
-.folder-tree-row-wrap.is-active {
-  background: var(--theme--background-subdued);
-}
-
-.folder-tree-row-wrap.is-active:hover {
-  background: color-mix(in srgb, var(--theme--foreground-subdued) 12%, var(--theme--background-subdued));
+  min-width: 0;
 }
 
 .folder-tree-row {
-  width: 100%;
-  outline: none;
-}
-
-.folder-tree-row-inner {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
-  min-height: 44px;
-  padding: 8px 4px 8px calc(6px + (var(--depth, 0) * 14px));
+  min-height: 40px;
+  margin: 0;
+  padding: 6px 10px 6px calc(12px + (var(--folder-depth, 0) * 18px));
   box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+  color: var(--theme--foreground);
+  transition: background 0.12s ease;
+}
+
+.folder-tree-row:hover {
+  background: color-mix(in srgb, var(--theme--foreground) 5%, transparent);
+}
+
+.folder-tree-row.is-active {
+  background: var(--theme--background-subdued);
+}
+
+.folder-accent-bar {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: calc(var(--folder-depth, 0) * 18px);
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--partner-accent);
+  pointer-events: none;
+}
+
+.has-partner-accent .folder-tree-icon {
+  color: var(--partner-accent);
 }
 
 .folder-tree-icon {
@@ -126,66 +149,71 @@ function selected(id: string): boolean {
 .folder-tree-label {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.folder-tree-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 650;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
   color: var(--theme--foreground);
-  text-align: left;
 }
 
-.folder-tree-label--nested {
-  font-weight: 500;
-  font-size: 13px;
+.folder-tree-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
   color: var(--theme--foreground-subdued);
 }
 
-.dropdown-item {
-  font-size: 14px;
-  cursor: pointer;
-  color: var(--theme--foreground);
-}
-
-.folder-tree-chevron-btn {
+.folder-tree-chevron {
   flex-shrink: 0;
-  margin-left: auto;
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius);
-  background: var(--theme--background-normal);
+  border: none;
+  border-radius: 4px;
+  background: transparent;
   color: var(--theme--foreground-subdued);
   cursor: pointer;
-  transition: transform 0.12s, color 0.12s, border-color 0.12s;
 }
 
-.folder-tree-chevron-btn:hover {
+.folder-tree-chevron:hover {
   color: var(--theme--foreground);
-  border-color: color-mix(in srgb, var(--theme--foreground-subdued) 40%, var(--theme--border-color));
+  background: color-mix(in srgb, var(--theme--foreground) 8%, transparent);
 }
 
-.folder-tree-chevron-btn.is-open :deep(.v-icon) {
-  transform: rotate(90deg);
-  transition: transform 0.12s;
+.folder-tree-chevron.is-open {
+  color: var(--theme--primary);
+}
+
+.folder-tree-chevron :deep(.v-icon) {
+  transition: transform 0.12s ease;
+}
+
+.folder-tree-chevron.is-open :deep(.v-icon) {
+  transform: rotate(180deg);
 }
 
 .folder-tree-chevron-spacer {
   flex-shrink: 0;
-  margin-left: auto;
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
 }
 
 .folder-tree-children {
   display: flex;
   flex-direction: column;
-  margin-inline-start: 12px;
-  padding-inline-start: calc(12px + (var(--tree-depth, 0) * 3px));
-  border-inline-start: 1px solid var(--theme--border-color);
+  min-width: 0;
 }
 </style>

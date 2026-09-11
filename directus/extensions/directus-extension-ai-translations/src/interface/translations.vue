@@ -37,74 +37,104 @@
 
       <div class="lang-selectors" :class="{ 'is-split': splitViewOn }">
         <!-- Source Lang Selector -->
-        <div
-          class="lang-box source-lang"
-          :class="{
-            'has-content': hasContent(sourceLanguage),
-            'is-draft': isDraft(sourceLanguage),
-          }"
-          @click="openSelect('source')"
-        >
-          <div class="lang-box-main">
-            <transition name="icon-morph" mode="out-in">
-              <v-icon
-                :key="`src-icon-${getLangIcon(sourceLanguage)}`"
-                :name="getLangIcon(sourceLanguage)"
-                small
-                class="lang-icon"
-                :class="{
-                  'lang-icon--active':
-                    hasContent(sourceLanguage) || isDraft(sourceLanguage),
-                  'lang-icon--empty':
-                    !hasContent(sourceLanguage) && !isDraft(sourceLanguage),
-                  'lang-icon--spin':
-                    hasContent(sourceLanguage) || isDraft(sourceLanguage),
-                }"
-                @click.stop="openSelect('source')"
-              />
-            </transition>
+        <v-menu attached placement="bottom-start" class="language-select">
+          <template #activator="{ toggle, active }">
+            <button
+              class="lang-box source-lang"
+              type="button"
+              :class="{
+                'has-content': hasContent(sourceLanguage),
+                'is-draft': isDraft(sourceLanguage),
+              }"
+              @click="toggle"
+            >
+              <div class="lang-box-main">
+                <transition name="icon-morph" mode="out-in">
+                  <v-icon
+                    :key="`src-icon-${getLangIcon(sourceLanguage)}`"
+                    :name="getLangIcon(sourceLanguage)"
+                    small
+                    class="lang-icon"
+                    :class="{
+                      'lang-icon--active':
+                        hasContent(sourceLanguage) || isDraft(sourceLanguage),
+                      'lang-icon--empty':
+                        !hasContent(sourceLanguage) && !isDraft(sourceLanguage),
+                      'lang-icon--spin':
+                        hasContent(sourceLanguage) || isDraft(sourceLanguage),
+                    }"
+                  />
+                </transition>
 
-            <v-select
-              ref="sourceSelect"
-              v-model="sourceLanguage"
-              :items="languageSelectItems"
-              item-text="text"
-              item-value="value"
-              inline
-              class="lang-select"
-              @click.stop
-            />
-          </div>
+                <span class="display-value">{{
+                  languageSelectItems.find((i) => i.value === sourceLanguage)
+                    ?.text || sourceLanguage
+                }}</span>
+              </div>
 
-          <div class="lang-actions">
-            <transition name="icon-morph" mode="out-in">
-              <v-icon
-                :key="`src-action-${sourceActionIcon(sourceLanguage)}`"
-                v-if="hasContent(sourceLanguage) || isDraft(sourceLanguage)"
-                :name="sourceActionIcon(sourceLanguage)"
-                class="lang-action mr-2"
-                :class="{ 'is-visible': hasContent(sourceLanguage) }"
-                clickable
-                @click.stop="sourceActionClick(sourceLanguage)"
-              />
-            </transition>
+              <div class="lang-actions controls" @click.stop @mousedown.stop>
+                <transition name="icon-morph" mode="out-in">
+                  <v-icon
+                    :key="`src-action-${sourceActionIcon(sourceLanguage)}`"
+                    v-if="hasContent(sourceLanguage) || isDraft(sourceLanguage)"
+                    :name="sourceActionIcon(sourceLanguage)"
+                    class="lang-action mr-2"
+                    :class="{ 'is-visible': hasContent(sourceLanguage) }"
+                    clickable
+                    @click.stop="sourceActionClick(sourceLanguage)"
+                  />
+                </transition>
 
-            <v-icon
-              v-if="!splitViewOn"
-              name="flip"
-              class="split-toggle mr-2"
+                <v-icon
+                  v-if="!splitViewOn"
+                  name="flip"
+                  class="split-toggle mr-2"
+                  clickable
+                  @click.stop="splitViewOn = true"
+                />
+
+                <v-icon
+                  name="expand_more"
+                  class="dropdown-icon expand"
+                  :class="{ active }"
+                  clickable
+                  @click.stop="toggle"
+                />
+              </div>
+            </button>
+          </template>
+
+          <v-list v-if="languageSelectItems" class="language-select-dropdown">
+            <v-list-item
+              v-for="item in languageSelectItems"
+              :key="item.value"
               clickable
-              @click.stop="splitViewOn = true"
-            />
-
-            <v-icon
-              name="expand_more"
-              class="dropdown-icon"
-              clickable
-              @click.stop="openSelect('source')"
-            />
-          </div>
-        </div>
+              @click="sourceLanguage = item.value"
+            >
+              <div class="start">
+                <div class="dot" :class="{ show: isDraft(item.value) }"></div>
+                {{ item.text }}
+              </div>
+              <div class="end">
+                <div
+                  class="custom-progress-linear"
+                  v-tooltip="
+                    `${Math.round(getTranslationProgress(item.value))}%`
+                  "
+                >
+                  <div class="custom-progress-background"></div>
+                  <div
+                    class="custom-progress-fill"
+                    :style="{
+                      width:
+                        Math.round(getTranslationProgress(item.value)) + '%',
+                    }"
+                  ></div>
+                </div>
+              </div>
+            </v-list-item>
+          </v-list>
+        </v-menu>
 
         <!-- Language Icon Gap -->
         <div class="lang-gap" v-show="splitViewOn">
@@ -112,192 +142,134 @@
         </div>
 
         <!-- Target Lang Selector -->
-        <div
-          class="lang-box target-lang"
+        <v-menu
           v-show="splitViewOn"
-          :class="{
-            'has-content': hasContent(targetLanguage),
-            'is-draft': isDraft(targetLanguage),
-          }"
-          @click="openSelect('target')"
+          attached
+          placement="bottom-start"
+          class="language-select"
         >
-          <div class="lang-box-main">
-            <transition name="icon-morph" mode="out-in">
-              <v-icon
-                :key="`tgt-icon-${getLangIcon(targetLanguage)}`"
-                :name="getLangIcon(targetLanguage)"
-                small
-                class="lang-icon"
-                :class="{
-                  'lang-icon--active':
-                    hasContent(targetLanguage) || isDraft(targetLanguage),
-                  'lang-icon--empty':
-                    !hasContent(targetLanguage) && !isDraft(targetLanguage),
-                  'lang-icon--spin':
-                    hasContent(targetLanguage) || isDraft(targetLanguage),
-                }"
-                @click.stop="openSelect('target')"
-              />
-            </transition>
+          <template #activator="{ toggle, active }">
+            <button
+              class="lang-box target-lang"
+              type="button"
+              :class="{
+                'has-content': hasContent(targetLanguage),
+                'is-draft': isDraft(targetLanguage),
+              }"
+              @click="toggle"
+            >
+              <div class="lang-box-main">
+                <transition name="icon-morph" mode="out-in">
+                  <v-icon
+                    :key="`tgt-icon-${getLangIcon(targetLanguage)}`"
+                    :name="getLangIcon(targetLanguage)"
+                    small
+                    class="lang-icon"
+                    :class="{
+                      'lang-icon--active':
+                        hasContent(targetLanguage) || isDraft(targetLanguage),
+                      'lang-icon--empty':
+                        !hasContent(targetLanguage) && !isDraft(targetLanguage),
+                      'lang-icon--spin':
+                        hasContent(targetLanguage) || isDraft(targetLanguage),
+                    }"
+                  />
+                </transition>
 
-            <v-select
-              ref="targetSelect"
-              v-model="targetLanguage"
-              :items="languageSelectItems"
-              item-text="text"
-              item-value="value"
-              inline
-              class="lang-select"
-              @click.stop
-            />
-          </div>
+                <span class="display-value">{{
+                  languageSelectItems.find((i) => i.value === targetLanguage)
+                    ?.text || targetLanguage
+                }}</span>
+              </div>
 
-          <div class="lang-actions">
-            <transition name="icon-morph" mode="out-in">
-              <v-icon
-                :key="`tgt-action-${targetActionIcon(targetLanguage)}`"
-                v-if="hasContent(targetLanguage) || isDraft(targetLanguage)"
-                :name="targetActionIcon(targetLanguage)"
-                class="lang-action mr-2"
-                :class="{ 'is-visible': hasContent(targetLanguage) }"
-                clickable
-                @click.stop="targetActionClick(targetLanguage)"
-              />
-            </transition>
+              <div class="lang-actions controls" @click.stop @mousedown.stop>
+                <transition name="icon-morph" mode="out-in">
+                  <v-icon
+                    :key="`tgt-action-${targetActionIcon(targetLanguage)}`"
+                    v-if="hasContent(targetLanguage) || isDraft(targetLanguage)"
+                    :name="targetActionIcon(targetLanguage)"
+                    class="lang-action mr-2"
+                    :class="{ 'is-visible': hasContent(targetLanguage) }"
+                    clickable
+                    @click.stop="targetActionClick(targetLanguage)"
+                  />
+                </transition>
 
-            <v-icon
-              name="flip"
-              class="split-toggle mr-2"
+                <v-icon
+                  name="flip"
+                  class="split-toggle mr-2"
+                  clickable
+                  @click.stop="splitViewOn = false"
+                />
+
+                <v-icon
+                  name="expand_more"
+                  class="dropdown-icon expand"
+                  :class="{ active }"
+                  clickable
+                  @click.stop="toggle"
+                />
+              </div>
+            </button>
+          </template>
+
+          <v-list v-if="languageSelectItems" class="language-select-dropdown">
+            <v-list-item
+              v-for="item in languageSelectItems"
+              :key="item.value"
               clickable
-              @click.stop="splitViewOn = false"
-            />
-
-            <v-icon
-              name="expand_more"
-              class="dropdown-icon"
-              clickable
-              @click.stop="openSelect('target')"
-            />
-          </div>
-        </div>
+              @click="targetLanguage = item.value"
+            >
+              <div class="start">
+                <div class="dot" :class="{ show: isDraft(item.value) }"></div>
+                {{ item.text }}
+              </div>
+              <div class="end">
+                <div
+                  class="custom-progress-linear"
+                  v-tooltip="
+                    `${Math.round(getTranslationProgress(item.value))}%`
+                  "
+                >
+                  <div class="custom-progress-background"></div>
+                  <div
+                    class="custom-progress-fill"
+                    :style="{
+                      width:
+                        Math.round(getTranslationProgress(item.value)) + '%',
+                    }"
+                  ></div>
+                </div>
+              </div>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
     </div>
 
-    <!-- ─── Field rows ─────────────────────────────────────────────── -->
+    <!-- ─── Field rows (nested groups + leaf fields) ───────────────── -->
     <div
       v-if="sourceLanguage && (targetLanguage || !splitViewOn)"
       class="fields-container"
     >
-      <div
-        v-for="(group, gi) in fieldGroups"
-        :key="gi"
-        class="field-row-inputs"
-        :class="{ 'is-split': splitViewOn }"
-      >
-        <!-- Source input(s) -->
-        <div
-          class="field-input-col"
-          :class="{ 'field-pair': group.length === 2 }"
-        >
-          <template v-for="f in group" :key="f.field">
-            <div class="field-sub-col">
-              <div class="native-field-label">
-                <span class="label-text">{{ f.name || f.field }}</span>
-                <span class="lang-badge source">{{ sourceLanguage }}</span>
-              </div>
-              <v-form
-                :key="`src-${sourceLanguage}-${f.field}`"
-                :fields="[unlabeled(f)]"
-                :model-value="{
-                  [f.field]: getRow(sourceLanguage)?.[f.field] ?? null,
-                }"
-                :primary-key="getPrimaryKey(sourceLanguage)"
-                :disabled="disabled"
-                class="inline-form"
-                @update:model-value="
-                  (val) =>
-                    setFieldValue(sourceLanguage, f.field, val[f.field] ?? null)
-                "
-              />
-              <p v-if="f.meta?.note" class="field-note" v-html="f.meta.note" />
-            </div>
-          </template>
-        </div>
-
-        <!-- Selection Checkbox(es) -->
-        <div
-          class="field-ai-col"
-          v-show="splitViewOn"
-          :class="{ 'field-pair': group.length === 2 }"
-        >
-          <template v-for="f in group" :key="f.field">
-            <v-checkbox
-              v-model="selection"
-              :value="f.field"
-              :disabled="disabled || aiTranslating"
-              class="ai-checkbox"
-            />
-          </template>
-        </div>
-
-        <!-- Target input(s) -->
-        <div
-          class="field-input-col"
-          v-show="splitViewOn"
-          :class="{ 'field-pair': group.length === 2 }"
-        >
-          <template v-for="f in group" :key="f.field">
-            <div
-              class="field-sub-col"
-              :class="{ pending: f.field in pendingTranslations }"
-            >
-              <div class="native-field-label">
-                <span class="label-text">{{ f.name || f.field }}</span>
-                <span class="lang-badge target">{{ targetLanguage }}</span>
-              </div>
-              <v-form
-                :key="`tgt-${targetLanguage}-${f.field}`"
-                :fields="[unlabeled(f)]"
-                :model-value="{
-                  [f.field]: getRow(targetLanguage!)?.[f.field] ?? null,
-                }"
-                :primary-key="getPrimaryKey(targetLanguage!)"
-                :disabled="disabled || f.field in pendingTranslations"
-                class="inline-form"
-                @update:model-value="
-                  (val) =>
-                    setFieldValue(
-                      targetLanguage!,
-                      f.field,
-                      val[f.field] ?? null,
-                    )
-                "
-              />
-              <p v-if="f.meta?.note" class="field-note" v-html="f.meta.note" />
-              <!-- Blue translated text below the field when pending -->
-              <div
-                v-if="f.field in pendingTranslations"
-                class="pending-translation-text"
-              >
-                <template v-if="Array.isArray(pendingTranslations[f.field])">
-                  <div
-                    v-for="(item, idx) in pendingTranslations[f.field]"
-                    :key="idx"
-                    class="pending-repeater-item"
-                  >
-                    <span v-for="(val, key) in item" :key="key">
-                      <strong>{{ key }}:</strong> {{ val }}&nbsp;&nbsp;
-                    </span>
-                  </div>
-                </template>
-                <template v-else>
-                  {{ pendingTranslations[f.field] }}
-                </template>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
+      <FieldTreeRows
+        :nodes="fieldTree"
+        :split-view-on="splitViewOn"
+        :source-language="sourceLanguage"
+        :target-language="targetLanguage"
+        :disabled="disabled"
+        :ai-translating="aiTranslating"
+        :selection="selection"
+        :pending-translations="pendingTranslations"
+        :open-groups="openGroups"
+        :unlabeled="unlabeled"
+        :get-row="getRow"
+        :get-primary-key="getPrimaryKey"
+        :set-field-value="setFieldValue"
+        :toggle-open="toggleGroupOpen"
+        :is-open="isGroupOpen"
+        @update:selection="selection = $event"
+      />
     </div>
 
     <!-- ─── Empty state ────────────────────────────────────────────── -->
@@ -337,8 +309,15 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
+// @ts-ignore - Directus provides vue-i18n at runtime
 import { useI18n } from "vue-i18n";
 import { useStores, useApi } from "@directus/extensions-sdk";
+import FieldTreeRows from "./FieldTreeRows.vue";
+import {
+  buildFieldTree,
+  collectLeafFields,
+  type AnyField,
+} from "./fieldTree";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -400,9 +379,6 @@ const userStore = useUserStore();
 const api = useApi();
 const { t } = useI18n();
 
-const sourceSelect = ref<any>(null);
-const targetSelect = ref<any>(null);
-
 const activeLanguagesCollection = computed(
   () => props.languagesCollection || "translations",
 );
@@ -436,7 +412,7 @@ const splitViewOn = ref(startSplitView.value);
 
 /** Pending AI translations: fieldName → translated value (not yet accepted). */
 const pendingTranslations = ref<Record<string, any>>({});
-/** Track which fields are selected for translation via checkboxes. */
+/** Track which leaf fields are selected for AI translation. */
 const selection = ref<string[]>([]);
 
 const hasPending = computed(
@@ -463,6 +439,7 @@ function applyAll() {
 
 function cancelAll() {
   pendingTranslations.value = {};
+  selection.value = [];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -607,31 +584,42 @@ const translatableFields = computed(() => {
   });
 });
 
-// Group consecutive half-width fields into pairs so they render side by side.
-// Full-width fields (or an odd trailing half) each get their own group.
-const fieldGroups = computed<any[][]>(() => {
-  const groups: any[][] = [];
-  const fields = translatableFields.value;
-  let i = 0;
-  while (i < fields.length) {
-    const isHalf = fields[i].meta?.width === 'half';
-    const nextIsHalf =
-      i + 1 < fields.length && fields[i + 1].meta?.width === 'half';
-    if (isHalf && nextIsHalf) {
-      groups.push([fields[i], fields[i + 1]]);
-      i += 2;
-    } else {
-      groups.push([fields[i]]);
-      i++;
-    }
-  }
-  return groups;
-});
+/** Leaf fields only — exclude group containers from progress / AI batches. */
+const leafTranslatableFields = computed(() =>
+  collectLeafFields(translatableFields.value as AnyField[]),
+);
+
+const fieldTree = computed(() =>
+  buildFieldTree(translatableFields.value as AnyField[]),
+);
+
+/** Explicit open/closed overrides; missing keys fall back to group options.start. */
+const openGroups = ref<Record<string, boolean>>({});
+
+function isGroupOpen(fieldName: string, startOpen: boolean): boolean {
+  if (fieldName in openGroups.value) return openGroups.value[fieldName]!;
+  return startOpen;
+}
+
+function toggleGroupOpen(fieldName: string, startOpen: boolean) {
+  openGroups.value = {
+    ...openGroups.value,
+    [fieldName]: !isGroupOpen(fieldName, startOpen),
+  };
+}
 
 function unlabeled(f: any) {
-  // Force width:full so v-form fills its container; the half/full layout is
-  // already handled at the wrapper level via fieldGroups + .field-pair grid.
-  return { ...f, name: null, meta: { ...f.meta, note: null, width: 'full' } };
+  // Force width:full so v-form fills its container; half/full pairing is
+  // handled at the leaf-row wrapper level via field-pair grid.
+  // Clear meta.group so nested Detail Group fields render as root fields —
+  // v-form skips anything that still belongs to a parent group.
+  const { group: _group, ...rest } = f;
+  return {
+    ...rest,
+    name: null,
+    group: null,
+    meta: { ...f.meta, note: null, width: "full", group: null },
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -814,6 +802,36 @@ function hasContent(langCode: string | null): boolean {
   });
 }
 
+function getTranslationProgress(langCode: string | null): number {
+  if (!langCode) return 0;
+  const row = getRow(langCode);
+  if (!row) return 0;
+
+  const total = leafTranslatableFields.value.length;
+  if (total === 0) return 0;
+
+  let filled = 0;
+  for (const field of leafTranslatableFields.value) {
+    const val = row[field.field];
+    let isFilled = false;
+
+    if (val != null) {
+      if (typeof val === "string") {
+        isFilled = val.trim().length > 0;
+      } else if (Array.isArray(val)) {
+        isFilled = val.length > 0;
+      } else if (typeof val === "object") {
+        isFilled = Object.keys(val).length > 0;
+      } else {
+        isFilled = true;
+      }
+    }
+    if (isFilled) filled++;
+  }
+
+  return (filled / total) * 100;
+}
+
 function hasData(langCode: string | null): boolean {
   return hasContent(langCode);
 }
@@ -877,17 +895,6 @@ function targetActionClick(langCode: string | null) {
     requestDelete(langCode);
   } else {
     removeDraft(langCode);
-  }
-}
-
-function openSelect(refName: "source" | "target") {
-  const select = refName === "source" ? sourceSelect.value : targetSelect.value;
-  if (select && select.$el) {
-    const btn =
-      select.$el.querySelector("button.inline-display") ??
-      select.$el.querySelector("button") ??
-      select.$el;
-    btn.click();
   }
 }
 
@@ -976,7 +983,7 @@ async function runAiTranslateAll() {
     }[] = [];
 
     for (const fieldName of selection.value) {
-      const f = translatableFields.value.find(
+      const f = leafTranslatableFields.value.find(
         (tf: any) => tf.field === fieldName,
       );
       if (!f) continue;
@@ -1128,6 +1135,7 @@ watch(
 }
 
 .lang-box {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1141,6 +1149,7 @@ watch(
   text-align: start;
   cursor: pointer;
   overflow: hidden;
+  border: none;
 }
 
 .lang-box-main {
@@ -1151,20 +1160,22 @@ watch(
   min-width: 0;
 }
 
-.lang-select {
-  flex: 1;
-  min-width: 0;
-  margin-right: 4px;
-  --v-select-color: inherit;
-  --v-select-font-weight: 600;
+.lang-box .expand {
+  transition: transform var(--medium) var(--transition-out);
+}
+.lang-box .expand.active {
+  transform: scaleY(-1);
+  transition-timing-function: var(--transition-in);
 }
 
-.lang-select :deep(.v-icon) {
-  display: none !important;
+.lang-box .display-value {
+  flex-grow: 1;
 }
 
-.lang-box :deep(.v-select) {
-  --v-select-color: inherit;
+.lang-box .controls {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .lang-icon,
@@ -1193,7 +1204,86 @@ watch(
   );
   color: var(--theme--secondary);
   --v-icon-color: var(--theme--secondary);
-  --v-icon-color-hover: var(--theme--secondary-accent, #c2185b);
+  --v-icon-color-hover: var(--theme--secondary-accent, #ec407a);
+}
+</style>
+
+<style scoped>
+.language-select-dropdown.v-list {
+  padding: 0;
+}
+
+.language-select-dropdown .v-list-item {
+  display: flex;
+  gap: 0.5625rem;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  cursor: pointer;
+  padding-block: 0.25rem;
+}
+
+.language-select-dropdown .v-list-item .start {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.language-select-dropdown .v-list-item .end {
+  display: flex;
+  flex-grow: 1;
+  gap: 0.5625rem;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--theme--form--field--input--foreground-subdued);
+}
+
+.language-select-dropdown .v-list-item:hover {
+  background-color: var(--theme--background-normal);
+}
+
+.language-select-dropdown .v-list-item .dot {
+  inline-size: 0.4375rem;
+  block-size: 100%;
+}
+
+.language-select-dropdown .v-list-item .dot.show::before {
+  display: block;
+  inline-size: 0.25rem;
+  block-size: 0.25rem;
+  background-color: var(--theme--form--field--input--foreground-subdued);
+  border-radius: 2px;
+  content: "";
+}
+
+.language-select-dropdown .v-list-item .custom-progress-linear {
+  position: relative;
+  max-inline-size: none;
+  width: 80px;
+  height: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: var(--theme--background-normal, #f0f4f8);
+}
+
+.language-select-dropdown .v-list-item .custom-progress-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #e4eaf1;
+  opacity: 1;
+}
+
+.language-select-dropdown .v-list-item .custom-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 999px;
+  background-color: #2ecda7;
+  transition: width 0.3s ease;
 }
 
 /* ── AI Actions ────────────────────────────────────────────── */
@@ -1284,13 +1374,16 @@ watch(
 }
 
 /* Checkbox: always purple regardless of checked/unchecked state */
-.ai-checkbox {
+.fields-container :deep(.ai-checkbox) {
   --v-checkbox-color: var(--ai-translate-purple) !important;
   --v-checkbox-color-checked: var(--ai-translate-purple) !important;
+  color: var(--ai-translate-purple) !important;
 }
-.ai-checkbox :deep(.v-icon) {
+.fields-container :deep(.ai-checkbox .v-icon) {
   --v-icon-color: var(--ai-translate-purple) !important;
+  color: var(--ai-translate-purple) !important;
 }
+
 .lang-action {
   opacity: 0.7;
 }
@@ -1319,25 +1412,29 @@ watch(
   transform: scale(1.05);
 }
 
-/* ── Field rows ────────────────────────────────────────────── */
+/* ── Field rows (pierce FieldTreeRows child) ───────────────── */
 .fields-container {
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
 
-.field-row-inputs {
+.fields-container :deep(.field-row-inputs) {
   display: grid;
-  grid-template-columns: 1fr 32px 1fr;
+  grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
   align-items: start;
   gap: 8px;
+  min-width: 0;
+  container-type: inline-size;
+  container-name: field-row;
 }
 
-.field-row-inputs:not(.is-split) {
-  grid-template-columns: 1fr;
+.fields-container :deep(.field-row-inputs:not(.is-split)) {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.field-input-col {
+.fields-container :deep(.field-input-col) {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1348,31 +1445,38 @@ watch(
     box-shadow 0.2s ease;
 }
 
-/* Two half-width fields side by side */
-.field-input-col.field-pair {
+.fields-container :deep(.field-input-col.field-pair) {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: subgrid;
+  grid-row: 1 / span 3;
   gap: 16px;
   align-items: start;
+  min-width: 0;
 }
 
-/* Individual field slot inside a pair */
-.field-sub-col {
+.fields-container :deep(.field-input-col.field-pair > .field-sub-col) {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: 1 / span 3;
+  gap: 4px;
+}
+
+.fields-container :deep(.field-sub-col) {
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+  position: relative;
 }
 
-/* Pending state on sub-col */
-.field-sub-col.pending {
+.fields-container :deep(.field-sub-col.pending) {
   background: color-mix(in srgb, var(--ai-translate-purple) 10%, white);
   padding: 8px;
   margin: -8px;
 }
 
-/* ── AI icon column ────────────────────────────────────────── */
-.field-ai-col {
+.fields-container :deep(.field-ai-col) {
   display: flex;
   align-items: start;
   justify-content: center;
@@ -1380,34 +1484,155 @@ watch(
   color: var(--theme--primary, var(--primary));
 }
 
-/* Stacked checkboxes for paired half-width fields */
-.field-ai-col.field-pair {
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
+.fields-container :deep(.field-ai-col.field-pair) {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: 1 / span 3;
   padding-top: 0;
 }
 
-.field-ai-col.field-pair .ai-checkbox {
-  padding-top: 35px;
+.fields-container :deep(.ai-checkbox-stack) {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
-/* ── Native Labels ─────────────────────────────────────────── */
-.native-field-label {
+.fields-container :deep(.field-ai-col.group-header-spacer) {
+  padding-top: 0;
+}
+
+.fields-container :deep(.field-input-col.field-pair .native-field-label) {
+  align-items: start;
+}
+
+@container field-row (max-width: 360px) {
+  .fields-container :deep(.field-row-inputs:not(.is-split) .field-input-col.field-pair) {
+    display: block;
+  }
+
+  .fields-container :deep(.field-row-inputs:not(.is-split) .field-input-col.field-pair > .field-sub-col) {
+    display: flex;
+    flex-direction: column;
+    grid-row: auto;
+  }
+}
+
+@container field-row (max-width: 752px) {
+  .fields-container :deep(.field-row-inputs.is-split) {
+    grid-template-rows: repeat(6, auto);
+  }
+
+  .fields-container :deep(.field-row-inputs.is-split .field-input-col.field-pair) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-row: 1 / span 6;
+  }
+
+  .fields-container :deep(.field-row-inputs.is-split .field-input-col.field-pair > .field-sub-col) {
+    grid-row: span 3;
+  }
+
+  .fields-container :deep(.field-row-inputs.is-split .field-ai-col.field-pair) {
+    grid-row: 1 / span 6;
+  }
+
+  .fields-container :deep(.field-row-inputs.is-split .ai-checkbox-stack) {
+    display: contents;
+  }
+
+  .fields-container :deep(.field-row-inputs.is-split .ai-checkbox-stack .ai-checkbox:nth-child(1)) {
+    grid-row: 2;
+  }
+
+  .fields-container :deep(.field-row-inputs.is-split .ai-checkbox-stack .ai-checkbox:nth-child(2)) {
+    grid-row: 5;
+  }
+}
+
+/* ── Input labels only (never .group-divider title) ───────────
+   Match native Directus: .field .field-label.type-label */
+.fields-container :deep(.native-field-label) {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
 }
 
-.native-field-label .label-text {
-  font-size: inherit;
+.fields-container :deep(.native-field-label .label-text),
+.fields-container :deep(.native-field-label .label-text.type-label) {
+  font-family: var(
+    --theme--form--field--label--font-family,
+    var(--theme--fonts--sans--font-family, inherit)
+  );
+  font-size: 11px !important;
   font-weight: var(--theme--form--field--label--font-weight, 600);
-  color: var(--theme--form--field--label--color, var(--foreground-subdued));
+  line-height: 1.2143;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+  color: var(
+    --theme--form--field--label--foreground,
+    var(--theme--foreground-subdued, var(--foreground-subdued))
+  );
+}
+
+/* ── Detail / raw / accordion group chrome ─────────────────── */
+/* Native Detail Group title: same v-divider.large as Directus.
+   Do not style .native-field-label / .label-text / .type-label here. */
+.fields-container :deep(.group-toggle) {
+  display: block;
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+}
+
+.fields-container :deep(.group-divider .type-text),
+.fields-container :deep(.group-divider .title) {
+  /* Detail title only — never touches .native-field-label */
+  color: var(--v-divider-label-color, #008cc0);
+}
+
+.fields-container :deep(.group-divider .expand-icon) {
+  float: inline-end;
+  color: var(--v-divider-label-color, #008cc0);
+  transform: rotate(90deg) !important;
+  transition: transform var(--fast, 125ms) var(--transition, ease-in-out);
+}
+
+.fields-container :deep(.group-divider.active .expand-icon) {
+  transform: rotate(0deg) !important;
+}
+
+.fields-container :deep(.group-divider .lang-badge) {
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+.fields-container :deep(.group-body) {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-left: calc(var(--group-depth, 0) * 4px);
+  padding-top: 16px;
+  padding-bottom: 8px;
+}
+
+.fields-container :deep(.group-header-row) {
+  margin-top: 4px;
 }
 
 /* ── Field note ────────────────────────────────────────────── */
-.field-note {
+.fields-container :deep(.field-note) {
   margin: -2px 0 6px;
   font-size: 12px;
   color: var(--theme--foreground-subdued, var(--foreground-subdued));
@@ -1415,7 +1640,7 @@ watch(
 }
 
 /* ── Lang badges ───────────────────────────────────────────── */
-.lang-badge {
+.fields-container :deep(.lang-badge) {
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
@@ -1425,18 +1650,18 @@ watch(
   letter-spacing: 0.02em;
 }
 
-.lang-badge.source {
+.fields-container :deep(.lang-badge.source) {
   background: var(--theme--primary-subdued, var(--primary-25));
   color: var(--theme--primary, var(--primary));
 }
 
-.lang-badge.target {
+.fields-container :deep(.lang-badge.target) {
   background: var(--theme--secondary-subdued, var(--secondary-25, #fce4ec));
   color: var(--theme--secondary, var(--secondary, #e91e63));
 }
 
 /* ── Pending translated text ────────────────────────────────── */
-.pending-translation-text {
+.fields-container :deep(.pending-translation-text) {
   margin-top: 4px;
   font-size: 13px;
   color: var(--ai-translate-purple);
@@ -1462,20 +1687,82 @@ watch(
   color: var(--theme--danger, var(--danger, #f44336));
 }
 
-/* ── Suppress v-form's built-in field label ────────────────── */
-.inline-form :deep(.type-label),
-.inline-form :deep(.field-label) {
-  display: none;
+/* ── v-form's built-in field label ────────────────────────────
+   We render our own native-field-label instead of the label text, so
+   suppress the text/dot/avatars — but keep the dropdown arrow, since
+   that's also the click target for Directus's raw-value context menu
+   (Edit/Copy/Paste/Undo/Clear), which we still want to work here.
+   The arrow only fades in on :hover of its own (otherwise tiny,
+   empty) row, which used to sit invisibly below our own label — so
+   hovering our visible label never revealed it. Overlay the native
+   label over our own label's full area instead, so hovering/clicking
+   our label is what reveals and triggers it. */
+.fields-container :deep(.inline-form .field),
+.fields-container :deep(.inline-form .v-menu),
+.fields-container :deep(.inline-form .v-menu-activator) {
+  position: static !important;
+}
+
+.fields-container :deep(.inline-form .field-label) {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 1.4em;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  background: transparent;
+}
+
+.fields-container :deep(.inline-form .field-label-content),
+.fields-container :deep(.inline-form .edit-dot),
+.fields-container :deep(.inline-form .spacer),
+.fields-container :deep(.inline-form .collab-field) {
+  display: none !important;
 }
 
 /* ── Suppress v-form internal field padding ───────────────────── */
-.inline-form :deep(.field) {
+.fields-container :deep(.inline-form .field) {
   padding: 0 !important;
   margin-top: 0 !important;
 }
 
-.inline-form :deep(.v-form-column) {
+.fields-container :deep(.inline-form .v-form-column) {
   padding: 0 !important;
+}
+
+/* ── Prevent v-form's own grid from refusing to shrink ─────────
+   Directus's v-form lays fields out on a grid whose columns default
+   to a fixed minmax(200px+, 1fr) track. That min width doesn't yield
+   to our flex/grid parents' min-width:0, so at narrow panel widths
+   the two half-width fields in a pair overlapped instead of shrinking. */
+.fields-container :deep(.inline-form),
+.fields-container :deep(.inline-form .v-form),
+.fields-container :deep(.inline-form .v-form-column),
+.fields-container :deep(.inline-form .field) {
+  min-width: 0 !important;
+}
+
+.fields-container :deep(.inline-form .v-form) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+/* The wrapper overrides above don't help if the actual control inside
+   (button, input, the select trigger, etc.) carries its own hardcoded
+   min-width from Directus core CSS — the column then physically can
+   never shrink far enough for the field-row container query below to
+   ever match. Force every descendant to be free to shrink. */
+.fields-container :deep(.inline-form *) {
+  min-width: 0 !important;
+}
+
+.fields-container :deep(.inline-form .field > *),
+.fields-container :deep(.inline-form .v-input),
+.fields-container :deep(.inline-form .v-select),
+.fields-container :deep(.inline-form button) {
+  width: 100% !important;
 }
 
 /* ── Spinning AI icon ──────────────────────────────────────── */

@@ -34,8 +34,8 @@
 import { ref, computed } from 'vue'
 import { useApi, useStores } from '@directus/extensions-sdk'
 import { useT } from '../composables/useT'
-import { validatePayload } from '@directus/utils'
 import { applyConditions } from '../utils/apply-conditions'
+import { validateItem } from '../utils/validate-item'
 
 const props = defineProps<{
   primaryKeys: string[]
@@ -80,36 +80,11 @@ function validateBatchEdits(): any[] {
   const touched = Object.keys(edits.value)
   if (!touched.length) return []
 
-  const errors: any[] = []
+  // Only validate fields the user touched in batch mode (untouched stay unchanged)
+  const touchedFields = allFields.filter((f) => touched.includes(f.field))
 
-  for (const field of allFields) {
-    if (!touched.includes(field.field)) continue
-
-    const effective = applyConditions(edits.value, field)
-    // Skip fields hidden by conditions — v-form won't show them in batch mode either
-    if (effective.meta?.hidden) continue
-
-    const val = edits.value[field.field]
-    const validation = effective.meta?.validation as { _and?: any[] } | null
-    if (!validation?._and?.length) continue
-    if (val === null || val === undefined) continue
-
-    const rule = { _and: validation._and }
-    const errs = validatePayload(rule, { [field.field]: val })
-    for (const e of errs) {
-      for (const detail of e.details ?? []) {
-        errors.push({
-          code: 'FAILED_VALIDATION',
-          field: field.field,
-          type: detail.type ?? 'custom',
-          hidden: effective.meta?.hidden ?? false,
-          group: effective.meta?.group ?? null,
-        })
-      }
-    }
-  }
-
-  return errors
+  // Reuse Data Model required + custom validation (same empty-value rules as file detail)
+  return validateItem(edits.value, touchedFields, false, true).filter((error) => !error.hidden)
 }
 
 function clearHiddenFromEdits(): Record<string, any> {

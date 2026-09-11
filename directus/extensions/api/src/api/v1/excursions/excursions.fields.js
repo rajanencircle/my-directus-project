@@ -29,6 +29,7 @@ export const LIST_FIELDS = [
   // Media fields for thumbnail
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.uploaded_by.partner_selected",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -38,7 +39,7 @@ export const LIST_FIELDS = [
   "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
-  "media.directus_files_id.tour32_export",
+  "media.tour32_export",
   "media.directus_files_id.dimensions_px",
   "media.directus_files_id.keyword_ids",
   "media.directus_files_id.folder.id",
@@ -121,9 +122,6 @@ export const DETAIL_FIELDS = [
   "image_badge_status",
   "image_badge_start_date",
   "image_badge_end_date",
-  "mobility_advice_text.id",
-  "mobility_advice_text.hotel_translations.translations_id.code",
-  "mobility_advice_text.hotel_translations.hotel_mobility_advice_text",
   // Descriptions translations
   "descriptions_translations.translations_id.code",
   "descriptions_translations.name_excursion",
@@ -142,6 +140,7 @@ export const DETAIL_FIELDS = [
   "price_infos_translations.participants_text",
   "price_infos_translations.additional_information",
   "price_infos_translations.price_info_supplementary",
+  "price_infos_translations.mobility_advice_text",
   // Price calculation — authoritative from_price pointer + margin/exchange config
   "price_calculation_translations.translations_id.code",
   "price_calculation_translations.buy_price_type",
@@ -150,7 +149,14 @@ export const DETAIL_FIELDS = [
   "price_calculation_translations.provision_percentage",
   "price_calculation_translations.margin_percentage",
   "price_calculation_translations.exchange_rate",
+  /* `from_price` is an M2O to `excursions_prices` (confirmed via schema), a priced row —
+   * same shape as hotels' room_prices/tours' tours_prices. Nested sell-price translations
+   * are fetched here (fixed — previously only the bare id was fetched, and pricing.js's
+   * buildPriceSettingsMap had no `excursions_prices_translations` branch either, so this
+   * silently resolved to the raw row id instead of a sell price). */
   "price_calculation_translations.from_price",
+  "price_calculation_translations.from_price.excursions_prices_translations.translations_id.code",
+  "price_calculation_translations.from_price.excursions_prices_translations.sell_price",
   // Surcharges calculation / margin per language
   "surcharges_translations.translations_id.code",
   "surcharges_translations.surcharge_percentage_type",
@@ -209,7 +215,6 @@ export const DETAIL_FIELDS = [
   "countries.countries_id.ISO",
   "countries.countries_id.translations.name",
   "countries.countries_id.translations.translations_id.code",
-  "partner_selected.partner_id.primarix_id",
   // Categories
   "categories.id",
   "categories.excursion_category_type.id",
@@ -226,13 +231,18 @@ export const DETAIL_FIELDS = [
   "price_periods.price_period_start",
   "price_periods.price_period_end",
   "price_periods.price_period_from",
-  // Price categories (occupancy-equivalent)
+  /* Price categories (occupancy-equivalent) resolve through the `excursions_price_categories_selected`
+   * junction (`excursions.price_categories` is an o2m alias). The junction row carries only
+   * `excursions_price_categories_id`, so the actual category record (and `price_category_from`)
+   * lives one level deeper under that key. */
   "price_categories.id",
-  "price_categories.price_category.id",
-  "price_categories.price_category.name",
-  "price_categories.price_category.translations.name",
-  "price_categories.price_category.translations.translations_id.code",
-  "price_categories.price_category_from",
+  "price_categories.excursions_price_categories_id.id",
+  "price_categories.excursions_price_categories_id.value",
+  "price_categories.excursions_price_categories_id.price_category_from",
+  "price_categories.excursions_price_categories_id.price_category.id",
+  "price_categories.excursions_price_categories_id.price_category.name",
+  "price_categories.excursions_price_categories_id.price_category.translations.name",
+  "price_categories.excursions_price_categories_id.price_category.translations.translations_id.code",
   // Prices — with per-language sell price
   "prices.id",
   "prices.excursions_category_id",
@@ -244,6 +254,7 @@ export const DETAIL_FIELDS = [
   // Media
   "media.sort",
   "media.directus_files_id.id",
+  "media.directus_files_id.uploaded_by.partner_selected",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -253,7 +264,7 @@ export const DETAIL_FIELDS = [
   "media.directus_files_id.translations.alt_text",
   "media.directus_files_id.expiry_date",
   "media.directus_files_id.is_map",
-  "media.directus_files_id.tour32_export",
+  "media.tour32_export",
   "media.directus_files_id.dimensions_px",
   "media.directus_files_id.keyword_ids",
   "media.directus_files_id.folder.id",

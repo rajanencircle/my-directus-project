@@ -326,7 +326,7 @@ function handleEdit() {
 
 .menu-item:hover {
   background-color: #f0ecff;
-  color: #6644dd;
+  color: #6644FF;
 }
 
 .action-button {
@@ -343,12 +343,12 @@ function handleEdit() {
 }
 
 .action-button.download {
-  background-color: #6644dd;
+  background-color: #6644FF;
   color: #fff;
 }
 
 .action-button.download:hover {
-  background-color: #5533cc;
+  background-color: #5039CC;
 }
 
 .action-button.edit {
