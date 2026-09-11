@@ -209,7 +209,7 @@ export default defineInterface({
         meta: {
           width: "half",
           interface: "input",
-          note: "Field on the occupancy record used to sort columns left-to-right. e.g. 'value' (number of guests) or 'sort' for a manual sort integer.",
+          note: "Field used to sort columns left-to-right. Checked on the occupancy junction row first (e.g. a manual 'sort' integer — this is what a drag-reorder in the M2M/occupancy selector writes, per-parent), falling back to the original occupancy record (e.g. 'value', a number of guests shared across every parent). Use 'sort' for manual per-record ordering — but that only works once each record's occupancies have actually been drag-reordered at least once; until then the field is empty for every row and the sort has no effect.",
           options: { placeholder: "e.g. value" },
         },
       },

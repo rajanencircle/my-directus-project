@@ -409,20 +409,31 @@ export function usePriceTableData(options: PriceTableDataOptions) {
      * falls back to reading the junction row directly in that case.
      */
     const valueField = resolveValueField(props);
+    const sortField = props.occupancySortField as string | undefined;
     const nestedOrOwn = (field: string) =>
       relatedField ? `${relatedField}.${field}` : field;
     const collection = props.occupancyJunctionCollection as string;
     const relatedCollection = relatedField
       ? await resolveRelatedCollection(api, collection, relatedField)
       : null;
-    const [includeOwnValue, includeRelatedValue] = await Promise.all([
+    const [includeOwnValue, includeRelatedValue, includeOwnSort] = await Promise.all([
       hasValueField(api, collection, valueField),
       relatedCollection ? hasValueField(api, relatedCollection, valueField) : Promise.resolve(false),
+      // A manual sort field (e.g. "sort") is typically per-parent and lives
+      // on the junction row itself — see `normalizeOccupancyFromJunction`,
+      // which prefers this over the nested related-record copy requested
+      // below. Only requested when `relatedField` is set and the junction
+      // collection actually has this field, since `nestedOrOwn` already
+      // covers the no-relatedField case (the bare field IS the request).
+      relatedField && sortField && sortField !== valueField
+        ? hasValueField(api, collection, sortField)
+        : Promise.resolve(false),
     ]);
 
     const fields = [
       primaryKeyField,
       ...(includeOwnValue ? [valueField] : []),
+      ...(includeOwnSort ? [sortField as string] : []),
       parentField,
       ...(relatedField ? [relatedField, `${relatedField}.id`] : []),
       nestedOrOwn(props.occupancyLabelField as string),
@@ -430,8 +441,8 @@ export function usePriceTableData(options: PriceTableDataOptions) {
       ...(props.occupancyFromPriceField
         ? [nestedOrOwn(props.occupancyFromPriceField as string)]
         : []),
-      ...(props.occupancySortField && props.occupancySortField !== valueField
-        ? [nestedOrOwn(props.occupancySortField as string)]
+      ...(sortField && sortField !== valueField
+        ? [nestedOrOwn(sortField)]
         : []),
       ...(props.occupancyLabelFallbackMinField
         ? [nestedOrOwn(props.occupancyLabelFallbackMinField as string)]
@@ -533,6 +544,7 @@ export function usePriceTableData(options: PriceTableDataOptions) {
         ? `${props.occupanciesField}.${props.occupancyJunctionRelatedField}`
         : (props.occupanciesField as string);
       const occupancyValueField = resolveValueField(props);
+      const occupancySortFieldName = props.occupancySortField as string | undefined;
       const occupancyFields = [
         `${props.occupanciesField}.${props.occupancyJunctionPrimaryKeyField}`,
         `${occupancyRelatedPrefix}.id`,
@@ -541,8 +553,18 @@ export function usePriceTableData(options: PriceTableDataOptions) {
         ...(props.occupancyFromPriceField
           ? [`${occupancyRelatedPrefix}.${props.occupancyFromPriceField}`]
           : []),
-        ...(props.occupancySortField && props.occupancySortField !== occupancyValueField
-          ? [`${occupancyRelatedPrefix}.${props.occupancySortField}`]
+        // A manual sort field (e.g. "sort") is typically per-parent and
+        // lives on the junction row itself (`room_occupancies.sort`, not
+        // `room_occupancies.occupancies_id.sort`) — see
+        // `normalizeOccupancyFromJunction`, which prefers this bare copy
+        // over the nested related-record one requested right after it.
+        ...(occupancySortFieldName &&
+        occupancySortFieldName !== occupancyValueField &&
+        props.occupancyJunctionRelatedField
+          ? [`${props.occupanciesField}.${occupancySortFieldName}`]
+          : []),
+        ...(occupancySortFieldName && occupancySortFieldName !== occupancyValueField
+          ? [`${occupancyRelatedPrefix}.${occupancySortFieldName}`]
           : []),
         ...(props.occupancyLabelFallbackMinField
           ? [`${occupancyRelatedPrefix}.${props.occupancyLabelFallbackMinField}`]

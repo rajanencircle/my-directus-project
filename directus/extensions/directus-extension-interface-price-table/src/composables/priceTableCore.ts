@@ -337,6 +337,7 @@ export function normalizeOccupancyFromJunction(
     : (buildFallbackRangeLabel(junctionRow, relatedRecord, cfg) ?? String(resolvedId ?? ""));
 
   const valueField = resolveValueField(cfg);
+  const sortField = cfg.occupancySortField;
 
   return {
     ...relatedRecord,
@@ -351,6 +352,25 @@ export function normalizeOccupancyFromJunction(
         junctionRow?.[cfg.occupancyFromPriceField] ??
         false)
       : false,
+    /*
+     * Manual sort order (e.g. "sort") is typically a per-parent value that
+     * lives on the junction row itself — Directus writes an M2M's
+     * drag-reorder position there (see `directus_relations.sort_field`),
+     * scoped to this one parent/occupancy pairing. An inherent property of
+     * the occupancy type (e.g. "value", guest count) instead lives on the
+     * related master record and is shared across every parent. Junction row
+     * wins when both are present so a real per-parent manual order is never
+     * shadowed by the `...relatedRecord` spread above silently overwriting
+     * it with the (usually empty) same-named field from the master record.
+     */
+    ...(sortField
+      ? {
+          [sortField]:
+            getNestedValue(junctionRow, sortField) ??
+            getNestedValue(relatedRecord, sortField) ??
+            null,
+        }
+      : {}),
   };
 }
 

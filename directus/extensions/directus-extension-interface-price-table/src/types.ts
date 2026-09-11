@@ -103,6 +103,7 @@ export interface OccupancyConfig {
   occupancyLabelField?: string;
   occupancyFromPriceField?: string;
   occupancyValueField?: string;
+  occupancySortField?: string;
   occupancyLabelFallbackMinField?: string;
   occupancyLabelFallbackMaxField?: string;
   occupancyLabelFallbackCategoryField?: string;
