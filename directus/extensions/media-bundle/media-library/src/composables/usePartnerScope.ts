@@ -46,7 +46,7 @@ export function partnerAlbumOrFilter(partnerIds: string[]) {
   }
   return {
     _or: [
-      { user_created: { partner_selected: { _in: partnerIds } } },
+      { user_created: { partner_selected: { partner_id: { _in: partnerIds } } } },
       {
         albums_directus_files: {
           directus_files_id: fileVisible,
@@ -61,7 +61,7 @@ export function filesPartnerOrFilter(partnerIds: string[]) {
   if (partnerIds.length === 0) return {}
   return {
     _or: [
-      { uploaded_by: { partner_selected: { _in: partnerIds } } },
+      { uploaded_by: { partner_selected: { partner_id: { _in: partnerIds } } } },
       { partner_selected: { _none: {} } },
       { partner_selected: { partner_id: { _in: partnerIds } } },
     ],
