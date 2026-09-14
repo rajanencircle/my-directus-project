@@ -69,10 +69,36 @@ function normalizeFolderRaw(item: Record<string, unknown>): DirectusFolder {
   };
 }
 
+/**
+ * Any folder that has a destination-cluster folder somewhere among its descendants
+ * (direct or nested) — these are containers, never pick targets themselves in
+ * "Other Upload" mode, so they're hidden alongside the cluster folders they contain.
+ */
+const ancestorsOfClusterFolders = computed(() => {
+  const set = new Set<string>();
+  if (!props.nonDestinationOnly) return set;
+  const byId = new Map(folders.value.map((f) => [f.id, f]));
+  for (const f of folders.value) {
+    if (f.destinationsCluster == null) continue;
+    let currentParentId = f.parent;
+    const visited = new Set<string>();
+    while (currentParentId && !visited.has(currentParentId)) {
+      visited.add(currentParentId);
+      set.add(currentParentId);
+      currentParentId = byId.get(currentParentId)?.parent ?? null;
+    }
+  }
+  return set;
+});
+
 const visibleFolders = computed(() => {
   let list = folders.value;
   if (props.excludeId) list = list.filter((f) => f.id !== props.excludeId);
-  if (props.nonDestinationOnly) list = list.filter((f) => f.destinationsCluster == null);
+  if (props.nonDestinationOnly) {
+    list = list.filter(
+      (f) => f.destinationsCluster == null && !ancestorsOfClusterFolders.value.has(f.id),
+    );
+  }
   return list;
 });
 

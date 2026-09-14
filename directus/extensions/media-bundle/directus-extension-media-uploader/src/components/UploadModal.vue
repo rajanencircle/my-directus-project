@@ -171,8 +171,6 @@ async function persistFilePartners(fileId: string, partnerIds: string[]) {
 type UploadMode = 'destination' | 'other';
 const uploadMode = ref<UploadMode>('destination');
 const isDestinationMode = computed(() => uploadMode.value === 'destination');
-const destinationFolderNote = ref<string | null>(null);
-const resolvingDestinationFolder = ref(false);
 
 /** Merge partial v-form emits — each single-field form would otherwise wipe siblings. */
 function onFileFieldValuesUpdate(next: Record<string, unknown> | null | undefined) {
@@ -205,31 +203,24 @@ function destinationLevelField(): string | null {
   return level?.field ?? null;
 }
 
+/**
+ * Silently assigns `selectedFolder` from the selected destination's cluster — no UI,
+ * per the client's flow: Destination Upload never shows a folder field at all.
+ */
 async function autoResolveDestinationFolder() {
   const field = destinationLevelField();
   if (!field) return;
   const destinationId = geoValue.value[field]?.id;
   if (!destinationId) {
-    destinationFolderNote.value = null;
+    selectedFolder.value = null;
     return;
   }
-  resolvingDestinationFolder.value = true;
-  destinationFolderNote.value = null;
-  try {
-    const result = await resolveDestinationFolder(api, destinationId);
-    if (result.status === 'resolved') {
-      selectedFolder.value = result.folderId;
-    } else {
-      selectedFolder.value = null;
-      destinationFolderNote.value =
-        result.status === 'no-cluster'
-          ? 'This destination has no cluster assigned — pick a folder manually or contact an admin.'
-          : result.status === 'no-folder-for-cluster'
-            ? 'No destination folder exists for this cluster yet — pick a folder manually or create one.'
-            : 'Could not resolve a destination folder automatically — pick one manually.';
-    }
-  } finally {
-    resolvingDestinationFolder.value = false;
+  const result = await resolveDestinationFolder(api, destinationId);
+  if (result.status === 'resolved') {
+    selectedFolder.value = result.folderId;
+  } else {
+    selectedFolder.value = null;
+    console.warn('[media-uploader] Could not resolve a destination-cluster folder:', result);
   }
 }
 
@@ -241,7 +232,6 @@ watch(
 );
 
 watch(uploadMode, (mode) => {
-  destinationFolderNote.value = null;
   if (mode === 'other') {
     selectedFolder.value = null;
   } else {
@@ -768,27 +758,18 @@ function lowerDialogZIndex() {
           </div>
         </div>
 
-        <div class="section">
-          <template v-if="props.geoEnabled && isDestinationMode">
-            <div class="label type-label">{{ lbl('uploadResolvedFolder', 'Destination folder') }}</div>
-            <div class="resolved-folder-note">
-              <template v-if="resolvingDestinationFolder">{{ t('loading') }}…</template>
-              <template v-else-if="selectedFolder">{{ lbl('uploadResolvedFolderAuto', 'Resolved automatically from the selected destination.') }}</template>
-              <template v-else-if="destinationFolderNote">
-                <v-icon name="info" x-small />
-                {{ destinationFolderNote }}
-              </template>
-              <template v-else>{{ lbl('uploadResolvedFolderPending', 'Select a destination below to resolve the folder.') }}</template>
-            </div>
-          </template>
-          <template v-else>
-            <div class="label type-label">{{ lbl('uploadToFolder', 'Upload to folder') }}</div>
-            <FolderDropdown
-              v-model="selectedFolder"
-              :exclude-id="props.uploadAreaFolder ?? null"
-              :non-destination-only="props.geoEnabled && !isDestinationMode"
-            />
-          </template>
+        <!--
+          Destination Upload: no folder UI at all — the folder is assigned silently
+          in the background from the selected destination's cluster (see
+          autoResolveDestinationFolder). Only "Other Upload" shows a manual picker.
+        -->
+        <div v-if="!(props.geoEnabled && isDestinationMode)" class="section">
+          <div class="label type-label">{{ lbl('uploadToFolder', 'Upload to folder') }}</div>
+          <FolderDropdown
+            v-model="selectedFolder"
+            :exclude-id="props.uploadAreaFolder ?? null"
+            :non-destination-only="props.geoEnabled && !isDestinationMode"
+          />
         </div>
 
         <!-- Ticket 1: Partner Selected — restricted to the current user's own partners -->
@@ -1061,20 +1042,6 @@ function lowerDialogZIndex() {
 
 .upload-mode-option input {
   cursor: pointer;
-}
-
-.resolved-folder-note {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 8px 10px;
-  box-sizing: border-box;
-  border: var(--theme--border-width, 1px) solid var(--theme--border-color);
-  border-radius: var(--theme--border-radius, 6px);
-  background: var(--theme--background-subdued);
-  color: var(--theme--foreground-subdued);
-  font-size: 13px;
 }
 
 .partner-selected-list {
