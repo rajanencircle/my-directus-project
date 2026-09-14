@@ -10,7 +10,7 @@ export interface DirectusAlbum {
 
 export const useAlbumsStore = defineStore('media-library-albums', () => {
   const api = useApi()
-  const { partnerScopeIds, currentUserId, isPartnerScoped, init: initPartnerScope } = usePartnerScope()
+  const { viewerScope, currentUserId, isPartnerScoped, init: initPartnerScope } = usePartnerScope()
 
   const albums = ref<DirectusAlbum[]>([])
   const selectedAlbumId = ref<string | null>(null)
@@ -28,8 +28,8 @@ export const useAlbumsStore = defineStore('media-library-albums', () => {
         albums.value = []
       }
       const statusFilter = { status: { _neq: 'archived' } }
-      const filter = isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0
-        ? { _and: [statusFilter, partnerAlbumOrFilter(partnerScopeIds.value ?? [])] }
+      const filter = isPartnerScoped.value
+        ? { _and: [statusFilter, partnerAlbumOrFilter(viewerScope.value)] }
         : statusFilter
       const res = await api.get('/items/albums_directus', {
         params: {

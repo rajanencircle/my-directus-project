@@ -156,13 +156,16 @@ function togglePartner(id: string) {
 const showPartnerSection = computed(() => userPartnerOptions.value.length > 0);
 
 async function persistFilePartners(fileId: string, partnerIds: string[]) {
+  // New files default to partner_visibility: 'all' (schema default) — only need a write
+  // when the editor actually restricted it to specific partners.
   if (partnerIds.length === 0) return;
   try {
-    await Promise.all(
-      partnerIds.map((partnerId) =>
+    await Promise.all([
+      api.patch(`/files/${fileId}`, { partner_visibility: 'selected' }),
+      ...partnerIds.map((partnerId) =>
         api.post('/items/files_partner', { directus_files_id: fileId, partner_id: partnerId }),
       ),
-    );
+    ]);
   } catch (err) {
     console.warn('[media-uploader] Failed to persist file partner_selected', err);
   }

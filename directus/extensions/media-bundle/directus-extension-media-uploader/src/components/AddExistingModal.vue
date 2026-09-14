@@ -74,7 +74,7 @@ const emit = defineEmits<{
 }>();
 
 const api = useApi();
-const { partnerScopeIds, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
+const { viewerScope, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
 
 const loading = ref(false);
 const linking = ref(false);
@@ -160,8 +160,8 @@ async function loadAlbums() {
   try {
     await initPartnerScope();
     const params: Record<string, unknown> = { limit: -1, sort: ["name"], fields: ["id", "name"] };
-    if (isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0) {
-      params.filter = partnerAlbumOrFilter(partnerScopeIds.value ?? []);
+    if (isPartnerScoped.value) {
+      params.filter = partnerAlbumOrFilter(viewerScope.value);
     }
     const res = await api.get("/items/albums_directus", { params });
     albums.value = (res.data?.data ?? []) as Album[];
@@ -361,8 +361,8 @@ async function fetchPage() {
     await initPartnerScope();
     const filterClauses: Record<string, unknown>[] = [];
 
-    if (isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0) {
-      filterClauses.push(filesPartnerOrFilter(partnerScopeIds.value ?? []));
+    if (isPartnerScoped.value) {
+      filterClauses.push(filesPartnerOrFilter(viewerScope.value));
     }
 
     const q = search.value.trim();

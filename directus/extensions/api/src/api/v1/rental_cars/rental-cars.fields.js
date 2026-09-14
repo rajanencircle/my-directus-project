@@ -23,7 +23,10 @@ export const LIST_FIELDS = [
   // Media fields for thumbnail
   "media.sort",
   "media.directus_files_id.id",
-  "media.directus_files_id.uploaded_by.partner_selected",
+  "media.directus_files_id.partner_visibility",
+  "media.directus_files_id.partner_selected.partner_id.id",
+  "media.directus_files_id.uploaded_by.partner_visibility",
+  "media.directus_files_id.uploaded_by.partner_selected.partner_id.id",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",
@@ -201,7 +204,10 @@ export const DETAIL_FIELDS = [
   // Media
   "media.sort",
   "media.directus_files_id.id",
-  "media.directus_files_id.uploaded_by.partner_selected",
+  "media.directus_files_id.partner_visibility",
+  "media.directus_files_id.partner_selected.partner_id.id",
+  "media.directus_files_id.uploaded_by.partner_visibility",
+  "media.directus_files_id.uploaded_by.partner_selected.partner_id.id",
   "media.directus_files_id.primarix_picid",
   "media.directus_files_id.fotoware_file_name",
   "media.directus_files_id.filename_download",

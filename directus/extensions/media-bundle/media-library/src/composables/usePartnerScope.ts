@@ -6,12 +6,20 @@ type ApiClient = {
 }
 
 /**
- * `partner_selected` on directus_users/directus_files is M2M as of the multi-partner
- * media change. State below is a *list* of partner ids the current user belongs to,
- * not a single id. An empty file `partner_selected` means "visible to everyone" —
- * every M2M-aware filter below encodes that rule directly.
+ * Unified BOTG partner-scoping pattern (matches products / api_users):
+ * an explicit `partner_visibility` (`all` | `selected`) field alongside the
+ * `partner_selected` M2M — visibility is never inferred from list emptiness.
+ * `all` = unrestricted (sees/is seen by everyone) regardless of `partner_selected`.
+ * `selected` with an empty `partner_selected` is a real, intentional "matches
+ * nothing" state (mirrors `extensions/api`'s NEVER_MATCH_FILTER).
  */
+export type ViewerScope = { visibility: 'all' | 'selected'; partnerIds: string[] }
+
+/** Matches nothing — same trick used server-side in extensions/api's NEVER_MATCH_FILTER. */
+const NEVER_MATCH_FILTER = { id: { _null: true } }
+
 const partnerScopeIds = ref<string[] | null>(null)
+const partnerVisibility = ref<'all' | 'selected' | null>(null)
 const currentUserId = ref<string | null>(null)
 const ready = ref(false)
 let _fetched = false
@@ -32,21 +40,28 @@ function extractPartnerIds(partnerSelected: unknown): string[] {
 }
 
 /**
- * Media (files/albums) visible to a user belonging to `partnerIds`:
- * uploaded by a user sharing any of those partners, OR the file/album's own
- * `partner_selected` is empty (visible to all) OR overlaps `partnerIds`.
+ * Albums visible to `viewer`:
+ * - viewer `all` → unrestricted, sees everything.
+ * - viewer `selected` with no partners → sees nothing.
+ * - otherwise → created by a user who is themselves `all` or shares a partner
+ *   (albums carry no `partner_visibility`/`partner_selected` of their own, so the
+ *   creator's own scope is the only signal), OR contains a file visible per
+ *   `filesPartnerOrFilter`'s rule (the file's own scope, authoritative).
  */
-export function partnerAlbumOrFilter(partnerIds: string[]) {
-  if (partnerIds.length === 0) return {}
+export function partnerAlbumOrFilter(viewer: ViewerScope) {
+  if (viewer.visibility === 'all') return {}
+  if (viewer.partnerIds.length === 0) return NEVER_MATCH_FILTER
+  const ids = viewer.partnerIds
   const fileVisible = {
     _or: [
-      { partner_selected: { _none: {} } },
-      { partner_selected: { partner_id: { _in: partnerIds } } },
+      { partner_visibility: { _eq: 'all' } },
+      { partner_selected: { partner_id: { _in: ids } } },
     ],
   }
   return {
     _or: [
-      { user_created: { partner_selected: { partner_id: { _in: partnerIds } } } },
+      { user_created: { partner_visibility: { _eq: 'all' } } },
+      { user_created: { partner_selected: { partner_id: { _in: ids } } } },
       {
         albums_directus_files: {
           directus_files_id: fileVisible,
@@ -56,14 +71,21 @@ export function partnerAlbumOrFilter(partnerIds: string[]) {
   }
 }
 
-/** Same rule as above, directly against a directus_files filter (uploader OR own partner_selected). */
-export function filesPartnerOrFilter(partnerIds: string[]) {
-  if (partnerIds.length === 0) return {}
+/**
+ * Directly against a directus_files filter. The file's own `partner_visibility`/
+ * `partner_selected` is fully authoritative — every file always has an explicit
+ * value now (schema default `all`), so there is no "uploader fallback" case left:
+ * that used to matter before files carried their own scope, and kept a loophole
+ * open (a file explicitly set to `selected` with nobody chosen yet was still
+ * shown to everyone whenever its uploader happened to be unrestricted).
+ */
+export function filesPartnerOrFilter(viewer: ViewerScope) {
+  if (viewer.visibility === 'all') return {}
+  if (viewer.partnerIds.length === 0) return NEVER_MATCH_FILTER
   return {
     _or: [
-      { uploaded_by: { partner_selected: { partner_id: { _in: partnerIds } } } },
-      { partner_selected: { _none: {} } },
-      { partner_selected: { partner_id: { _in: partnerIds } } },
+      { partner_visibility: { _eq: 'all' } },
+      { partner_selected: { partner_id: { _in: viewer.partnerIds } } },
     ],
   }
 }
@@ -78,7 +100,7 @@ function folderIdFromRow(folder: unknown): string | null {
   return id === 'null' || id === 'undefined' ? null : id
 }
 
-/** All partner ids of a nested created_by/uploaded_by user (now M2M — returns a list). */
+/** All partner ids of a nested created_by/uploaded_by user (M2M — returns a list). */
 export function partnerIdsFromCreatedBy(createdBy: unknown): string[] {
   if (createdBy == null || typeof createdBy !== 'object') return []
   const ps = (createdBy as { partner_selected?: unknown }).partner_selected
@@ -118,19 +140,21 @@ export type PartnerFolderRow = {
 }
 
 /**
- * Folders visible under partner scope (partnerIds = every partner the current user belongs to):
- * - created by a user sharing any of those partners, even if empty
- * - contain at least one file visible to those partners (uploader shares a partner, OR the
- *   file's own `partner_selected` is empty/overlaps)
- * - plus every ancestor (navigation parents)
+ * Folders visible under `viewer`'s scope:
+ * - viewer `all` → every folder.
+ * - viewer `selected` with no partners → none.
+ * - otherwise → created by a same-partner user (even if empty), or containing at
+ *   least one file visible per `filesPartnerOrFilter`, plus every ancestor.
  */
 export async function collectPartnerFolderIds(
   api: ApiClient,
-  partnerIds: string[],
+  viewer: ViewerScope,
   allFolders: PartnerFolderRow[],
 ): Promise<Set<string>> {
-  if (partnerIds.length === 0) return new Set(allFolders.map((f) => f.id))
+  if (viewer.visibility === 'all') return new Set(allFolders.map((f) => f.id))
+  if (viewer.partnerIds.length === 0) return new Set()
 
+  const partnerIds = viewer.partnerIds
   const seed = new Set<string>()
   for (const f of allFolders) {
     if (f.createdByPartnerIds?.some((id) => partnerIds.includes(id))) {
@@ -142,7 +166,7 @@ export async function collectPartnerFolderIds(
     const res = await api.get('/files', {
       params: {
         filter: {
-          _and: [filesPartnerOrFilter(partnerIds), { folder: { _nnull: true } }],
+          _and: [filesPartnerOrFilter(viewer), { folder: { _nnull: true } }],
         },
         aggregate: { count: ['id'] },
         groupBy: ['folder'],
@@ -175,6 +199,7 @@ export async function collectPartnerFolderIds(
 
 export function resetPartnerScope(): void {
   partnerScopeIds.value = null
+  partnerVisibility.value = null
   currentUserId.value = null
   ready.value = false
   _fetched = false
@@ -191,9 +216,14 @@ function sameIds(a: string[] | null, b: string[]): boolean {
 export function usePartnerScope() {
   const api = useApi()
 
-  const isPartnerScoped = computed(() => (partnerScopeIds.value?.length ?? 0) > 0)
+  const isPartnerScoped = computed(() => partnerVisibility.value === 'selected')
   /** Convenience for call sites that only care about a single accent/primary partner. */
   const primaryPartnerId = computed(() => partnerScopeIds.value?.[0] ?? null)
+  /** Bundles visibility + partner ids for the filter builders above. */
+  const viewerScope = computed<ViewerScope>(() => ({
+    visibility: partnerVisibility.value ?? 'all',
+    partnerIds: partnerScopeIds.value ?? [],
+  }))
 
   /**
    * Load partner scope for the current session.
@@ -228,18 +258,26 @@ export function usePartnerScope() {
     _fetching = (async () => {
       try {
         const res = await api.get('/users/me', {
-          params: { fields: ['id', 'partner_selected.partner_id'] },
+          params: { fields: ['id', 'partner_visibility', 'partner_selected.partner_id'] },
         })
-        const data = res.data?.data as { id?: unknown; partner_selected?: unknown } | undefined
+        const data = res.data?.data as
+          | { id?: unknown; partner_visibility?: unknown; partner_selected?: unknown }
+          | undefined
         const nextUserId = data?.id ? String(data.id) : null
+        const nextVisibility: 'all' | 'selected' = data?.partner_visibility === 'selected' ? 'selected' : 'all'
         const nextPartnerIds = extractPartnerIds(data?.partner_selected)
-        changed = currentUserId.value !== nextUserId || !sameIds(partnerScopeIds.value, nextPartnerIds)
+        changed =
+          currentUserId.value !== nextUserId ||
+          partnerVisibility.value !== nextVisibility ||
+          !sameIds(partnerScopeIds.value, nextPartnerIds)
         currentUserId.value = nextUserId
+        partnerVisibility.value = nextVisibility
         partnerScopeIds.value = nextPartnerIds
       } catch (err) {
         console.warn('[media-library] usePartnerScope: failed to fetch partner_selected', err)
-        changed = currentUserId.value !== null || partnerScopeIds.value != null
+        changed = currentUserId.value !== null || partnerScopeIds.value != null || partnerVisibility.value != null
         partnerScopeIds.value = null
+        partnerVisibility.value = null
         currentUserId.value = null
       } finally {
         _fetched = true
@@ -253,6 +291,8 @@ export function usePartnerScope() {
 
   return {
     partnerScopeIds,
+    partnerVisibility,
+    viewerScope,
     primaryPartnerId,
     currentUserId,
     isPartnerScoped,

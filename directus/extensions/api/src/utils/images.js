@@ -2,19 +2,38 @@ import { LOCALE_TO_ISO } from "../maps/language-code.map.js";
 import { restrictTo } from "../shared/response/visibility.js";
 import { getRequestBaseUrl } from "../api/shared/requestContext.js";
 
-function unwrapPartnerId(value) {
-  if (value == null || value === "") return null;
-  if (typeof value === "object") {
-    const id = value.id;
-    return id != null && id !== "" ? String(id) : null;
-  }
-  return String(value);
+/**
+ * `partner_selected` on directus_files/directus_users is M2M (an array of junction
+ * rows shaped `{ partner_id: { id, ... } }` or `{ partner_id: <id> }`) as of the
+ * multi-partner media change — unwrap to a plain list of partner id strings.
+ */
+function unwrapPartnerIds(value) {
+  if (value == null) return [];
+  const rows = Array.isArray(value) ? value : [value];
+  return rows
+    .map((row) => {
+      if (row == null) return null;
+      if (typeof row === "object") {
+        const partner = "partner_id" in row ? row.partner_id : row;
+        const id = partner != null && typeof partner === "object" ? partner.id : partner;
+        return id != null && id !== "" ? String(id) : null;
+      }
+      return String(row);
+    })
+    .filter((id) => id != null);
 }
 
 /**
- * Restricts assigned product media to the API user's partner.
- * All → keep every assigned file (including uploaders with no partner).
- * Selected → keep only files whose uploader's partner_selected matches; drop nulls.
+ * Restricts assigned product media to the API user's partner, using the same
+ * visibility-first rule as everywhere else in the system: explicit
+ * `partner_visibility` (`all`/`selected`) wins, `partner_selected` only matters
+ * when `selected`. The file's own scope is fully authoritative — every file
+ * always has an explicit `partner_visibility` now (schema default `all`), so
+ * there's no uploader fallback: that used to matter before files carried their
+ * own scope, and kept a loophole open (a file explicitly set to `selected` with
+ * nobody chosen yet was still shown to everyone whenever its uploader happened to
+ * be unrestricted).
+ * All → keep every assigned file. Selected → keep only files covered by the token's partner.
  */
 export function filterMediaJunctionByPartner(
   mediaJunctionRows,
@@ -22,15 +41,13 @@ export function filterMediaJunctionByPartner(
 ) {
   const rows = mediaJunctionRows ?? [];
   if (partnerVisibility !== "selected") return rows;
-  const expected = unwrapPartnerId(partnerId);
+  const expected = partnerId != null && partnerId !== "" ? String(partnerId) : null;
   if (!expected) return [];
   return rows.filter((row) => {
-    const uploader = row?.directus_files_id?.uploaded_by;
-    const uploaderPartner =
-      uploader != null && typeof uploader === "object"
-        ? unwrapPartnerId(uploader.partner_selected)
-        : null;
-    return uploaderPartner != null && uploaderPartner === expected;
+    const file = row?.directus_files_id;
+    if (!file) return false;
+    if (file.partner_visibility === "all") return true;
+    return unwrapPartnerIds(file.partner_selected).includes(expected);
   });
 }
 

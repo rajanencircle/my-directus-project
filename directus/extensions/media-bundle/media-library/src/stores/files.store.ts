@@ -23,9 +23,11 @@ export interface DirectusFile {
     first_name: string
     last_name: string
     avatar: string | null
+    partner_visibility?: 'all' | 'selected' | null
     partner_selected?: PartnerJunctionRow[] | null
   } | null
-  /** M2M — this file's own partner scope. Empty/absent = visible to all partners. */
+  /** This file's own partner scope. 'all' = visible to everyone regardless of partner_selected. */
+  partner_visibility?: 'all' | 'selected' | null
   partner_selected?: PartnerJunctionRow[] | null
   modified_on?: string | null
   modified_by?: string | { id: string; first_name: string; last_name: string; avatar?: string | null } | null
@@ -79,6 +81,7 @@ const FILE_FIELDS = [
   'uploaded_by.first_name',
   'uploaded_by.last_name',
   'uploaded_by.avatar',
+  'uploaded_by.partner_visibility',
   'uploaded_by.partner_selected.partner_id.id',
   'uploaded_by.partner_selected.partner_id.visually',
   'uploaded_by.partner_selected.partner_id.label',
@@ -107,7 +110,7 @@ export const useFilesStore = defineStore('media-library-files', () => {
   const api = useApi()
   const { useUserStore } = useStores()
   const userStore = useUserStore()
-  const { partnerScopeIds, isPartnerScoped } = usePartnerScope()
+  const { viewerScope, isPartnerScoped } = usePartnerScope()
 
   const files = ref<DirectusFile[]>([])
   const totalCount = ref(0)
@@ -275,7 +278,7 @@ export const useFilesStore = defineStore('media-library-files', () => {
         builtIn['uploaded_by'] = { _eq: currentUserId }
       }
     } else if (isPartnerScoped.value) {
-      Object.assign(builtIn, filesPartnerOrFilter(partnerScopeIds.value ?? []))
+      Object.assign(builtIn, filesPartnerOrFilter(viewerScope.value))
     }
 
     if (activeFilter.value === 'all' && folderTarget !== undefined) {

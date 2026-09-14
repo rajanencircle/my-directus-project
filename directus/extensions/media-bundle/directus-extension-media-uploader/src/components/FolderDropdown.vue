@@ -33,7 +33,7 @@ const emit = defineEmits<{
 }>();
 
 const api = useApi();
-const { partnerScopeIds, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
+const { viewerScope, isPartnerScoped, init: initPartnerScope } = usePartnerScope();
 
 const folders = ref<DirectusFolder[]>([]);
 const loading = ref(false);
@@ -211,8 +211,8 @@ async function fetchFolders(opts?: { silent?: boolean }) {
       rows = Array.isArray(res.data?.data) ? res.data.data : [];
     }
     const all = rows.map((r: Record<string, unknown>) => normalizeFolderRaw(r));
-    if (isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0) {
-      const allowed = await collectPartnerFolderIds(api, partnerScopeIds.value ?? [], all);
+    if (isPartnerScoped.value) {
+      const allowed = await collectPartnerFolderIds(api, viewerScope.value, all);
       folders.value = all.filter((f) => allowed.has(f.id));
     } else {
       folders.value = all;

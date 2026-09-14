@@ -19,7 +19,7 @@ import {
 } from '../../media-library/src/utils/downloadExecute';
 import type { SaveTarget } from '../../media-library/src/utils/zipDownloadShared';
 import { useMediaSettings } from '../../media-library/src/composables/useMediaSettings';
-import { usePartnerScope, partnerIdsFromCreatedBy } from '../../media-library/src/composables/usePartnerScope';
+import { usePartnerScope } from '../../media-library/src/composables/usePartnerScope';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -297,141 +297,6 @@ const filesFkRelation = computed(() => {
   return (relationsStore.relations as any[]).find((r) => r.collection === junction && r.field === fkField);
 });
 
-// ─── Partner conflict check (Ticket 1 — "Separating libraries correctly") ────
-// Auto-discover this collection's own partner M2M (e.g. hotels.partner,
-// excursions.partner_selected) the same way: find an M2M relation back to
-// `props.collection`, then confirm the same junction's other leg points at
-// `partner`. No per-collection config needed — works for any product
-// collection that follows the existing <collection>_partner convention.
-
-const collectionPartnerRelation = computed(() => {
-  const candidates = (relationsStore.relations as any[]).filter(
-    (r) => r.related_collection === props.collection && r.meta?.one_field,
-  );
-  for (const candidate of candidates) {
-    const partnerLeg = (relationsStore.relations as any[]).find(
-      (r) => r.collection === candidate.collection && r.related_collection === 'partner',
-    );
-    if (partnerLeg) return { collectionLeg: candidate, partnerLeg };
-  }
-  return null;
-});
-
-const partnerJunctionTable = computed(() => collectionPartnerRelation.value?.collectionLeg.collection ?? null);
-const partnerCollectionFkField = computed(() => collectionPartnerRelation.value?.collectionLeg.field ?? null);
-const partnerFkField = computed(() => collectionPartnerRelation.value?.partnerLeg.field ?? null);
-
-interface PartnerConflictFile {
-  junctionRowId: string | number;
-  fileId: string;
-  title: string;
-  partnerLabels: string[];
-}
-
-const partnerConflictOpen = ref(false);
-const partnerConflictFiles = ref<PartnerConflictFile[]>([]);
-const partnerConflictBusy = ref(false);
-const productPartnerIds = ref<string[]>([]);
-
-/**
- * Reconcile this product's current partner list against its attached media
- * (Option A: checked whenever this Media tab loads/reloads — no attempt to
- * detect "just added", so it will keep surfacing until resolved).
- */
-async function checkPartnerConflicts() {
-  if (isNewRecord.value) return;
-  if (!partnerJunctionTable.value || !partnerCollectionFkField.value || !partnerFkField.value) return;
-
-  try {
-    const res = await api.get(`/items/${partnerJunctionTable.value}`, {
-      params: {
-        filter: { [partnerCollectionFkField.value]: { _eq: props.primaryKey } },
-        fields: [`${partnerFkField.value}.id`],
-        limit: -1,
-      },
-    });
-    const rows = (res.data?.data ?? []) as Record<string, any>[];
-    const partnerIds = rows
-      .map((r) => r[partnerFkField.value]?.id ?? r[partnerFkField.value])
-      .filter((id) => id != null)
-      .map(String);
-    productPartnerIds.value = partnerIds;
-
-    // Empty partner list = product not restricted to specific partners — never a conflict.
-    if (partnerIds.length === 0) return;
-
-    const fk = filesFkField.value;
-    const conflicts: PartnerConflictFile[] = [];
-    for (const row of rowsDraft.value) {
-      const file = row[fk];
-      if (!file) continue;
-      const fileSelected = Array.isArray(file.partner_selected) ? file.partner_selected : [];
-      const filePartnerIds = fileSelected.map((p: any) => p.partner_id?.id).filter((id: any) => id != null);
-      if (filePartnerIds.length === 0) continue; // empty = visible to all, never a conflict
-      const covered = filePartnerIds.map(String).some((id: string) => partnerIds.includes(id));
-      if (covered) continue;
-
-      conflicts.push({
-        junctionRowId: row.id,
-        fileId: file.id,
-        title: file.title || file.filename_download || file.id,
-        partnerLabels: fileSelected.map((p: any) => p.partner_id?.label).filter(Boolean),
-      });
-    }
-
-    if (conflicts.length > 0) {
-      partnerConflictFiles.value = conflicts;
-      partnerConflictOpen.value = true;
-    }
-  } catch (err) {
-    console.warn('[media-uploader] checkPartnerConflicts failed', err);
-  }
-}
-
-async function resolvePartnerConflictExtend() {
-  partnerConflictBusy.value = true;
-  try {
-    const writes: Promise<any>[] = [];
-    for (const c of partnerConflictFiles.value) {
-      const existing = new Set(
-        (rowsDraft.value.find((r) => r.id === c.junctionRowId)?.[filesFkField.value]?.partner_selected ?? [])
-          .map((p: any) => String(p.partner_id?.id))
-          .filter(Boolean),
-      );
-      for (const partnerId of productPartnerIds.value) {
-        if (existing.has(partnerId)) continue;
-        writes.push(api.post('/items/files_partner', { directus_files_id: c.fileId, partner_id: partnerId }));
-      }
-    }
-    await Promise.all(writes);
-    partnerConflictOpen.value = false;
-    partnerConflictFiles.value = [];
-    await loadFiles();
-  } finally {
-    partnerConflictBusy.value = false;
-  }
-}
-
-async function resolvePartnerConflictRemove() {
-  partnerConflictBusy.value = true;
-  try {
-    await Promise.all(
-      partnerConflictFiles.value.map((c) => api.delete(`/items/${junctionTable.value}/${c.junctionRowId}`)),
-    );
-    partnerConflictOpen.value = false;
-    partnerConflictFiles.value = [];
-    await loadFiles();
-  } finally {
-    partnerConflictBusy.value = false;
-  }
-}
-
-function resolvePartnerConflictDismiss() {
-  // Leave everything as-is — will surface again next time this tab is viewed.
-  partnerConflictOpen.value = false;
-  partnerConflictFiles.value = [];
-}
-
 const filesRelatedCollection = computed(() => filesFkRelation.value?.related_collection ?? null);
 
 /** Junction has a `sort` column (e.g. hotels_directus_files.sort). */
@@ -587,13 +452,7 @@ function initJunction(): boolean {
 
 // ─── Data Loading ─────────────────────────────────────────────────────────────
 
-function fileUploaderPartnerIds(file: unknown): string[] {
-  if (file == null || typeof file !== 'object') return [];
-  const ub = (file as Record<string, unknown>).uploaded_by;
-  return partnerIdsFromCreatedBy(ub);
-}
-
-/** File's own partner_selected (M2M) — empty means visible to everyone. */
+/** File's own partner_selected (M2M). */
 function fileOwnPartnerIds(file: unknown): string[] {
   if (file == null || typeof file !== 'object') return [];
   const ps = (file as Record<string, unknown>).partner_selected;
@@ -606,12 +465,24 @@ function fileOwnPartnerIds(file: unknown): string[] {
     .filter((id): id is string => id != null);
 }
 
+/**
+ * The file's own `partner_visibility`/`partner_selected` is fully authoritative —
+ * every file always has an explicit value now (schema default `all`), so there is
+ * no uploader-fallback case left. (An earlier version fell back to the uploader's
+ * own scope for files with no explicit scope of their own — that's obsolete now
+ * and was a real access-control bug: a file explicitly set to `selected` with no
+ * partners chosen yet was still shown to everyone whenever its uploader happened
+ * to be unrestricted.)
+ */
 function isFileVisibleForPartner(file: unknown): boolean {
+  if (!isPartnerScoped.value) return true; // viewer partner_visibility === 'all'
   const scopeIds = partnerScopeIds.value ?? [];
-  if (!isPartnerScoped.value || scopeIds.length === 0) return true;
-  const ownIds = fileOwnPartnerIds(file);
-  if (ownIds.length > 0) return ownIds.some((id) => scopeIds.includes(id));
-  return fileUploaderPartnerIds(file).some((id) => scopeIds.includes(id));
+  if (scopeIds.length === 0) return false; // viewer 'selected' with no partners — sees nothing
+
+  const rec = file && typeof file === 'object' ? (file as Record<string, unknown>) : null;
+  if ((rec?.partner_visibility ?? 'all') === 'all') return true;
+
+  return fileOwnPartnerIds(file).some((id) => scopeIds.includes(id));
 }
 
 function splitRowsByPartner(rows: JunctionRow[]): { visible: JunctionRow[]; hidden: JunctionRow[] } {
@@ -653,9 +524,11 @@ async function loadFiles() {
       `${fk}.uploaded_by.first_name`,
       `${fk}.uploaded_by.last_name`,
       `${fk}.uploaded_by.email`,
+      `${fk}.uploaded_by.partner_visibility`,
       `${fk}.uploaded_by.partner_selected.partner_id.id`,
       `${fk}.uploaded_by.partner_selected.partner_id.visually`,
       `${fk}.uploaded_by.partner_selected.partner_id.label`,
+      `${fk}.partner_visibility`,
       `${fk}.partner_selected.partner_id.id`,
       `${fk}.partner_selected.partner_id.visually`,
       `${fk}.partner_selected.partner_id.label`,
@@ -790,9 +663,11 @@ async function fetchFilesByIds(fileIds: string[]) {
         'uploaded_by.first_name',
         'uploaded_by.last_name',
         'uploaded_by.email',
+        'uploaded_by.partner_visibility',
         'uploaded_by.partner_selected.partner_id.id',
         'uploaded_by.partner_selected.partner_id.visually',
         'uploaded_by.partner_selected.partner_id.label',
+        'partner_visibility',
         'partner_selected.partner_id.id',
         'partner_selected.partner_id.visually',
         'partner_selected.partner_id.label',
@@ -1088,7 +963,6 @@ onMounted(async () => {
     await hydrateDraftFromValue();
   } else {
     await loadFiles();
-    await checkPartnerConflicts();
   }
 });
 
@@ -1100,7 +974,6 @@ watch(
       junctionReady.value = ready;
       if (ready) {
         await loadFiles();
-        await checkPartnerConflicts();
       }
     }
   }
@@ -1287,56 +1160,10 @@ watch(
       :on-zip-download="handleBulkDownload"
       :on-single-download="handleBulkDownload"
     />
-
-    <v-dialog v-model="partnerConflictOpen" @esc="resolvePartnerConflictDismiss">
-      <v-card class="partner-conflict-card">
-        <v-card-title>Media partner conflict</v-card-title>
-        <v-card-text>
-          <p>
-            {{ partnerConflictFiles.length }} media item{{ partnerConflictFiles.length === 1 ? '' : 's' }} attached
-            here {{ partnerConflictFiles.length === 1 ? "isn't" : "aren't" }} visible to every partner this item is
-            scoped to. Choose how to resolve it:
-          </p>
-          <ul class="partner-conflict-list">
-            <li v-for="c in partnerConflictFiles.slice(0, 8)" :key="c.fileId">
-              <strong>{{ c.title }}</strong> — currently: {{ c.partnerLabels.join(', ') }}
-            </li>
-          </ul>
-          <p v-if="partnerConflictFiles.length > 8">…and {{ partnerConflictFiles.length - 8 }} more.</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-button secondary :loading="partnerConflictBusy" @click="resolvePartnerConflictDismiss">
-            Leave as-is
-          </v-button>
-          <v-button secondary :loading="partnerConflictBusy" @click="resolvePartnerConflictRemove">
-            Remove media from item
-          </v-button>
-          <v-button :loading="partnerConflictBusy" @click="resolvePartnerConflictExtend">
-            Extend media rights
-          </v-button>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
 <style scoped>
-.partner-conflict-card {
-  width: 520px;
-  max-width: 92vw;
-}
-
-.partner-conflict-list {
-  margin: 8px 0 0;
-  padding-left: 18px;
-  max-height: 220px;
-  overflow-y: auto;
-}
-
-.partner-conflict-list li {
-  margin-bottom: 4px;
-  font-size: 13px;
-}
 
 .media-uploader {
   display: flex;

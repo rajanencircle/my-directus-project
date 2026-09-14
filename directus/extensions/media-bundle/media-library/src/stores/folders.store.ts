@@ -63,7 +63,7 @@ function mapFolderRows(rows: unknown[]): RawFolder[] {
 
 export const useFoldersStore = defineStore('media-library-folders', () => {
   const api = useApi()
-  const { partnerScopeIds, currentUserId, isPartnerScoped, init: initPartnerScope } = usePartnerScope()
+  const { viewerScope, currentUserId, isPartnerScoped, init: initPartnerScope } = usePartnerScope()
 
   const rawFolders = ref<RawFolder[]>([])
   const selectedFolderId = ref<string | null>(null)
@@ -111,10 +111,10 @@ export const useFoldersStore = defineStore('media-library-folders', () => {
   }
 
   async function applyPartnerPrune(all: RawFolder[]): Promise<void> {
-    if (isPartnerScoped.value && (partnerScopeIds.value?.length ?? 0) > 0) {
+    if (isPartnerScoped.value) {
       const allowed = await collectPartnerFolderIds(
         api,
-        partnerScopeIds.value ?? [],
+        viewerScope.value,
         all.map((f) => ({ id: f.id, parent: f.parent, createdByPartnerIds: f.createdByPartnerIds })),
       )
       rawFolders.value = all.filter((f) => allowed.has(f.id))
